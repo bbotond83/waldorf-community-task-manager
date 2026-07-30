@@ -1,0 +1,1685 @@
+{
+  "workflow_id": "2026-07-29T15:09:07Z",
+  "scope": "feature",
+  "started_at": "2026-07-29T15:09:07Z",
+  "stages": [
+    {
+      "stage_slug": "workspace-scaffold",
+      "started_at": "2026-07-29T15:09:07Z",
+      "completed_at": "2026-07-29T15:09:07Z",
+      "agent": "orchestrator",
+      "memory_path": "aidlc/spaces/default/intents/260729-feature/initialization/workspace-scaffold/memory.md",
+      "memory_entries": null,
+      "memory_breakdown": null,
+      "sensor_firings": [],
+      "outcome": "approved",
+      "learnings_captured": {
+        "from_orchestrator": 0,
+        "from_user_addition": 0
+      }
+    },
+    {
+      "stage_slug": "workspace-detection",
+      "started_at": "2026-07-29T15:09:07Z",
+      "completed_at": "2026-07-29T15:09:07Z",
+      "agent": "orchestrator",
+      "memory_path": "aidlc/spaces/default/intents/260729-feature/initialization/workspace-detection/memory.md",
+      "memory_entries": null,
+      "memory_breakdown": null,
+      "sensor_firings": [],
+      "outcome": "approved",
+      "learnings_captured": {
+        "from_orchestrator": 0,
+        "from_user_addition": 0
+      }
+    },
+    {
+      "stage_slug": "state-init",
+      "started_at": "2026-07-29T15:09:07Z",
+      "completed_at": "2026-07-29T15:09:07Z",
+      "agent": "orchestrator",
+      "memory_path": "aidlc/spaces/default/intents/260729-feature/initialization/state-init/memory.md",
+      "memory_entries": null,
+      "memory_breakdown": null,
+      "sensor_firings": [],
+      "outcome": "approved",
+      "learnings_captured": {
+        "from_orchestrator": 0,
+        "from_user_addition": 0
+      }
+    },
+    {
+      "stage_slug": "intent-capture",
+      "started_at": "2026-07-29T15:09:07Z",
+      "completed_at": "2026-07-30T08:13:11Z",
+      "agent": "aidlc-product-agent",
+      "memory_path": "aidlc/spaces/default/intents/260729-feature/ideation/intent-capture/memory.md",
+      "memory_entries": 3,
+      "memory_breakdown": {
+        "interpretations": 1,
+        "deviations": 1,
+        "tradeoffs": 1,
+        "open_questions": 0
+      },
+      "sensor_firings": [
+        {
+          "id": "claim-sources",
+          "fire_id": "2b65bd0e",
+          "result": "passed",
+          "ts": "2026-07-29T15:09:57Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "fdb1618f",
+          "result": "passed",
+          "ts": "2026-07-29T15:09:57Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "bbfec754",
+          "result": "passed",
+          "ts": "2026-07-29T15:09:57Z"
+        },
+        {
+          "id": "claim-sources",
+          "fire_id": "e28db361",
+          "result": "passed",
+          "ts": "2026-07-29T15:09:57Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "2bcc300f",
+          "result": "passed",
+          "ts": "2026-07-29T15:09:57Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "01006c57",
+          "result": "passed",
+          "ts": "2026-07-29T15:09:57Z"
+        },
+        {
+          "id": "claim-sources",
+          "fire_id": "30a51036",
+          "result": "passed",
+          "ts": "2026-07-29T15:12:12Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "9df60284",
+          "result": "passed",
+          "ts": "2026-07-29T15:12:12Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "3a4c5dbc",
+          "result": "passed",
+          "ts": "2026-07-29T15:12:12Z"
+        },
+        {
+          "id": "claim-sources",
+          "fire_id": "84655e6d",
+          "result": "passed",
+          "ts": "2026-07-29T15:12:24Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "8234a260",
+          "result": "passed",
+          "ts": "2026-07-29T15:12:24Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "ce58af7f",
+          "result": "passed",
+          "ts": "2026-07-29T15:12:24Z"
+        },
+        {
+          "id": "claim-sources",
+          "fire_id": "adcf3ea0",
+          "result": "passed",
+          "ts": "2026-07-29T15:17:00Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "2b59a3aa",
+          "result": "passed",
+          "ts": "2026-07-29T15:17:00Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "c334586f",
+          "result": "passed",
+          "ts": "2026-07-29T15:17:00Z"
+        },
+        {
+          "id": "claim-sources",
+          "fire_id": "60ebae12",
+          "result": "passed",
+          "ts": "2026-07-29T15:17:09Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "d5720ead",
+          "result": "passed",
+          "ts": "2026-07-29T15:17:09Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "dde6c1dd",
+          "result": "passed",
+          "ts": "2026-07-29T15:17:09Z"
+        },
+        {
+          "id": "claim-sources",
+          "fire_id": "545fef07",
+          "result": "failed",
+          "ts": "2026-07-29T15:20:33Z",
+          "detail_path": "aidlc/spaces/default/intents/260729-feature/.aidlc-sensors/intent-capture/claim-sources-545fef07.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "162cb5ea",
+          "result": "passed",
+          "ts": "2026-07-29T15:20:33Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "4577b8b7",
+          "result": "passed",
+          "ts": "2026-07-29T15:20:33Z"
+        },
+        {
+          "id": "claim-sources",
+          "fire_id": "bdf131ef",
+          "result": "failed",
+          "ts": "2026-07-29T15:20:33Z",
+          "detail_path": "aidlc/spaces/default/intents/260729-feature/.aidlc-sensors/intent-capture/claim-sources-bdf131ef.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "5415b22c",
+          "result": "passed",
+          "ts": "2026-07-29T15:20:33Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "0fba2968",
+          "result": "passed",
+          "ts": "2026-07-29T15:20:33Z"
+        },
+        {
+          "id": "claim-sources",
+          "fire_id": "1832e724",
+          "result": "failed",
+          "ts": "2026-07-29T15:20:33Z",
+          "detail_path": "aidlc/spaces/default/intents/260729-feature/.aidlc-sensors/intent-capture/claim-sources-1832e724.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "a643ee8c",
+          "result": "passed",
+          "ts": "2026-07-29T15:20:33Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "b9e2e954",
+          "result": "passed",
+          "ts": "2026-07-29T15:20:33Z"
+        },
+        {
+          "id": "claim-sources",
+          "fire_id": "42ecb811",
+          "result": "failed",
+          "ts": "2026-07-29T15:20:42Z",
+          "detail_path": "aidlc/spaces/default/intents/260729-feature/.aidlc-sensors/intent-capture/claim-sources-42ecb811.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "903f1209",
+          "result": "passed",
+          "ts": "2026-07-29T15:20:42Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "074baa29",
+          "result": "passed",
+          "ts": "2026-07-29T15:20:42Z"
+        },
+        {
+          "id": "claim-sources",
+          "fire_id": "07571085",
+          "result": "failed",
+          "ts": "2026-07-29T15:24:05Z",
+          "detail_path": "aidlc/spaces/default/intents/260729-feature/.aidlc-sensors/intent-capture/claim-sources-07571085.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "31097810",
+          "result": "passed",
+          "ts": "2026-07-29T15:24:05Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "2194aa4b",
+          "result": "passed",
+          "ts": "2026-07-29T15:24:05Z"
+        },
+        {
+          "id": "claim-sources",
+          "fire_id": "5143e937",
+          "result": "failed",
+          "ts": "2026-07-29T15:24:49Z",
+          "detail_path": "aidlc/spaces/default/intents/260729-feature/.aidlc-sensors/intent-capture/claim-sources-5143e937.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "e5a4aee0",
+          "result": "passed",
+          "ts": "2026-07-29T15:24:49Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "c5805a1d",
+          "result": "passed",
+          "ts": "2026-07-29T15:24:49Z"
+        },
+        {
+          "id": "claim-sources",
+          "fire_id": "3596f6c4",
+          "result": "failed",
+          "ts": "2026-07-29T15:25:10Z",
+          "detail_path": "aidlc/spaces/default/intents/260729-feature/.aidlc-sensors/intent-capture/claim-sources-3596f6c4.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "9aafdddf",
+          "result": "passed",
+          "ts": "2026-07-29T15:25:10Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "a89e5e1b",
+          "result": "passed",
+          "ts": "2026-07-29T15:25:10Z"
+        },
+        {
+          "id": "claim-sources",
+          "fire_id": "7cc7bd84",
+          "result": "failed",
+          "ts": "2026-07-29T15:25:10Z",
+          "detail_path": "aidlc/spaces/default/intents/260729-feature/.aidlc-sensors/intent-capture/claim-sources-7cc7bd84.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "e9e2a2cd",
+          "result": "passed",
+          "ts": "2026-07-29T15:25:10Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "929c1b7e",
+          "result": "passed",
+          "ts": "2026-07-29T15:25:10Z"
+        },
+        {
+          "id": "claim-sources",
+          "fire_id": "84a0471e",
+          "result": "failed",
+          "ts": "2026-07-29T15:25:34Z",
+          "detail_path": "aidlc/spaces/default/intents/260729-feature/.aidlc-sensors/intent-capture/claim-sources-84a0471e.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "6617a045",
+          "result": "passed",
+          "ts": "2026-07-29T15:25:34Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "0728ee5d",
+          "result": "passed",
+          "ts": "2026-07-29T15:25:34Z"
+        },
+        {
+          "id": "claim-sources",
+          "fire_id": "ba4578db",
+          "result": "failed",
+          "ts": "2026-07-29T15:25:53Z",
+          "detail_path": "aidlc/spaces/default/intents/260729-feature/.aidlc-sensors/intent-capture/claim-sources-ba4578db.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "801c3514",
+          "result": "passed",
+          "ts": "2026-07-29T15:25:53Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "426be6f0",
+          "result": "passed",
+          "ts": "2026-07-29T15:25:53Z"
+        },
+        {
+          "id": "claim-sources",
+          "fire_id": "ad5d84f3",
+          "result": "failed",
+          "ts": "2026-07-29T15:26:12Z",
+          "detail_path": "aidlc/spaces/default/intents/260729-feature/.aidlc-sensors/intent-capture/claim-sources-ad5d84f3.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "805ed183",
+          "result": "passed",
+          "ts": "2026-07-29T15:26:12Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "204b1a17",
+          "result": "passed",
+          "ts": "2026-07-29T15:26:12Z"
+        },
+        {
+          "id": "claim-sources",
+          "fire_id": "b7c5bdc1",
+          "result": "failed",
+          "ts": "2026-07-29T15:26:12Z",
+          "detail_path": "aidlc/spaces/default/intents/260729-feature/.aidlc-sensors/intent-capture/claim-sources-b7c5bdc1.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "d1adf881",
+          "result": "passed",
+          "ts": "2026-07-29T15:26:12Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "f8fae624",
+          "result": "passed",
+          "ts": "2026-07-29T15:26:12Z"
+        },
+        {
+          "id": "claim-sources",
+          "fire_id": "65494c9c",
+          "result": "failed",
+          "ts": "2026-07-29T15:32:37Z",
+          "detail_path": "aidlc/spaces/default/intents/260729-feature/.aidlc-sensors/intent-capture/claim-sources-65494c9c.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "09492d7f",
+          "result": "passed",
+          "ts": "2026-07-29T15:32:37Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "f9158bb4",
+          "result": "passed",
+          "ts": "2026-07-29T15:32:37Z"
+        },
+        {
+          "id": "claim-sources",
+          "fire_id": "87307c4c",
+          "result": "failed",
+          "ts": "2026-07-29T15:32:54Z",
+          "detail_path": "aidlc/spaces/default/intents/260729-feature/.aidlc-sensors/intent-capture/claim-sources-87307c4c.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "614141bf",
+          "result": "passed",
+          "ts": "2026-07-29T15:32:54Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "33b27d28",
+          "result": "passed",
+          "ts": "2026-07-29T15:32:54Z"
+        },
+        {
+          "id": "claim-sources",
+          "fire_id": "27e01949",
+          "result": "failed",
+          "ts": "2026-07-29T15:36:10Z",
+          "detail_path": "aidlc/spaces/default/intents/260729-feature/.aidlc-sensors/intent-capture/claim-sources-27e01949.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "52ad6a03",
+          "result": "passed",
+          "ts": "2026-07-29T15:36:10Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "46396f95",
+          "result": "passed",
+          "ts": "2026-07-29T15:36:10Z"
+        },
+        {
+          "id": "claim-sources",
+          "fire_id": "bf0900dd",
+          "result": "failed",
+          "ts": "2026-07-29T15:36:10Z",
+          "detail_path": "aidlc/spaces/default/intents/260729-feature/.aidlc-sensors/intent-capture/claim-sources-bf0900dd.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "6e18ceb1",
+          "result": "passed",
+          "ts": "2026-07-29T15:36:11Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "8211c4c0",
+          "result": "passed",
+          "ts": "2026-07-29T15:36:11Z"
+        },
+        {
+          "id": "claim-sources",
+          "fire_id": "f9b8159c",
+          "result": "failed",
+          "ts": "2026-07-29T15:36:33Z",
+          "detail_path": "aidlc/spaces/default/intents/260729-feature/.aidlc-sensors/intent-capture/claim-sources-f9b8159c.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "ab89d1ce",
+          "result": "passed",
+          "ts": "2026-07-29T15:36:33Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "e510c2e7",
+          "result": "passed",
+          "ts": "2026-07-29T15:36:33Z"
+        },
+        {
+          "id": "claim-sources",
+          "fire_id": "9cab9cd0",
+          "result": "failed",
+          "ts": "2026-07-29T15:36:42Z",
+          "detail_path": "aidlc/spaces/default/intents/260729-feature/.aidlc-sensors/intent-capture/claim-sources-9cab9cd0.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "ccf8216c",
+          "result": "passed",
+          "ts": "2026-07-29T15:36:42Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "d638a284",
+          "result": "passed",
+          "ts": "2026-07-29T15:36:42Z"
+        },
+        {
+          "id": "claim-sources",
+          "fire_id": "9099c416",
+          "result": "failed",
+          "ts": "2026-07-29T15:36:43Z",
+          "detail_path": "aidlc/spaces/default/intents/260729-feature/.aidlc-sensors/intent-capture/claim-sources-9099c416.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "fa490687",
+          "result": "passed",
+          "ts": "2026-07-29T15:36:43Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "9cfa6886",
+          "result": "passed",
+          "ts": "2026-07-29T15:36:43Z"
+        },
+        {
+          "id": "claim-sources",
+          "fire_id": "fde8adb1",
+          "result": "failed",
+          "ts": "2026-07-29T16:03:19Z",
+          "detail_path": "aidlc/spaces/default/intents/260729-feature/.aidlc-sensors/intent-capture/claim-sources-fde8adb1.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "9e00c65d",
+          "result": "passed",
+          "ts": "2026-07-29T16:03:19Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "cefc19f2",
+          "result": "passed",
+          "ts": "2026-07-29T16:03:19Z"
+        },
+        {
+          "id": "claim-sources",
+          "fire_id": "085787fc",
+          "result": "failed",
+          "ts": "2026-07-30T08:01:51Z",
+          "detail_path": "aidlc/spaces/default/intents/260729-feature/.aidlc-sensors/intent-capture/claim-sources-085787fc.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "295dc880",
+          "result": "passed",
+          "ts": "2026-07-30T08:01:51Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "01671fa8",
+          "result": "passed",
+          "ts": "2026-07-30T08:01:51Z"
+        },
+        {
+          "id": "claim-sources",
+          "fire_id": "2ae07e5c",
+          "result": "failed",
+          "ts": "2026-07-30T08:01:58Z",
+          "detail_path": "aidlc/spaces/default/intents/260729-feature/.aidlc-sensors/intent-capture/claim-sources-2ae07e5c.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "d2af24ae",
+          "result": "passed",
+          "ts": "2026-07-30T08:01:58Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "58eb56e1",
+          "result": "passed",
+          "ts": "2026-07-30T08:01:59Z"
+        },
+        {
+          "id": "claim-sources",
+          "fire_id": "69677f9f",
+          "result": "failed",
+          "ts": "2026-07-30T08:02:55Z",
+          "detail_path": "aidlc/spaces/default/intents/260729-feature/.aidlc-sensors/intent-capture/claim-sources-69677f9f.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "08c6f14b",
+          "result": "passed",
+          "ts": "2026-07-30T08:02:55Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "7ea3f34c",
+          "result": "passed",
+          "ts": "2026-07-30T08:02:55Z"
+        },
+        {
+          "id": "claim-sources",
+          "fire_id": "1431467b",
+          "result": "failed",
+          "ts": "2026-07-30T08:03:07Z",
+          "detail_path": "aidlc/spaces/default/intents/260729-feature/.aidlc-sensors/intent-capture/claim-sources-1431467b.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "451b6d63",
+          "result": "passed",
+          "ts": "2026-07-30T08:03:07Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "145bbfd9",
+          "result": "passed",
+          "ts": "2026-07-30T08:03:07Z"
+        },
+        {
+          "id": "claim-sources",
+          "fire_id": "40e6c69f",
+          "result": "failed",
+          "ts": "2026-07-30T08:03:07Z",
+          "detail_path": "aidlc/spaces/default/intents/260729-feature/.aidlc-sensors/intent-capture/claim-sources-40e6c69f.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "fbf9a321",
+          "result": "passed",
+          "ts": "2026-07-30T08:03:07Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "9edc2dfa",
+          "result": "passed",
+          "ts": "2026-07-30T08:03:07Z"
+        },
+        {
+          "id": "claim-sources",
+          "fire_id": "a50fc7be",
+          "result": "failed",
+          "ts": "2026-07-30T08:10:19Z",
+          "detail_path": "aidlc/spaces/default/intents/260729-feature/.aidlc-sensors/intent-capture/claim-sources-a50fc7be.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "da3729bd",
+          "result": "passed",
+          "ts": "2026-07-30T08:10:20Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "3fc12cd2",
+          "result": "passed",
+          "ts": "2026-07-30T08:10:20Z"
+        },
+        {
+          "id": "claim-sources",
+          "fire_id": "9fb9ee2f",
+          "result": "failed",
+          "ts": "2026-07-30T08:11:20Z",
+          "detail_path": "aidlc/spaces/default/intents/260729-feature/.aidlc-sensors/intent-capture/claim-sources-9fb9ee2f.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "f1b303d7",
+          "result": "passed",
+          "ts": "2026-07-30T08:11:21Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "1e3febbf",
+          "result": "passed",
+          "ts": "2026-07-30T08:11:21Z"
+        },
+        {
+          "id": "claim-sources",
+          "fire_id": "1a8a072e",
+          "result": "failed",
+          "ts": "2026-07-30T08:11:21Z",
+          "detail_path": "aidlc/spaces/default/intents/260729-feature/.aidlc-sensors/intent-capture/claim-sources-1a8a072e.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "5993c856",
+          "result": "passed",
+          "ts": "2026-07-30T08:11:21Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "7075d74f",
+          "result": "passed",
+          "ts": "2026-07-30T08:11:21Z"
+        },
+        {
+          "id": "claim-sources",
+          "fire_id": "f06ef94b",
+          "result": "failed",
+          "ts": "2026-07-30T08:11:33Z",
+          "detail_path": "aidlc/spaces/default/intents/260729-feature/.aidlc-sensors/intent-capture/claim-sources-f06ef94b.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "764c8af2",
+          "result": "passed",
+          "ts": "2026-07-30T08:11:33Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "8f19fafc",
+          "result": "passed",
+          "ts": "2026-07-30T08:11:33Z"
+        },
+        {
+          "id": "claim-sources",
+          "fire_id": "4a473ecf",
+          "result": "failed",
+          "ts": "2026-07-30T08:11:34Z",
+          "detail_path": "aidlc/spaces/default/intents/260729-feature/.aidlc-sensors/intent-capture/claim-sources-4a473ecf.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "b721eee7",
+          "result": "passed",
+          "ts": "2026-07-30T08:11:34Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "90c5e3be",
+          "result": "passed",
+          "ts": "2026-07-30T08:11:34Z"
+        },
+        {
+          "id": "claim-sources",
+          "fire_id": "77c906a4",
+          "result": "failed",
+          "ts": "2026-07-30T08:12:10Z",
+          "detail_path": "aidlc/spaces/default/intents/260729-feature/.aidlc-sensors/intent-capture/claim-sources-77c906a4.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "2889cdf5",
+          "result": "passed",
+          "ts": "2026-07-30T08:12:10Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "36355f90",
+          "result": "passed",
+          "ts": "2026-07-30T08:12:10Z"
+        },
+        {
+          "id": "claim-sources",
+          "fire_id": "4a11c857",
+          "result": "failed",
+          "ts": "2026-07-30T08:12:16Z",
+          "detail_path": "aidlc/spaces/default/intents/260729-feature/.aidlc-sensors/intent-capture/claim-sources-4a11c857.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "90580a3b",
+          "result": "passed",
+          "ts": "2026-07-30T08:12:16Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "83fa60df",
+          "result": "passed",
+          "ts": "2026-07-30T08:12:16Z"
+        }
+      ],
+      "outcome": "approved",
+      "learnings_captured": {
+        "from_orchestrator": 0,
+        "from_user_addition": 0
+      }
+    },
+    {
+      "stage_slug": "market-research",
+      "started_at": "2026-07-30T08:13:11Z",
+      "completed_at": "2026-07-30T08:59:06Z",
+      "agent": "aidlc-product-agent",
+      "memory_path": "aidlc/spaces/default/intents/260729-feature/ideation/market-research/memory.md",
+      "memory_entries": 3,
+      "memory_breakdown": {
+        "interpretations": 2,
+        "deviations": 0,
+        "tradeoffs": 1,
+        "open_questions": 0
+      },
+      "sensor_firings": [
+        {
+          "id": "required-sections",
+          "fire_id": "26f48ea5",
+          "result": "passed",
+          "ts": "2026-07-30T08:16:39Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "2e972ea0",
+          "result": "passed",
+          "ts": "2026-07-30T08:16:39Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "6423887a",
+          "result": "passed",
+          "ts": "2026-07-30T08:16:39Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "8f8a3bad",
+          "result": "passed",
+          "ts": "2026-07-30T08:16:40Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "d87cfc4c",
+          "result": "passed",
+          "ts": "2026-07-30T08:19:53Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "eddb55db",
+          "result": "passed",
+          "ts": "2026-07-30T08:19:53Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "69218767",
+          "result": "passed",
+          "ts": "2026-07-30T08:42:48Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "ec5ac25e",
+          "result": "passed",
+          "ts": "2026-07-30T08:42:48Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "8039b34d",
+          "result": "passed",
+          "ts": "2026-07-30T08:42:48Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "1d354550",
+          "result": "passed",
+          "ts": "2026-07-30T08:42:48Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "ff904456",
+          "result": "passed",
+          "ts": "2026-07-30T08:42:49Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "43b2339c",
+          "result": "passed",
+          "ts": "2026-07-30T08:42:49Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "68acb2f3",
+          "result": "passed",
+          "ts": "2026-07-30T08:42:49Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "c8b7c6c3",
+          "result": "passed",
+          "ts": "2026-07-30T08:42:49Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "67d88ea7",
+          "result": "passed",
+          "ts": "2026-07-30T08:42:49Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "fb181419",
+          "result": "passed",
+          "ts": "2026-07-30T08:42:49Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "40201611",
+          "result": "passed",
+          "ts": "2026-07-30T08:42:59Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "b1a47820",
+          "result": "passed",
+          "ts": "2026-07-30T08:42:59Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "847fea02",
+          "result": "passed",
+          "ts": "2026-07-30T08:42:59Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "d3cb0292",
+          "result": "passed",
+          "ts": "2026-07-30T08:42:59Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "64f2d9cc",
+          "result": "passed",
+          "ts": "2026-07-30T08:42:59Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "bc51862f",
+          "result": "passed",
+          "ts": "2026-07-30T08:42:59Z"
+        }
+      ],
+      "outcome": "approved",
+      "learnings_captured": {
+        "from_orchestrator": 0,
+        "from_user_addition": 0
+      }
+    },
+    {
+      "stage_slug": "feasibility",
+      "started_at": "2026-07-30T08:59:06Z",
+      "completed_at": "2026-07-30T09:30:47Z",
+      "agent": "aidlc-architect-agent",
+      "memory_path": "aidlc/spaces/default/intents/260729-feature/ideation/feasibility/memory.md",
+      "memory_entries": 4,
+      "memory_breakdown": {
+        "interpretations": 2,
+        "deviations": 0,
+        "tradeoffs": 1,
+        "open_questions": 1
+      },
+      "sensor_firings": [
+        {
+          "id": "required-sections",
+          "fire_id": "62398b7a",
+          "result": "passed",
+          "ts": "2026-07-30T08:59:39Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "124ab592",
+          "result": "passed",
+          "ts": "2026-07-30T08:59:39Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "788c792f",
+          "result": "passed",
+          "ts": "2026-07-30T08:59:39Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "267c28fc",
+          "result": "passed",
+          "ts": "2026-07-30T08:59:39Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "e90cd2dc",
+          "result": "passed",
+          "ts": "2026-07-30T09:04:32Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "9fc24553",
+          "result": "passed",
+          "ts": "2026-07-30T09:04:32Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "5b1ddf5d",
+          "result": "passed",
+          "ts": "2026-07-30T09:06:16Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "a3c66ef5",
+          "result": "passed",
+          "ts": "2026-07-30T09:06:16Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "4488d9bd",
+          "result": "passed",
+          "ts": "2026-07-30T09:06:17Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "7c92da3c",
+          "result": "passed",
+          "ts": "2026-07-30T09:06:17Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "3be05428",
+          "result": "passed",
+          "ts": "2026-07-30T09:06:17Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "8381d37d",
+          "result": "passed",
+          "ts": "2026-07-30T09:06:17Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "7b43784a",
+          "result": "passed",
+          "ts": "2026-07-30T09:06:17Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "7a631cc0",
+          "result": "passed",
+          "ts": "2026-07-30T09:06:17Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "776dd920",
+          "result": "passed",
+          "ts": "2026-07-30T09:06:17Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "b7e77951",
+          "result": "passed",
+          "ts": "2026-07-30T09:06:17Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "71f34f74",
+          "result": "passed",
+          "ts": "2026-07-30T09:06:27Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "e8966f78",
+          "result": "passed",
+          "ts": "2026-07-30T09:06:27Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "c35976bc",
+          "result": "passed",
+          "ts": "2026-07-30T09:06:27Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "f3711c42",
+          "result": "passed",
+          "ts": "2026-07-30T09:06:27Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "2ada9290",
+          "result": "passed",
+          "ts": "2026-07-30T09:06:27Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "fb5e4540",
+          "result": "passed",
+          "ts": "2026-07-30T09:06:27Z"
+        }
+      ],
+      "outcome": "approved",
+      "learnings_captured": {
+        "from_orchestrator": 0,
+        "from_user_addition": 0
+      }
+    },
+    {
+      "stage_slug": "scope-definition",
+      "started_at": "2026-07-30T09:30:47Z",
+      "completed_at": "2026-07-30T10:32:55Z",
+      "agent": "aidlc-product-agent",
+      "memory_path": "aidlc/spaces/default/intents/260729-feature/ideation/scope-definition/memory.md",
+      "memory_entries": 2,
+      "memory_breakdown": {
+        "interpretations": 1,
+        "deviations": 0,
+        "tradeoffs": 1,
+        "open_questions": 0
+      },
+      "sensor_firings": [
+        {
+          "id": "required-sections",
+          "fire_id": "292dceca",
+          "result": "passed",
+          "ts": "2026-07-30T09:31:42Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "15c6b190",
+          "result": "passed",
+          "ts": "2026-07-30T09:31:42Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "0e5ee035",
+          "result": "passed",
+          "ts": "2026-07-30T09:31:42Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "3c48c043",
+          "result": "passed",
+          "ts": "2026-07-30T09:31:42Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "ce786a64",
+          "result": "passed",
+          "ts": "2026-07-30T09:45:51Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "ae758813",
+          "result": "passed",
+          "ts": "2026-07-30T09:45:51Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "37d1c42c",
+          "result": "passed",
+          "ts": "2026-07-30T09:45:51Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "708b4810",
+          "result": "passed",
+          "ts": "2026-07-30T09:45:51Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "03ebdf54",
+          "result": "passed",
+          "ts": "2026-07-30T09:45:51Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "86bc0cfa",
+          "result": "passed",
+          "ts": "2026-07-30T09:45:51Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "b27dfe04",
+          "result": "passed",
+          "ts": "2026-07-30T09:45:52Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "1a4fcfd0",
+          "result": "passed",
+          "ts": "2026-07-30T09:45:52Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "f56aa5f0",
+          "result": "passed",
+          "ts": "2026-07-30T09:45:59Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "7f43c7d3",
+          "result": "passed",
+          "ts": "2026-07-30T09:45:59Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "9e72fac4",
+          "result": "passed",
+          "ts": "2026-07-30T09:45:59Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "671bfbec",
+          "result": "passed",
+          "ts": "2026-07-30T09:45:59Z"
+        }
+      ],
+      "outcome": "approved",
+      "learnings_captured": {
+        "from_orchestrator": 0,
+        "from_user_addition": 0
+      }
+    },
+    {
+      "stage_slug": "team-formation",
+      "started_at": "2026-07-30T10:32:55Z",
+      "completed_at": "2026-07-30T10:42:08Z",
+      "agent": "aidlc-delivery-agent",
+      "memory_path": "aidlc/spaces/default/intents/260729-feature/ideation/team-formation/memory.md",
+      "memory_entries": null,
+      "memory_breakdown": null,
+      "sensor_firings": [
+        {
+          "id": "required-sections",
+          "fire_id": "2d3b118e",
+          "result": "passed",
+          "ts": "2026-07-30T10:35:11Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "da8925e6",
+          "result": "passed",
+          "ts": "2026-07-30T10:35:11Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "e26d6969",
+          "result": "passed",
+          "ts": "2026-07-30T10:36:55Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "95cb0ea9",
+          "result": "failed",
+          "ts": "2026-07-30T10:36:55Z",
+          "detail_path": "aidlc/spaces/default/intents/260729-feature/.aidlc-sensors/team-formation/upstream-coverage-95cb0ea9.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "8571a37f",
+          "result": "passed",
+          "ts": "2026-07-30T10:36:55Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "a4bae73a",
+          "result": "failed",
+          "ts": "2026-07-30T10:36:55Z",
+          "detail_path": "aidlc/spaces/default/intents/260729-feature/.aidlc-sensors/team-formation/upstream-coverage-a4bae73a.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "331af830",
+          "result": "passed",
+          "ts": "2026-07-30T10:36:55Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "996ba64e",
+          "result": "failed",
+          "ts": "2026-07-30T10:36:55Z",
+          "detail_path": "aidlc/spaces/default/intents/260729-feature/.aidlc-sensors/team-formation/upstream-coverage-996ba64e.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "8cb8b40c",
+          "result": "passed",
+          "ts": "2026-07-30T10:36:55Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "9b64d5b6",
+          "result": "failed",
+          "ts": "2026-07-30T10:36:55Z",
+          "detail_path": "aidlc/spaces/default/intents/260729-feature/.aidlc-sensors/team-formation/upstream-coverage-9b64d5b6.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "bd3428f7",
+          "result": "passed",
+          "ts": "2026-07-30T10:38:48Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "1a857eb6",
+          "result": "failed",
+          "ts": "2026-07-30T10:38:48Z",
+          "detail_path": "aidlc/spaces/default/intents/260729-feature/.aidlc-sensors/team-formation/upstream-coverage-1a857eb6.md"
+        }
+      ],
+      "outcome": "approved",
+      "learnings_captured": {
+        "from_orchestrator": 0,
+        "from_user_addition": 0
+      }
+    },
+    {
+      "stage_slug": "rough-mockups",
+      "started_at": "2026-07-30T10:42:08Z",
+      "completed_at": "2026-07-30T14:30:24Z",
+      "agent": "aidlc-design-agent",
+      "memory_path": "aidlc/spaces/default/intents/260729-feature/ideation/rough-mockups/memory.md",
+      "memory_entries": null,
+      "memory_breakdown": null,
+      "sensor_firings": [
+        {
+          "id": "required-sections",
+          "fire_id": "057c214d",
+          "result": "passed",
+          "ts": "2026-07-30T10:51:56Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "9a6cd4c4",
+          "result": "passed",
+          "ts": "2026-07-30T10:51:56Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "05fe9b58",
+          "result": "passed",
+          "ts": "2026-07-30T10:58:05Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "68f110fc",
+          "result": "failed",
+          "ts": "2026-07-30T10:58:05Z",
+          "detail_path": "aidlc/spaces/default/intents/260729-feature/.aidlc-sensors/rough-mockups/upstream-coverage-68f110fc.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "8cd39388",
+          "result": "passed",
+          "ts": "2026-07-30T10:58:06Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "775ba6e4",
+          "result": "failed",
+          "ts": "2026-07-30T10:58:06Z",
+          "detail_path": "aidlc/spaces/default/intents/260729-feature/.aidlc-sensors/rough-mockups/upstream-coverage-775ba6e4.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "aa1c3e65",
+          "result": "passed",
+          "ts": "2026-07-30T10:58:06Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "b1413f91",
+          "result": "failed",
+          "ts": "2026-07-30T10:58:06Z",
+          "detail_path": "aidlc/spaces/default/intents/260729-feature/.aidlc-sensors/rough-mockups/upstream-coverage-b1413f91.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "9abdd342",
+          "result": "passed",
+          "ts": "2026-07-30T11:50:10Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "c41032a8",
+          "result": "failed",
+          "ts": "2026-07-30T11:50:10Z",
+          "detail_path": "aidlc/spaces/default/intents/260729-feature/.aidlc-sensors/rough-mockups/upstream-coverage-c41032a8.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "a7bcf9f8",
+          "result": "passed",
+          "ts": "2026-07-30T11:52:23Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "b62e9064",
+          "result": "passed",
+          "ts": "2026-07-30T11:52:23Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "2c1ecd26",
+          "result": "passed",
+          "ts": "2026-07-30T11:52:23Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "f99fb95a",
+          "result": "passed",
+          "ts": "2026-07-30T11:52:23Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "36fc722b",
+          "result": "passed",
+          "ts": "2026-07-30T11:52:23Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "4542a70e",
+          "result": "passed",
+          "ts": "2026-07-30T11:52:23Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "ec30d876",
+          "result": "passed",
+          "ts": "2026-07-30T11:58:47Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "6e626e31",
+          "result": "passed",
+          "ts": "2026-07-30T11:58:47Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "d9c0c346",
+          "result": "passed",
+          "ts": "2026-07-30T11:59:21Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "ce8049a1",
+          "result": "passed",
+          "ts": "2026-07-30T11:59:21Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "4c4b0640",
+          "result": "passed",
+          "ts": "2026-07-30T11:59:28Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "d4936457",
+          "result": "passed",
+          "ts": "2026-07-30T11:59:28Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "75e0369a",
+          "result": "passed",
+          "ts": "2026-07-30T12:01:00Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "60fa08be",
+          "result": "passed",
+          "ts": "2026-07-30T12:01:00Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "6cd3f581",
+          "result": "passed",
+          "ts": "2026-07-30T12:04:54Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "b7a2aaaf",
+          "result": "passed",
+          "ts": "2026-07-30T12:04:54Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "6bb85534",
+          "result": "passed",
+          "ts": "2026-07-30T12:04:54Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "228943c3",
+          "result": "passed",
+          "ts": "2026-07-30T12:04:54Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "2696ad36",
+          "result": "passed",
+          "ts": "2026-07-30T12:09:57Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "34d69c2c",
+          "result": "passed",
+          "ts": "2026-07-30T12:13:04Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "5f064963",
+          "result": "passed",
+          "ts": "2026-07-30T12:13:05Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "6716e1fd",
+          "result": "passed",
+          "ts": "2026-07-30T12:13:05Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "ca1767ca",
+          "result": "passed",
+          "ts": "2026-07-30T12:13:05Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "ba801415",
+          "result": "passed",
+          "ts": "2026-07-30T12:13:27Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "6b2e58df",
+          "result": "passed",
+          "ts": "2026-07-30T12:15:56Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "8454bb6a",
+          "result": "passed",
+          "ts": "2026-07-30T12:15:56Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "ac705a7c",
+          "result": "passed",
+          "ts": "2026-07-30T12:18:45Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "937bd4ac",
+          "result": "passed",
+          "ts": "2026-07-30T12:18:46Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "8db206ce",
+          "result": "passed",
+          "ts": "2026-07-30T13:34:29Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "0a3ac7ee",
+          "result": "passed",
+          "ts": "2026-07-30T13:34:29Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "b1cb07d8",
+          "result": "passed",
+          "ts": "2026-07-30T13:36:28Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "dee5b410",
+          "result": "passed",
+          "ts": "2026-07-30T13:36:28Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "a5d1ed3d",
+          "result": "passed",
+          "ts": "2026-07-30T13:40:51Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "4ed85f92",
+          "result": "passed",
+          "ts": "2026-07-30T13:40:51Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "8cc665fe",
+          "result": "passed",
+          "ts": "2026-07-30T13:45:18Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "7fd58fa5",
+          "result": "passed",
+          "ts": "2026-07-30T13:45:18Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "51b8d7ac",
+          "result": "passed",
+          "ts": "2026-07-30T13:52:17Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "e7b3fbb3",
+          "result": "passed",
+          "ts": "2026-07-30T13:52:17Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "fd04dc47",
+          "result": "passed",
+          "ts": "2026-07-30T13:57:55Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "9b7a7cc6",
+          "result": "passed",
+          "ts": "2026-07-30T13:57:55Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "f16518a7",
+          "result": "passed",
+          "ts": "2026-07-30T14:04:00Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "65152d63",
+          "result": "passed",
+          "ts": "2026-07-30T14:04:00Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "9b1d4418",
+          "result": "passed",
+          "ts": "2026-07-30T14:04:00Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "d80fdd75",
+          "result": "passed",
+          "ts": "2026-07-30T14:04:00Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "56d8ac3f",
+          "result": "passed",
+          "ts": "2026-07-30T14:12:13Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "aed1e3c0",
+          "result": "passed",
+          "ts": "2026-07-30T14:12:13Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "01622b39",
+          "result": "passed",
+          "ts": "2026-07-30T14:15:08Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "8f875d86",
+          "result": "passed",
+          "ts": "2026-07-30T14:15:08Z"
+        }
+      ],
+      "outcome": "approved",
+      "learnings_captured": {
+        "from_orchestrator": 0,
+        "from_user_addition": 0
+      }
+    },
+    {
+      "stage_slug": "approval-handoff",
+      "started_at": "2026-07-30T14:30:24Z",
+      "completed_at": null,
+      "agent": "aidlc-delivery-agent",
+      "memory_path": "aidlc/spaces/default/intents/260729-feature/ideation/approval-handoff/memory.md",
+      "memory_entries": null,
+      "memory_breakdown": null,
+      "sensor_firings": [],
+      "outcome": "pending",
+      "learnings_captured": null
+    }
+  ]
+}
