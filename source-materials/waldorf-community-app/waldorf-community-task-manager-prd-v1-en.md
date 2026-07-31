@@ -1876,3 +1876,80 @@ During Intent Capture and Requirements Analysis:
 - Pay special attention to authorization, Row Level Security, notification behavior, Hungarian UI copy, and Excel import validation.
 - Do not start implementation until Requirements Analysis and Application Design have been reviewed and approved.
 ```
+
+---
+
+## 27. Product-owner clarifications — 2026-07-31
+
+These decisions were confirmed during the independent pre-MR Intent review and are authoritative refinements to this PRD.
+
+### 27.1 Legacy workbook migration scope
+
+- All 17 sheets in `domain/Ovis tábla v2.xlsx` are in migration scope.
+- Their records and operational meaning must be preserved during migration; none of the sheets may be silently dropped.
+- The detailed row-to-domain mapping remains to be defined during requirements and design, including the target representation for workgroups, library lending, water-testing cost sharing, garden/bazaar finances, operational procedures, maintenance backlogs, and event contributions.
+
+### 27.2 Family-owned duties
+
+- A task responsibility belongs to a `Family`, not to one individual parent.
+- Requirements and design must define which linked parent receives notifications, which linked parents may act on the family's assignment, and how responsibility is shown when a family has multiple parents.
+
+### 27.3 Additional personal data
+
+- Residence/location, occupation, hobbies, and “how you support the community” fields from the workbook must be imported.
+- Their role visibility, edit rights, lawful purpose, and deletion behavior must be explicitly defined. Import does not imply that normal parent or read-only users may see these fields.
+
+### 27.4 Status and completion preservation
+
+- Existing status, progress, and completion information in maintenance and large-cleaning sheets must be preserved.
+- The earlier blanket exclusion of completion tracking does not permit these baseline values to be discarded. Requirements must distinguish preserved/imported status from any new ongoing completion workflow.
+
+### 27.5 Event contributions and allergens
+
+- Event supplies, food contributions, allergen information, and related event-planning details may be stored as free-text notes in MVP.
+- Requirements must still define who can edit the notes and how safety-relevant allergen text is made visible.
+
+### 27.6 Repeat-safe import
+
+- Reprocessing the same workbook must be repeat-safe and must not create duplicate people, families, tasks, events, assignments, or other records.
+- Requirements must define the stable import identity/key strategy and the result shown for already-imported or changed rows.
+- Atomic commit, rollback, immutable preview binding, cutover behavior, and recovery after a later-discovered import defect remain open decisions.
+
+### 27.7 Participant display names
+
+- Parents and read-only staff may see participant display names where needed for task and event coordination.
+- Email addresses, phone numbers, residence/location, occupation, hobbies, and other restricted personal details remain governed by role and scope permissions and must not be inferred from display-name visibility.
+
+### 27.8 Reminder schedule
+
+- Upcoming-duty reminders are required both 7 days and 24 hours before the duty.
+- Duplicate suppression, change/reschedule behavior, retry behavior, timezone boundaries, and cancellation of stale queued reminders must be defined in requirements.
+
+### 27.9 Locale, Unicode, time, and contact standards
+
+- The system must use Hungarian (`hu-HU`) user-facing formatting and Hungarian-aware search and sorting.
+- The operating timezone is `Europe/Budapest` unless an organization-level timezone capability is explicitly approved later.
+- REST timestamps must use RFC 3339 with an explicit offset or `Z`.
+- Text must be UTF-8 end to end and normalized consistently for identity matching and search.
+- Phone numbers must have a defined international normalization policy (E.164 canonical storage), and email/phone validation must be equivalent across UI, REST API, invitations, profiles, and import.
+
+### 27.10 Annual privacy review and mandatory deletion
+
+- Personal-data retention must be reviewed at least once every year.
+- Deletion is mandatory once a child leaves the kindergarten.
+- Requirements must define the deletion trigger and deadline, the treatment of a family with another child still enrolled, which parent/family data is deleted, and whether legally or operationally required audit records are anonymized or retained.
+
+### 27.11 Clarifications still open
+
+The following details remain unresolved and must be answered before their affected requirements/design are approved:
+
+1. Deterministic mapping of every workbook sheet and row type to product records.
+2. Identity matching and human-resolution rules for aliases, spelling differences, multi-person cells, and family membership.
+3. Import atomicity, rollback, immutable preview binding, cutover, and post-commit recovery.
+4. Structured handling of task sub-shifts, procedures, safety warnings, materials, dependencies, priorities, and organizer notes.
+5. Exact permissions and immediate revocation behavior for every role and resource across UI and REST API.
+6. Legal workflow transitions and conflict behavior for concurrent signup, swap, cancellation, review, task cancellation, and archive actions.
+7. Notification recipient recalculation, batching, retry, stale-message cancellation, and privacy of notification content/logs.
+8. Exact annual-review ownership, evidence, deletion deadline, sibling/family exceptions, and audit anonymization.
+9. Supported workbook template/version and hostile-file controls.
+10. Measurable browser, accessibility, performance-volume, reliability, recovery, and API-contract acceptance criteria.

@@ -7,32 +7,23 @@
 
 ## Way of Working
 
-<!-- Affirmed during practices-discovery. Example: -->
-<!-- We use GitHub Flow with feature branches. Branches live 3-5 days max. -->
-<!-- Hotfixes branch from main and merge back via expedited review. -->
+Use trunk-based development. Work in short-lived feature branches and squash-merge them to `main`.
 
 ## Walking Skeleton
 
-<!-- Affirmed during practices-discovery. Example: -->
-<!-- We don't run a walking skeleton — our deployment pipeline is mature -->
-<!-- and the slice cost outweighs the value at our maturity stage. -->
+Use a scope-dependent walking skeleton: run a gated skeleton only when the active scope enables it.
 
 ## Testing Posture
 
-<!-- Affirmed during practices-discovery. Example: -->
-<!-- We use BDD. Specifications drive scenarios; scenarios drive code. -->
-<!-- Each Unit ships with feature files in /features/. -->
+Write tests alongside code. Maintain at least 80% line coverage and require green CI before merge.
 
 ## Deployment
 
-<!-- Affirmed during practices-discovery. -->
+Continuously deploy to production after all automated gates pass.
 
 ## Code Style
 
-<!-- Team-specific conventions beyond the linter. Example: -->
-<!-- - Prefer named exports over default exports -->
-<!-- - All async functions return Result<T, E>, never throw -->
-
+Use the repository formatter and linter, and follow idiomatic TypeScript. Do not add further team conventions until the repository tooling is established.
 ## Forbidden
 
 <!-- Team-specific forbidden patterns -->
