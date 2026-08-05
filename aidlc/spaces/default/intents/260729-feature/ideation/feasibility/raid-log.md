@@ -7,7 +7,8 @@
 | R-01 | Role or row-level access rules could expose parent contact details or assignment identities incorrectly. | Medium | High | Make privacy rules explicit in design; test every role and data-access path. | [intent] [Q4] |
 | R-02 | A three-month delivery target could be missed through scope expansion toward generic SaaS feature parity. | Medium | High | Preserve exclusions; prioritize a thin role-aware signup and reminder workflow first. | [Q3] [market] |
 | R-03 | Vercel, Supabase, or email-provider configuration may not satisfy the intended EU-residency and data-processing controls. | Medium | High | Verify region, contracts, sub-processors, and data flows before production. | [Q2] [Q4] |
-| R-04 | One-time Excel source quality may delay import or produce incomplete records. | Medium | Medium | Use preview, mapping, validation, and correction workflow; do not promise live sync. | [intent] [Q1] |
+| R-04 | The all-17-sheet migration may delay delivery, lose operational meaning, or duplicate records. | High | High | Use deterministic mapping, stable identity matching, repeat-safe preview/commit, validation, and recovery design; do not promise live sync. | [intent] [Q1] [PRD-27] |
+| R-05 | Sensitive imported profile fields or delayed child-leaving deletion could expose personal data. | Medium | High | Define field-level roles, lawful purpose, annual review, deletion trigger/deadline, sibling exception, and audit treatment before release. | [PRD-27] |
 
 ## Assumptions
 
@@ -24,6 +25,7 @@
 | Issue | Legal basis, retention period, deletion process, and privacy owner are not yet defined. | Resolve before production release. |
 | Dependency | Transactional email provider and delivery configuration. | Select during application/infrastructure design. |
 | Dependency | Clean source spreadsheet and administrator availability for mapping review. | Validate during import design and migration planning. |
+| Dependency | Deterministic workbook mapping and import recovery decisions. | Resolve in requirements and application design before migration approval. |
 
 ## Sources
 

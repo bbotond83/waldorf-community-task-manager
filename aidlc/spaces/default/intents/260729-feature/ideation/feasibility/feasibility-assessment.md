@@ -19,13 +19,13 @@ The decision to use a tailored build remains justified by the market assessment:
 | Identity and roles | Validate that Supabase authorization design can enforce the approved role and contact-visibility rules. | Architecture and security design |
 | Data location | Configure Vercel and Supabase regions and supporting services to meet the EU-data-residency decision. | Infrastructure and compliance design |
 | Email | Select and validate a transactional email approach, including delivery failures and Hungarian templates. | Application and operations design |
-| Import | Limit the one-time Excel migration to admin-mapped preview and validation; no ongoing synchronization. | Functional design |
+| Import | Migrate all 17 legacy sheets with preserved operational meaning, admin-mapped preview/validation, repeat-safe identity matching, and no ongoing synchronization. | Requirements, functional, and application design |
 | Schedule | Protect the three-month boundary through Must/Should prioritization and defer excluded features. | Scope and delivery planning |
-| Privacy | Define retention/deletion rules and the legal basis before production, rather than treating GDPR alignment as complete by default. | Compliance and NFR stages |
+| Privacy | Define field-level access, annual review, child-leaving deletion, sibling exceptions, audit treatment, and legal basis before production. | Compliance and NFR stages |
 
 ## Confidence and Open Items
 
-Feasibility confidence is **medium**. Product scope and platform choices are clear; the remaining material uncertainty is governance detail: retention periods, legal basis, operational ownership, and the selected email provider still need decisions. GDPR alignment is a planning baseline, not a legal-compliance certification.
+Feasibility confidence is **medium-low**. Product scope and platform choices are clear, but Section 27 materially expands migration and privacy detail: deterministic mapping, identity/conflict resolution, import atomicity/recovery, retention/deletion ownership, and notification behavior still need decisions. GDPR alignment is a planning baseline, not a legal-compliance certification.
 
 ## Sources
 

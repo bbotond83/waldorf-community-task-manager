@@ -23,8 +23,11 @@
 | --- | --- | --- |
 | Product reporting cadence | Not yet defined. | [Q7] |
 | Assignment reminders | Send at 7 days and 24 hours before an assignment. | [Q10] |
+| Migration review | Administrators validate all 17 workbook-sheet mappings, import exceptions, and preserved operational meaning. | [PRD-27] |
+| Privacy retention | A designated data owner must complete annual review and child-leaving deletion decisions. | [PRD-27] |
 
 ## Assumptions & Open Questions
 
 - The final decision-maker for scope, priority, swap, cancellation, and privacy decisions is not yet identified. [Q6] [assumption]
 - A stakeholder reporting cadence is not yet defined. [Q7] [assumption]
+- Workbook mapping, import identity resolution, and privacy-retention ownership need named accountable stakeholders. [PRD-27]

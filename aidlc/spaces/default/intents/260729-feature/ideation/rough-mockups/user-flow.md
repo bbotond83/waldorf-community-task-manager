@@ -17,17 +17,17 @@ Sign in -> My Tasks -> Assignment Detail
 
 ## Admin Flow
 
-Sign in -> manage tasks/events -> assign or approve cancellation -> monitor reminders -> upload Excel -> map columns in preview -> fix validation errors -> confirm one-time import.
+Sign in -> manage tasks/events -> assign or approve cancellation -> monitor reminders -> upload Excel -> map all 17 sheets in preview -> fix validation and identity conflicts -> confirm repeat-safe one-time import.
 
 ```text
 Sign in -> authorized admin dashboard
   -> create task/event -> validation error / save
   -> assign family -> success / unavailable / permission denied
   -> cancellation request -> approve (release) / reject (keep assignment)
-  -> reminder monitoring -> delivered / failed status (no manual resend)
-  -> import file -> mapping -> validation errors -> confirm import
+  -> reminder monitoring -> delivered / retried / failed / stale-cancelled status
+  -> import file -> all-sheet mapping -> validation or identity conflicts -> preview -> confirm repeat-safe import
 ```
 
 ## Read-only Staff Flow
 
-Sign in -> Csoport naptár -> view schedule and event details only; no editing and no parent names/contact data.
+Sign in -> Csoport naptár -> view schedule and event details only; no editing, but participant display names may appear where coordination needs them. No contact or restricted personal details are shown.

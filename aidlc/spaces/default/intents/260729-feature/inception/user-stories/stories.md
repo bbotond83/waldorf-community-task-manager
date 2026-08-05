@@ -1,0 +1,31 @@
+# User Stories
+
+## Parent Coordination
+
+- **US-01 (Must) Family duties:** As a parent, I want to see my linked family’s duties. **Given** multiple active linked parents, **when** either opens duties, **then** each sees and may take permitted action on the same family assignment; **given** an authorized administrator selects a primary recipient, **when** reminders queue, **then** only that active recipient is queued; unrelated UI/API access returns no assignment or sensitive data. (FR-02/03)
+- **US-02 (Must) Signup:** As a parent, I want to sign up for an eligible open task. **Given** capacity and eligibility, **when** I select `Jelentkezem`, **then** a family assignment is created with Hungarian confirmation; **given** full/ineligible capacity, **then** the action is unavailable with an explanatory status. (FR-05)
+- **US-03 (Must) Requests:** As a parent, I want to request cancellation or a swap. **Given** my active assignment, **when** I submit a valid reason, **then** a pending request is visible and duplicates are blocked; qualified two-family swaps exchange atomically and recalculate reminders; capacity breaches or competing swaps change neither assignment; an administrator-approved non-qualified swap atomically exchanges assignments and recalculates reminders, while rejection preserves both assignments; admin decisions create redacted, access-controlled audit evidence. (FR-05, NFR-07)
+- **US-04 (Must) Reminders:** As a parent, I want Hungarian reminders. **Given** a Budapest-time duty, **when** it is scheduled or changed, **then** 7-day/24-hour reminders queue, stale jobs cancel, duplicates suppress, and failures retry with privacy-safe admin status; role-restricted redacted audit evidence records notification status. (FR-13/14, NFR-03, NFR-07)
+
+## Scoped Administration
+
+- **US-05 (Must) Records:** As an administrator, I want to manage scoped family/child, group/school-year, task/assignment, event, dashboard, and archive records. **Given** my authorized scope, **when** I create/edit/archive/restore, **then** changes succeed with role-restricted redacted audit evidence; out-of-scope UI/API actions are denied; parent views return only records relevant to linked children/groups. (FR-05a, NFR-07)
+- **US-06 (Must) Roles:** As a super or kindergarten administrator, I want role/scope management. **Given** a role or scope is removed, **when** the affected user makes their next UI/API/data request, **then** access is denied and sensitive fields are absent; privileged role changes create redacted, access-controlled audit evidence. (FR-01/03, NFR-01/07)
+- **US-07 (Must) Event notes:** As an event participant, I want safe contribution and allergen visibility. **Given** assignment, confirmed signup, or explicit admin grant, **when** I view the event, **then** allergen text is visible; kindergarten/group admins manage event supply, food, and allergen notes; other users are denied and parents edit only their own contribution notes. (FR-07)
+
+## Migration and Privacy
+
+- **US-08 (Must) Import preview:** As an administrator, I want a deterministic import preview. **Given** the supported workbook, **when** uploaded, **then** all 17 sheet/row mappings preserve sub-shifts, procedures, warnings, materials, dependencies, priorities, and organizer notes as structured fields or documented notes; an authorized administrator resolves alias, spelling, multi-person-cell, and family-membership conflicts in the preview queue before confirmation; hostile files are rejected safely and outcomes have role-restricted redacted audit evidence. (FR-08/09/12a, NFR-07)
+- **US-09 (Must) Import commit:** As an administrator, I want an immutable, repeat-safe commit. **Given** an approved preview hash and mapping version, **when** committed or retried, **then** it is atomic, reports changed/already-imported rows, creates no duplicates, recovery restores service within one hour, and outcome evidence is redacted and access-controlled. (FR-10/11/12a, NFR-06/07)
+- **US-10 (Must) Status preservation:** As an administrator, I want imported maintenance/cleaning status preserved. **Given** source status/progress/completion, **when** imported, **then** values remain available without creating a new completion workflow. (FR-06)
+- **US-11 (Must) Privacy lifecycle:** As an administrator, I want annual review and family-departure processing. **Given** last-child departure and 30 days without hold, **when** lifecycle runs, **then** eligible fields delete, permitted history anonymizes, and only redacted, access-controlled audit evidence remains; audit excludes raw phones, full email content, optional free text, and sensitive reasons, then deletes/anonymizes after one year unless investigation requires retention; sibling/hold defers deletion. (FR-04/15, NFR-02a–h, NFR-07)
+
+## Standards and Staff
+
+- **US-12 (Must) Shared validation:** As an administrator, I want consistent input handling. **Given** equivalent data through UI, API, invitation, profile, or import, **when** validated or identity matched, **then** the same UTF-8-normalized, E.164/RFC-3339, Hungarian-aware outcome and identity result occurs. (FR-12, NFR-03)
+- **US-13 (Should) Staff schedule:** As read-only staff, I want relevant schedules. **Given** authorized group/date scope, **when** I view it, **then** only coordination display names and schedule fields show; contacts, sensitive fields, edits, and unrelated data are denied. (FR-03)
+- **US-14 (Must) Core quality:** As every user, I want core flows to work accessibly on my device. **Given** the core-flow inventory and 30-family profile, **when** parent/admin flows run, **then** pages/API complete within 2 seconds, pass the approved WCAG core-flow scope and Chrome, Safari, Firefox, mobile Safari, and mobile Chrome matrix; CI enforces formatter, lint, type, security, tests, and ≥80% line coverage; monthly availability is calculated and verified against 99.5%. (NFR-04–06a)
+
+## Dependencies and INVEST
+
+Authorization and family links precede coordination; assignment state precedes reminders; approved mapping precedes import; data dictionary precedes privacy lifecycle. Each story is a persona/workflow slice with observable Given/When/Then acceptance criteria.

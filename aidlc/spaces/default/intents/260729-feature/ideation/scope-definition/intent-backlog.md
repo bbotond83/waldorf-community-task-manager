@@ -8,16 +8,16 @@ This backlog derives from the approved [intent statement](../intent-capture/inte
 
 | ID | Proto-unit | Value | Dependencies | Sequence |
 | --- | --- | --- | --- | --- |
-| PB-01 | Authentication, roles, family membership, and privacy controls | Protects family/contact data and enables every role-specific workflow. | Supabase baseline | 1 |
+| PB-01 | Authentication, roles, family membership, privacy controls, and lifecycle deletion | Protects family/contact data and enables every role-specific workflow. | Supabase baseline | 1 |
 | PB-02 | Core family, child, school-year, group, task, event, and assignment records | Establishes the shared coordination model. | PB-01 | 1 |
 | PB-03 | Parent dashboard, self-signup, family-owned assignment, swaps, and cancellation requests | Delivers the primary parent value. | PB-01, PB-02 | 2 |
-| PB-04 | Email reminders and notification visibility | Reduces missed commitments and manual follow-up. | PB-02, PB-03 | 2 |
+| PB-04 | Email reminders and notification visibility | Reduces missed commitments and manual follow-up; supports duplicate suppression, reschedule/cancellation handling, and retry. | PB-02, PB-03 | 2 |
 | PB-05 | Admin assignment, approval, dashboard, and archive workflows | Enables coordinators to operate the community workflow. | PB-01–PB-04 | 3 |
-| PB-06 | One-time Excel import with mapping preview and validation | Enables controlled migration from the current baseline. | PB-02, PB-05 | 3 |
+| PB-06 | Repeat-safe migration of all 17 workbook sheets with mapping preview and validation | Preserves current operational meaning without duplicate records. | PB-02, PB-05 | 3 |
 
 ## Explicit Deferrals
 
-Native apps, SMS/WhatsApp, payments, automatic rotation, completion tracking, live Excel synchronization, and unapproved integrations remain out of scope. Dashboard refinements are not approved for deferral in this MVP; delivery planning must protect the full committed set within the agreed boundary.
+Native apps, SMS/WhatsApp, payments, automatic rotation, new ongoing completion tracking, live Excel synchronization, and unapproved integrations remain out of scope. Imported legacy completion/status values are not deferred. Dashboard refinements are not approved for deferral in this MVP; delivery planning must protect the full committed set within the agreed boundary.
 
 ## Value Stream
 

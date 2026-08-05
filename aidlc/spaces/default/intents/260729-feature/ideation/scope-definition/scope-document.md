@@ -7,15 +7,18 @@ This scope applies the approved [intent statement](../intent-capture/intent-stat
 ## In Scope
 
 - Role-aware access for super admins, kindergarten admins, group admins, parents, and read-only staff.
-- Family, child, school-year, group, task, event, assignment, signup, swap, cancellation, dashboard, archive, and one-time Excel-import workflows.
+- Family, child, school-year, group, task, event, assignment, signup, swap, cancellation, dashboard, archive, and one-time Excel-import workflows, covering all 17 legacy workbook sheets and preserving their operational meaning.
 - Family-owned assignments; parent self-service signup; auto-approvable parent swaps; approval-bound cancellations.
-- 7-day and 24-hour email reminders, with Hungarian parent-facing experience.
-- Admin-only email and phone visibility; role-bounded assignment display-name visibility.
+- 7-day and 24-hour email reminders, with Hungarian parent-facing experience, duplicate suppression, rescheduling, retry, stale-message cancellation, and `Europe/Budapest` time handling to be specified.
+- Role-bounded participant display-name visibility; email, phone, residence/location, occupation, hobbies, and other restricted personal details remain permission-controlled.
+- Repeat-safe import with stable identity strategy, visible outcomes for duplicate/changed rows, and preservation of imported maintenance/cleaning status values; mapping, atomicity, rollback, and recovery remain requirements/design decisions.
+- Hungarian (`hu-HU`) formatting, Hungarian-aware search/sorting, UTF-8 normalization, RFC 3339 timestamps, E.164 phone canonicalization, and equivalent validation across UI, API, invitations, profiles, and import.
+- Annual personal-data review and child-leaving deletion workflow, including sibling-family and audit-retention treatment.
 - Vercel-hosted Next.js application with Supabase backend/authentication/database planning baseline.
 
 ## Out of Scope
 
-- Native mobile apps, SMS/WhatsApp notifications, payments, automatic rotation, task completion tracking, and live Excel synchronization.
+- Native mobile apps, SMS/WhatsApp notifications, payments, automatic rotation, new ongoing task-completion tracking, and live Excel synchronization. Preservation of imported legacy completion/status values remains in scope.
 - New external integrations beyond one-time Excel import and email delivery.
 - Broad generic volunteer-management feature parity beyond the approved community workflow.
 

@@ -1,0 +1,28 @@
+**Collaborator:** aidlc-design-agent
+
+## Contribution
+
+The personas match the approved role model and the story grouping follows the primary parent, administrator, and staff journeys. The stories are a sound backlog outline, but they are not yet a design-testable user-story set: the acceptance text is brief prose rather than Given/When/Then criteria, and it leaves several visible states, recovery routes, and accessible interaction expectations implicit. The rough mockups provide useful detail that should be preserved as story acceptance criteria rather than re-decided during implementation.
+
+### UX refinements for incorporation
+
+- **US-01 / US-02 parent coordination:** State the initial/loading, empty, available, full, assigned, swap-pending, cancellation-pending, approved, rejected, and invalidated-after-change states. The signup action must be unavailable with an explanatory Hungarian message when capacity is full or the family is ineligible. The swap flow needs a recognisable counterpart list, explicit Accept/Decline controls, an atomic outcome, and recovery when eligibility or capacity changes before acceptance; the requester and counterpart must both see the resulting state.
+- **US-02 cancellation:** Require a labelled cancellation-reason field, inline validation, Submit and Cancel controls, a visible pending state that prevents duplicate requests, and a decision outcome visible to the family. An approver needs the request context, reason, role-scoped actions, optional rejection reason, confirmation, and an error state; approval releases the assignment and rejection preserves it.
+- **US-03 reminders:** Make the parent-facing reminder/change outcome persist in the in-app notifications view; email delivery alone is not sufficient feedback. Dates and times must render in `hu-HU` and `Europe/Budapest`; reminder changes should state whether a scheduled message was recalculated, suppressed, cancelled, retried, or failed without exposing contact details.
+- **US-04 / US-05 administration:** Separate record management, task/event editing, assignment, approval, archive/restore, and role/membership management into independently testable stories or clearly enumerated subflows. Every scoped admin view must show the active group context, use relevance-filtered results, and render empty, loading, validation, success, and permission-denied states. Super-admin-only organization/role controls must be absent as well as server-denied for lower roles.
+- **US-06 import:** Treat import as a multi-step, resumable review flow: Upload → parsing/progress → all-sheet mapping summary → row/identity conflict queue → immutable preview → explicit Confirm → commit result/recovery guidance. The UI must prevent confirmation while unresolved conflicts or validation errors remain, explain repeat/changed-row results in plain Hungarian, and show no raw personal data in error copy or audit-facing summaries.
+- **US-07 privacy lifecycle:** Add the administrator's annual-review queue and family-departure decision states (another child enrolled; 30-day grace period; legal/operational hold; completed deletion/anonymization). Audit views should reveal only redacted event summaries to authorized roles and clearly distinguish archived from deleted/anonymized records.
+- **US-08 staff schedule:** The acceptance criteria should affirm that staff have a read-only, role-scoped group/date schedule with no edit affordances, contacts, sensitive profiles, assignment details, or unnecessary family data. Coordination display names appear only when needed for a displayed task/event.
+- **US-09 accessibility and responsive behavior:** For each core parent/admin flow, use semantic headings and landmarks, visible keyboard focus, a skip link, native labelled controls, Hungarian text errors, status announcements (`aria-live` where dynamic), non-colour-only outcomes, and 44×44 px touch targets. Mobile is single-column cards; tables become cards or equivalent accessible summaries. Verify at 200% zoom and through keyboard-only navigation.
+
+### BDD acceptance pattern to apply
+
+Each story should use observable criteria. For example: **Given** a linked parent viewing an available, relevant task, **when** they select `Jelentkezem`, **then** the system creates the family-owned assignment, announces a Hungarian confirmation, updates the card without losing context, and schedules the 7-day/24-hour reminders; **and given** the task is full or the parent is not eligible, **when** the card loads, **then** `Jelentkezem` is unavailable and an explanatory Hungarian status is shown.
+
+## Positions
+
+- AGREE: The five persona definitions and role-scoped narrative align with FR-01–FR-03 and the approved role-aware information architecture.
+- AGREE: Persona/workflow epics are appropriate for this mobile-first operational MVP, provided implementation sequencing retains the privacy and authorization foundation first.
+- OBJECT: The current one-line acceptance statements do not satisfy the inception rule that each story use Given/When/Then acceptance criteria, nor do they expose enough interaction state to support an accessible, consistent implementation.
+- OBJECT: US-04, US-05, US-06, and US-07 each combine several distinct journeys; split them into independently testable stories (or preserve explicit subflow-level BDD criteria) before delivery planning.
+- OBJECT: The Quality story is too broad to verify responsive and accessible behavior. Core-flow WCAG 2.2 AA, keyboard, screen-reader, zoom, touch-target, and mobile/desktop acceptance checks must be attached to the affected workflow stories and retained as cross-cutting release criteria.

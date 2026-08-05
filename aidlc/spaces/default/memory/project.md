@@ -57,6 +57,12 @@
 <!-- Populated by practices-discovery affirmation gate. -->
 <!-- Format: ALWAYS [behavior] (affirmed [date]) -->
 <!-- Example: ALWAYS use Result<T,E> for fallible operations in service layer (affirmed 2026-05-17) -->
+- ALWAYS keep each requirements-analysis answer directly attached to its corresponding question and retain a single current consolidated confirmation (learned 2026-08-04)
+- ALWAYS express user stories as independently testable Given/When/Then slices with explicit authorization, privacy, and audit outcomes (learned 2026-08-05)
+- ALWAYS represent privacy-sensitive or approval workflows with explicit detail-screen states, access boundaries, and recovery outcomes (learned 2026-08-05)
+- ALWAYS document module data ownership, public contracts, and transactional/event boundaries before engineering handoff (learned 2026-08-05)
+- ALWAYS keep dependency topology separate from economic delivery sequencing and make durable event dependencies explicit (learned 2026-08-05)
+- ALWAYS use a walking skeleton to validate end-to-end boundaries before parallelizing independent delivery work (learned 2026-08-05)
 
 ## Corrections
 

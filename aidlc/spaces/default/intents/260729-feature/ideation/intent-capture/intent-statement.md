@@ -26,11 +26,14 @@ The MVP keeps email addresses and phone numbers admin-only; parents may see assi
 
 The MVP sends assignment reminders at both 7 days and 24 hours. Parent-to-parent swaps may auto-approve, while cancellations require approval. [Q10] [Q11]
 
-Assignments belong to families so that any linked parent may act. Excel import uses preview-time admin column mapping to an import template. [Q12] [Q13]
+Assignments belong to families so that any linked parent may act. Excel import uses preview-time admin column mapping to an import template. The authoritative PRD refinement requires all 17 legacy-workbook sheets and their operational meaning to be preserved, with repeat-safe identity matching and per-sheet mapping defined in later requirements and design. [Q12] [Q13] [PRD-27]
 
-The MVP excludes native mobile apps, SMS/WhatsApp notifications, payments, automatic rotation, task completion tracking, and live Excel synchronization. [Q16]
+Imported residence/location, occupation, hobbies, community-support details, maintenance and large-cleaning status/progress/completion, and event contribution/allergen notes are in scope. Their purpose, role visibility, edit rights, retention/deletion treatment, and any new ongoing completion workflow remain to be defined. [PRD-27]
+
+The MVP excludes native mobile apps, SMS/WhatsApp notifications, payments, automatic rotation, new ongoing task-completion tracking, and live Excel synchronization. Existing status, progress, and completion values imported from the legacy workbook must be preserved. [Q16] [PRD-27]
 
 ## Assumptions & Open Questions
 
 - The final decision-maker for scope, priority, swap, cancellation, and privacy decisions is not yet identified. [Q6] [assumption]
 - A stakeholder reporting cadence is not yet defined. [Q7] [assumption]
+- PRD Section 27 leaves import identity/conflict resolution, atomicity and recovery; privacy retention/deletion operations; exact role/resource permissions; notification queue behavior; and measurable quality criteria unresolved. [PRD-27]
