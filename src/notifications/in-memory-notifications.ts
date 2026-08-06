@@ -1,0 +1,2 @@
+import type { EmailAttempt, Notification, NotificationStore } from "./notification-service.ts";
+export class InMemoryNotificationStore implements NotificationStore { readonly notifications: Notification[] = []; readonly attempts: EmailAttempt[] = []; saveNotification(notification: Notification) { this.notifications.push(notification); } saveAttempt(attempt: EmailAttempt) { this.attempts.push(attempt); } hasJob(jobId: string) { return this.attempts.some((attempt) => attempt.jobId === jobId); } }
