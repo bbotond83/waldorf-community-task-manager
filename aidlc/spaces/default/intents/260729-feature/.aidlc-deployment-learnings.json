@@ -1,0 +1,8 @@
+{
+  "stage_slug": "deployment-pipeline",
+  "selections": [
+    {"candidate_id":"c1","type":"learning","scope":"project","heading":"Deployment","text":"ALWAYS use Vercel immutable deployment promotion and prior-deployment rollback as the application release strategy","source":"orchestrator"},
+    {"candidate_id":"c2","type":"learning","scope":"project","heading":"Deployment","text":"NEVER create an executable deployment workflow before a deployable application and linked target project exist","source":"orchestrator"},
+    {"candidate_id":"c3","type":"learning","scope":"project","heading":"Deployment","text":"ALWAYS require manual production approval from development for the two-environment MVP","source":"orchestrator"}
+  ]
+}

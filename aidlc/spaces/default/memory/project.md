@@ -25,10 +25,19 @@
 
 <!-- Project-specific specialisation. -->
 
+- ALWAYS treat current executable test and coverage results as authoritative when historical summaries contain stale counts (learned 2026-08-06) <!-- cid:build-and-test:c1 -->
+- ALWAYS include security and performance instructions when explicit NFR or privacy risks require them, even under Standard strategy (learned 2026-08-06) <!-- cid:build-and-test:c2 -->
+- ALWAYS report provisioned environment checks as outstanding evidence until they are executed against real integrations (learned 2026-08-06) <!-- cid:build-and-test:c3 -->
+- ALWAYS block CI on high and critical dependency vulnerabilities (learned 2026-08-06) <!-- cid:ci-pipeline:c3 -->
 ## Deployment
 
 <!-- Project-specific specialisation. -->
 
+- ALWAYS use the tested git SHA as artifact provenance while the repository contains domain modules without a deployable application bundle (learned 2026-08-06) <!-- cid:ci-pipeline:c1 -->
+- NEVER publish a package artifact unless the project explicitly adopts package distribution (learned 2026-08-06) <!-- cid:ci-pipeline:c2 -->
+- ALWAYS use Vercel immutable deployment promotion and prior-deployment rollback as the application release strategy (learned 2026-08-06) <!-- cid:deployment-pipeline:c1 -->
+- NEVER create an executable deployment workflow before a deployable application and linked target project exist (learned 2026-08-06) <!-- cid:deployment-pipeline:c2 -->
+- ALWAYS require manual production approval from development for the two-environment MVP (learned 2026-08-06) <!-- cid:deployment-pipeline:c3 -->
 ## Code Style
 
 <!-- Project-specific specialisation. -->

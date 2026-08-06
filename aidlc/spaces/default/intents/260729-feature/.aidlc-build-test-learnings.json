@@ -1,0 +1,29 @@
+{
+  "stage_slug": "build-and-test",
+  "selections": [
+    {
+      "candidate_id": "c1",
+      "type": "learning",
+      "scope": "project",
+      "heading": "Testing Posture",
+      "text": "ALWAYS treat current executable test and coverage results as authoritative when historical summaries contain stale counts",
+      "source": "orchestrator"
+    },
+    {
+      "candidate_id": "c2",
+      "type": "learning",
+      "scope": "project",
+      "heading": "Testing Posture",
+      "text": "ALWAYS include security and performance instructions when explicit NFR or privacy risks require them, even under Standard strategy",
+      "source": "orchestrator"
+    },
+    {
+      "candidate_id": "c3",
+      "type": "learning",
+      "scope": "project",
+      "heading": "Testing Posture",
+      "text": "ALWAYS report provisioned environment checks as outstanding evidence until they are executed against real integrations",
+      "source": "orchestrator"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "stage_slug": "ci-pipeline",
+  "selections": [
+    {"candidate_id":"c1","type":"learning","scope":"project","heading":"Deployment","text":"ALWAYS use the tested git SHA as artifact provenance while the repository contains domain modules without a deployable application bundle","source":"orchestrator"},
+    {"candidate_id":"c2","type":"learning","scope":"project","heading":"Deployment","text":"NEVER publish a package artifact unless the project explicitly adopts package distribution","source":"orchestrator"},
+    {"candidate_id":"c3","type":"learning","scope":"project","heading":"Testing Posture","text":"ALWAYS block CI on high and critical dependency vulnerabilities","source":"orchestrator"}
+  ]
+}
