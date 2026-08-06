@@ -27,6 +27,18 @@ Source: `source-materials/waldorf-community-app/Ovis tábla v2.xlsx`. Import row
 - Preview binds to workbook content hash and mapping-register version; commit is atomic and idempotent.
 - Reject hostile/unsupported files, duplicate source hashes, malformed values, and unresolved required identities; report changed and already-imported rows.
 - Roll back the full commit on failure; preserve the preview and audit evidence for a one-hour recovery objective.
+- Optional occupation, hobbies, skills, and community-support values are omitted unless the parent gives explicit, versioned, auditable consent in the approved account flow; withdrawal deletes those values. No historic workbook value creates consent.
+- Canonical writes remain invisible until a staged publish transaction succeeds. If a migration must batch, each batch writes only import-scoped staging records and one final publish transaction makes the version visible.
+- Rollback is allowed only while a cutover freeze is active; otherwise it creates a reconciliation run that preserves post-import parent/administrator changes and requires authorized review before applying compensating changes.
+
+## Legacy Workflow Destinations
+
+| Sheet | MVP destination | Permitted user action |
+|---|---|---|
+| Munkacsoportok | Read-only, scoped workgroup archive | View topic, membership, and named organizer; contact organizer outside the product. |
+| Könyvtár | Read-only, scoped library archive | View catalogue/loan history; lending and returns use the named kindergarten library process. |
+| Vízvizsgálat | Read-only, scoped cost-share archive | View own family response/share and named organizer; payments remain outside the product. |
+| Kert- és bazárpénzek | Read-only administrator finance archive | Authorized admins view historic balances; reconciliation and payments remain outside the product. |
 
 ## Row-Level Contract
 

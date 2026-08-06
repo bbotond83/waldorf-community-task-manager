@@ -5204,106 +5204,9 @@
       }
     },
     {
-      "stage_slug": "code-generation",
-      "started_at": "2026-08-06T09:55:28Z",
-      "completed_at": null,
-      "agent": "aidlc-developer-agent",
-      "memory_path": "aidlc/spaces/default/intents/260729-feature/construction/code-generation/memory.md",
-      "memory_entries": null,
-      "memory_breakdown": null,
-      "sensor_firings": [
-        {
-          "id": "linter",
-          "fire_id": "1331584d",
-          "result": "passed",
-          "ts": "2026-08-06T09:58:07Z"
-        },
-        {
-          "id": "type-check",
-          "fire_id": "cb7c8747",
-          "result": "passed",
-          "ts": "2026-08-06T09:58:08Z"
-        },
-        {
-          "id": "linter",
-          "fire_id": "73d3bffd",
-          "result": "passed",
-          "ts": "2026-08-06T09:58:09Z"
-        },
-        {
-          "id": "type-check",
-          "fire_id": "075c4fe8",
-          "result": "passed",
-          "ts": "2026-08-06T09:58:10Z"
-        },
-        {
-          "id": "linter",
-          "fire_id": "23cc20b7",
-          "result": "passed",
-          "ts": "2026-08-06T09:58:11Z"
-        },
-        {
-          "id": "type-check",
-          "fire_id": "5872f9ab",
-          "result": "passed",
-          "ts": "2026-08-06T09:58:11Z"
-        },
-        {
-          "id": "linter",
-          "fire_id": "65eec3e5",
-          "result": "passed",
-          "ts": "2026-08-06T09:58:12Z"
-        },
-        {
-          "id": "type-check",
-          "fire_id": "9b9b77d0",
-          "result": "passed",
-          "ts": "2026-08-06T09:58:13Z"
-        },
-        {
-          "id": "linter",
-          "fire_id": "a3072e56",
-          "result": "passed",
-          "ts": "2026-08-06T09:58:50Z"
-        },
-        {
-          "id": "type-check",
-          "fire_id": "b2886c38",
-          "result": "passed",
-          "ts": "2026-08-06T09:58:51Z"
-        },
-        {
-          "id": "linter",
-          "fire_id": "747badc7",
-          "result": "passed",
-          "ts": "2026-08-06T09:59:03Z"
-        },
-        {
-          "id": "type-check",
-          "fire_id": "4b030932",
-          "result": "passed",
-          "ts": "2026-08-06T09:59:04Z"
-        },
-        {
-          "id": "linter",
-          "fire_id": "c049ea96",
-          "result": "passed",
-          "ts": "2026-08-06T09:59:18Z"
-        },
-        {
-          "id": "type-check",
-          "fire_id": "c624f89b",
-          "result": "passed",
-          "ts": "2026-08-06T09:59:19Z"
-        }
-      ],
-      "outcome": "pending",
-      "learnings_captured": null
-    },
-    {
       "stage_slug": "infrastructure-design",
       "started_at": "2026-08-06T10:00:33Z",
-      "completed_at": null,
+      "completed_at": "2026-08-06T10:40:59Z",
       "agent": "aidlc-aws-platform-agent",
       "memory_path": "aidlc/spaces/default/intents/260729-feature/construction/infrastructure-design/memory.md",
       "memory_entries": 4,
@@ -5313,6 +5216,21 @@
         "tradeoffs": 1,
         "open_questions": 1
       },
+      "sensor_firings": [],
+      "outcome": "approved",
+      "learnings_captured": {
+        "from_orchestrator": 0,
+        "from_user_addition": 0
+      }
+    },
+    {
+      "stage_slug": "code-generation",
+      "started_at": "2026-08-06T10:40:59Z",
+      "completed_at": null,
+      "agent": "aidlc-developer-agent",
+      "memory_path": "aidlc/spaces/default/intents/260729-feature/construction/code-generation/memory.md",
+      "memory_entries": null,
+      "memory_breakdown": null,
       "sensor_firings": [],
       "outcome": "pending",
       "learnings_captured": null
