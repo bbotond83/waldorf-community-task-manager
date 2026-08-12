@@ -5,5 +5,12 @@
     "dirName": "260729-feature",
     "scope": "feature",
     "status": "complete"
+  },
+  {
+    "uuid": "019ff140-80de-7fe8-9a21-19b0c5724140",
+    "slug": "runnable-web-app",
+    "dirName": "260811-runnable-web-app",
+    "scope": "feature",
+    "status": "in-flight"
   }
 ]

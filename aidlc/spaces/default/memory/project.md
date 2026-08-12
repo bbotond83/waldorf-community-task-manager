@@ -61,6 +61,7 @@
 <!-- Format: NEVER [behavior] (affirmed [date]) -->
 <!-- Example: NEVER throw exceptions across service layer boundaries (affirmed 2026-05-17) -->
 
+- NEVER enable executable deployment workflows before a deployable application and linked target project exist. (affirmed 2026-08-12)
 ## Mandated
 
 <!-- Populated by practices-discovery affirmation gate. -->
@@ -73,6 +74,19 @@
 - ALWAYS keep dependency topology separate from economic delivery sequencing and make durable event dependencies explicit (learned 2026-08-05)
 - ALWAYS use a walking skeleton to validate end-to-end boundaries before parallelizing independent delivery work (learned 2026-08-05)
 
+- ALWAYS require green automated checks before merge. (affirmed 2026-08-12)
+- ALWAYS run a gated first Bolt when the active scope enables a walking skeleton. (affirmed 2026-08-12)
+- ALWAYS write tests in the same change as the code and add a regression test for every defect. (affirmed 2026-08-12)
+- ALWAYS enforce at least 80% line, branch, and function coverage across all production source. (affirmed 2026-08-12)
+- ALWAYS block delivery on failed type checking, tests, production build, start smoke, critical browser-flow checks, serious or critical accessibility violations in that flow, or high and critical dependency findings. (affirmed 2026-08-12)
+- ALWAYS automatically deploy eligible changes to staging and require protected manual approval before immutable production promotion. (affirmed 2026-08-12)
+- ALWAYS use Prettier and ESLint as blocking checks. (affirmed 2026-08-12)
+- ALWAYS use English technical identifiers and Hungarian user-facing copy. (affirmed 2026-08-12)
+- ALWAYS preserve module ports, injection, and colocated tests. (affirmed 2026-08-12)
+- ALWAYS map expected application failures to explicit result states and unexpected infrastructure errors at the application boundary. (affirmed 2026-08-12)
+- ALWAYS run CI secret scanning and SAST, with high and critical SAST findings blocking delivery. (affirmed 2026-08-12)
+- ALWAYS pin CI actions to immutable revisions. (affirmed 2026-08-12)
+- ALWAYS generate an SBOM and artifact attestation when a deployable artifact exists. (affirmed 2026-08-12)
 ## Corrections
 
 <!-- Project-specific corrections from human feedback. -->
