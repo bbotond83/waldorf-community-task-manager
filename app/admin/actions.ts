@@ -1,0 +1,227 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { normalizeRequiredText, validation } from "../../src/application/index.ts";
+import { mapApplicationResult } from "./_lib/action-state.ts";
+import { resolveAdminFacade } from "./_lib/facade.ts";
+import { resolveAdminSession } from "./_lib/session.ts";
+
+export type AdminActionState = Readonly<{
+  state:
+    | "initial"
+    | "validation"
+    | "success"
+    | "denied"
+    | "conflict"
+    | "invalidated"
+    | "retryable"
+    | "terminal";
+  message?: string;
+  code?: string;
+  fieldErrors?: Readonly<Record<string, string>>;
+  retry?: Readonly<{ idempotencyKey: string; action: string }>;
+  outcome?: string;
+}>;
+
+export type AdminAction = (
+  state: AdminActionState,
+  formData: FormData,
+) => Promise<AdminActionState>;
+
+export async function saveRecordAction(
+  _state: AdminActionState,
+  formData: FormData,
+): Promise<AdminActionState> {
+  const title = normalizeRequiredText(formData.get("title"), "title", 120);
+  if (title.state === "validation") return mapApplicationResult(title);
+  const context = parseMutationContext(formData);
+  if (!context.ok) return context.state;
+  const boundary = await resolveBoundary();
+  if (!boundary.ok) return boundary.state;
+  const result = await boundary.facade.saveRecord(boundary.session.applicationSession, {
+    scope: boundary.session.scope,
+    ...context.value,
+    payload: { title: title.data, kind: stringValue(formData, "kind") },
+  });
+  if (result.state === "success") revalidatePath("/admin/nyilvantartasok");
+  return mapApplicationResult(result, "A nyilvántartás mentése sikerült.");
+}
+
+export async function archiveRecordAction(
+  _state: AdminActionState,
+  formData: FormData,
+): Promise<AdminActionState> {
+  return runRecordStateAction(formData, "archive");
+}
+
+export async function restoreRecordAction(
+  _state: AdminActionState,
+  formData: FormData,
+): Promise<AdminActionState> {
+  return runRecordStateAction(formData, "restore");
+}
+
+export async function saveTaskAction(
+  _state: AdminActionState,
+  formData: FormData,
+): Promise<AdminActionState> {
+  const title = normalizeRequiredText(formData.get("title"), "title", 120);
+  if (title.state === "validation") return mapApplicationResult(title);
+  const context = parseMutationContext(formData);
+  if (!context.ok) return context.state;
+  const boundary = await resolveBoundary();
+  if (!boundary.ok) return boundary.state;
+  const result = await boundary.facade.saveTaskOrEvent(boundary.session.applicationSession, {
+    scope: boundary.session.scope,
+    ...context.value,
+    payload: {
+      title: title.data,
+      kind: stringValue(formData, "kind") === "event" ? "event" : "task",
+      scenario: stringValue(formData, "scenario"),
+    },
+  });
+  if (result.state === "success") revalidatePath("/admin/feladatok");
+  return mapApplicationResult(result, "A feladat vagy esemény mentése sikerült.");
+}
+
+export async function assignTaskAction(
+  _state: AdminActionState,
+  formData: FormData,
+): Promise<AdminActionState> {
+  const context = parseMutationContext(formData);
+  if (!context.ok) return context.state;
+  const boundary = await resolveBoundary();
+  if (!boundary.ok) return boundary.state;
+  const result = await boundary.facade.assign(boundary.session.applicationSession, {
+    scope: boundary.session.scope,
+    ...context.value,
+    payload: { scenario: stringValue(formData, "scenario") },
+  });
+  if (result.state === "success") revalidatePath(`/admin/feladatok/${context.value.id}`);
+  return mapApplicationResult(result, "A hozzárendelés sikerült.");
+}
+
+export async function decideApprovalAction(
+  _state: AdminActionState,
+  formData: FormData,
+): Promise<AdminActionState> {
+  const context = parseMutationContext(formData);
+  if (!context.ok) return context.state;
+  const boundary = await resolveBoundary();
+  if (!boundary.ok) return boundary.state;
+  const decision = stringValue(formData, "decision") === "rejected" ? "rejected" : "approved";
+  const result = await boundary.facade.decideApproval(boundary.session.applicationSession, {
+    scope: boundary.session.scope,
+    ...context.value,
+    decision,
+    payload: { scenario: stringValue(formData, "scenario") },
+  });
+  if (result.state === "success") {
+    revalidatePath("/admin/jovahagyasok");
+    return {
+      state: "success",
+      message:
+        result.data.outcome === "approved" ? "A kérelem jóváhagyva." : "A kérelem elutasítva.",
+      code: result.code,
+      outcome: result.data.outcome,
+    };
+  }
+  const mapped = mapApplicationResult(result);
+  if (result.state === "conflict" && result.code === "APPROVAL_ALREADY_DECIDED") {
+    return { ...mapped, message: "A kérelmet már elbírálták.", outcome: "already-decided" };
+  }
+  if (result.state === "invalidated") return { ...mapped, outcome: "invalidated" };
+  if (result.state === "denied") return { ...mapped, outcome: "denied" };
+  if (result.state === "dependency-failure-retryable") return { ...mapped, outcome: "retryable" };
+  if (result.state === "dependency-failure-terminal") return { ...mapped, outcome: "terminal" };
+  return mapped;
+}
+
+export async function saveEventNotesAction(
+  _state: AdminActionState,
+  formData: FormData,
+): Promise<AdminActionState> {
+  const context = parseMutationContext(formData);
+  if (!context.ok) return context.state;
+  const fields = ["allergenNote", "supplyNote", "foodNote"] as const;
+  const payload: Record<string, string> = {};
+  const fieldErrors: Record<string, string> = {};
+  for (const field of fields) {
+    const value = stringValue(formData, field).trim().replaceAll(/\s+/g, " ");
+    if (value.length > 300) fieldErrors[field] = "A megjegyzés legfeljebb 300 karakter lehet.";
+    payload[field] = value;
+  }
+  if (Object.keys(fieldErrors).length > 0) return mapApplicationResult(validation(fieldErrors));
+  const boundary = await resolveBoundary();
+  if (!boundary.ok) return boundary.state;
+  const result = await boundary.facade.saveEventNotes(boundary.session.applicationSession, {
+    scope: boundary.session.scope,
+    ...context.value,
+    payload,
+  });
+  if (result.state === "success") revalidatePath(`/admin/feladatok/${context.value.id}`);
+  return mapApplicationResult(result, "Az esemény engedélyezett megjegyzései mentve.");
+}
+
+async function runRecordStateAction(
+  formData: FormData,
+  operation: "archive" | "restore",
+): Promise<AdminActionState> {
+  const context = parseMutationContext(formData);
+  if (!context.ok) return context.state;
+  const boundary = await resolveBoundary();
+  if (!boundary.ok) return boundary.state;
+  const input = {
+    scope: boundary.session.scope,
+    ...context.value,
+    payload: { scenario: stringValue(formData, "scenario") },
+  };
+  const result =
+    operation === "archive"
+      ? await boundary.facade.archiveRecord(boundary.session.applicationSession, input)
+      : await boundary.facade.restoreRecord(boundary.session.applicationSession, input);
+  if (result.state === "success") {
+    revalidatePath("/admin/nyilvantartasok");
+    revalidatePath("/admin/archivum");
+  }
+  return mapApplicationResult(
+    result,
+    operation === "archive" ? "A rekord archiválva." : "A rekord visszaállítva.",
+  );
+}
+
+function parseMutationContext(
+  formData: FormData,
+):
+  | { ok: true; value: { id: string; expectedVersion: number; idempotencyKey: string } }
+  | { ok: false; state: AdminActionState } {
+  const id = stringValue(formData, "id");
+  const expectedVersion = Number(formData.get("expectedVersion"));
+  const idempotencyKey = stringValue(formData, "idempotencyKey");
+  const fieldErrors: Record<string, string> = {};
+  if (!/^[a-z0-9][a-z0-9-]{1,79}$/.test(id)) fieldErrors.id = "Érvénytelen azonosító.";
+  if (!Number.isInteger(expectedVersion) || expectedVersion < 1)
+    fieldErrors.expectedVersion = "Érvénytelen verzió.";
+  if (!/^[A-Za-z0-9][A-Za-z0-9:_-]{7,127}$/.test(idempotencyKey))
+    fieldErrors.idempotencyKey = "Érvénytelen műveleti kulcs.";
+  if (Object.keys(fieldErrors).length > 0)
+    return { ok: false, state: mapApplicationResult(validation(fieldErrors)) };
+  return { ok: true, value: { id, expectedVersion, idempotencyKey } };
+}
+
+async function resolveBoundary() {
+  const session = await resolveAdminSession();
+  const facade = await resolveAdminFacade();
+  if (session.state !== "success" || !facade) {
+    return {
+      ok: false as const,
+      state: { state: "denied", message: "Nincs jogosultság" } as AdminActionState,
+    };
+  }
+  return { ok: true as const, session: session.data, facade };
+}
+
+function stringValue(formData: FormData, field: string): string {
+  const value = formData.get(field);
+  return typeof value === "string" ? value : "";
+}

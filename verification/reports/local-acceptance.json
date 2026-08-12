@@ -1,0 +1,1147 @@
+{
+  "schemaVersion": "waldorf-acceptance-report-v1",
+  "gitSha": "69edd12c7aba1c0ae35138bbac67932d86b85e63",
+  "fixtureVersion": "waldorf-local-v1",
+  "manifestVersion": "waldorf-scenarios-v1",
+  "manifestSha256": "261ffedec4261ac5754e0c965d70a9a58c0ec126c5d92f9618178f1b3ad116be",
+  "generatedAt": "2026-08-12T15:32:22.472Z",
+  "counts": {
+    "pass": 33,
+    "fail": 0,
+    "outstanding": 6
+  },
+  "evidence": [
+    {
+      "schemaVersion": "waldorf-evidence-v1",
+      "scenarioId": "LOCAL-AUTH-CONTRACT",
+      "storyIds": [
+        "US-LR-00"
+      ],
+      "requirementIds": [
+        "FR-LR-14",
+        "NFR-LR-05"
+      ],
+      "matrixRows": [
+        "AUTH-SUPER-ADMIN-ALLOW",
+        "AUTH-IMMEDIATE-REVOCATION-DENY"
+      ],
+      "fixtureVersion": "waldorf-local-v1",
+      "manifestVersion": "waldorf-scenarios-v1",
+      "runtimeMode": "synthetic",
+      "target": "local",
+      "tool": "npm run verify:manifests",
+      "toolVersion": "node=v24.19.0;npm=11.19.0",
+      "result": "PASS",
+      "startedAt": "2026-08-12T15:32:22.472Z",
+      "finishedAt": "2026-08-12T15:32:22.472Z",
+      "gitSha": "69edd12c7aba1c0ae35138bbac67932d86b85e63",
+      "artifactPath": ".verification/logs/manifests.log",
+      "exitCode": 0,
+      "durationMs": 0
+    },
+    {
+      "schemaVersion": "waldorf-evidence-v1",
+      "scenarioId": "LOCAL-FRESH-START",
+      "storyIds": [
+        "US-LR-01"
+      ],
+      "requirementIds": [
+        "FR-LR-01",
+        "FR-LR-02",
+        "FR-LR-11",
+        "FR-LR-12",
+        "NFR-LR-01"
+      ],
+      "matrixRows": [
+        "AUTH-PARENT-DUTIES-ALLOW"
+      ],
+      "fixtureVersion": "waldorf-local-v1",
+      "manifestVersion": "waldorf-scenarios-v1",
+      "runtimeMode": "synthetic",
+      "target": "local",
+      "tool": "npm run smoke:start",
+      "toolVersion": "node=v24.19.0;npm=11.19.0",
+      "result": "PASS",
+      "startedAt": "2026-08-12T15:32:22.472Z",
+      "finishedAt": "2026-08-12T15:32:22.472Z",
+      "gitSha": "69edd12c7aba1c0ae35138bbac67932d86b85e63",
+      "artifactPath": ".verification/logs/smoke.log",
+      "exitCode": 0,
+      "durationMs": 0
+    },
+    {
+      "schemaVersion": "waldorf-evidence-v1",
+      "scenarioId": "LOCAL-SYNTHETIC-IDENTITY",
+      "storyIds": [
+        "US-LR-02"
+      ],
+      "requirementIds": [
+        "FR-LR-04",
+        "FR-LR-05",
+        "FR-LR-06",
+        "NFR-LR-05"
+      ],
+      "matrixRows": [
+        "AUTH-PARENT-DUTIES-ALLOW",
+        "AUTH-IMMEDIATE-REVOCATION-DENY"
+      ],
+      "fixtureVersion": "waldorf-local-v1",
+      "manifestVersion": "waldorf-scenarios-v1",
+      "runtimeMode": "synthetic",
+      "target": "local",
+      "tool": "npm run test:browser",
+      "toolVersion": "node=v24.19.0;npm=11.19.0",
+      "browser": "chromium,firefox,mobile-chrome",
+      "result": "PASS",
+      "startedAt": "2026-08-12T15:32:22.472Z",
+      "finishedAt": "2026-08-12T15:32:22.472Z",
+      "gitSha": "69edd12c7aba1c0ae35138bbac67932d86b85e63",
+      "artifactPath": ".verification/logs/browser.log",
+      "exitCode": 0,
+      "durationMs": 0
+    },
+    {
+      "schemaVersion": "waldorf-evidence-v1",
+      "scenarioId": "LOCAL-ROLE-SHELL",
+      "storyIds": [
+        "US-LR-03",
+        "US-14"
+      ],
+      "requirementIds": [
+        "FR-LR-07",
+        "NFR-LR-03",
+        "NFR-04"
+      ],
+      "matrixRows": [
+        "AUTH-PARENT-DUTIES-ALLOW"
+      ],
+      "fixtureVersion": "waldorf-local-v1",
+      "manifestVersion": "waldorf-scenarios-v1",
+      "runtimeMode": "synthetic",
+      "target": "local",
+      "tool": "npm run test:browser",
+      "toolVersion": "node=v24.19.0;npm=11.19.0",
+      "browser": "chromium,firefox,mobile-chrome",
+      "result": "PASS",
+      "startedAt": "2026-08-12T15:32:22.472Z",
+      "finishedAt": "2026-08-12T15:32:22.472Z",
+      "gitSha": "69edd12c7aba1c0ae35138bbac67932d86b85e63",
+      "artifactPath": ".verification/logs/browser.log",
+      "exitCode": 0,
+      "durationMs": 0
+    },
+    {
+      "schemaVersion": "waldorf-evidence-v1",
+      "scenarioId": "LOCAL-PARENT-DUTIES",
+      "storyIds": [
+        "US-LR-04a",
+        "US-01",
+        "US-02"
+      ],
+      "requirementIds": [
+        "FR-LR-08",
+        "FR-02",
+        "FR-03",
+        "FR-05"
+      ],
+      "matrixRows": [
+        "AUTH-PARENT-DUTIES-ALLOW",
+        "AUTH-PARENT-UNRELATED-DENY"
+      ],
+      "fixtureVersion": "waldorf-local-v1",
+      "manifestVersion": "waldorf-scenarios-v1",
+      "runtimeMode": "synthetic",
+      "target": "local",
+      "tool": "npm run test:browser",
+      "toolVersion": "node=v24.19.0;npm=11.19.0",
+      "browser": "chromium,firefox,mobile-chrome",
+      "result": "PASS",
+      "startedAt": "2026-08-12T15:32:22.472Z",
+      "finishedAt": "2026-08-12T15:32:22.472Z",
+      "gitSha": "69edd12c7aba1c0ae35138bbac67932d86b85e63",
+      "artifactPath": ".verification/logs/browser.log",
+      "exitCode": 0,
+      "durationMs": 0
+    },
+    {
+      "schemaVersion": "waldorf-evidence-v1",
+      "scenarioId": "LOCAL-PARENT-REQUESTS",
+      "storyIds": [
+        "US-LR-04b",
+        "US-03"
+      ],
+      "requirementIds": [
+        "FR-LR-08",
+        "FR-05",
+        "NFR-07"
+      ],
+      "matrixRows": [
+        "AUTH-PARENT-DUTIES-ALLOW"
+      ],
+      "fixtureVersion": "waldorf-local-v1",
+      "manifestVersion": "waldorf-scenarios-v1",
+      "runtimeMode": "synthetic",
+      "target": "local",
+      "tool": "npm run test:browser",
+      "toolVersion": "node=v24.19.0;npm=11.19.0",
+      "browser": "chromium,firefox,mobile-chrome",
+      "result": "PASS",
+      "startedAt": "2026-08-12T15:32:22.472Z",
+      "finishedAt": "2026-08-12T15:32:22.472Z",
+      "gitSha": "69edd12c7aba1c0ae35138bbac67932d86b85e63",
+      "artifactPath": ".verification/logs/browser.log",
+      "exitCode": 0,
+      "durationMs": 0
+    },
+    {
+      "schemaVersion": "waldorf-evidence-v1",
+      "scenarioId": "LOCAL-PARENT-NOTIFICATIONS",
+      "storyIds": [
+        "US-LR-04c",
+        "US-04"
+      ],
+      "requirementIds": [
+        "FR-LR-10a",
+        "FR-13",
+        "FR-14",
+        "FR-17"
+      ],
+      "matrixRows": [
+        "AUTH-PARENT-NOTIFICATIONS-ALLOW"
+      ],
+      "fixtureVersion": "waldorf-local-v1",
+      "manifestVersion": "waldorf-scenarios-v1",
+      "runtimeMode": "synthetic",
+      "target": "local",
+      "tool": "npm run test:browser",
+      "toolVersion": "node=v24.19.0;npm=11.19.0",
+      "browser": "chromium,firefox,mobile-chrome",
+      "result": "PASS",
+      "startedAt": "2026-08-12T15:32:22.472Z",
+      "finishedAt": "2026-08-12T15:32:22.472Z",
+      "gitSha": "69edd12c7aba1c0ae35138bbac67932d86b85e63",
+      "artifactPath": ".verification/logs/browser.log",
+      "exitCode": 0,
+      "durationMs": 0
+    },
+    {
+      "schemaVersion": "waldorf-evidence-v1",
+      "scenarioId": "LOCAL-PARENT-A11Y-RECOVERY",
+      "storyIds": [
+        "US-LR-04d"
+      ],
+      "requirementIds": [
+        "NFR-LR-03",
+        "NFR-LR-04"
+      ],
+      "matrixRows": [
+        "AUTH-PARENT-DUTIES-ALLOW"
+      ],
+      "fixtureVersion": "waldorf-local-v1",
+      "manifestVersion": "waldorf-scenarios-v1",
+      "runtimeMode": "synthetic",
+      "target": "local",
+      "tool": "npm run test:a11y",
+      "toolVersion": "node=v24.19.0;npm=11.19.0",
+      "browser": "chromium,firefox,mobile-chrome",
+      "result": "PASS",
+      "startedAt": "2026-08-12T15:32:22.472Z",
+      "finishedAt": "2026-08-12T15:32:22.472Z",
+      "gitSha": "69edd12c7aba1c0ae35138bbac67932d86b85e63",
+      "artifactPath": ".verification/logs/browser.log",
+      "exitCode": 0,
+      "durationMs": 0
+    },
+    {
+      "schemaVersion": "waldorf-evidence-v1",
+      "scenarioId": "LOCAL-INVITATION-AUTH",
+      "storyIds": [
+        "US-LR-04e"
+      ],
+      "requirementIds": [
+        "FR-LR-10a",
+        "NFR-08"
+      ],
+      "matrixRows": [
+        "AUTH-PARENT-DUTIES-ALLOW"
+      ],
+      "fixtureVersion": "waldorf-local-v1",
+      "manifestVersion": "waldorf-scenarios-v1",
+      "runtimeMode": "synthetic",
+      "target": "local",
+      "tool": "npm run test:browser",
+      "toolVersion": "node=v24.19.0;npm=11.19.0",
+      "browser": "chromium,firefox,mobile-chrome",
+      "result": "PASS",
+      "startedAt": "2026-08-12T15:32:22.472Z",
+      "finishedAt": "2026-08-12T15:32:22.472Z",
+      "gitSha": "69edd12c7aba1c0ae35138bbac67932d86b85e63",
+      "artifactPath": ".verification/logs/browser.log",
+      "exitCode": 0,
+      "durationMs": 0
+    },
+    {
+      "schemaVersion": "waldorf-evidence-v1",
+      "scenarioId": "LOCAL-EVENT-NOTES",
+      "storyIds": [
+        "US-LR-04f",
+        "US-07"
+      ],
+      "requirementIds": [
+        "FR-07",
+        "NFR-LR-05"
+      ],
+      "matrixRows": [
+        "AUTH-PARENT-DUTIES-ALLOW",
+        "AUTH-PARENT-UNRELATED-DENY"
+      ],
+      "fixtureVersion": "waldorf-local-v1",
+      "manifestVersion": "waldorf-scenarios-v1",
+      "runtimeMode": "synthetic",
+      "target": "local",
+      "tool": "npm run test:browser",
+      "toolVersion": "node=v24.19.0;npm=11.19.0",
+      "browser": "chromium,firefox,mobile-chrome",
+      "result": "PASS",
+      "startedAt": "2026-08-12T15:32:22.472Z",
+      "finishedAt": "2026-08-12T15:32:22.472Z",
+      "gitSha": "69edd12c7aba1c0ae35138bbac67932d86b85e63",
+      "artifactPath": ".verification/logs/browser.log",
+      "exitCode": 0,
+      "durationMs": 0
+    },
+    {
+      "schemaVersion": "waldorf-evidence-v1",
+      "scenarioId": "LOCAL-STAFF-SCHEDULE",
+      "storyIds": [
+        "US-LR-05",
+        "US-13"
+      ],
+      "requirementIds": [
+        "FR-LR-09",
+        "FR-03",
+        "NFR-LR-05"
+      ],
+      "matrixRows": [
+        "AUTH-STAFF-SCHEDULE-ALLOW",
+        "AUTH-STAFF-MUTATION-DENY",
+        "AUTH-STAFF-SENSITIVE-FIELDS-DENY",
+        "AUTH-STAFF-OUT-OF-SCOPE-DENY"
+      ],
+      "fixtureVersion": "waldorf-local-v1",
+      "manifestVersion": "waldorf-scenarios-v1",
+      "runtimeMode": "synthetic",
+      "target": "local",
+      "tool": "npm run test:browser",
+      "toolVersion": "node=v24.19.0;npm=11.19.0",
+      "browser": "chromium,firefox,mobile-chrome",
+      "result": "PASS",
+      "startedAt": "2026-08-12T15:32:22.472Z",
+      "finishedAt": "2026-08-12T15:32:22.472Z",
+      "gitSha": "69edd12c7aba1c0ae35138bbac67932d86b85e63",
+      "artifactPath": ".verification/logs/browser.log",
+      "exitCode": 0,
+      "durationMs": 0
+    },
+    {
+      "schemaVersion": "waldorf-evidence-v1",
+      "scenarioId": "LOCAL-ADMIN-RECORDS",
+      "storyIds": [
+        "US-LR-06a1",
+        "US-05"
+      ],
+      "requirementIds": [
+        "FR-LR-10",
+        "FR-05a"
+      ],
+      "matrixRows": [
+        "AUTH-GROUP-ADMIN-CORE-ALLOW",
+        "AUTH-GROUP-ADMIN-OUT-OF-SCOPE-DENY"
+      ],
+      "fixtureVersion": "waldorf-local-v1",
+      "manifestVersion": "waldorf-scenarios-v1",
+      "runtimeMode": "synthetic",
+      "target": "local",
+      "tool": "npm run test:browser",
+      "toolVersion": "node=v24.19.0;npm=11.19.0",
+      "browser": "chromium,firefox,mobile-chrome",
+      "result": "PASS",
+      "startedAt": "2026-08-12T15:32:22.472Z",
+      "finishedAt": "2026-08-12T15:32:22.472Z",
+      "gitSha": "69edd12c7aba1c0ae35138bbac67932d86b85e63",
+      "artifactPath": ".verification/logs/browser.log",
+      "exitCode": 0,
+      "durationMs": 0
+    },
+    {
+      "schemaVersion": "waldorf-evidence-v1",
+      "scenarioId": "LOCAL-ADMIN-ARCHIVE",
+      "storyIds": [
+        "US-LR-06a2"
+      ],
+      "requirementIds": [
+        "FR-LR-10a",
+        "FR-05a",
+        "NFR-08"
+      ],
+      "matrixRows": [
+        "AUTH-KINDERGARTEN-ADMIN-ALLOW"
+      ],
+      "fixtureVersion": "waldorf-local-v1",
+      "manifestVersion": "waldorf-scenarios-v1",
+      "runtimeMode": "synthetic",
+      "target": "local",
+      "tool": "npm run test:browser",
+      "toolVersion": "node=v24.19.0;npm=11.19.0",
+      "browser": "chromium,firefox,mobile-chrome",
+      "result": "PASS",
+      "startedAt": "2026-08-12T15:32:22.472Z",
+      "finishedAt": "2026-08-12T15:32:22.472Z",
+      "gitSha": "69edd12c7aba1c0ae35138bbac67932d86b85e63",
+      "artifactPath": ".verification/logs/browser.log",
+      "exitCode": 0,
+      "durationMs": 0
+    },
+    {
+      "schemaVersion": "waldorf-evidence-v1",
+      "scenarioId": "LOCAL-ADMIN-TASKS",
+      "storyIds": [
+        "US-LR-06b1"
+      ],
+      "requirementIds": [
+        "FR-LR-03",
+        "FR-LR-10",
+        "FR-05"
+      ],
+      "matrixRows": [
+        "AUTH-GROUP-ADMIN-CORE-ALLOW"
+      ],
+      "fixtureVersion": "waldorf-local-v1",
+      "manifestVersion": "waldorf-scenarios-v1",
+      "runtimeMode": "synthetic",
+      "target": "local",
+      "tool": "npm run test:browser",
+      "toolVersion": "node=v24.19.0;npm=11.19.0",
+      "browser": "chromium,firefox,mobile-chrome",
+      "result": "PASS",
+      "startedAt": "2026-08-12T15:32:22.472Z",
+      "finishedAt": "2026-08-12T15:32:22.472Z",
+      "gitSha": "69edd12c7aba1c0ae35138bbac67932d86b85e63",
+      "artifactPath": ".verification/logs/browser.log",
+      "exitCode": 0,
+      "durationMs": 0
+    },
+    {
+      "schemaVersion": "waldorf-evidence-v1",
+      "scenarioId": "LOCAL-ADMIN-ASSIGNMENTS",
+      "storyIds": [
+        "US-LR-06b2"
+      ],
+      "requirementIds": [
+        "FR-LR-10",
+        "FR-05",
+        "FR-05a"
+      ],
+      "matrixRows": [
+        "AUTH-GROUP-ADMIN-CORE-ALLOW"
+      ],
+      "fixtureVersion": "waldorf-local-v1",
+      "manifestVersion": "waldorf-scenarios-v1",
+      "runtimeMode": "synthetic",
+      "target": "local",
+      "tool": "npm run test:browser",
+      "toolVersion": "node=v24.19.0;npm=11.19.0",
+      "browser": "chromium,firefox,mobile-chrome",
+      "result": "PASS",
+      "startedAt": "2026-08-12T15:32:22.472Z",
+      "finishedAt": "2026-08-12T15:32:22.472Z",
+      "gitSha": "69edd12c7aba1c0ae35138bbac67932d86b85e63",
+      "artifactPath": ".verification/logs/browser.log",
+      "exitCode": 0,
+      "durationMs": 0
+    },
+    {
+      "schemaVersion": "waldorf-evidence-v1",
+      "scenarioId": "LOCAL-ADMIN-APPROVAL",
+      "storyIds": [
+        "US-LR-06c"
+      ],
+      "requirementIds": [
+        "FR-LR-10",
+        "FR-05",
+        "NFR-07"
+      ],
+      "matrixRows": [
+        "AUTH-GROUP-ADMIN-CORE-ALLOW"
+      ],
+      "fixtureVersion": "waldorf-local-v1",
+      "manifestVersion": "waldorf-scenarios-v1",
+      "runtimeMode": "synthetic",
+      "target": "local",
+      "tool": "npm run test:browser",
+      "toolVersion": "node=v24.19.0;npm=11.19.0",
+      "browser": "chromium,firefox,mobile-chrome",
+      "result": "PASS",
+      "startedAt": "2026-08-12T15:32:22.472Z",
+      "finishedAt": "2026-08-12T15:32:22.472Z",
+      "gitSha": "69edd12c7aba1c0ae35138bbac67932d86b85e63",
+      "artifactPath": ".verification/logs/browser.log",
+      "exitCode": 0,
+      "durationMs": 0
+    },
+    {
+      "schemaVersion": "waldorf-evidence-v1",
+      "scenarioId": "LOCAL-IMPORT",
+      "storyIds": [
+        "US-LR-06d",
+        "US-08",
+        "US-09",
+        "US-10"
+      ],
+      "requirementIds": [
+        "FR-LR-10a",
+        "FR-08",
+        "FR-09",
+        "FR-10",
+        "FR-11",
+        "FR-12a"
+      ],
+      "matrixRows": [
+        "AUTH-KINDERGARTEN-ADMIN-ALLOW",
+        "AUTH-GRP-IMPORT-DENY"
+      ],
+      "fixtureVersion": "waldorf-local-v1",
+      "manifestVersion": "waldorf-scenarios-v1",
+      "runtimeMode": "synthetic",
+      "target": "local",
+      "tool": "npm run test:browser",
+      "toolVersion": "node=v24.19.0;npm=11.19.0",
+      "browser": "chromium,firefox,mobile-chrome",
+      "result": "PASS",
+      "startedAt": "2026-08-12T15:32:22.472Z",
+      "finishedAt": "2026-08-12T15:32:22.472Z",
+      "gitSha": "69edd12c7aba1c0ae35138bbac67932d86b85e63",
+      "artifactPath": ".verification/logs/browser.log",
+      "exitCode": 0,
+      "durationMs": 0
+    },
+    {
+      "schemaVersion": "waldorf-evidence-v1",
+      "scenarioId": "LOCAL-REMINDER-MONITORING",
+      "storyIds": [
+        "US-LR-06e"
+      ],
+      "requirementIds": [
+        "FR-LR-10a",
+        "FR-14",
+        "FR-17"
+      ],
+      "matrixRows": [
+        "AUTH-KINDERGARTEN-ADMIN-ALLOW"
+      ],
+      "fixtureVersion": "waldorf-local-v1",
+      "manifestVersion": "waldorf-scenarios-v1",
+      "runtimeMode": "synthetic",
+      "target": "local",
+      "tool": "npm run test:browser",
+      "toolVersion": "node=v24.19.0;npm=11.19.0",
+      "browser": "chromium,firefox,mobile-chrome",
+      "result": "PASS",
+      "startedAt": "2026-08-12T15:32:22.472Z",
+      "finishedAt": "2026-08-12T15:32:22.472Z",
+      "gitSha": "69edd12c7aba1c0ae35138bbac67932d86b85e63",
+      "artifactPath": ".verification/logs/browser.log",
+      "exitCode": 0,
+      "durationMs": 0
+    },
+    {
+      "schemaVersion": "waldorf-evidence-v1",
+      "scenarioId": "LOCAL-PRIVACY-LIFECYCLE",
+      "storyIds": [
+        "US-LR-06f",
+        "US-11"
+      ],
+      "requirementIds": [
+        "FR-LR-10a",
+        "FR-15",
+        "FR-18",
+        "NFR-02a",
+        "NFR-02h"
+      ],
+      "matrixRows": [
+        "AUTH-KINDERGARTEN-ADMIN-ALLOW"
+      ],
+      "fixtureVersion": "waldorf-local-v1",
+      "manifestVersion": "waldorf-scenarios-v1",
+      "runtimeMode": "synthetic",
+      "target": "local",
+      "tool": "npm run test:browser",
+      "toolVersion": "node=v24.19.0;npm=11.19.0",
+      "browser": "chromium,firefox,mobile-chrome",
+      "result": "PASS",
+      "startedAt": "2026-08-12T15:32:22.472Z",
+      "finishedAt": "2026-08-12T15:32:22.472Z",
+      "gitSha": "69edd12c7aba1c0ae35138bbac67932d86b85e63",
+      "artifactPath": ".verification/logs/browser.log",
+      "exitCode": 0,
+      "durationMs": 0
+    },
+    {
+      "schemaVersion": "waldorf-evidence-v1",
+      "scenarioId": "LOCAL-GOVERNANCE-REVOCATION",
+      "storyIds": [
+        "US-LR-06g",
+        "US-06"
+      ],
+      "requirementIds": [
+        "FR-01",
+        "FR-LR-14",
+        "NFR-LR-05"
+      ],
+      "matrixRows": [
+        "AUTH-SUPER-ADMIN-ALLOW",
+        "AUTH-KINDERGARTEN-GOVERNANCE-DENY",
+        "AUTH-IMMEDIATE-REVOCATION-DENY"
+      ],
+      "fixtureVersion": "waldorf-local-v1",
+      "manifestVersion": "waldorf-scenarios-v1",
+      "runtimeMode": "synthetic",
+      "target": "local",
+      "tool": "npm run test:browser",
+      "toolVersion": "node=v24.19.0;npm=11.19.0",
+      "browser": "chromium,firefox,mobile-chrome",
+      "result": "PASS",
+      "startedAt": "2026-08-12T15:32:22.472Z",
+      "finishedAt": "2026-08-12T15:32:22.472Z",
+      "gitSha": "69edd12c7aba1c0ae35138bbac67932d86b85e63",
+      "artifactPath": ".verification/logs/browser.log",
+      "exitCode": 0,
+      "durationMs": 0
+    },
+    {
+      "schemaVersion": "waldorf-evidence-v1",
+      "scenarioId": "LOCAL-SHARED-VALIDATION",
+      "storyIds": [
+        "US-LR-06h",
+        "US-12"
+      ],
+      "requirementIds": [
+        "FR-12",
+        "NFR-03"
+      ],
+      "matrixRows": [
+        "AUTH-KINDERGARTEN-ADMIN-ALLOW"
+      ],
+      "fixtureVersion": "waldorf-local-v1",
+      "manifestVersion": "waldorf-scenarios-v1",
+      "runtimeMode": "synthetic",
+      "target": "local",
+      "tool": "npm test",
+      "toolVersion": "node=v24.19.0;npm=11.19.0",
+      "result": "PASS",
+      "startedAt": "2026-08-12T15:32:22.472Z",
+      "finishedAt": "2026-08-12T15:32:22.472Z",
+      "gitSha": "69edd12c7aba1c0ae35138bbac67932d86b85e63",
+      "artifactPath": ".verification/logs/tests.log",
+      "exitCode": 0,
+      "durationMs": 0
+    },
+    {
+      "schemaVersion": "waldorf-evidence-v1",
+      "scenarioId": "LOCAL-SECURITY-PRIVACY",
+      "storyIds": [
+        "US-LR-07"
+      ],
+      "requirementIds": [
+        "NFR-LR-05",
+        "NFR-01",
+        "NFR-02c",
+        "NFR-02h"
+      ],
+      "matrixRows": [
+        "AUTH-PARENT-UNRELATED-DENY",
+        "AUTH-STAFF-SENSITIVE-FIELDS-DENY",
+        "AUTH-GROUP-ADMIN-OUT-OF-SCOPE-DENY",
+        "AUTH-KINDERGARTEN-GOVERNANCE-DENY",
+        "AUTH-IMMEDIATE-REVOCATION-DENY"
+      ],
+      "fixtureVersion": "waldorf-local-v1",
+      "manifestVersion": "waldorf-scenarios-v1",
+      "runtimeMode": "synthetic",
+      "target": "local",
+      "tool": "npm run verify:security",
+      "toolVersion": "node=v24.19.0;npm=11.19.0",
+      "result": "PASS",
+      "startedAt": "2026-08-12T15:32:22.472Z",
+      "finishedAt": "2026-08-12T15:32:22.472Z",
+      "gitSha": "69edd12c7aba1c0ae35138bbac67932d86b85e63",
+      "artifactPath": ".verification/logs/security.log",
+      "exitCode": 0,
+      "durationMs": 0
+    },
+    {
+      "schemaVersion": "waldorf-evidence-v1",
+      "scenarioId": "LOCAL-QUALITY-BROWSER",
+      "storyIds": [
+        "US-LR-08"
+      ],
+      "requirementIds": [
+        "NFR-LR-02",
+        "NFR-LR-03",
+        "NFR-LR-04",
+        "NFR-LR-07"
+      ],
+      "matrixRows": [
+        "AUTH-PARENT-DUTIES-ALLOW"
+      ],
+      "fixtureVersion": "waldorf-local-v1",
+      "manifestVersion": "waldorf-scenarios-v1",
+      "runtimeMode": "synthetic",
+      "target": "local",
+      "tool": "npm run verify:local",
+      "toolVersion": "node=v24.19.0;npm=11.19.0",
+      "browser": "chromium,firefox,mobile-chrome",
+      "result": "PASS",
+      "startedAt": "2026-08-12T15:32:22.472Z",
+      "finishedAt": "2026-08-12T15:32:22.472Z",
+      "gitSha": "69edd12c7aba1c0ae35138bbac67932d86b85e63",
+      "artifactPath": ".verification/logs/aggregate.log",
+      "exitCode": 0,
+      "durationMs": 0
+    },
+    {
+      "schemaVersion": "waldorf-evidence-v1",
+      "scenarioId": "LOCAL-HANDOFF-NO-DEPLOY",
+      "storyIds": [
+        "US-LR-09"
+      ],
+      "requirementIds": [
+        "FR-LR-12",
+        "FR-LR-13",
+        "FR-LR-13a"
+      ],
+      "matrixRows": [
+        "AUTH-PARENT-DUTIES-ALLOW"
+      ],
+      "fixtureVersion": "waldorf-local-v1",
+      "manifestVersion": "waldorf-scenarios-v1",
+      "runtimeMode": "synthetic",
+      "target": "local",
+      "tool": "npm run verify:no-deploy",
+      "toolVersion": "node=v24.19.0;npm=11.19.0",
+      "result": "PASS",
+      "startedAt": "2026-08-12T15:32:22.472Z",
+      "finishedAt": "2026-08-12T15:32:22.472Z",
+      "gitSha": "69edd12c7aba1c0ae35138bbac67932d86b85e63",
+      "artifactPath": ".verification/logs/security.log",
+      "exitCode": 0,
+      "durationMs": 0
+    },
+    {
+      "schemaVersion": "waldorf-evidence-v1",
+      "scenarioId": "NFR08-INVITATION-EXPIRY-RESEND",
+      "storyIds": [
+        "US-LR-04e"
+      ],
+      "requirementIds": [
+        "NFR-08"
+      ],
+      "matrixRows": [
+        "AUTH-PARENT-DUTIES-ALLOW"
+      ],
+      "fixtureVersion": "waldorf-local-v1",
+      "manifestVersion": "waldorf-scenarios-v1",
+      "runtimeMode": "synthetic",
+      "target": "local",
+      "tool": "npm run test:browser",
+      "toolVersion": "node=v24.19.0;npm=11.19.0",
+      "browser": "chromium,firefox,mobile-chrome",
+      "result": "PASS",
+      "startedAt": "2026-08-12T15:32:22.472Z",
+      "finishedAt": "2026-08-12T15:32:22.472Z",
+      "gitSha": "69edd12c7aba1c0ae35138bbac67932d86b85e63",
+      "artifactPath": ".verification/logs/browser.log",
+      "exitCode": 0,
+      "durationMs": 0
+    },
+    {
+      "schemaVersion": "waldorf-evidence-v1",
+      "scenarioId": "NFR08-UPCOMING-DUTY",
+      "storyIds": [
+        "US-LR-04e"
+      ],
+      "requirementIds": [
+        "NFR-08"
+      ],
+      "matrixRows": [
+        "AUTH-PARENT-DUTIES-ALLOW"
+      ],
+      "fixtureVersion": "waldorf-local-v1",
+      "manifestVersion": "waldorf-scenarios-v1",
+      "runtimeMode": "synthetic",
+      "target": "local",
+      "tool": "npm run test:browser",
+      "toolVersion": "node=v24.19.0;npm=11.19.0",
+      "browser": "chromium,firefox,mobile-chrome",
+      "result": "PASS",
+      "startedAt": "2026-08-12T15:32:22.472Z",
+      "finishedAt": "2026-08-12T15:32:22.472Z",
+      "gitSha": "69edd12c7aba1c0ae35138bbac67932d86b85e63",
+      "artifactPath": ".verification/logs/browser.log",
+      "exitCode": 0,
+      "durationMs": 0
+    },
+    {
+      "schemaVersion": "waldorf-evidence-v1",
+      "scenarioId": "NFR08-NOTIFICATION-CENTRE",
+      "storyIds": [
+        "US-LR-04c"
+      ],
+      "requirementIds": [
+        "NFR-08"
+      ],
+      "matrixRows": [
+        "AUTH-PARENT-NOTIFICATIONS-ALLOW"
+      ],
+      "fixtureVersion": "waldorf-local-v1",
+      "manifestVersion": "waldorf-scenarios-v1",
+      "runtimeMode": "synthetic",
+      "target": "local",
+      "tool": "npm run test:browser",
+      "toolVersion": "node=v24.19.0;npm=11.19.0",
+      "browser": "chromium,firefox,mobile-chrome",
+      "result": "PASS",
+      "startedAt": "2026-08-12T15:32:22.472Z",
+      "finishedAt": "2026-08-12T15:32:22.472Z",
+      "gitSha": "69edd12c7aba1c0ae35138bbac67932d86b85e63",
+      "artifactPath": ".verification/logs/browser.log",
+      "exitCode": 0,
+      "durationMs": 0
+    },
+    {
+      "schemaVersion": "waldorf-evidence-v1",
+      "scenarioId": "NFR08-QUEUES-FILTERS",
+      "storyIds": [
+        "US-LR-05",
+        "US-LR-06c"
+      ],
+      "requirementIds": [
+        "NFR-08"
+      ],
+      "matrixRows": [
+        "AUTH-STAFF-SCHEDULE-ALLOW"
+      ],
+      "fixtureVersion": "waldorf-local-v1",
+      "manifestVersion": "waldorf-scenarios-v1",
+      "runtimeMode": "synthetic",
+      "target": "local",
+      "tool": "npm run test:browser",
+      "toolVersion": "node=v24.19.0;npm=11.19.0",
+      "browser": "chromium,firefox,mobile-chrome",
+      "result": "PASS",
+      "startedAt": "2026-08-12T15:32:22.472Z",
+      "finishedAt": "2026-08-12T15:32:22.472Z",
+      "gitSha": "69edd12c7aba1c0ae35138bbac67932d86b85e63",
+      "artifactPath": ".verification/logs/browser.log",
+      "exitCode": 0,
+      "durationMs": 0
+    },
+    {
+      "schemaVersion": "waldorf-evidence-v1",
+      "scenarioId": "NFR08-SCHOOL-YEAR-ARCHIVE",
+      "storyIds": [
+        "US-LR-06a2"
+      ],
+      "requirementIds": [
+        "NFR-08"
+      ],
+      "matrixRows": [
+        "AUTH-KINDERGARTEN-ADMIN-ALLOW"
+      ],
+      "fixtureVersion": "waldorf-local-v1",
+      "manifestVersion": "waldorf-scenarios-v1",
+      "runtimeMode": "synthetic",
+      "target": "local",
+      "tool": "npm run test:browser",
+      "toolVersion": "node=v24.19.0;npm=11.19.0",
+      "browser": "chromium,firefox,mobile-chrome",
+      "result": "PASS",
+      "startedAt": "2026-08-12T15:32:22.472Z",
+      "finishedAt": "2026-08-12T15:32:22.472Z",
+      "gitSha": "69edd12c7aba1c0ae35138bbac67932d86b85e63",
+      "artifactPath": ".verification/logs/browser.log",
+      "exitCode": 0,
+      "durationMs": 0
+    },
+    {
+      "schemaVersion": "waldorf-evidence-v1",
+      "scenarioId": "NFR08-ROLE-RESOURCE-FIELD-PARITY",
+      "storyIds": [
+        "US-LR-00",
+        "US-LR-07"
+      ],
+      "requirementIds": [
+        "NFR-08"
+      ],
+      "matrixRows": [
+        "AUTH-PARENT-SENSITIVE-FIELDS-DENY",
+        "AUTH-STAFF-SENSITIVE-FIELDS-DENY",
+        "AUTH-GROUP-ADMIN-OUT-OF-SCOPE-DENY",
+        "AUTH-KINDERGARTEN-GOVERNANCE-DENY"
+      ],
+      "fixtureVersion": "waldorf-local-v1",
+      "manifestVersion": "waldorf-scenarios-v1",
+      "runtimeMode": "synthetic",
+      "target": "local",
+      "tool": "npm run verify:manifests",
+      "toolVersion": "node=v24.19.0;npm=11.19.0",
+      "result": "PASS",
+      "startedAt": "2026-08-12T15:32:22.472Z",
+      "finishedAt": "2026-08-12T15:32:22.472Z",
+      "gitSha": "69edd12c7aba1c0ae35138bbac67932d86b85e63",
+      "artifactPath": ".verification/logs/manifests.log",
+      "exitCode": 0,
+      "durationMs": 0
+    },
+    {
+      "schemaVersion": "waldorf-evidence-v1",
+      "scenarioId": "NFR08-IMPORT",
+      "storyIds": [
+        "US-LR-06d"
+      ],
+      "requirementIds": [
+        "NFR-08"
+      ],
+      "matrixRows": [
+        "AUTH-KINDERGARTEN-ADMIN-ALLOW"
+      ],
+      "fixtureVersion": "waldorf-local-v1",
+      "manifestVersion": "waldorf-scenarios-v1",
+      "runtimeMode": "synthetic",
+      "target": "local",
+      "tool": "npm run test:browser",
+      "toolVersion": "node=v24.19.0;npm=11.19.0",
+      "browser": "chromium,firefox,mobile-chrome",
+      "result": "PASS",
+      "startedAt": "2026-08-12T15:32:22.472Z",
+      "finishedAt": "2026-08-12T15:32:22.472Z",
+      "gitSha": "69edd12c7aba1c0ae35138bbac67932d86b85e63",
+      "artifactPath": ".verification/logs/browser.log",
+      "exitCode": 0,
+      "durationMs": 0
+    },
+    {
+      "schemaVersion": "waldorf-evidence-v1",
+      "scenarioId": "NFR08-REMINDERS",
+      "storyIds": [
+        "US-LR-06e"
+      ],
+      "requirementIds": [
+        "NFR-08"
+      ],
+      "matrixRows": [
+        "AUTH-KINDERGARTEN-ADMIN-ALLOW"
+      ],
+      "fixtureVersion": "waldorf-local-v1",
+      "manifestVersion": "waldorf-scenarios-v1",
+      "runtimeMode": "synthetic",
+      "target": "local",
+      "tool": "npm run test:browser",
+      "toolVersion": "node=v24.19.0;npm=11.19.0",
+      "browser": "chromium,firefox,mobile-chrome",
+      "result": "PASS",
+      "startedAt": "2026-08-12T15:32:22.472Z",
+      "finishedAt": "2026-08-12T15:32:22.472Z",
+      "gitSha": "69edd12c7aba1c0ae35138bbac67932d86b85e63",
+      "artifactPath": ".verification/logs/browser.log",
+      "exitCode": 0,
+      "durationMs": 0
+    },
+    {
+      "schemaVersion": "waldorf-evidence-v1",
+      "scenarioId": "NFR08-LIFECYCLE-RECOVERY",
+      "storyIds": [
+        "US-LR-06f"
+      ],
+      "requirementIds": [
+        "NFR-08"
+      ],
+      "matrixRows": [
+        "AUTH-KINDERGARTEN-ADMIN-ALLOW"
+      ],
+      "fixtureVersion": "waldorf-local-v1",
+      "manifestVersion": "waldorf-scenarios-v1",
+      "runtimeMode": "synthetic",
+      "target": "local",
+      "tool": "npm run test:browser",
+      "toolVersion": "node=v24.19.0;npm=11.19.0",
+      "browser": "chromium,firefox,mobile-chrome",
+      "result": "PASS",
+      "startedAt": "2026-08-12T15:32:22.472Z",
+      "finishedAt": "2026-08-12T15:32:22.472Z",
+      "gitSha": "69edd12c7aba1c0ae35138bbac67932d86b85e63",
+      "artifactPath": ".verification/logs/browser.log",
+      "exitCode": 0,
+      "durationMs": 0
+    },
+    {
+      "schemaVersion": "waldorf-evidence-v1",
+      "scenarioId": "SAFARI-DESKTOP-SMOKE",
+      "storyIds": [
+        "US-LR-08",
+        "US-14"
+      ],
+      "requirementIds": [
+        "NFR-LR-07",
+        "NFR-08"
+      ],
+      "matrixRows": [
+        "AUTH-PARENT-DUTIES-ALLOW"
+      ],
+      "fixtureVersion": "waldorf-local-v1",
+      "manifestVersion": "waldorf-scenarios-v1",
+      "runtimeMode": "linked-target",
+      "target": "linked-target",
+      "tool": "manual Safari runbook",
+      "toolVersion": "node=v24.19.0;npm=11.19.0",
+      "browser": "safari-desktop",
+      "result": "OUTSTANDING",
+      "startedAt": "2026-08-12T15:32:22.472Z",
+      "finishedAt": "2026-08-12T15:32:22.472Z",
+      "gitSha": "69edd12c7aba1c0ae35138bbac67932d86b85e63",
+      "artifactPath": ".verification/logs/outstanding.log",
+      "durationMs": 0
+    },
+    {
+      "schemaVersion": "waldorf-evidence-v1",
+      "scenarioId": "SAFARI-MOBILE-SMOKE",
+      "storyIds": [
+        "US-LR-08",
+        "US-14"
+      ],
+      "requirementIds": [
+        "NFR-LR-07",
+        "NFR-08"
+      ],
+      "matrixRows": [
+        "AUTH-PARENT-DUTIES-ALLOW"
+      ],
+      "fixtureVersion": "waldorf-local-v1",
+      "manifestVersion": "waldorf-scenarios-v1",
+      "runtimeMode": "linked-target",
+      "target": "linked-target",
+      "tool": "manual mobile Safari runbook",
+      "toolVersion": "node=v24.19.0;npm=11.19.0",
+      "browser": "mobile-safari",
+      "result": "OUTSTANDING",
+      "startedAt": "2026-08-12T15:32:22.472Z",
+      "finishedAt": "2026-08-12T15:32:22.472Z",
+      "gitSha": "69edd12c7aba1c0ae35138bbac67932d86b85e63",
+      "artifactPath": ".verification/logs/outstanding.log",
+      "durationMs": 0
+    },
+    {
+      "schemaVersion": "waldorf-evidence-v1",
+      "scenarioId": "TARGET-SUPABASE-AUTH-RLS",
+      "storyIds": [
+        "US-LR-07"
+      ],
+      "requirementIds": [
+        "FR-LR-10b",
+        "NFR-LR-05"
+      ],
+      "matrixRows": [
+        "AUTH-IMMEDIATE-REVOCATION-DENY"
+      ],
+      "fixtureVersion": "waldorf-local-v1",
+      "manifestVersion": "waldorf-scenarios-v1",
+      "runtimeMode": "linked-target",
+      "target": "linked-target",
+      "tool": "future linked-target suite",
+      "toolVersion": "node=v24.19.0;npm=11.19.0",
+      "result": "OUTSTANDING",
+      "startedAt": "2026-08-12T15:32:22.472Z",
+      "finishedAt": "2026-08-12T15:32:22.472Z",
+      "gitSha": "69edd12c7aba1c0ae35138bbac67932d86b85e63",
+      "artifactPath": ".verification/logs/outstanding.log",
+      "durationMs": 0
+    },
+    {
+      "schemaVersion": "waldorf-evidence-v1",
+      "scenarioId": "TARGET-SUPABASE-PERSISTENCE",
+      "storyIds": [
+        "US-LR-06d",
+        "US-LR-06f"
+      ],
+      "requirementIds": [
+        "FR-LR-10b"
+      ],
+      "matrixRows": [
+        "AUTH-KINDERGARTEN-ADMIN-ALLOW"
+      ],
+      "fixtureVersion": "waldorf-local-v1",
+      "manifestVersion": "waldorf-scenarios-v1",
+      "runtimeMode": "linked-target",
+      "target": "linked-target",
+      "tool": "future linked-target suite",
+      "toolVersion": "node=v24.19.0;npm=11.19.0",
+      "result": "OUTSTANDING",
+      "startedAt": "2026-08-12T15:32:22.472Z",
+      "finishedAt": "2026-08-12T15:32:22.472Z",
+      "gitSha": "69edd12c7aba1c0ae35138bbac67932d86b85e63",
+      "artifactPath": ".verification/logs/outstanding.log",
+      "durationMs": 0
+    },
+    {
+      "schemaVersion": "waldorf-evidence-v1",
+      "scenarioId": "TARGET-SCHEDULER-PROVIDER",
+      "storyIds": [
+        "US-LR-04c",
+        "US-LR-06e"
+      ],
+      "requirementIds": [
+        "FR-LR-10b"
+      ],
+      "matrixRows": [
+        "AUTH-KINDERGARTEN-ADMIN-ALLOW"
+      ],
+      "fixtureVersion": "waldorf-local-v1",
+      "manifestVersion": "waldorf-scenarios-v1",
+      "runtimeMode": "linked-target",
+      "target": "linked-target",
+      "tool": "future linked-target suite",
+      "toolVersion": "node=v24.19.0;npm=11.19.0",
+      "result": "OUTSTANDING",
+      "startedAt": "2026-08-12T15:32:22.472Z",
+      "finishedAt": "2026-08-12T15:32:22.472Z",
+      "gitSha": "69edd12c7aba1c0ae35138bbac67932d86b85e63",
+      "artifactPath": ".verification/logs/outstanding.log",
+      "durationMs": 0
+    },
+    {
+      "schemaVersion": "waldorf-evidence-v1",
+      "scenarioId": "TARGET-VERCEL-PREVIEW-STAGING",
+      "storyIds": [
+        "US-LR-09"
+      ],
+      "requirementIds": [
+        "FR-LR-13a"
+      ],
+      "matrixRows": [
+        "AUTH-PARENT-DUTIES-ALLOW"
+      ],
+      "fixtureVersion": "waldorf-local-v1",
+      "manifestVersion": "waldorf-scenarios-v1",
+      "runtimeMode": "linked-target",
+      "target": "linked-target",
+      "tool": "future approved deployment workflow",
+      "toolVersion": "node=v24.19.0;npm=11.19.0",
+      "result": "OUTSTANDING",
+      "startedAt": "2026-08-12T15:32:22.472Z",
+      "finishedAt": "2026-08-12T15:32:22.472Z",
+      "gitSha": "69edd12c7aba1c0ae35138bbac67932d86b85e63",
+      "artifactPath": ".verification/logs/outstanding.log",
+      "durationMs": 0
+    }
+  ]
+}

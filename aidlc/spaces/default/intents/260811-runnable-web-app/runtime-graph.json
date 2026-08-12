@@ -1700,9 +1700,1519 @@
     {
       "stage_slug": "functional-design",
       "started_at": "2026-08-12T10:11:15Z",
-      "completed_at": null,
+      "completed_at": "2026-08-12T10:53:11Z",
       "agent": "aidlc-architect-agent",
       "memory_path": "aidlc/spaces/default/intents/260811-runnable-web-app/construction/functional-design/memory.md",
+      "memory_entries": null,
+      "memory_breakdown": null,
+      "sensor_firings": [
+        {
+          "id": "required-sections",
+          "fire_id": "0be12c62",
+          "result": "passed",
+          "ts": "2026-08-12T10:12:19Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "08776d5a",
+          "result": "passed",
+          "ts": "2026-08-12T10:12:19Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "67727692",
+          "result": "passed",
+          "ts": "2026-08-12T10:12:19Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "520c27ae",
+          "result": "failed",
+          "ts": "2026-08-12T10:12:19Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-520c27ae.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "b3f353c4",
+          "result": "passed",
+          "ts": "2026-08-12T10:12:19Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "003f83c3",
+          "result": "failed",
+          "ts": "2026-08-12T10:12:19Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-003f83c3.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "a2febf31",
+          "result": "passed",
+          "ts": "2026-08-12T10:12:48Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "8f30c0d3",
+          "result": "passed",
+          "ts": "2026-08-12T10:12:48Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "1f6eb7d8",
+          "result": "passed",
+          "ts": "2026-08-12T10:12:49Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "701acfa1",
+          "result": "failed",
+          "ts": "2026-08-12T10:12:49Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-701acfa1.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "e1578153",
+          "result": "passed",
+          "ts": "2026-08-12T10:13:20Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "56a98f69",
+          "result": "failed",
+          "ts": "2026-08-12T10:13:20Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-56a98f69.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "9e57806a",
+          "result": "passed",
+          "ts": "2026-08-12T10:13:20Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "db47be28",
+          "result": "failed",
+          "ts": "2026-08-12T10:13:20Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-db47be28.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "91bf5208",
+          "result": "passed",
+          "ts": "2026-08-12T10:13:20Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "e5d2807b",
+          "result": "failed",
+          "ts": "2026-08-12T10:13:20Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-e5d2807b.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "10fc0265",
+          "result": "passed",
+          "ts": "2026-08-12T10:13:21Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "d1cb69fe",
+          "result": "failed",
+          "ts": "2026-08-12T10:13:21Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-d1cb69fe.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "f6967bc8",
+          "result": "passed",
+          "ts": "2026-08-12T10:13:21Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "53e91f43",
+          "result": "failed",
+          "ts": "2026-08-12T10:13:21Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-53e91f43.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "0d9c1ba8",
+          "result": "passed",
+          "ts": "2026-08-12T10:28:15Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "2b33a108",
+          "result": "passed",
+          "ts": "2026-08-12T10:28:15Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "348b5cdf",
+          "result": "passed",
+          "ts": "2026-08-12T10:28:15Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "79d1e3d7",
+          "result": "passed",
+          "ts": "2026-08-12T10:28:15Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "db9e99f6",
+          "result": "passed",
+          "ts": "2026-08-12T10:28:15Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "6b8f70c3",
+          "result": "passed",
+          "ts": "2026-08-12T10:28:15Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "206a8e16",
+          "result": "passed",
+          "ts": "2026-08-12T10:31:27Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "c420cc02",
+          "result": "passed",
+          "ts": "2026-08-12T10:31:27Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "54790584",
+          "result": "passed",
+          "ts": "2026-08-12T10:31:27Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "425ca7ed",
+          "result": "failed",
+          "ts": "2026-08-12T10:31:27Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-425ca7ed.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "235b2944",
+          "result": "passed",
+          "ts": "2026-08-12T10:31:27Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "e3793a80",
+          "result": "failed",
+          "ts": "2026-08-12T10:31:27Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-e3793a80.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "a9770122",
+          "result": "passed",
+          "ts": "2026-08-12T10:31:52Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "ef662770",
+          "result": "passed",
+          "ts": "2026-08-12T10:31:52Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "79e4f137",
+          "result": "passed",
+          "ts": "2026-08-12T10:31:52Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "70c99706",
+          "result": "failed",
+          "ts": "2026-08-12T10:31:52Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-70c99706.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "a0fd1838",
+          "result": "passed",
+          "ts": "2026-08-12T10:31:52Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "9ea43882",
+          "result": "failed",
+          "ts": "2026-08-12T10:31:52Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-9ea43882.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "85eb1d35",
+          "result": "passed",
+          "ts": "2026-08-12T10:32:09Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "bc4be102",
+          "result": "failed",
+          "ts": "2026-08-12T10:32:09Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-bc4be102.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "05eda62f",
+          "result": "passed",
+          "ts": "2026-08-12T10:32:09Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "904ec5db",
+          "result": "failed",
+          "ts": "2026-08-12T10:32:09Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-904ec5db.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "60fb29ed",
+          "result": "passed",
+          "ts": "2026-08-12T10:32:31Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "80836b03",
+          "result": "passed",
+          "ts": "2026-08-12T10:32:31Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "a2bc182c",
+          "result": "passed",
+          "ts": "2026-08-12T10:32:31Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "97d456db",
+          "result": "passed",
+          "ts": "2026-08-12T10:32:31Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "d3d48af2",
+          "result": "passed",
+          "ts": "2026-08-12T10:32:55Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "55833ce2",
+          "result": "passed",
+          "ts": "2026-08-12T10:32:55Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "154ac111",
+          "result": "passed",
+          "ts": "2026-08-12T10:32:56Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "0cfb2674",
+          "result": "failed",
+          "ts": "2026-08-12T10:32:56Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-0cfb2674.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "712cd31d",
+          "result": "passed",
+          "ts": "2026-08-12T10:32:56Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "1d375e03",
+          "result": "failed",
+          "ts": "2026-08-12T10:32:56Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-1d375e03.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "9cb391d1",
+          "result": "passed",
+          "ts": "2026-08-12T10:32:56Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "7b5765d6",
+          "result": "failed",
+          "ts": "2026-08-12T10:32:56Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-7b5765d6.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "d7ac3e20",
+          "result": "passed",
+          "ts": "2026-08-12T10:33:19Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "3e14d0c0",
+          "result": "passed",
+          "ts": "2026-08-12T10:33:20Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "7ce36641",
+          "result": "passed",
+          "ts": "2026-08-12T10:33:20Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "bc0d5433",
+          "result": "failed",
+          "ts": "2026-08-12T10:33:20Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-bc0d5433.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "1f29de9e",
+          "result": "passed",
+          "ts": "2026-08-12T10:33:20Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "85fe6ed0",
+          "result": "failed",
+          "ts": "2026-08-12T10:33:20Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-85fe6ed0.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "a2e301e0",
+          "result": "passed",
+          "ts": "2026-08-12T10:33:20Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "00de48c2",
+          "result": "failed",
+          "ts": "2026-08-12T10:33:20Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-00de48c2.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "b0e9c5e4",
+          "result": "passed",
+          "ts": "2026-08-12T10:33:39Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "0d20f211",
+          "result": "failed",
+          "ts": "2026-08-12T10:33:39Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-0d20f211.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "4f0fbf4e",
+          "result": "passed",
+          "ts": "2026-08-12T10:33:39Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "4a885eef",
+          "result": "failed",
+          "ts": "2026-08-12T10:33:39Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-4a885eef.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "784ad49d",
+          "result": "passed",
+          "ts": "2026-08-12T10:33:39Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "9d806857",
+          "result": "failed",
+          "ts": "2026-08-12T10:33:39Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-9d806857.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "6c1ec98a",
+          "result": "passed",
+          "ts": "2026-08-12T10:33:58Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "9d94b478",
+          "result": "passed",
+          "ts": "2026-08-12T10:33:58Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "cf11d300",
+          "result": "passed",
+          "ts": "2026-08-12T10:33:58Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "9940eaef",
+          "result": "passed",
+          "ts": "2026-08-12T10:33:58Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "054b440e",
+          "result": "passed",
+          "ts": "2026-08-12T10:34:19Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "d2f227ae",
+          "result": "passed",
+          "ts": "2026-08-12T10:34:19Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "da4111d4",
+          "result": "passed",
+          "ts": "2026-08-12T10:34:19Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "584a6f71",
+          "result": "failed",
+          "ts": "2026-08-12T10:34:19Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-584a6f71.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "2611df2a",
+          "result": "passed",
+          "ts": "2026-08-12T10:34:19Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "81636576",
+          "result": "failed",
+          "ts": "2026-08-12T10:34:19Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-81636576.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "0c5d6009",
+          "result": "passed",
+          "ts": "2026-08-12T10:34:19Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "df57471c",
+          "result": "failed",
+          "ts": "2026-08-12T10:34:19Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-df57471c.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "08d7caff",
+          "result": "passed",
+          "ts": "2026-08-12T10:34:40Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "0b4d1423",
+          "result": "passed",
+          "ts": "2026-08-12T10:34:40Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "1fd772a3",
+          "result": "passed",
+          "ts": "2026-08-12T10:34:40Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "8f1155ce",
+          "result": "failed",
+          "ts": "2026-08-12T10:34:40Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-8f1155ce.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "99852180",
+          "result": "passed",
+          "ts": "2026-08-12T10:34:40Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "c441bf40",
+          "result": "failed",
+          "ts": "2026-08-12T10:34:40Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-c441bf40.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "3b79dade",
+          "result": "passed",
+          "ts": "2026-08-12T10:34:40Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "4f592bdc",
+          "result": "failed",
+          "ts": "2026-08-12T10:34:40Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-4f592bdc.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "28289476",
+          "result": "passed",
+          "ts": "2026-08-12T10:34:59Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "0252b12e",
+          "result": "failed",
+          "ts": "2026-08-12T10:34:59Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-0252b12e.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "2f9fcd93",
+          "result": "passed",
+          "ts": "2026-08-12T10:34:59Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "0067f283",
+          "result": "failed",
+          "ts": "2026-08-12T10:34:59Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-0067f283.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "f0820e00",
+          "result": "passed",
+          "ts": "2026-08-12T10:34:59Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "6e7fbf57",
+          "result": "failed",
+          "ts": "2026-08-12T10:34:59Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-6e7fbf57.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "f834acec",
+          "result": "passed",
+          "ts": "2026-08-12T10:36:09Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "403ad683",
+          "result": "passed",
+          "ts": "2026-08-12T10:36:09Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "81af655a",
+          "result": "passed",
+          "ts": "2026-08-12T10:36:09Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "f38691db",
+          "result": "passed",
+          "ts": "2026-08-12T10:36:09Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "f5205e6f",
+          "result": "passed",
+          "ts": "2026-08-12T10:37:28Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "68b33e0d",
+          "result": "passed",
+          "ts": "2026-08-12T10:37:28Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "9e8229c8",
+          "result": "passed",
+          "ts": "2026-08-12T10:37:28Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "2501cb40",
+          "result": "failed",
+          "ts": "2026-08-12T10:37:28Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-2501cb40.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "0d7b3c15",
+          "result": "passed",
+          "ts": "2026-08-12T10:37:28Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "fc916fdd",
+          "result": "failed",
+          "ts": "2026-08-12T10:37:28Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-fc916fdd.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "1ac97c26",
+          "result": "passed",
+          "ts": "2026-08-12T10:37:28Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "873c39b5",
+          "result": "failed",
+          "ts": "2026-08-12T10:37:29Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-873c39b5.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "f0dd1810",
+          "result": "passed",
+          "ts": "2026-08-12T10:38:00Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "6278b681",
+          "result": "passed",
+          "ts": "2026-08-12T10:38:00Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "6fd93588",
+          "result": "passed",
+          "ts": "2026-08-12T10:38:00Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "36a8fc0d",
+          "result": "failed",
+          "ts": "2026-08-12T10:38:00Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-36a8fc0d.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "5838e9ed",
+          "result": "passed",
+          "ts": "2026-08-12T10:38:00Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "90791391",
+          "result": "failed",
+          "ts": "2026-08-12T10:38:00Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-90791391.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "a45a3aff",
+          "result": "passed",
+          "ts": "2026-08-12T10:38:01Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "4bf711bb",
+          "result": "failed",
+          "ts": "2026-08-12T10:38:01Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-4bf711bb.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "5ecf69a2",
+          "result": "passed",
+          "ts": "2026-08-12T10:38:37Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "659130eb",
+          "result": "passed",
+          "ts": "2026-08-12T10:38:37Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "5df36a4f",
+          "result": "passed",
+          "ts": "2026-08-12T10:38:37Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "d76871a0",
+          "result": "failed",
+          "ts": "2026-08-12T10:38:37Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-d76871a0.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "70b74592",
+          "result": "passed",
+          "ts": "2026-08-12T10:38:37Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "c794ccab",
+          "result": "failed",
+          "ts": "2026-08-12T10:38:37Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-c794ccab.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "339a2062",
+          "result": "passed",
+          "ts": "2026-08-12T10:38:37Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "1f28854d",
+          "result": "failed",
+          "ts": "2026-08-12T10:38:37Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-1f28854d.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "0b2ef981",
+          "result": "passed",
+          "ts": "2026-08-12T10:39:21Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "e5c5548c",
+          "result": "passed",
+          "ts": "2026-08-12T10:39:21Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "39727744",
+          "result": "passed",
+          "ts": "2026-08-12T10:39:21Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "b855fe3e",
+          "result": "passed",
+          "ts": "2026-08-12T10:39:21Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "73092028",
+          "result": "passed",
+          "ts": "2026-08-12T10:39:21Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "851eea48",
+          "result": "passed",
+          "ts": "2026-08-12T10:39:21Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "435d93ab",
+          "result": "passed",
+          "ts": "2026-08-12T10:39:58Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "bee30ae4",
+          "result": "passed",
+          "ts": "2026-08-12T10:39:58Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "bb65b296",
+          "result": "passed",
+          "ts": "2026-08-12T10:39:58Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "dbe983cd",
+          "result": "failed",
+          "ts": "2026-08-12T10:39:58Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-dbe983cd.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "7840b784",
+          "result": "passed",
+          "ts": "2026-08-12T10:39:58Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "1a4bcc6e",
+          "result": "failed",
+          "ts": "2026-08-12T10:39:58Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-1a4bcc6e.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "67446d0b",
+          "result": "passed",
+          "ts": "2026-08-12T10:39:58Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "f9ed51b0",
+          "result": "failed",
+          "ts": "2026-08-12T10:39:58Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-f9ed51b0.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "e22eee37",
+          "result": "passed",
+          "ts": "2026-08-12T10:40:34Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "401e3e2c",
+          "result": "passed",
+          "ts": "2026-08-12T10:40:34Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "6f1341a4",
+          "result": "passed",
+          "ts": "2026-08-12T10:40:34Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "66f2419d",
+          "result": "failed",
+          "ts": "2026-08-12T10:40:34Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-66f2419d.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "b433c356",
+          "result": "passed",
+          "ts": "2026-08-12T10:40:34Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "dee31419",
+          "result": "failed",
+          "ts": "2026-08-12T10:40:34Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-dee31419.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "dc42a9fa",
+          "result": "passed",
+          "ts": "2026-08-12T10:40:34Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "30c350fe",
+          "result": "failed",
+          "ts": "2026-08-12T10:40:34Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-30c350fe.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "71b8864d",
+          "result": "passed",
+          "ts": "2026-08-12T10:41:06Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "d1270ed9",
+          "result": "passed",
+          "ts": "2026-08-12T10:41:06Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "381bd5fd",
+          "result": "passed",
+          "ts": "2026-08-12T10:41:06Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "bd41c73d",
+          "result": "failed",
+          "ts": "2026-08-12T10:41:06Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-bd41c73d.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "b7220b89",
+          "result": "passed",
+          "ts": "2026-08-12T10:41:06Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "5d850d8b",
+          "result": "failed",
+          "ts": "2026-08-12T10:41:06Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-5d850d8b.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "9d1089b3",
+          "result": "passed",
+          "ts": "2026-08-12T10:41:06Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "508eb1fc",
+          "result": "failed",
+          "ts": "2026-08-12T10:41:06Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-508eb1fc.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "1a9c407d",
+          "result": "passed",
+          "ts": "2026-08-12T10:41:38Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "9ac36a0c",
+          "result": "passed",
+          "ts": "2026-08-12T10:41:38Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "e783af3a",
+          "result": "passed",
+          "ts": "2026-08-12T10:41:38Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "f83e0e31",
+          "result": "failed",
+          "ts": "2026-08-12T10:41:38Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-f83e0e31.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "d4323ac9",
+          "result": "passed",
+          "ts": "2026-08-12T10:41:38Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "4c39dd9d",
+          "result": "failed",
+          "ts": "2026-08-12T10:41:38Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-4c39dd9d.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "2b7d31b7",
+          "result": "passed",
+          "ts": "2026-08-12T10:41:58Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "1960b079",
+          "result": "passed",
+          "ts": "2026-08-12T10:41:58Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "31bda15d",
+          "result": "passed",
+          "ts": "2026-08-12T10:41:58Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "f342aff1",
+          "result": "failed",
+          "ts": "2026-08-12T10:41:58Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-f342aff1.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "7d9c174c",
+          "result": "passed",
+          "ts": "2026-08-12T10:42:37Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "b785b312",
+          "result": "passed",
+          "ts": "2026-08-12T10:42:37Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "89a5236b",
+          "result": "passed",
+          "ts": "2026-08-12T10:42:37Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "5fab4b69",
+          "result": "failed",
+          "ts": "2026-08-12T10:42:37Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-5fab4b69.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "ae0938fa",
+          "result": "passed",
+          "ts": "2026-08-12T10:42:38Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "c15c626b",
+          "result": "failed",
+          "ts": "2026-08-12T10:42:38Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-c15c626b.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "d77922ea",
+          "result": "passed",
+          "ts": "2026-08-12T10:42:38Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "d1bc78ed",
+          "result": "failed",
+          "ts": "2026-08-12T10:42:38Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-d1bc78ed.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "9b2f1556",
+          "result": "passed",
+          "ts": "2026-08-12T10:42:38Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "21d28b27",
+          "result": "failed",
+          "ts": "2026-08-12T10:42:38Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-21d28b27.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "b22a3b94",
+          "result": "passed",
+          "ts": "2026-08-12T10:42:38Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "13866de5",
+          "result": "failed",
+          "ts": "2026-08-12T10:42:38Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-13866de5.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "679ac383",
+          "result": "failed",
+          "ts": "2026-08-12T10:43:07Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/required-sections-679ac383.md"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "f9c3dea3",
+          "result": "passed",
+          "ts": "2026-08-12T10:43:07Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "56bf563a",
+          "result": "passed",
+          "ts": "2026-08-12T10:43:58Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "edc0606e",
+          "result": "failed",
+          "ts": "2026-08-12T10:43:58Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/functional-design/upstream-coverage-edc0606e.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "eefded94",
+          "result": "passed",
+          "ts": "2026-08-12T10:51:38Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "30c6c93b",
+          "result": "passed",
+          "ts": "2026-08-12T10:51:38Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "ddf629b8",
+          "result": "passed",
+          "ts": "2026-08-12T10:51:38Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "e8031f44",
+          "result": "passed",
+          "ts": "2026-08-12T10:51:38Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "c3bef29d",
+          "result": "passed",
+          "ts": "2026-08-12T10:51:38Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "36d1d244",
+          "result": "passed",
+          "ts": "2026-08-12T10:51:38Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "05e891c1",
+          "result": "passed",
+          "ts": "2026-08-12T10:51:38Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "c9cc57d1",
+          "result": "passed",
+          "ts": "2026-08-12T10:51:38Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "8cb5f194",
+          "result": "passed",
+          "ts": "2026-08-12T10:51:38Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "0530e668",
+          "result": "passed",
+          "ts": "2026-08-12T10:51:38Z"
+        }
+      ],
+      "outcome": "approved",
+      "learnings_captured": {
+        "from_orchestrator": 0,
+        "from_user_addition": 0
+      }
+    },
+    {
+      "stage_slug": "nfr-requirements",
+      "started_at": "2026-08-12T10:53:12Z",
+      "completed_at": "2026-08-12T10:57:26Z",
+      "agent": "aidlc-architect-agent",
+      "memory_path": "aidlc/spaces/default/intents/260811-runnable-web-app/construction/nfr-requirements/memory.md",
+      "memory_entries": null,
+      "memory_breakdown": null,
+      "sensor_firings": [
+        {
+          "id": "required-sections",
+          "fire_id": "c5d250d5",
+          "result": "passed",
+          "ts": "2026-08-12T10:53:49Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "1fcdb3cc",
+          "result": "failed",
+          "ts": "2026-08-12T10:53:49Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/nfr-requirements/upstream-coverage-1fcdb3cc.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "dee3f4b0",
+          "result": "passed",
+          "ts": "2026-08-12T10:53:49Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "d11c0b59",
+          "result": "passed",
+          "ts": "2026-08-12T10:53:49Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "d0f0fc62",
+          "result": "passed",
+          "ts": "2026-08-12T10:53:49Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "84338e97",
+          "result": "passed",
+          "ts": "2026-08-12T10:53:49Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "8cf5e7fe",
+          "result": "passed",
+          "ts": "2026-08-12T10:53:49Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "0cee2503",
+          "result": "passed",
+          "ts": "2026-08-12T10:53:49Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "4e786fd4",
+          "result": "passed",
+          "ts": "2026-08-12T10:53:49Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "ec18369f",
+          "result": "passed",
+          "ts": "2026-08-12T10:53:49Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "489683bb",
+          "result": "passed",
+          "ts": "2026-08-12T10:53:49Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "4caf3a78",
+          "result": "passed",
+          "ts": "2026-08-12T10:53:49Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "3afd5d41",
+          "result": "passed",
+          "ts": "2026-08-12T10:53:49Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "fae876ac",
+          "result": "failed",
+          "ts": "2026-08-12T10:53:49Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/nfr-requirements/upstream-coverage-fae876ac.md"
+        }
+      ],
+      "outcome": "approved",
+      "learnings_captured": {
+        "from_orchestrator": 0,
+        "from_user_addition": 0
+      }
+    },
+    {
+      "stage_slug": "nfr-design",
+      "started_at": "2026-08-12T10:57:26Z",
+      "completed_at": "2026-08-12T11:11:44Z",
+      "agent": "aidlc-architect-agent",
+      "memory_path": "aidlc/spaces/default/intents/260811-runnable-web-app/construction/nfr-design/memory.md",
+      "memory_entries": null,
+      "memory_breakdown": null,
+      "sensor_firings": [
+        {
+          "id": "required-sections",
+          "fire_id": "c40700b9",
+          "result": "passed",
+          "ts": "2026-08-12T10:58:02Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "d18c308a",
+          "result": "failed",
+          "ts": "2026-08-12T10:58:02Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/nfr-design/upstream-coverage-d18c308a.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "4813cccd",
+          "result": "passed",
+          "ts": "2026-08-12T10:58:03Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "34a13f78",
+          "result": "passed",
+          "ts": "2026-08-12T10:58:03Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "bcb54a15",
+          "result": "passed",
+          "ts": "2026-08-12T10:58:03Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "08a7eb1e",
+          "result": "passed",
+          "ts": "2026-08-12T10:58:03Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "d0a24c06",
+          "result": "passed",
+          "ts": "2026-08-12T10:58:03Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "501ab957",
+          "result": "passed",
+          "ts": "2026-08-12T10:58:03Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "d3beb0f4",
+          "result": "passed",
+          "ts": "2026-08-12T10:58:03Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "ecf44ad5",
+          "result": "passed",
+          "ts": "2026-08-12T10:58:03Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "974042fb",
+          "result": "passed",
+          "ts": "2026-08-12T10:58:03Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "b7254382",
+          "result": "passed",
+          "ts": "2026-08-12T10:58:03Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "473ee723",
+          "result": "passed",
+          "ts": "2026-08-12T10:58:03Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "5cebbaf4",
+          "result": "failed",
+          "ts": "2026-08-12T10:58:03Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/nfr-design/upstream-coverage-5cebbaf4.md"
+        }
+      ],
+      "outcome": "approved",
+      "learnings_captured": {
+        "from_orchestrator": 0,
+        "from_user_addition": 0
+      }
+    },
+    {
+      "stage_slug": "infrastructure-design",
+      "started_at": "2026-08-12T11:11:44Z",
+      "completed_at": "2026-08-12T11:14:10Z",
+      "agent": "aidlc-aws-platform-agent",
+      "memory_path": "aidlc/spaces/default/intents/260811-runnable-web-app/construction/infrastructure-design/memory.md",
+      "memory_entries": null,
+      "memory_breakdown": null,
+      "sensor_firings": [
+        {
+          "id": "required-sections",
+          "fire_id": "eab46afa",
+          "result": "passed",
+          "ts": "2026-08-12T11:12:18Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "bf4c5b35",
+          "result": "failed",
+          "ts": "2026-08-12T11:12:18Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/infrastructure-design/upstream-coverage-bf4c5b35.md"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "b30e7a56",
+          "result": "passed",
+          "ts": "2026-08-12T11:12:18Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "1d1ca4c9",
+          "result": "passed",
+          "ts": "2026-08-12T11:12:18Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "6f3d8fae",
+          "result": "passed",
+          "ts": "2026-08-12T11:12:18Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "a7f24f70",
+          "result": "passed",
+          "ts": "2026-08-12T11:12:18Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "bc305e22",
+          "result": "passed",
+          "ts": "2026-08-12T11:12:18Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "ccbb6b2c",
+          "result": "passed",
+          "ts": "2026-08-12T11:12:18Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "2cdcdb9c",
+          "result": "passed",
+          "ts": "2026-08-12T11:12:18Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "90261a64",
+          "result": "passed",
+          "ts": "2026-08-12T11:12:18Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "3ca8a36d",
+          "result": "passed",
+          "ts": "2026-08-12T11:12:19Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "68c41f13",
+          "result": "passed",
+          "ts": "2026-08-12T11:12:19Z"
+        },
+        {
+          "id": "required-sections",
+          "fire_id": "4e948bf1",
+          "result": "passed",
+          "ts": "2026-08-12T11:12:19Z"
+        },
+        {
+          "id": "upstream-coverage",
+          "fire_id": "55a84b7f",
+          "result": "failed",
+          "ts": "2026-08-12T11:12:19Z",
+          "detail_path": "aidlc/spaces/default/intents/260811-runnable-web-app/.aidlc-sensors/infrastructure-design/upstream-coverage-55a84b7f.md"
+        }
+      ],
+      "outcome": "approved",
+      "learnings_captured": {
+        "from_orchestrator": 0,
+        "from_user_addition": 0
+      }
+    },
+    {
+      "stage_slug": "code-generation",
+      "started_at": "2026-08-12T11:14:10Z",
+      "completed_at": null,
+      "agent": "aidlc-developer-agent",
+      "memory_path": "aidlc/spaces/default/intents/260811-runnable-web-app/construction/code-generation/memory.md",
       "memory_entries": null,
       "memory_breakdown": null,
       "sensor_firings": [],
