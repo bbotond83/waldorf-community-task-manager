@@ -21,3 +21,11 @@ Implement the complete read-only Staff schedule surface in the shared Next.js ru
 - No Staff mutation method, server action, edit control, contact/locality/profile/protected-reason/assignment/family detail, or unrelated row is introduced.
 - Synthetic data is invented; linked Supabase RLS/persistence and Safari evidence remain `OUTSTANDING`.
 - No executable deployment workflow or target invocation is added.
+
+## Review
+
+**Reviewer:** aidlc-architecture-reviewer-agent (inline fallback after two pinned-model dispatch failures)
+
+**Verdict:** READY
+
+The plan and summary preserve Staff as read-only, authorize each row before projection, bound filters, and structurally omit prohibited fields and mutation paths. Focused tests and browser evidence cover scope denial, revocation, error classification, and accessibility. The summary transparently reports one unrelated Parent failure in an aggregate browser run alongside the passing isolated Staff suite; this does not indicate a Staff defect. No deployment or real-target claim is made. No blocking mismatch was found.

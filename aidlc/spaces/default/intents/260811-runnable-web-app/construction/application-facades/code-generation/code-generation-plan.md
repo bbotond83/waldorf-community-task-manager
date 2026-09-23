@@ -23,3 +23,11 @@ Implement the transport-neutral application boundary shared by every web surface
 - Domain modules retain ownership of rules, aggregates, repositories, and transactions; façades call public contracts only.
 - Expected failures return explicit results; raw exceptions and prohibited fields never cross the application boundary.
 - No package publication, executable deployment workflow, or target network action is added.
+
+## Review
+
+**Reviewer:** aidlc-architecture-reviewer-agent (inline fallback after two pinned-model dispatch failures)
+
+**Verdict:** READY
+
+The plan and summary implement the approved transport-neutral boundary: authorization precedes domain invocation, field projections are allowlisted, expected failures use explicit results, idempotency is injected, and Staff remains read-only. Test evidence covers malicious/faulting ports, scope and field denial, revocation, redaction, and delivery integration. The library remains isolated from framework, persistence, and provider details, with linked-target checks left outstanding. No blocking mismatch was found.

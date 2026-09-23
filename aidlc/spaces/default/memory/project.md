@@ -91,3 +91,5 @@
 
 <!-- Project-specific corrections from human feedback. -->
 <!-- Format: NEVER/ALWAYS [behavior] (learned [date]) -->
+- Reuse existing Code Generation artifacts when the recorded plan approval is explicit. (learned 2026-09-23) <!-- cid:code-generation:c1 -->
+- Use the inline review fallback after two reviewer dispatch failures caused by an unsupported pinned model. (learned 2026-09-23) <!-- cid:code-generation:c2 -->
