@@ -40,7 +40,7 @@
     "verify": "npm run verify:local"
   },
   "dependencies": {
-    "next": "latest",
+    "next": "16.3.6",
     "react": "latest",
     "react-dom": "latest",
     "zod": "latest"
@@ -53,12 +53,12 @@
     "@types/node": "^24.0.0",
     "@types/react": "latest",
     "@types/react-dom": "latest",
-    "@vitest/coverage-v8": "latest",
+    "@vitest/coverage-v8": "4.1.11",
     "eslint": "latest",
     "eslint-config-next": "latest",
     "jsdom": "latest",
     "prettier": "latest",
     "typescript": "^5.9.0",
-    "vitest": "latest"
+    "vitest": "4.1.11"
   }
 }
