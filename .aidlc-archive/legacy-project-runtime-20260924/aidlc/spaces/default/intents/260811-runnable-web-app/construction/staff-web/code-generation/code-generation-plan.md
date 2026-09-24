@@ -1,0 +1,31 @@
+# Staff Web Code Generation Plan
+
+## Scope
+
+Implement the complete read-only Staff schedule surface in the shared Next.js runtime. The unit owns authorized schedule list/filter/detail views and loading, empty, denied, retryable, and terminal states. It must expose only approved schedule fields and required coordination display names, with no mutation or sensitive-data path.
+
+## Plan
+
+- [x] **Step 1 — Implement the Staff route shell and navigation boundary.** Add `/munkatars/beosztas` route/layout with server session resolution, Staff-role and route authorization, Hungarian H1/main/status structure, safe home/back navigation, loading/error/denied states, and stable `data-testid` controls. Trace: US-LR-03/05, FR-LR-07/09/14. Evidence: `app/munkatars/{layout,loading,error}.tsx`, `_lib/session.ts`, and `_components/StaffAccessState.tsx`; production build lists both Staff routes.
+- [x] **Step 2 — Implement validated schedule filters and bounded list rendering.** Add group/date filters with at most 31 days, URL persistence, clear/reset, loading/empty/ready states, semantic desktop table and mobile/200%-zoom labelled cards from one authorized model, and no shared protected client store. Trace: US-LR-05, inherited US-13, NFR-LR-04. Evidence: `beosztas/page.tsx`, `ScheduleFilter.tsx`, `ScheduleCollection.tsx`, and passing component/browser range, empty, table/card, URL-return, mobile, and zoom cases.
+- [x] **Step 3 — Implement authorized schedule detail.** Add detail route using one row key, repeat role/group/row/field authorization server-side, preserve return filters, render only date/time/activity/granted group/permitted location or coverage/required coordination display name, and generically deny crafted/out-of-scope rows without counts or existence signals. Trace: US-LR-05, FR-LR-03/09/14. Evidence: `beosztas/[id]/page.tsx`; passing façade and browser crafted-row/group denial plus detail/return assertions.
+- [x] **Step 4 — Implement retryable and terminal dependency states.** Map Staff façade results to validation, denied, retryable, and terminal panels; expose retry only for classified retryable failure, preserve filter/detail context, focus denial/error headings, announce state changes, and include no raw error or provider data. Trace: US-LR-05, NFR-LR-05. Evidence: `StaffStatePanel.tsx` and `FocusedStateSection.tsx`; passing retry-only, focus, live-region, redaction, and terminal browser/component cases.
+- [x] **Step 5 — Add deterministic Staff synthetic adapter and fixtures.** Extend synthetic composition with invented staff profiles, group grants, schedule entries, empty/out-of-scope/revoked/failure scenarios, bounded queries, next-request authorization version enforcement, and allowlisted projections through the Staff application port only. Trace: US-LR-02/05, FR-LR-04/09/10a. Evidence: `src/staff-web/synthetic-staff.ts`; seven passing adapter tests cover projection, bounded/empty, ungranted row/group, next-request revocation, failure classification, and read-only method surface.
+- [x] **Step 6 — Add Standard-strategy unit, route, and component tests.** Cover permitted list/detail plus at least two edge/failure states for filters/list/detail, 31-day validation, empty clear behavior, direct route/group/row/field denial, next-request revocation, forbidden contact/locality/profile/reason/family/assignment/mutation absence across model and DOM, redaction, focus, announcements, and semantic table/card parity. Trace: US-LR-05/07/08, NFR-LR-02/03/05. Evidence: `synthetic-staff.test.ts` and `staff-components.test.tsx`; aggregate domain 118/118 and delivery 57/57 pass.
+- [x] **Step 7 — Extend Playwright critical Staff flows.** Exercise Staff profile selection, schedule filter/list/detail/return, empty and clear, out-of-scope denial, retryable/terminal states, forbidden-field and no-mutation assertions, Chromium/Firefox/mobile Chrome, axe/keyboard/focus/zoom/touch, and two-second response target. Trace: Bolt 2 demo/DoD, NFR-LR-03/04/07. Evidence: `tests/browser/staff-web.spec.ts`; 18/18 pass across all three projects. Aggregate browser rerun passed every Staff case (74/75 overall; one unrelated parallel Parent signup failure, which passed its isolated rerun).
+- [x] **Step 8 — Validate and summarize Staff Web.** Run format, lint, strict typecheck, focused/aggregate tests and coverage, production build, start smoke, and Staff browser suite on Node 24; fix unit-owned failures; mark steps complete; document files, decisions, evidence, coverage, and deviations in `code-summary.md`. Trace: NFR-LR-02/06 and Bolt 2. Evidence: Node 24.19/npm 11.19 format, Staff lint, typecheck, tests, coverage, build, smoke, and focused browser commands completed; details are recorded in `code-summary.md`.
+
+## Boundaries
+
+- Staff delivery imports only session/Staff façade contracts and authorized view models; never repositories, Supabase, raw aggregates, or other role models.
+- No Staff mutation method, server action, edit control, contact/locality/profile/protected-reason/assignment/family detail, or unrelated row is introduced.
+- Synthetic data is invented; linked Supabase RLS/persistence and Safari evidence remain `OUTSTANDING`.
+- No executable deployment workflow or target invocation is added.
+
+## Review
+
+**Reviewer:** aidlc-architecture-reviewer-agent (inline fallback after two pinned-model dispatch failures)
+
+**Verdict:** READY
+
+The plan and summary preserve Staff as read-only, authorize each row before projection, bound filters, and structurally omit prohibited fields and mutation paths. Focused tests and browser evidence cover scope denial, revocation, error classification, and accessibility. The summary transparently reports one unrelated Parent failure in an aggregate browser run alongside the passing isolated Staff suite; this does not indicate a Staff defect. No deployment or real-target claim is made. No blocking mismatch was found.

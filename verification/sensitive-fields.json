@@ -1,0 +1,92 @@
+{
+  "version": "waldorf-sensitive-fields-v1",
+  "fields": [
+    {
+      "id": "SF-DISPLAY-NAME",
+      "purpose": "coordination label",
+      "allowed": ["authorized participants", "scoped staff", "scoped administrators"],
+      "redactFrom": ["unrelated responses"],
+      "lifecycle": "anonymize with historical record"
+    },
+    {
+      "id": "SF-PARTICIPANT-NAME",
+      "purpose": "task or event coordination",
+      "allowed": ["authorized task/event users"],
+      "redactFrom": ["unrelated responses", "logs", "audit", "reports"],
+      "lifecycle": "anonymize with historical record"
+    },
+    {
+      "id": "SF-EMAIL",
+      "purpose": "account and delivery",
+      "allowed": ["own approved account flow", "in-scope administrators"],
+      "redactFrom": [
+        "staff",
+        "normal parent views",
+        "logs",
+        "audit",
+        "fixtures",
+        "screenshots",
+        "reports"
+      ],
+      "lifecycle": "delete after last-child grace period"
+    },
+    {
+      "id": "SF-PHONE",
+      "purpose": "approved contact",
+      "allowed": ["own approved account flow", "in-scope administrators"],
+      "redactFrom": [
+        "staff",
+        "normal parent views",
+        "logs",
+        "audit",
+        "fixtures",
+        "screenshots",
+        "reports"
+      ],
+      "lifecycle": "delete after last-child grace period"
+    },
+    {
+      "id": "SF-LOCALITY",
+      "purpose": "restricted imported municipality",
+      "allowed": ["in-scope administrators"],
+      "redactFrom": ["parents", "staff", "logs", "audit", "fixtures", "screenshots", "reports"],
+      "lifecycle": "delete after last-child grace period"
+    },
+    {
+      "id": "SF-OPTIONAL-PROFILE",
+      "purpose": "consented coordination preferences",
+      "allowed": ["own profile", "in-scope administrators when required"],
+      "redactFrom": [
+        "parents other than owner",
+        "staff",
+        "logs",
+        "audit",
+        "fixtures",
+        "screenshots",
+        "reports"
+      ],
+      "lifecycle": "delete on consent withdrawal or after grace period"
+    },
+    {
+      "id": "SF-PROTECTED-REASON",
+      "purpose": "swap/cancellation or lifecycle decision",
+      "allowed": ["requester", "in-scope decision administrators"],
+      "redactFrom": ["all other users", "logs", "audit", "fixtures", "screenshots", "reports"],
+      "lifecycle": "delete or anonymize under workflow retention"
+    },
+    {
+      "id": "SF-UNRELATED-FAMILY",
+      "purpose": "explicit prohibited cross-family data class",
+      "allowed": [],
+      "redactFrom": [
+        "all unauthorized responses",
+        "logs",
+        "audit",
+        "fixtures",
+        "screenshots",
+        "reports"
+      ],
+      "lifecycle": "never project across family boundary"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+.next
+coverage
+node_modules
+playwright-report
+test-results
+aidlc
+source-materials
+package-lock.json
+verification/reports/local-acceptance.json
+verification/reports/local-acceptance.md
+verification/reports/outstanding-targets.md

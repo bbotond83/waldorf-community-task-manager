@@ -1,0 +1,75 @@
+import { randomUUID } from "node:crypto";
+import { AdminMutationForm } from "../../_components/AdminMutationForm.tsx";
+import { AsyncStatePanel } from "../../_components/AsyncStatePanel.tsx";
+import { archiveRecordAction, saveRecordAction } from "../../actions.ts";
+import { resolveAdminFacade } from "../../_lib/facade.ts";
+import { resolveAdminSession } from "../../_lib/session.ts";
+import { terminalFailure } from "../../../../src/application/results.ts";
+
+export default async function RecordDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const session = await resolveAdminSession();
+  const facade = await resolveAdminFacade();
+  const result =
+    session.state === "success" && facade
+      ? await facade.getRecord(session.data.applicationSession, session.data.scope, "record", id)
+      : terminalFailure();
+  return (
+    <section className="admin-page" data-testid="admin-record-detail-page">
+      <header>
+        <p className="eyebrow">Nyilvántartások</p>
+        <h1 tabIndex={-1}>Rekord részletei</h1>
+      </header>
+      <AsyncStatePanel
+        result={result}
+        testId="admin-record-detail-state"
+        emptyMessage="A rekord nem található."
+      >
+        {(record) => (
+          <div className="admin-detail-grid">
+            <section>
+              <h2>{record.title}</h2>
+              <p>Állapot: {record.state}</p>
+              <p>Verzió: {record.version}</p>
+            </section>
+            <AdminMutationForm
+              action={saveRecordAction}
+              submitLabel="Módosítás mentése"
+              testId="admin-record-edit-form"
+            >
+              <input type="hidden" name="id" value={record.id} />
+              <input type="hidden" name="expectedVersion" value={record.version ?? 1} />
+              <input
+                type="hidden"
+                name="idempotencyKey"
+                value={`record:save:${record.id}:${randomUUID()}`}
+              />
+              <input type="hidden" name="kind" value="record" />
+              <label htmlFor="title">Megnevezés</label>
+              <input
+                id="title"
+                name="title"
+                defaultValue={record.title}
+                required
+                data-testid="admin-record-title-input"
+              />
+            </AdminMutationForm>
+            <AdminMutationForm
+              action={archiveRecordAction}
+              submitLabel="Archiválás"
+              testId="admin-record-archive-form"
+            >
+              <input type="hidden" name="id" value={record.id} />
+              <input type="hidden" name="expectedVersion" value={record.version ?? 1} />
+              <input
+                type="hidden"
+                name="idempotencyKey"
+                value={`record:archive:${record.id}:${randomUUID()}`}
+              />
+            </AdminMutationForm>
+          </div>
+        )}
+      </AsyncStatePanel>
+    </section>
+  );
+}

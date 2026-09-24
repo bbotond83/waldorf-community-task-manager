@@ -1,0 +1,43 @@
+{
+  "version": "waldorf-local-v1",
+  "dataClassification": "invented-only",
+  "familyProfile": { "count": 30, "locale": "hu-HU", "timezone": "Europe/Budapest" },
+  "profiles": [
+    { "id": "parent-local", "role": "parent", "scope": "family-fenyo", "home": "/szulo/feladatok" },
+    {
+      "id": "staff-local",
+      "role": "read_only_staff",
+      "scope": "group-oak",
+      "home": "/munkatars/beosztas"
+    },
+    { "id": "group-admin-local", "role": "group_admin", "scope": "group-oak", "home": "/admin" },
+    {
+      "id": "kindergarten-admin-local",
+      "role": "kindergarten_admin",
+      "scope": "organization-local",
+      "home": "/admin"
+    },
+    {
+      "id": "super-admin-local",
+      "role": "super_admin",
+      "scope": "organization-local",
+      "home": "/admin"
+    }
+  ],
+  "states": [
+    "loading",
+    "empty",
+    "available",
+    "full",
+    "ineligible",
+    "validation",
+    "pending",
+    "success",
+    "denied",
+    "conflict",
+    "invalidated",
+    "dependency-failure-retryable",
+    "dependency-failure-terminal",
+    "recovery"
+  ]
+}
