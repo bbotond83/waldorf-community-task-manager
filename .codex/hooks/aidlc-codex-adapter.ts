@@ -32,15 +32,20 @@
 //   - session-start: the core hook prints
 //     {"additionalContext": "..."}; Codex expects the hookSpecificOutput
 //     wrapper (verified live, findings E1) — the shim re-wraps.
-//   - stop: {"decision":"block","reason"} passes through VERBATIM — the
+//   - bind-bash-session: POSIX Bash input is rewritten through
+//     hookSpecificOutput.updatedInput so every command inherits the validated
+//     payload session without process inspection.
+//   - continue-workflow: {"decision":"block","reason"} passes through VERBATIM — the
 //     contract is identical on Codex (stop_hook_active included).
 //   - everything else: advisory; stdout ignored, exit 0.
 //
 // Usage (wired in .codex/hooks.json):
-//   bun .codex/hooks/aidlc-codex-adapter.ts <target>
-// where <target> ∈ session-start | audit-and-sensors | state-sync |
-//                  runtime-compile | validate-state | log-subagent | stop |
-//                  mint | state-transition-guard | reviewer-scope
+//   aidlc engine adapter codex <target>
+// where <target> ∈ session-start | audit-and-sensors | sync-workflow-state |
+//                  rebuild-stage-graph | validate-state | log-subagent | continue-workflow |
+//                  record-human-turn | state-transition-guard | reviewer-scope |
+//                  review-freeze | deliver-stage-rules | plan-approval-guard |
+//                  bind-bash-session
 
 import { createHash } from "node:crypto";
 import {
@@ -55,8 +60,12 @@ import {
 import { tmpdir } from "node:os";
 import { dirname, isAbsolute, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { appendAuditEntry } from "../tools/aidlc-audit.ts";
-import { stateFilePath } from "../tools/aidlc-lib.ts";
+import {
+  isNonAnswer,
+  sessionsDir,
+  stateFilePath,
+  validSessionId,
+} from "../tools/aidlc-lib.ts";
 
 const HOOKS_DIR = dirname(fileURLToPath(import.meta.url));
 
@@ -73,6 +82,97 @@ interface CodexHookInput {
   agent_type?: string;
   agent_id?: string;
   stop_hook_active?: boolean;
+  prompt?: string;
+  user_prompt?: string;
+  message?: string;
+}
+
+interface CodexSpawnAgentInput {
+  agent_type?: unknown;
+  message?: unknown;
+  items?: unknown;
+}
+
+function spawnAgentPrompt(input: CodexSpawnAgentInput): string {
+  const parts: string[] = [];
+  if (typeof input.message === "string") parts.push(input.message);
+  if (Array.isArray(input.items)) {
+    for (const item of input.items) {
+      if (item !== null && typeof item === "object") {
+        const text = (item as Record<string, unknown>).text;
+        if (typeof text === "string") parts.push(text);
+      }
+    }
+  }
+  return parts.join("\n");
+}
+
+function offeredOptionLabels(toolInput: unknown): Map<string, Set<string>> {
+  const offered = new Map<string, Set<string>>();
+  if (toolInput === null || typeof toolInput !== "object") return offered;
+  const questions = (toolInput as Record<string, unknown>).questions;
+  if (!Array.isArray(questions)) return offered;
+  for (const question of questions) {
+    if (question === null || typeof question !== "object") continue;
+    const record = question as Record<string, unknown>;
+    if (typeof record.id !== "string" || !Array.isArray(record.options)) continue;
+    const labels = new Set<string>();
+    for (const option of record.options) {
+      if (typeof option === "string") labels.add(option.trim());
+      else if (option !== null && typeof option === "object") {
+        const candidate = option as Record<string, unknown>;
+        for (const key of ["label", "value", "text"] as const) {
+          if (typeof candidate[key] === "string") labels.add(candidate[key].trim());
+        }
+      }
+    }
+    offered.set(record.id, labels);
+  }
+  return offered;
+}
+
+export function hasExplicitHumanSelection(toolResponse: unknown, toolInput?: unknown): boolean {
+  if (typeof toolResponse !== "string") return false;
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(toolResponse);
+  } catch {
+    return false;
+  }
+  if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) return false;
+  const response = parsed as Record<string, unknown>;
+  if (Object.keys(response).length !== 1 || !("answers" in response)) return false;
+  const answers = response.answers;
+  if (answers === null || typeof answers !== "object" || Array.isArray(answers)) return false;
+  const selections = Object.entries(answers as Record<string, unknown>);
+  if (selections.length === 0) return false;
+  const offered = offeredOptionLabels(toolInput);
+  return selections.every(([questionId, selection]) => {
+    if (selection === null || typeof selection !== "object" || Array.isArray(selection)) return false;
+    const record = selection as Record<string, unknown>;
+    if (Object.keys(record).length !== 1 || !Array.isArray(record.answers)) return false;
+    return record.answers.length > 0 && record.answers.every((answer) => {
+      if (typeof answer !== "string" || answer.trim().length === 0) return false;
+      return !isNonAnswer(answer) || offered.get(questionId)?.has(answer.trim()) === true;
+    });
+  });
+}
+
+function explicitHumanSelectionText(toolResponse: unknown): string {
+  if (typeof toolResponse !== "string") return "";
+  try {
+    const parsed = JSON.parse(toolResponse) as {
+      answers?: Record<string, { answers?: unknown[] }>;
+    };
+    for (const selection of Object.values(parsed.answers ?? {})) {
+      for (const answer of selection.answers ?? []) {
+        if (typeof answer === "string" && answer.trim()) return answer.trim();
+      }
+    }
+  } catch {
+    // Non-structured prompt payloads use the direct fields below.
+  }
+  return "";
 }
 
 export async function run(
@@ -96,6 +196,11 @@ const projectDirRaw =
 const projectDir = isAbsolute(projectDirRaw)
   ? projectDirRaw
   : resolve(process.cwd(), projectDirRaw);
+const payloadSessionId = validSessionId(codex.session_id);
+if (payloadSessionId) {
+  process.env.AIDLC_SESSION_OVERRIDE = payloadSessionId;
+  process.env.AIDLC_SESSION_OVERRIDE_SOURCE = "payload";
+}
 const projectEnv = {
   ...process.env,
   AIDLC_PROJECT_DIR: projectDir,
@@ -192,7 +297,7 @@ function runCore(hookFile: string, input: string): { stdout: string; code: numbe
   // PATH containing bun (the hook environment often lacks the bun install dir).
   const executable = process.env.AIDLC_COMPILED_EXECUTABLE;
   const command = executable
-    ? [executable, "hook", hookFile.replace(/^aidlc-|\.ts$/g, "")]
+    ? [executable, "engine", "hook", hookFile.replace(/^aidlc-|\.ts$/g, "")]
     : [process.execPath, join(HOOKS_DIR, hookFile)];
   const r = Bun.spawnSync(command, {
     stdin: Buffer.from(input, "utf-8"),
@@ -212,7 +317,7 @@ function runCoreWithStderr(
 ): { stdout: string; stderr: string; code: number } {
   const executable = process.env.AIDLC_COMPILED_EXECUTABLE;
   const command = executable
-    ? [executable, "hook", hookFile.replace(/^aidlc-|\.ts$/g, "")]
+    ? [executable, "engine", "hook", hookFile.replace(/^aidlc-|\.ts$/g, "")]
     : [process.execPath, join(HOOKS_DIR, hookFile)];
   const r = Bun.spawnSync(command, {
     stdin: Buffer.from(input, "utf-8"),
@@ -253,16 +358,50 @@ function wrapContext(coreStdout: string, eventName: string): string {
   return coreStdout;
 }
 
+function allowUpdatedInput(coreStdout: string): string {
+  try {
+    const parsed = JSON.parse(coreStdout) as {
+      hookSpecificOutput?: {
+        hookEventName?: unknown;
+        permissionDecision?: unknown;
+        updatedInput?: unknown;
+      };
+    };
+    const output = parsed.hookSpecificOutput;
+    if (
+      output?.hookEventName === "PreToolUse" &&
+      output.updatedInput !== undefined &&
+      output.permissionDecision === undefined
+    ) {
+      output.permissionDecision = "allow";
+      return `${JSON.stringify(parsed)}\n`;
+    }
+  } catch {
+    // Unparseable core output is not a successful input rewrite.
+  }
+  return coreStdout;
+}
+
+function wrapUpdatedInput(updatedInput: Record<string, unknown>): string {
+  return allowUpdatedInput(`${JSON.stringify({
+    hookSpecificOutput: {
+      hookEventName: "PreToolUse",
+      updatedInput,
+    },
+  })}\n`);
+}
+
 // --- D-4: SESSION_ENDED reconcile-at-next-start ------------------------------
 
-const heartbeatFile = join(projectDir, "aidlc-docs", ".aidlc-hooks-health", "codex-session.json");
+const heartbeatFile = join(sessionsDir(projectDir), "codex-session.json");
 
 function reconcilePriorSession(): void {
-  // Only meaningful inside an active workflow; the heartbeat lives in the
-  // same health dir the core hooks already maintain.
-  if (!existsSync(join(projectDir, "aidlc-docs"))) return;
+  // The heartbeat is recorded even before a workflow exists. If the first turn
+  // creates an intent, the utility can then bind this session to that record and
+  // a later Codex session can reconcile its inferred SESSION_ENDED correctly.
+  const hasActiveWorkflow = existsSync(stateFilePath(projectDir));
   try {
-    if (existsSync(heartbeatFile)) {
+    if (hasActiveWorkflow && existsSync(heartbeatFile)) {
       const prior = JSON.parse(readFileSync(heartbeatFile, "utf-8")) as {
         session_id?: string;
         ts?: string;
@@ -274,7 +413,10 @@ function reconcilePriorSession(): void {
         const reason =
           `inferred — Codex has no SessionEnd event (D-4); reconciled at next ` +
           `SessionStart. Prior session ${prior.session_id} last seen ${prior.ts ?? "unknown"}.`;
-        runCore("aidlc-session-end.ts", JSON.stringify({ reason }));
+        runCore(
+          "aidlc-session-end.ts",
+          JSON.stringify({ reason, session_id: prior.session_id }),
+        );
       }
     }
     mkdirSync(dirname(heartbeatFile), { recursive: true });
@@ -305,6 +447,32 @@ function patchedFiles(command: string): Array<{ path: string; tool: "Write" | "E
 // --- Targets ------------------------------------------------------------------
 
 switch (target) {
+  case "bind-bash-session": {
+    const command =
+      typeof codex.tool_input?.command === "string"
+        ? codex.tool_input.command
+        : "";
+    if (
+      process.platform === "win32" ||
+      codex.tool_name !== "Bash" ||
+      !payloadSessionId ||
+      !command
+    ) {
+      persistResponse("", 0);
+      return 0;
+    }
+    const prefix =
+      `export AIDLC_SESSION_OVERRIDE='${payloadSessionId}' ` +
+      "AIDLC_SESSION_OVERRIDE_SOURCE='payload'; ";
+    const wrapped = wrapUpdatedInput({
+      ...codex.tool_input,
+      command: command.startsWith(prefix) ? command : `${prefix}${command}`,
+    });
+    persistResponse(wrapped, 0);
+    process.stdout.write(wrapped);
+    return 0;
+  }
+
   case "session-start": {
     reconcilePriorSession();
     // Forward session_id so the core hook's per-session→intent stamp (on
@@ -324,7 +492,7 @@ switch (target) {
   }
 
   case "audit-and-sensors": {
-    // apply_patch → audit-logger THEN sensor-fire per touched file (mirrors
+    // apply_patch → write-audit-log THEN run-sensors per touched file (mirrors
     // the Claude settings.json Write|Edit registration order). Advisory.
     if ((codex.tool_name ?? "") === "apply_patch") {
       const command = (codex.tool_input?.command as string) ?? "";
@@ -334,15 +502,15 @@ switch (target) {
           tool_name: f.tool,
           tool_input: { file_path: f.path },
         });
-        runCore("aidlc-audit-logger.ts", fwd);
-        runCore("aidlc-sensor-fire.ts", fwd);
+        runCore("aidlc-write-audit-log.ts", fwd);
+        runCore("aidlc-run-sensors.ts", fwd);
       }
     }
     persistResponse("", 0);
     return 0;
   }
 
-  case "state-sync": {
+  case "sync-workflow-state": {
     // update_plan → the first in_progress step maps to the TaskUpdate
     // in_progress transition; the core hook extracts the "[slug]" suffix.
     if ((codex.tool_name ?? "") === "update_plan") {
@@ -354,17 +522,17 @@ switch (target) {
           tool_name: "TaskUpdate",
           tool_input: { status: "in_progress", activeForm: active.step },
         });
-        runCore("aidlc-sync-statusline.ts", fwd);
+        runCore("aidlc-sync-workflow-state.ts", fwd);
       }
     }
     persistResponse("", 0);
     return 0;
   }
 
-  case "runtime-compile": {
+  case "rebuild-stage-graph": {
     // Codex already names the shell tool "Bash" with tool_input.command —
     // the core hook's exact contract. Verbatim pipe.
-    runCore("aidlc-runtime-compile.ts", rawInput);
+    runCore("aidlc-rebuild-stage-graph.ts", rawInput);
     persistResponse("", 0);
     return 0;
   }
@@ -379,16 +547,16 @@ switch (target) {
 
   case "log-subagent": {
     // SubagentStop already carries agent_type (real role name since Codex
-    // 0.139.0; the doctor-enforced floor is 0.145.0) + agent_id. Verbatim pipe.
+    // 0.139.0; the doctor-advised floor is 0.145.0) + agent_id. Verbatim pipe.
     runCore("aidlc-log-subagent.ts", rawInput);
     persistResponse("", 0);
     return 0;
   }
 
-  case "stop": {
+  case "continue-workflow": {
     // Contract identical on Codex (stop_hook_active included): pass stdin
     // verbatim, forward {"decision":"block","reason"} stdout + exit code.
-    const r = runCore("aidlc-stop.ts", rawInput);
+    const r = runCore("aidlc-continue-workflow.ts", rawInput);
     persistResponse(r.stdout, r.code);
     if (r.stdout) process.stdout.write(r.stdout);
     return r.code;
@@ -452,6 +620,132 @@ switch (target) {
     return 0;
   }
 
+  case "review-freeze": {
+    // PreToolUse: the §12a terminal-receipt write-freeze. Bash already carries
+    // the core hook's command shape, while apply_patch fans out one Write per
+    // touched path (Delete File / Move to included). Block contract: exit 2 +
+    // stderr; the response cache replays the block on duplicate delivery.
+    const tool = codex.tool_name ?? "";
+    if (tool === "Bash") {
+      const r = runCoreWithStderr("aidlc-review-freeze.ts", rawInput);
+      persistResponse(r.stdout, r.code === 2 ? 2 : 0, r.stderr);
+      if (r.code === 2) {
+        process.stderr.write(r.stderr);
+        return 2;
+      }
+      return 0;
+    }
+    if (tool === "apply_patch") {
+      const command = (codex.tool_input?.command as string) ?? "";
+      const targets: Array<{ path: string; tool: string }> = patchedFiles(command);
+      for (const m of command.matchAll(/^\*\*\* (?:Delete File|Move to): (.+)$/gm)) {
+        const rel = m[1].trim();
+        targets.push({ path: isAbsolute(rel) ? rel : join(projectDir, rel), tool: "Edit" });
+      }
+      for (const f of targets) {
+        const fwd = JSON.stringify({
+          hook_event_name: "PreToolUse",
+          tool_name: f.tool,
+          tool_input: { file_path: f.path },
+        });
+        const r = runCoreWithStderr("aidlc-review-freeze.ts", fwd);
+        if (r.code === 2) {
+          persistResponse("", 2, r.stderr);
+          process.stderr.write(r.stderr);
+          return 2;
+        }
+      }
+    }
+    persistResponse("", 0);
+    return 0;
+  }
+
+  case "deliver-stage-rules": {
+    // Codex 0.145 consumes the same PreToolUse hookSpecificOutput.updatedInput
+    // contract as Claude, plus an explicit allow decision for rewritten input.
+    // The core hook recognizes spawn_agent and appends the exact active-stage
+    // bundle to message/items; the adapter completes the Codex envelope.
+    const r = runCoreWithStderr("aidlc-deliver-stage-rules.ts", rawInput);
+    const answeredCode = r.code === 2 ? 2 : 0;
+    const stdout = r.code === 2 ? r.stdout : allowUpdatedInput(r.stdout);
+    persistResponse(stdout, answeredCode, r.stderr);
+    if (stdout) process.stdout.write(stdout);
+    if (r.code === 2) {
+      process.stderr.write(r.stderr);
+      return 2;
+    }
+    return 0;
+  }
+
+  case "plan-approval-guard": {
+    // PreToolUse: code-generation's plan-before-generation ordering. Bash
+    // forwards directly; apply_patch fans out one Write call per touched path;
+    // spawn_agent is normalized to the core Task shape. The block contract is
+    // exit 2 + stderr, cached like reviewer-scope so duplicate delivery replays
+    // the block faithfully.
+    const tool = codex.tool_name ?? "";
+    if (tool === "Bash") {
+      const r = runCoreWithStderr("aidlc-plan-approval-guard.ts", rawInput);
+      persistResponse(r.stdout, r.code === 2 ? 2 : 0, r.stderr);
+      if (r.code === 2) {
+        process.stderr.write(r.stderr);
+        return 2;
+      }
+      return 0;
+    }
+    if (tool === "apply_patch") {
+      const command = (codex.tool_input?.command as string) ?? "";
+      const targets: Array<{ path: string; tool: string }> = patchedFiles(command);
+      for (const m of command.matchAll(/^\*\*\* (?:Delete File|Move to): (.+)$/gm)) {
+        const rel = m[1].trim();
+        targets.push({ path: isAbsolute(rel) ? rel : join(projectDir, rel), tool: "Edit" });
+      }
+      for (const f of targets) {
+        const r = runCoreWithStderr(
+          "aidlc-plan-approval-guard.ts",
+          JSON.stringify({
+            hook_event_name: "PreToolUse",
+            tool_name: f.tool,
+            tool_input: { file_path: f.path },
+          }),
+        );
+        if (r.code === 2) {
+          persistResponse("", 2, r.stderr);
+          process.stderr.write(r.stderr);
+          return 2;
+        }
+      }
+      persistResponse("", 0);
+      return 0;
+    }
+    if (tool !== "spawn_agent") {
+      persistResponse("", 0);
+      return 0;
+    }
+    const spawnInput: CodexSpawnAgentInput = codex.tool_input ?? {};
+    const target =
+      typeof spawnInput.agent_type === "string" ? spawnInput.agent_type : "";
+    if (target !== "aidlc-developer-agent") {
+      persistResponse("", 0);
+      return 0;
+    }
+    const fwd = JSON.stringify({
+      hook_event_name: "PreToolUse",
+      tool_name: "Task",
+      tool_input: {
+        subagent_type: target,
+        prompt: spawnAgentPrompt(spawnInput),
+      },
+    });
+    const r = runCoreWithStderr("aidlc-plan-approval-guard.ts", fwd);
+    persistResponse(r.stdout, r.code === 2 ? 2 : 0, r.stderr);
+    if (r.code === 2) {
+      process.stderr.write(r.stderr);
+      return 2;
+    }
+    return 0;
+  }
+
   case "state-transition-guard": {
     // Global PreToolUse lifecycle guard. Only Bash can name aidlc-state.ts;
     // everything else permits immediately. Preserve exit 2 + stderr exactly.
@@ -468,19 +762,39 @@ switch (target) {
     break;
   }
 
-  case "mint": {
+  case "record-human-turn": {
+    if (
+      codex.tool_name === "request_user_input" &&
+      !hasExplicitHumanSelection(codex.tool_response, codex.tool_input)
+    ) {
+      persistResponse("", 0);
+      return 0;
+    }
     // UserPromptSubmit: a real human acted this turn — record a HUMAN_TURN event
     // in the active intent's audit shard (human-presence gate). Gated on workflow
-    // state existing (same self-gate as the core mint hook) so a prompt in a
+    // state existing (same self-gate as the core record-human-turn hook) so a prompt in a
     // project that never ran the framework does not scaffold audit shards.
-    // Fail-open: a mint failure must never block the turn. Advisory, no stdout.
-    try {
-      if (existsSync(stateFilePath(projectDir))) {
-        appendAuditEntry("HUMAN_TURN", {}, projectDir);
-      }
-    } catch {
-      // best-effort presence record — advisory
-    }
+    // Fail-open: a record-human-turn failure must never block the turn. Advisory, no stdout.
+    //
+    // A structured request_user_input selection is forwarded as the tool
+    // response it is, never as typed prompt text: the core hook records the
+    // Plan Approval choice from either channel, but the break-glass override
+    // phrase counts only when the human typed it as a prompt.
+    const selectionText = explicitHumanSelectionText(codex.tool_response);
+    const forwarded =
+      codex.tool_name === "request_user_input"
+        ? {
+            hook_event_name: "PostToolUse",
+            ...(codex.session_id ? { session_id: codex.session_id } : {}),
+            tool_name: "request_user_input",
+            tool_response: { answer: selectionText },
+          }
+        : {
+            hook_event_name: "UserPromptSubmit",
+            ...(codex.session_id ? { session_id: codex.session_id } : {}),
+            prompt: codex.prompt || codex.user_prompt || codex.message || "",
+          };
+    runCoreWithStderr("aidlc-record-human-turn.ts", JSON.stringify(forwarded));
     persistResponse("", 0);
     return 0;
   }

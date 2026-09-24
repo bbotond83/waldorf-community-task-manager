@@ -12,8 +12,12 @@ files are `aidlc/spaces/<active-space>/memory/{org,team,project}.md`;
 `phases/<phase>.md` attaches because the stage's frontmatter `phase: <name>`
 selects it. Stage rules are reserved for future use. The compile bakes the
 resolved chain into each stage node's `rules_in_context`; every applicable
-rule appears in the chain — nothing drops at runtime. This file documents how
-to read those layers safely.
+rule appears in the chain - nothing drops at runtime. At stage entry the
+engine delivers each substantive rule file through an ordered sequence of
+bounded `load-steering` directives before `run-stage` (empty templates are
+dropped per § 1; there is no size-based path fallback). This file documents
+how to read those layers safely when an agent needs a practice outside that
+delivery sequence (tool shaping, question prompts).
 
 ---
 
@@ -68,6 +72,11 @@ For the **walking skeleton** topic:
 For the **testing** topic:
 - Prefer `## Testing Posture`.
 - Fall back to any heading containing `test` (case-insensitive).
+- For Code Generation, resolve the explicit `Methodology` and `Ordering`
+  statements independently from coverage, tooling, integration, or scope
+  notes. A narrower note that says nothing about cadence remains additive and
+  does not erase a broader affirmed methodology. A contradictory narrower
+  methodology is an error under the strict-additive model.
 
 For the **deployment** topic:
 - Prefer `## Deployment`.
@@ -109,7 +118,7 @@ Hardcoded defaults are:
 |---|---|
 | Way of Working | trunk-based development; base `main`, target `main`; squash-merge |
 | Walking Skeleton | scope-dependent; the active scope file's `skeleton:` field supplies the default ceremony stance |
-| Testing Posture | TDD encouraged but not enforced; the test-strategy axis governs volume |
+| Testing Posture | test-after ordering when no methodology is affirmed; the test-strategy axis governs volume |
 | Deployment | trunk-based with on-merge staging deploy; production gate is human-approved |
 | Code Style | defer to project linter/formatter configuration |
 

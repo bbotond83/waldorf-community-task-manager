@@ -1,8 +1,9 @@
 ---
 id: upstream-coverage
 kind: deterministic
-command: bun .codex/tools/aidlc-sensor-upstream-coverage.ts
+command: aidlc engine sensor-upstream-coverage
 default_severity: advisory
+fire_on: gate
 description: Checks the stage's deliverables reference the upstream artifacts the stage frontmatter declares it consumes
 category: document-shape
 matches: "**/{aidlc-docs,intents}/**"
