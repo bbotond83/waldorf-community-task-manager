@@ -37,6 +37,9 @@ read-only Staff, Group Administrator, Kindergarten Administrator, or Super Admin
 permitted navigation projection. Use `Tesztprofil váltása` to clear the current local session before
 choosing another role.
 
+For a Hungarian hands-on walkthrough and test checklist, see
+[HASZNALATI_UTMUTATO_HU.md](./HASZNALATI_UTMUTATO_HU.md).
+
 Build and run the production-compatible output locally:
 
 ```bash
