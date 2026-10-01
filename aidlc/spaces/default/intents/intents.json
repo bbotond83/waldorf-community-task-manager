@@ -4,6 +4,13 @@
     "slug": "brownfield-roadmap",
     "dirName": "260925-brownfield-roadmap",
     "scope": "waldorf-brownfield-roadmap",
+    "status": "complete"
+  },
+  {
+    "uuid": "01a0f65b-f08a-7e93-9448-a0e8f051a595",
+    "slug": "bolt-document-delivery",
+    "dirName": "261001-bolt-document-delivery",
+    "scope": "waldorf-bolt-document-delivery",
     "status": "in-flight"
   }
 ]

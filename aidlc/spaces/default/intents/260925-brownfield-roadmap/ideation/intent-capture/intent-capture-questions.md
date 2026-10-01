@@ -117,4 +117,4 @@ Does this all look correct before I generate the artifact?
 A. Accept assumptions
 B. Convert to follow-up questions
 
-[Answer]:
+[Answer]: A. Accept assumptions

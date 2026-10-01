@@ -2159,7 +2159,7 @@ function composeDispatchDirective(
     );
     if (flags.intent) {
       parts.push(
-        `The proposal's required \`creationDescription\` MUST equal the original task text verbatim: ${JSON.stringify(flags.intent)}. On approval, pass it after the literal \`--\` delimiter as one shell-safe argv value; for this exact task the command is \`next --scope <scopeName> -- ${shellArg(flags.intent)}\`. Never use double quotes around untrusted task text and never use a bare \`next --scope <scopeName>\`, so shell metacharacters and flag-like descriptions stay literal and the created Project field preserves the real description.`,
+        `The proposal's required \`creationDescription\` MUST equal the original task text verbatim: ${JSON.stringify(flags.intent)}. On approval, pass it after the literal \`--\` delimiter as one shell-safe argv value; for this exact task the command is \`next ${flags.newIntent ? "--new-intent " : ""}--scope <scopeName> -- ${shellArg(flags.intent)}\`. Never use double quotes around untrusted task text and never use a bare \`next --scope <scopeName>\`, so shell metacharacters and flag-like descriptions stay literal and the created Project field preserves the real description.`,
       );
     } else {
       parts.push(
@@ -5078,7 +5078,17 @@ function routeNext(args: string[], projectDir: string | undefined): void {
       ));
       return;
     }
-    emit(composeDispatchDirective(flags, stateContent !== null));
+    // Completed records are retained history, not a running plan to reshape.
+    // An explicit new-intent request also composes a fresh workflow proposal.
+    const inFlight = stateContent !== null &&
+      getField(stateContent, "Status") !== "Completed" &&
+      getField(stateContent, "Status") !== "Archived" &&
+      !flags.newIntent;
+    // Creation after a retained record must not become a scope change.
+    const creationFlags = !inFlight && stateContent !== null
+      ? { ...flags, newIntent: true }
+      : flags;
+    emit(composeDispatchDirective(creationFlags, inFlight));
     return;
   }
 
