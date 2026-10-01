@@ -134,6 +134,8 @@ test("@a11y Staff supports keyboard, focus, zoom, touch, mobile cards, and axe",
   await page.getByTestId("app-shell-skip-link").focus();
   await page.keyboard.press("Enter");
   await expect(page.getByTestId("app-shell-main")).toBeFocused();
+  // Exercise wider text metrics as well as page zoom across operating systems.
+  await page.addStyleTag({ content: ".staff-table { font-size: 1.2rem; }" });
   await page.evaluate(() => {
     document.documentElement.style.zoom = "2";
   });

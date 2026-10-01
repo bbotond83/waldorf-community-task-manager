@@ -1,4 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
+import { firefoxLaunchOptions } from "./scripts/verification/firefox-launch.ts";
 
 const basePort = Number(process.env.APP_PORT ?? 3100);
 const serverEnvironment = (port: number) => ({
@@ -33,7 +34,11 @@ export default defineConfig({
     },
     {
       name: "firefox",
-      use: { ...devices["Desktop Firefox"], baseURL: `http://127.0.0.1:${basePort + 1}` },
+      use: {
+        ...devices["Desktop Firefox"],
+        baseURL: `http://127.0.0.1:${basePort + 1}`,
+        launchOptions: firefoxLaunchOptions(),
+      },
     },
     {
       name: "mobile-chrome",

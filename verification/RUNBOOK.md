@@ -9,6 +9,12 @@
 
 The command performs locked local installation-independent acceptance and calls only loopback. For a literal clean-install rehearsal, remove or relocate `node_modules` outside the repository, run `npm ci`, then execute the command. Do not add real credentials or personal data.
 
+### macOS browser execution
+
+Run browser verification from a terminal with permission to launch native applications. When running through Codex, request execution outside its filesystem/process sandbox for `npm run test:browser` or `npm run verify:local`; a sandboxed launch can abort Firefox during application registration and deny Chromium's Mach service registration.
+
+On macOS, the Firefox project writes `waldorf-application.ini` beside the bundled browser's resources in Playwright's browser cache and selects it with `XUL_APP_FILE`. This keeps Gecko's application-data directory separate from personal Firefox data and addresses the macOS 27 startup hang tracked in [Playwright issue #42768](https://github.com/microsoft/playwright/issues/42768). The bundled browser executable and its sandbox settings remain intact. Install the browser revision matching the locked Playwright package before running verification. A launch failure remains a failed check; do not report skipped browser tests as passed.
+
 ## Profile routes
 
 - Parent: `/szulo/feladatok`, `/szulo/ertesitesek`, invitation/authentication entry.

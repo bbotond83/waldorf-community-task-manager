@@ -20,6 +20,7 @@ test("selects a synthetic parent profile and renders its permitted shell", async
 test("switching profiles clears the prior projection", async ({ page }) => {
   await page.goto("/");
   await page.getByTestId("profile-selector-parent-local-button").click();
+  await expect(page.getByRole("heading", { name: "Üdvözlünk, Szülő!" })).toBeFocused();
   await page.getByTestId("app-shell-switch-profile-button").click();
   await expect(page.getByRole("heading", { name: "Helyi tesztprofil kiválasztása" })).toBeVisible();
   await page.getByTestId("profile-selector-staff-local-button").click();
