@@ -1,9 +1,9 @@
 # Local Acceptance Report
 
-- Git SHA: `69edd12c7aba1c0ae35138bbac67932d86b85e63`
+- Git SHA: `71a3b5f8d74be036b10571690e439d865fb5d664`
 - Fixture: `waldorf-local-v1`
 - Manifest: `waldorf-scenarios-v1` (SHA-256 `261ffedec4261ac5754e0c965d70a9a58c0ec126c5d92f9618178f1b3ad116be`)
-- Generated from evidence completed at: `2026-08-12T15:32:22.472Z`
+- Generated from evidence completed at: `2026-10-01T08:13:45.144Z`
 - Results: 33 PASS, 0 FAIL, 6 OUTSTANDING
 
 | Scenario | Target | Result | Tool | Artifact |
