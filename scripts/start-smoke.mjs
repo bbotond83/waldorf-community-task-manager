@@ -1,18 +1,44 @@
-import { spawn } from "node:child_process";
+import { execFileSync, spawn } from "node:child_process";
+import { fileURLToPath } from "node:url";
 
 const port = Number(process.env.SMOKE_PORT ?? 3210);
 const timeoutMs = Number(process.env.SMOKE_TIMEOUT_MS ?? 30_000);
 const baseUrl = `http://127.0.0.1:${port}`;
-const child = spawn("npm", ["run", "start"], {
-  env: {
-    ...process.env,
-    APP_RUNTIME_MODE: "synthetic",
-    APP_SYNTHETIC_FIXTURE_VERSION: "waldorf-local-v1",
-    APP_HOST: "127.0.0.1",
-    APP_PORT: String(port),
-  },
-  stdio: ["ignore", "pipe", "pipe"],
+const environment = {
+  ...process.env,
+  APP_RUNTIME_MODE: "synthetic",
+  APP_SYNTHETIC_FIXTURE_VERSION: "waldorf-local-v1",
+  APP_HOST: "127.0.0.1",
+  APP_PORT: String(port),
+};
+// Preserve the prestart checks while owning the server process directly.
+// Killing an npm wrapper can leave Next.js holding the captured output pipes.
+execFileSync(process.execPath, ["scripts/validate-toolchain.mjs"], {
+  env: environment,
+  stdio: "inherit",
 });
+execFileSync(
+  process.execPath,
+  ["--experimental-strip-types", "scripts/validate-runtime-config.ts"],
+  { env: environment, stdio: "inherit" },
+);
+const child = spawn(
+  process.execPath,
+  [
+    fileURLToPath(import.meta.resolve("next/dist/bin/next")),
+    "start",
+    "--hostname",
+    "127.0.0.1",
+    "--port",
+    String(port),
+  ],
+  {
+    env: {
+      ...environment,
+    },
+    stdio: ["ignore", "pipe", "pipe"],
+  },
+);
 
 let output = "";
 child.stdout.on("data", (chunk) => {
@@ -52,10 +78,13 @@ try {
   console.error(output.slice(-2_000));
   process.exitCode = 1;
 } finally {
+  const exited = new Promise((resolve) => child.once("exit", resolve));
   child.kill("SIGTERM");
-  await Promise.race([
-    new Promise((resolve) => child.once("exit", resolve)),
-    new Promise((resolve) => setTimeout(resolve, 2_000)),
-  ]);
-  if (child.exitCode === null) child.kill("SIGKILL");
+  await Promise.race([exited, new Promise((resolve) => setTimeout(resolve, 2_000))]);
+  if (child.exitCode === null && child.signalCode === null) {
+    child.kill("SIGKILL");
+    await exited;
+  }
+  child.stdout.destroy();
+  child.stderr.destroy();
 }
