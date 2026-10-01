@@ -1,0 +1,20 @@
+
+> waldorf-community-task-manager@0.2.0 test:delivery
+> vitest run --config vitest.config.ts tests/coverage/app-entrypoints.test.tsx tests/coverage/admin-pages.test.tsx tests/coverage/parent-pages.test.tsx tests/coverage/staff-pages.test.tsx tests/coverage/admin-actions.test.ts tests/coverage/parent-actions.test.ts tests/coverage/app-session-boundaries.test.ts
+
+
+ RUN  v4.1.11 /Users/dev/Development/waldorf-community-task-manager
+
+ ✓ |delivery| tests/coverage/parent-actions.test.ts (18 tests) 9ms
+ ✓ |delivery| tests/coverage/app-session-boundaries.test.ts (3 tests) 12ms
+ ✓ |delivery| tests/coverage/admin-actions.test.ts (28 tests) 18ms
+ ✓ |delivery| tests/coverage/app-entrypoints.test.tsx (12 tests) 18ms
+ ✓ |delivery| tests/coverage/parent-pages.test.tsx (17 tests) 119ms
+ ✓ |delivery| tests/coverage/staff-pages.test.tsx (7 tests) 121ms
+ ✓ |delivery| tests/coverage/admin-pages.test.tsx (32 tests) 214ms
+
+ Test Files  7 passed (7)
+      Tests  117 passed (117)
+   Start at  15:21:26
+   Duration  1.33s (transform 887ms, setup 1.12s, import 1.62s, tests 512ms, environment 4.62s)
+

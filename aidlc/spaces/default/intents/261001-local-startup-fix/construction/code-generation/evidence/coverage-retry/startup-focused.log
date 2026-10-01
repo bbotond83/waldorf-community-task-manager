@@ -1,0 +1,13 @@
+
+> waldorf-community-task-manager@0.2.0 test:delivery
+> vitest run --config vitest.config.ts tests/integration/runtime-config-cli.test.ts tests/unit/toolchain-validation.test.ts tests/unit/runtime-boundaries.test.ts
+
+
+ RUN  v4.1.11 /Users/dev/Development/waldorf-community-task-manager
+
+
+ Test Files  3 passed (3)
+      Tests  49 passed (49)
+   Start at  14:08:18
+   Duration  8.21s (transform 173ms, setup 465ms, import 150ms, tests 8.13s, environment 3.74s)
+

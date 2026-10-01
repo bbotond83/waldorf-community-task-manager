@@ -10,11 +10,11 @@
   "scripts": {
     "check:toolchain": "node scripts/validate-toolchain.mjs",
     "preinstall": "npm run check:toolchain",
-    "predev": "npm run check:toolchain && node --experimental-strip-types scripts/validate-runtime-config.ts",
+    "predev": "npm run check:toolchain && node --experimental-strip-types scripts/validate-runtime-config.ts development",
     "dev": "next dev --hostname 127.0.0.1",
-    "prebuild": "npm run check:toolchain && node --experimental-strip-types scripts/validate-runtime-config.ts",
+    "prebuild": "npm run check:toolchain && node --experimental-strip-types scripts/validate-runtime-config.ts production",
     "build": "next build",
-    "prestart": "npm run check:toolchain && node --experimental-strip-types scripts/validate-runtime-config.ts",
+    "prestart": "npm run check:toolchain && node --experimental-strip-types scripts/validate-runtime-config.ts production",
     "start": "next start --hostname ${APP_HOST:-127.0.0.1} --port ${APP_PORT:-3000}",
     "typecheck": "tsc --noEmit",
     "lint": "eslint app src/application src/runtime tests scripts *.config.* proxy.ts --max-warnings=0",
@@ -40,6 +40,7 @@
     "verify": "npm run verify:local"
   },
   "dependencies": {
+    "@next/env": "16.3.6",
     "next": "16.3.6",
     "react": "latest",
     "react-dom": "latest",
@@ -53,6 +54,7 @@
     "@types/node": "^24.0.0",
     "@types/react": "latest",
     "@types/react-dom": "latest",
+    "@vitest/coverage-istanbul": "4.1.11",
     "@vitest/coverage-v8": "4.1.11",
     "eslint": "latest",
     "eslint-config-next": "latest",

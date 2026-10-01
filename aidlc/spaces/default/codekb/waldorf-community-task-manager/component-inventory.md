@@ -1,5 +1,7 @@
 # Component Inventory
 
+> Focused update, 2026-10-01: earlier repository-wide prose is preserved as historical static knowledge; its freshness was UNVERIFIED. Only the deep files listed in reverse-engineering-timestamp.md were analyzed for this update. No tests or runtime/external checks were executed.
+
 One Next.js package contains these in-process responsibility areas. They are not independently deployed services. Component headings are the canonical names used in the timestamp scope block.
 
 ## App Router delivery
@@ -113,3 +115,24 @@ One Next.js package contains these in-process responsibility areas. They are not
 **Responsibility:** Project scopes/rules, lifecycle records, agent/stage/hook/sensor/tool runtime and archived process artifacts.  
 **Depends on:** installed AIDLC 2.10.0 Codex distribution.  
 **Assessment:** Governance is versioned; historical claims must be reconciled against current app source.
+
+## Local startup lifecycle
+
+**Location:** package.json, scripts/validate-runtime-config.ts, scripts/validate-toolchain.mjs, README.md, .nvmrc, .npmrc, .env.example, next.config.ts.  
+**Responsibility:** Contributor setup, strict toolchain validation, runtime configuration validation before dev/build/start.  
+**Depends on:** npm lifecycle, pure runtime schema, Node and Next CLI.  
+**Assessment:** At risk: every prehook runs before framework env loading; README assumes nvm. Host/port shell expansion is an inherited-process boundary.
+
+## Runtime configuration validation
+
+**Location:** src/runtime/config.ts, src/runtime/composition.ts, src/runtime/production/composition.ts.  
+**Responsibility:** Pure schema validation, safe error formatting, and mode selection; this component names only the freshly analyzed subset of the broader historical runtime component.  
+**Depends on:** Zod and selected composition modules.  
+**Assessment:** Typed result boundary and invalid-config checks must be preserved; production composition is unlinked.
+
+## Local startup smoke harness
+
+**Location:** scripts/start-smoke.mjs.  
+**Responsibility:** Run loopback production output and request documented readiness route.  
+**Depends on:** npm start and loopback HTTP readiness.  
+**Assessment:** Explicit synthetic-mode injection bypasses the env-file startup symptom. Handler body and test assertions were not scanned.

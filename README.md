@@ -9,13 +9,38 @@ A responsive web application for replacing the current Excel-based kindergarten 
 - Privacy-safe synthetic mode for local acceptance
 - No Vercel, Supabase, email-provider, staging, or production target is contacted by local startup
 
-Install the supported runtime, then create the uncommitted local environment file:
+Select the supported tools for the current terminal. If nvm is installed:
 
 ```bash
-nvm use
-npm install
-cp .env.example .env.local
+nvm install 24
+nvm use 24
 ```
+
+If Node 24 is already installed through Homebrew at `/opt/homebrew/opt/node@24/bin`, use it
+without installing nvm:
+
+```bash
+export PATH="/opt/homebrew/opt/node@24/bin:$PATH"
+```
+
+This PATH selection applies only to the current terminal; it does not edit shell profiles or
+global machine settings. Verify the selected versions before installing or starting:
+
+```bash
+node --version                  # must report v24.x
+npm --version                   # must report 11.x
+npm run check:toolchain
+```
+
+Then install the locked dependencies and prepare the uncommitted synthetic environment file:
+
+```bash
+npm ci
+if [ ! -e .env.local ]; then cp .env.example .env.local; fi
+```
+
+Keep an existing `.env.local`; review its configuration rather than overwriting it. The documented
+local procedure uses the synthetic defaults from `.env.example`.
 
 Install/start commands fail closed with a stable `TOOLCHAIN_*_UNSUPPORTED` code when the Node or npm
 major does not match the supported baseline; configuration values are never included in that output.
@@ -30,6 +55,22 @@ Start the development server on loopback:
 ```bash
 npm run dev
 ```
+
+The prehook loads the applicable environment files before validating configuration, so no separate
+`APP_RUNTIME_MODE` export is needed. Without an explicit `NODE_ENV`, dev selects development files;
+build and start select production files. An explicit `development`, `production`, or `test` value
+uses that mode's files. Inherited environment values take precedence, followed by the mode-specific
+local file, `.env.local` (except in test mode), the mode-specific file, and `.env`. Missing or invalid
+effective runtime configuration still stops the command before Next starts.
+
+If the development watcher reports `EMFILE: too many open files, watch`, enable polling for that
+one command and retry:
+
+```bash
+WATCHPACK_POLLING=true npm run dev
+```
+
+This changes only the server process's watcher behavior; no machine limit or shell profile is edited.
 
 Open `http://127.0.0.1:3000`. A successful fresh start returns HTTP 200 and shows
 `Helyi tesztprofil kiválasztása`. Choose one of the five synthetic profiles to verify the Parent,
@@ -49,6 +90,20 @@ npm run start
 
 The same synthetic `.env.local` is used for this local production-output check. Readiness is available
 at `GET /api/readiness`; it reports only a stable status, runtime mode, and marker.
+
+For either server, check readiness from another terminal:
+
+```bash
+curl http://127.0.0.1:3000/api/readiness
+```
+
+Expect HTTP 200 with `status: "ready"`, `mode: "synthetic"`, and `marker: "waldorf-local-ready"`.
+Stop dev before starting the production server, and use Ctrl+C to stop each server after checking it.
+Framework `NODE_ENV=production` is independent of application `APP_RUNTIME_MODE=synthetic`.
+
+The default listener is loopback port 3000. For `npm run start`, nondefault `APP_HOST`/`APP_PORT`
+arguments come from the inherited shell environment; loading them inside the validator does not
+export them back to npm's later shell expansion.
 
 To build a production composition in a future linked environment, set `APP_RUNTIME_MODE=production`
 and provide the server-only variables named in `.env.example`. Validation checks their shape without
@@ -91,13 +146,14 @@ explicit release blocker/outstanding item until recorded on a supported Apple en
 
 ## Fresh-checkout local acceptance
 
-Use the exact supported toolchain and lockfile:
+Select Node 24/npm 11 using either current-terminal route in **Supported local runtime**, then use
+the lockfile and preserve any existing local environment file:
 
 ```bash
-nvm install 24
-nvm use 24
+node --version                   # must report v24.x
 npm --version                    # must report 11.x
-cp .env.example .env.local
+npm run check:toolchain
+if [ ! -e .env.local ]; then cp .env.example .env.local; fi
 npm ci
 npx playwright install chromium firefox
 npm run verify:local

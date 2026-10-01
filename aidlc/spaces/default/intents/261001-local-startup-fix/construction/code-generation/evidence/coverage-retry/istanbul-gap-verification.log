@@ -1,0 +1,65 @@
+
+> waldorf-community-task-manager@0.2.0 test:delivery
+> vitest run --config vitest.config.ts tests/coverage/verification-entrypoints.test.ts
+
+
+ RUN  v4.1.11 /Users/dev/Development/waldorf-community-task-manager
+
+ ❯ |delivery| tests/coverage/verification-entrypoints.test.ts (32 tests | 1 failed) 2865ms
+   ✓ validates full public manifests and hashes actual content 54ms
+   ✓ rejects invalid evidence schema, timing, provenance and missing artifacts 17ms
+   ✓ executes real orchestration ordering with every subprocess safely simulated 210ms
+   ✓ halts at failed lint before security/build and records safe evidence 24ms
+   ✓ rejects omitted and duplicated aggregate evidence 20ms
+   ✓ rejects malformed manifest authorization-matrix.json version 199ms
+   ✓ rejects malformed manifest sensitive-fields.json version 25ms
+   ✓ rejects malformed manifest scenarios.json version 28ms
+   ✓ rejects malformed manifest authorization-matrix.json rows 15ms
+   ✓ rejects malformed manifest sensitive-fields.json fields 123ms
+   ✓ rejects malformed manifest fixtures.json profiles 35ms
+   ✓ rejects malformed manifest scenarios.json scenarios 31ms
+   ✓ rejects inconsistent manifest unknown-field 215ms
+   ✓ rejects inconsistent manifest invalid-effect  378ms
+   ✓ rejects inconsistent manifest duplicate-row 34ms
+   ✓ rejects inconsistent manifest incomplete 36ms
+   ✓ rejects inconsistent manifest unknown-profile 26ms
+   ✓ rejects inconsistent manifest unknown-row  375ms
+   ✓ rejects inconsistent manifest local-status 244ms
+   ✓ rejects inconsistent manifest linked-status 31ms
+   × rejects inconsistent manifest missing-story 203ms
+   ✓ rejects inconsistent manifest missing-nfr 49ms
+   ✓ rejects inconsistent manifest missing-browser 29ms
+   ✓ rejects inconsistent manifest safari-status 27ms
+   ✓ rejects stale, future, unknown and improperly promoted evidence 19ms
+   ✓ runs measured privacy scanner against only invented owned files 23ms
+   ✓ runs measured secrets scanner against only invented owned files  315ms
+   ✓ runs measured sast scanner against only invented owned files 20ms
+   ✓ runs measured no-deploy scanner against only invented owned files 12ms
+   ✓ rejects prohibited privacy artifact while exposing only matched rule/path 15ms
+   ✓ rejects invalid scanner mode 10ms
+   ✓ rewrites only invented Firefox metadata in owned resources 23ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |delivery| tests/coverage/verification-entrypoints.test.ts > rejects inconsistent manifest missing-story
+AssertionError: expected [Function] to throw error including 'missing story' but got 'LOCAL-AUTH-CONTRACT is incomplete'
+
+Expected: "missing story"
+Received: "LOCAL-AUTH-CONTRACT is incomplete"
+
+ ❯ tests/coverage/verification-entrypoints.test.ts:201:41
+    199|   writeFileSync(matrixPath, JSON.stringify(matrix));
+    200|   writeFileSync(scenarioPath, JSON.stringify(manifest));
+    201|   expect(() => validateManifests(root)).toThrow(message);
+       |                                         ^
+    202| });
+    203| it("rejects stale, future, unknown and improperly promoted evidence", …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 31 passed (32)
+   Start at  15:17:45
+   Duration  4.29s (transform 94ms, setup 1.13s, import 73ms, tests 2.86s, environment 0ms)
+

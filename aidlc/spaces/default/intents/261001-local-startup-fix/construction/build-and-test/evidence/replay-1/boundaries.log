@@ -1,0 +1,17 @@
+
+> waldorf-community-task-manager@0.2.0 test:delivery
+> vitest run --config vitest.config.ts tests/coverage/framework-entrypoints.test.ts tests/coverage/runtime-cli-instrumentation.test.ts tests/coverage/smoke-entrypoint.test.ts tests/coverage/verification-entrypoints.test.ts
+
+
+ RUN  v4.1.11 /Users/dev/Development/waldorf-community-task-manager
+
+ ✓  delivery  tests/coverage/smoke-entrypoint.test.ts (3 tests) 17ms
+ ✓  delivery  tests/coverage/runtime-cli-instrumentation.test.ts (7 tests) 60ms
+ ✓  delivery  tests/coverage/framework-entrypoints.test.ts (2 tests) 4ms
+ ✓  delivery  tests/coverage/verification-entrypoints.test.ts (35 tests) 1674ms
+
+ Test Files  4 passed (4)
+      Tests  47 passed (47)
+   Start at  16:00:26
+   Duration  1.91s (transform 150ms, setup 382ms, import 139ms, tests 1.75s, environment 455ms)
+

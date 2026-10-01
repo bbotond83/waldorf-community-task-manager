@@ -1,5 +1,7 @@
 # Dependencies
 
+> Focused update, 2026-10-01: earlier repository-wide prose is preserved as historical static knowledge; its freshness was UNVERIFIED. Only the deep files listed in reverse-engineering-timestamp.md were analyzed for this update. No tests or runtime/external checks were executed.
+
 ## Package Graph
 
 One private npm ESM package, version 0.2.0, with package-lock.json version 3. There is no npm workspace or separate deployable service. npm ci resolves the committed lock; several direct manifest dependencies use latest, so lock regeneration can advance packages.
@@ -40,3 +42,9 @@ supabase/migrations/20260806_access_rls.sql defines role/version tables, scoped 
 - Main push workflow also creates a CycloneDX SBOM and build/SBOM attestations; Actions are pinned to immutable SHAs.
 
 No CI deployment dependency or deploy job exists.
+
+## Startup Dependency Boundary
+
+All lifecycle prehooks call toolchain validation, then the configuration CLI; the CLI imports the pure runtime schema and Zod. Next initialization follows only after those checks. Next 16.3.6 depends transitively on `@next/env` 16.3.6. Selecting that loader for the fix would require a direct application dependency and corresponding lockfile update rather than assuming a transitive package remains available.
+
+Loader choice is pending; retain the dependency direction from environment initialization at the CLI boundary into pure schema validation. No new domain or external-service dependency is required by the diagnosis.

@@ -1,0 +1,42 @@
+[
+  {
+    "check": "owned-copy-cleanup",
+    "check_passed": true,
+    "application": "/private/tmp/waldorf-build-test-replay-jukp4ei6"
+  },
+  {
+    "check": "listener-cleanup",
+    "port": 3000,
+    "check_passed": true
+  },
+  {
+    "check": "listener-cleanup",
+    "port": 3100,
+    "check_passed": true
+  },
+  {
+    "check": "listener-cleanup",
+    "port": 3101,
+    "check_passed": true
+  },
+  {
+    "check": "listener-cleanup",
+    "port": 3102,
+    "check_passed": true
+  },
+  {
+    "check": "listener-cleanup",
+    "port": 3210,
+    "check_passed": true
+  },
+  {
+    "check": "listener-cleanup",
+    "port": 3211,
+    "check_passed": true
+  },
+  {
+    "check": "listener-cleanup",
+    "port": 3212,
+    "check_passed": true
+  }
+]

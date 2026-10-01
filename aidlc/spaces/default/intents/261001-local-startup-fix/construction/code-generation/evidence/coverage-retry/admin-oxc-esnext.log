@@ -1,0 +1,21 @@
+
+ RUN  v4.1.11 /Users/dev/Development/waldorf-community-task-manager
+      Coverage enabled with v8
+
+ ✓ |delivery| tests/coverage/admin-actions.test.ts (28 tests) 23ms
+
+⎯⎯⎯⎯⎯⎯ Unhandled Error ⎯⎯⎯⎯⎯⎯⎯
+Error: Invalid b counter: app/admin/actions.ts
+ ❯ validateProductionCoverage node_modules/.vite-temp/vitest.config.ts.timestamp-1790857801110-d86a3e3ac9a3e8.mjs:67:148
+ ❯ ProductionCoverageReporter.onCoverage node_modules/.vite-temp/vitest.config.ts.timestamp-1790857801110-d86a3e3ac9a3e8.mjs:104:18
+ ❯ node_modules/vitest/dist/chunks/cli-api.CnMVyzaz.js:14051:56
+ ❯ Vitest.report node_modules/vitest/dist/chunks/cli-api.CnMVyzaz.js:14051:36
+ ❯ TestRun.end node_modules/vitest/dist/chunks/cli-api.CnMVyzaz.js:12669:35
+ ❯ node_modules/vitest/dist/chunks/cli-api.CnMVyzaz.js:13674:26
+ ❯ node_modules/vitest/dist/chunks/cli-api.CnMVyzaz.js:13684:11
+ ❯ node_modules/vitest/dist/chunks/cli-api.CnMVyzaz.js:13546:19
+ ❯ startVitest node_modules/vitest/dist/chunks/cli-api.CnMVyzaz.js:14621:8
+
+
+
+

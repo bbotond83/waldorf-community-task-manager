@@ -1,0 +1,94 @@
+[
+  {
+    "path": "README.md",
+    "sha256": "647443901fc913762c1d9d2a5ec4c9a8e37fc32374e0897682f9e2fdaf298a57"
+  },
+  {
+    "path": "package.json",
+    "sha256": "8687af62e2b6cac3fa484572eb31e06db7a051ee90c79c20f80bd71bb763fb6b"
+  },
+  {
+    "path": "package-lock.json",
+    "sha256": "76c8d07b35e4faa7f5f1f8da1f80bf5a82f7b0370ad9edaca93184b6187b1886"
+  },
+  {
+    "path": "scripts/validate-runtime-config.ts",
+    "sha256": "09c966f4bc5a34157a64cb98730e5932e5b8d2f1769aae2972732aa75cbdac0a"
+  },
+  {
+    "path": "tests/integration/runtime-config-cli.test.ts",
+    "sha256": "023173815fa7c7813c73ee67a9fcb4d92ae8e952c15d5a1a6fe8f5f41f5342d0"
+  },
+  {
+    "path": "tests/unit/toolchain-validation.test.ts",
+    "sha256": "4c5f065526a2636b25e0647b429b6fc117df9f363555d116baccc340fb632441"
+  },
+  {
+    "path": "vitest.config.ts",
+    "sha256": "ee2987ef802907a7f9303edcd553bbe89a6a69660ecfccb86e5a66806bbe842a"
+  },
+  {
+    "path": "tests/coverage/admin-actions.test.ts",
+    "sha256": "345d0ccf183fc7a680d7d68b95458cf09cd326df6d78d7714371c1cf38961f43"
+  },
+  {
+    "path": "tests/coverage/admin-pages.test.tsx",
+    "sha256": "ff99b4a1b332b0208af12b59509cf36c4eed0122e3e4013320d7cdf2e556aab4"
+  },
+  {
+    "path": "tests/coverage/app-entrypoints.test.tsx",
+    "sha256": "bffe008edc8682bb288a4ff9e6e8dd27ad7070f1ec8a31f28513bd9c75fe6621"
+  },
+  {
+    "path": "tests/coverage/app-session-boundaries.test.ts",
+    "sha256": "7da18a7a805454d561795da4fd5b254eb35897f0ccca2a1fae6c9fc2920b5ec9"
+  },
+  {
+    "path": "tests/coverage/domain-adapter.test.ts",
+    "sha256": "4092098be30cd28703e4cffcf8671450d897dc92632f06948598f570427719cf"
+  },
+  {
+    "path": "tests/coverage/framework-entrypoints.test.ts",
+    "sha256": "13ab979724ed95623b2056ffe56e8ae28110ae9b2df70818b9da7bf1a3ff3bbf"
+  },
+  {
+    "path": "tests/coverage/parent-actions.test.ts",
+    "sha256": "4700fae0067154c46f2e8cce3bbcd97f781339832c7b5e0c3e6eb6d84f06b44c"
+  },
+  {
+    "path": "tests/coverage/parent-pages.test.tsx",
+    "sha256": "c2eb3c89b5e140f15e7b6eebc550c5e981f27e0575b4dc79a4c49295a99c9bc9"
+  },
+  {
+    "path": "tests/coverage/production-inventory.test.ts",
+    "sha256": "de557bbc08b407f3189e5e0794780b2d0fdf353124dea9e2408b99ba013e2259"
+  },
+  {
+    "path": "tests/coverage/runtime-cli-instrumentation.test.ts",
+    "sha256": "b7eb9fe7880ae16a0f4e4141c5000cbc907c6bf7007e1d2977bfaf9a214b52ee"
+  },
+  {
+    "path": "tests/coverage/smoke-entrypoint.test.ts",
+    "sha256": "6f1f7993218f4ed7252c3e2ec9b1fe8e5bb37d556c226ed4cb9cac45e92e8dd0"
+  },
+  {
+    "path": "tests/coverage/staff-pages.test.tsx",
+    "sha256": "920dd7d1c5287fef0da2952a7112316163533a53de892639576b21b8ca0641b7"
+  },
+  {
+    "path": "tests/coverage/support/node-test-adapter.ts",
+    "sha256": "1626e9e948333943ce6aaa98e56269974c1d3429e7de53f989eceeecb7501b36"
+  },
+  {
+    "path": "tests/coverage/support/production-coverage-reporter.ts",
+    "sha256": "1fb8379b74d59b3f5180b6799a1f958d80f4aed7af563c3e65ba2b4fb9a38256"
+  },
+  {
+    "path": "tests/coverage/support/production-inventory.ts",
+    "sha256": "b00ed310ce789f4b1053a163d06782c8493ff04b69f99a6f2ded8087b6cfa9f8"
+  },
+  {
+    "path": "tests/coverage/verification-entrypoints.test.ts",
+    "sha256": "51a7a04becb822e9d005a212917bebc63a29c7c0108f56a73b9389b6e5c4d86e"
+  }
+]

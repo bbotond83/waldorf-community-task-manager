@@ -1,0 +1,21 @@
+{
+  "native_cases": 128,
+  "adapted_cases": 128,
+  "native_suite_summaries_excluded": [
+    "AuthorizationContract",
+    "SyntheticAdminPort approval exact outcomes",
+    "SyntheticAdminPort assignments and archive",
+    "SyntheticAdminPort authorization and redaction",
+    "SyntheticAdminPort scoped records",
+    "application contracts",
+    "application library isolation",
+    "role application facades",
+    "synthetic Parent fa\u00e7ade",
+    "synthetic Staff schedule",
+    "synthetic advanced administrator workflows",
+    "synthetic invitation states"
+  ],
+  "same_case_name_multiset": true,
+  "only_native": [],
+  "only_adapted": []
+}

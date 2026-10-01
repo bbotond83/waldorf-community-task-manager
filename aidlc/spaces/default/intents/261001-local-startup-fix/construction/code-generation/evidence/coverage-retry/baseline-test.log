@@ -1,0 +1,181 @@
+
+> waldorf-community-task-manager@0.2.0 test
+> npm run test:domain && npm run test:delivery
+
+
+> waldorf-community-task-manager@0.2.0 test:domain
+> node --experimental-strip-types --test "src/**/*.test.ts"
+
+✔ enforces parent action-resource-field matrix (1.96025ms)
+✔ allows organization admins across their organization (2.714417ms)
+✔ restricts group admins to their granted group (1.079125ms)
+✔ restricts parents to their linked family (0.132167ms)
+✔ limits staff to schedules and coordination display names (0.087625ms)
+✔ returns generic Hungarian denials and redacted audit evidence (0.086042ms)
+✔ revocation invalidates the next protected request (0.115209ms)
+✔ prevents kindergarten admins from changing super-admin governance (0.083875ms)
+▶ synthetic advanced administrator workflows
+  ✔ denies Group Administrator import before adapter state is created (1.058458ms)
+  ✔ validates, resolves, commits, and deduplicates one immutable import (5.713334ms)
+  ✔ rejects changed fingerprint and stale preview without partial commit (0.247166ms)
+  ✔ rejects malformed, oversized, missing-sheet, and missing-header workbooks (1.099834ms)
+  ✔ recovers an interrupted import using the original run identity (0.45125ms)
+  ✔ retries only classified reminder failures with the same correlation identity (0.232625ms)
+  ✔ enforces governance role, self-lockout, stale version, and next-request revocation (0.263458ms)
+  ✔ rechecks lifecycle blocker/version and performs one redacted atomic outcome (0.227583ms)
+  ✔ allowlists recipients and rejects stale or invented settings (0.167208ms)
+  ✔ maps retryable and terminal adapter failures without raw provider text (0.280958ms)
+✔ synthetic advanced administrator workflows (10.632375ms)
+▶ SyntheticAdminPort scoped records
+  ✔ returns only invented records in the granted group (0.84525ms)
+  ✔ generically denies a crafted identifier outside the scope (0.151459ms)
+  ✔ returns empty for a filter without matches (0.132166ms)
+  ✔ rejects stale versions without changing the record (0.287125ms)
+  ✔ returns retryable and terminal dependency failures explicitly (0.382833ms)
+✔ SyntheticAdminPort scoped records (2.341708ms)
+▶ SyntheticAdminPort assignments and archive
+  ✔ assigns an eligible task once (0.265334ms)
+  ✔ maps ineligible and full capacity to distinct conflicts (0.165917ms)
+  ✔ leaves an archived record unchanged on restore conflict (0.106625ms)
+✔ SyntheticAdminPort assignments and archive (0.665333ms)
+▶ SyntheticAdminPort approval exact outcomes
+  ✔ returns approved and rejected outcomes (5.526666ms)
+  ✔ returns already-decided, invalidated, and denied without retry metadata (0.214542ms)
+  ✔ returns retry metadata only for retryable dependency failure (0.13525ms)
+✔ SyntheticAdminPort approval exact outcomes (5.99175ms)
+▶ SyntheticAdminPort authorization and redaction
+  ✔ invalidates the next request after authorization revocation (0.477667ms)
+  ✔ denies a scope not granted by the session before the adapter runs (0.064292ms)
+  ✔ never projects prohibited contact or profile fields (0.077125ms)
+✔ SyntheticAdminPort authorization and redaction (0.670083ms)
+✔ filters scoped open admin queues (0.754375ms)
+✔ returns generic scope denial (0.060875ms)
+✔ returns archived school year as read-only projection (0.075166ms)
+✔ does not disclose other or missing school years (0.049583ms)
+▶ AuthorizationContract
+  ✔ exposes a versioned executable matrix (0.379834ms)
+  ✔ allows a parent to read its linked family duties (0.232166ms)
+  ✔ denies a parent requesting contact fields (0.083958ms)
+  ✔ keeps Staff read-only (0.057ms)
+  ✔ denies Group Administrator import explicitly (0.060083ms)
+  ✔ allows Kindergarten Administrator import at organization scope (0.061583ms)
+  ✔ limits governance to Super Administrator (0.080042ms)
+  ✔ invalidates the next request and clears protected cache after revocation (0.398625ms)
+  ✔ builds role navigation without the Group Administrator import route (0.124375ms)
+✔ AuthorizationContract (2.080083ms)
+▶ application contracts
+  ✔ normalizes equivalent whitespace (0.473ms)
+  ✔ returns a stable required-field error (1.147042ms)
+  ✔ rejects invalid mutation metadata (0.156084ms)
+  ✔ rejects schedule ranges beyond 31 days (0.088209ms)
+  ✔ constructs retry metadata only for retryable failures (0.071917ms)
+  ✔ maps unknown failures to terminal by default (0.087125ms)
+  ✔ creates an immutable allowlisted projection (0.133834ms)
+  ✔ rejects prohibited properties recursively (0.19775ms)
+  ✔ records synthetic PASS but keeps linked targets OUTSTANDING (1.900291ms)
+  ✔ publishes a privacy-minimized application event (0.179709ms)
+✔ application contracts (6.911583ms)
+▶ role application facades
+  ✔ returns an immutable parent duty list (0.689458ms)
+  ✔ does not invoke a Parent port before authorization (0.411042ms)
+  ✔ deduplicates Parent signup with the same key and fingerprint (0.473959ms)
+  ✔ rejects reuse of a signup key with different input (0.146833ms)
+  ✔ maps a classified Parent dependency failure to retryable (0.139583ms)
+  ✔ returns a Staff schedule without mutation or contact fields (0.186291ms)
+  ✔ validates a Staff date range before invoking its port (0.082417ms)
+  ✔ returns one authorized Staff schedule entry and hides missing entries (0.150042ms)
+  ✔ denies Group Administrator import before invoking its port (0.187625ms)
+  ✔ allows Kindergarten Administrator import through the public port (0.170417ms)
+  ✔ exposes the complete administrator workflow surface through one port (0.601917ms)
+  ✔ executes Parent request, notification, and note workflows (0.291167ms)
+  ✔ does not expose synthetic session selection in production (0.073791ms)
+  ✔ keeps invitation resend non-enumerating on adapter failure (0.072541ms)
+  ✔ resolves synthetic sessions, invitation destinations, and navigation (0.181334ms)
+✔ role application facades (4.776084ms)
+▶ application library isolation
+  ✔ has no framework, transport, environment, or concrete adapter imports (30.177709ms)
+  ✔ keeps user-facing presentation identifiers Hungarian-safe and stable (4.622125ms)
+✔ application library isolation (36.167375ms)
+✔ signs up an eligible linked family and emits replacement event (1.514416ms)
+✔ rejects unrelated family signup without state (0.120083ms)
+✔ rolls back capacity conflicts (0.233416ms)
+✔ atomically swaps only after both authenticated families confirm (0.182917ms)
+✔ creates relationships transactionally and recalculates visibility (3.298958ms)
+✔ returns a linked parent view without contact or optional fields (0.220958ms)
+✔ denies an unrelated parent without revealing the family (0.107083ms)
+✔ shows consented sensitive fields only to in-scope administrators (0.968875ms)
+✔ rejects duplicate parent links without changing relevance projections (0.296958ms)
+✔ rejects cross-organization links and parent mutations (0.130917ms)
+✔ documents optional profiles require explicit consent before administrative projection (0.375959ms)
+✔ binds commit to an immutable preview fingerprint and reports changed rows (6.094917ms)
+✔ rejects stale preview bindings without publishing (0.222334ms)
+✔ requires consent for optional profile imports (0.069125ms)
+✔ stages and publishes together with no duplicate preview commit (0.082042ms)
+✔ reconciles staged visibility after a committed import rollback (0.092166ms)
+✔ requires all 17 mapped sheets and blocks hostile cell values (0.070792ms)
+✔ persists sheet destinations and authorized conflict resolution (0.122292ms)
+✔ only permits authorized open conflict resolution (0.657583ms)
+✔ dispatches due jobs and records retry state (2.5685ms)
+✔ cancels stale duty jobs (0.328167ms)
+✔ creates paired in-app and durable queued email outcomes at both thresholds (1.760667ms)
+✔ creates missed threshold notification immediately once (0.120791ms)
+✔ records privacy-safe queued status (0.113375ms)
+✔ uses instants across Budapest DST boundaries without local-time arithmetic (0.099459ms)
+✔ returns only the linked family assignments (0.753333ms)
+✔ returns generic denial for unrelated family (0.068209ms)
+✔ lists only the recipient notification centre (0.085ms)
+✔ marks own notification read and returns its link (1.100458ms)
+✔ does not expose another recipient notification (0.086ms)
+✔ delegates linked-parent signup, swap, and cancellation outcomes (0.129833ms)
+▶ synthetic Parent façade
+  ✔ returns only the linked family's invented duties (2.288042ms)
+  ✔ generically denies unrelated and unknown duty detail (0.786792ms)
+  ✔ creates exactly one eligible assignment for a repeated idempotency key (1.218625ms)
+  ✔ keeps full, ineligible, and stale signup state unchanged (1.69225ms)
+  ✔ maps swap success, conflict, and retryable dependency outcomes exactly (1.084334ms)
+  ✔ maps cancellation validation, terminal dependency, and denial without a reason projection (0.628125ms)
+  ✔ marks a notification read idempotently and rejects an unknown notification (0.397583ms)
+  ✔ updates only the Parent's own contribution note (0.3815ms)
+✔ synthetic Parent façade (10.106417ms)
+▶ synthetic invitation states
+  ✔ classifies valid, expired, used, and invalid tokens without account data (0.152208ms)
+✔ synthetic invitation states (0.292875ms)
+✔ rechecks final eligibility transactionally before deletion (0.73575ms)
+✔ defers when a sibling remains enrolled with redacted audit evidence (0.781042ms)
+✔ defers after re-enrolment or a hold (0.06725ms)
+✔ provides redacted deferral reason (0.050959ms)
+✔ keeps audit events within one-year retention (0.116084ms)
+✔ returns only schedule projection fields for scoped staff (0.724042ms)
+✔ returns generic denial without schedule existence (0.073334ms)
+✔ rejects invalid and unbounded date ranges (0.065917ms)
+✔ returns explicit empty state (0.053167ms)
+▶ synthetic Staff schedule
+  ✔ returns only the allowlisted schedule projection for a granted group (1.250166ms)
+  ✔ returns empty for a bounded range without entries (0.117625ms)
+  ✔ rejects a range longer than 31 days before calling the adapter (0.079583ms)
+  ✔ generically denies an ungranted group and row (0.15275ms)
+  ✔ enforces grant revocation on the next request (0.09525ms)
+  ✔ classifies retryable and terminal failures without leaking adapter details (0.174542ms)
+  ✔ keeps the adapter read-only (0.048708ms)
+✔ synthetic Staff schedule (2.536583ms)
+ℹ tests 128
+ℹ suites 12
+ℹ pass 128
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 669.801167
+
+> waldorf-community-task-manager@0.2.0 test:delivery
+> vitest run --config vitest.config.ts
+
+
+ RUN  v4.1.11 /Users/dev/Development/waldorf-community-task-manager
+
+
+ Test Files  10 passed (10)
+      Tests  98 passed (98)
+   Start at  14:08:15
+   Duration  9.70s (transform 645ms, setup 4.70s, import 2.50s, tests 8.77s, environment 50.49s)
+

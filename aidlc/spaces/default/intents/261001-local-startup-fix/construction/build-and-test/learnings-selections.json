@@ -1,0 +1,15 @@
+{
+  "stage_slug": "build-and-test",
+  "space": "default",
+  "intent": "261001-local-startup-fix",
+  "selections": [
+    {
+      "candidate_id": "c1",
+      "type": "learning",
+      "scope": "project",
+      "heading": "Corrections",
+      "text": "Human selected Retry with fix after unverified coverage/audit targets. Preserve the append-only loop-back ledger and replay Code Generation with fresh Plan Approval",
+      "source": "orchestrator"
+    }
+  ]
+}

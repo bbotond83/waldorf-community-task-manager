@@ -1,5 +1,7 @@
 # Code Quality Assessment
 
+> Focused update, 2026-10-01: earlier repository-wide prose is preserved as historical static knowledge; its freshness was UNVERIFIED. Only the deep files listed in reverse-engineering-timestamp.md were analyzed for this update. No tests or runtime/external checks were executed.
+
 ## Verification Boundary
 
 Static inspection only at commit d7995af0aacf59ff7aa75880c45cc5e0a50eda9e. No tests, builds, installs, audits, application sessions, external calls, database operations, or deployments were run. Existing recorded checks below are historical and retain their original SHA/date.
@@ -48,3 +50,13 @@ The archived CodeKB claim that there were no routes, browser/server entry, Next/
 - Decide whether feature-branch pushes should receive CI before PR creation.
 - Reconcile stale README/runtime wording and obsolete conditional rule text in a separate review.
 - Run the project verification chain with Node 24 when implementation work is authorized.
+
+## Confirmed Local Startup Defect
+
+`scripts/validate-runtime-config.ts:3` validates inherited `process.env` without loading configuration files. `package.json:13–18` invokes it in predev, prebuild, and prestart before Next initializes. README's env-copy recipe therefore cannot provide runtime mode to these validators without an extra shell export. README's nvm-only runtime selection also misses the reported existing Homebrew option.
+
+## Focused Verification Gap and Risk Controls
+
+Smoke (`scripts/start-smoke.mjs:7–13`) and the skimmed local verification runner (`scripts/verification/run-local-verification.ts:41–48`) explicitly inject synthetic mode. Their success alone would conceal the defect. Later authorized regression checks should use temporary fixture environments with no exported mode, exercise development versus production selection and shell precedence, and assert missing/invalid configuration still fails with secret-safe output. This is a recommendation, not an executed check or Testing Contract.
+
+Existing test filenames and CI presence were inventoried; their bodies and current results were not evaluated. Preserve all prior verification figures as historical. Keep Node/npm constraints, Next precedence, pure schema checks, safe errors, and loopback defaults. No `.env.local` contents were read; no secrets, tests, startup processes, or external targets were accessed by this investigation.

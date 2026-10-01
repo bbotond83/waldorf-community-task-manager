@@ -1,0 +1,5 @@
+
+> waldorf-community-task-manager@0.2.0 scan:sast
+> node --experimental-strip-types scripts/verification/scan-artifacts.ts sast
+
+SAST_SCAN_PASS files=180

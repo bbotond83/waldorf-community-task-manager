@@ -1,5 +1,7 @@
 # API Documentation
 
+> Focused update, 2026-10-01: earlier repository-wide prose is preserved as historical static knowledge; its freshness was UNVERIFIED. Only the deep files listed in reverse-engineering-timestamp.md were analyzed for this update. No tests or runtime/external checks were executed.
+
 ## HTTP Route Handlers
 
 Three Next.js handlers were identified:
@@ -46,3 +48,9 @@ src/access/supabase-route-adapter.ts calls the first two through a narrow inject
 ## Verification Limits
 
 No route requests, application sessions, external calls, or database operations were run. The APIs are documented from static source inspection only.
+
+## Fresh Runtime Configuration Contracts
+
+`validateRuntimeConfig(environment)` performs pure schema validation and returns explicit valid/error states. Missing or unsupported runtime mode fails; production mode additionally requires a session secret of at least 32 characters, HTTPS Supabase URL, and key of at least 20 characters. Synthetic fixture version has a constrained default. `formatRuntimeConfigError(error)` exposes only stable code and variable name, never values.
+
+`composeRuntime(environment = process.env)` validates first and dynamically selects mode composition. `createProductionComposition(config)` remains an unlinked slot with no outbound target call in the examined implementation. The standalone validator consumes the same pure contract before framework initialization. There is no new HTTP/API contract in this bugfix; previous endpoint prose above was not freshly analyzed.

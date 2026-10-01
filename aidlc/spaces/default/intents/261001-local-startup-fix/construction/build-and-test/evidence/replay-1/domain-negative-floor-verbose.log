@@ -1,0 +1,331 @@
+
+ RUN  v4.1.11 /Users/dev/Development/waldorf-community-task-manager
+      Coverage enabled with istanbul
+
+ ✓  domain-coverage  src/application/isolation.test.ts > application library isolation > has no framework, transport, environment, or concrete adapter imports 3ms
+ ✓  domain-coverage  src/application/isolation.test.ts > application library isolation > keeps user-facing presentation identifiers Hungarian-safe and stable 0ms
+ ✓  domain-coverage  src/privacy-audit/lifecycle-service.test.ts > rechecks final eligibility transactionally before deletion 1ms
+ ✓  domain-coverage  src/privacy-audit/lifecycle-service.test.ts > defers when a sibling remains enrolled with redacted audit evidence 1ms
+ ✓  domain-coverage  src/privacy-audit/lifecycle-service.test.ts > defers after re-enrolment or a hold 0ms
+ ✓  domain-coverage  src/privacy-audit/lifecycle-service.test.ts > provides redacted deferral reason 0ms
+ ✓  domain-coverage  src/privacy-audit/lifecycle-service.test.ts > keeps audit events within one-year retention 0ms
+ ✓  domain-coverage  src/access/access-service.test.ts > allows organization admins across their organization 1ms
+ ✓  domain-coverage  src/access/access-service.test.ts > restricts group admins to their granted group 1ms
+ ✓  domain-coverage  src/access/access-service.test.ts > restricts parents to their linked family 0ms
+ ✓  domain-coverage  src/access/access-service.test.ts > limits staff to schedules and coordination display names 0ms
+ ✓  domain-coverage  src/access/access-service.test.ts > returns generic Hungarian denials and redacted audit evidence 0ms
+ ✓  domain-coverage  src/access/access-service.test.ts > revocation invalidates the next protected request 0ms
+ ✓  domain-coverage  src/access/access-service.test.ts > prevents kindergarten admins from changing super-admin governance 0ms
+ ✓  domain-coverage  src/parent-experience/parent-experience-service.test.ts > returns only the linked family assignments 1ms
+ ✓  domain-coverage  src/parent-experience/parent-experience-service.test.ts > returns generic denial for unrelated family 0ms
+ ✓  domain-coverage  src/parent-experience/parent-experience-service.test.ts > lists only the recipient notification centre 0ms
+ ✓  domain-coverage  src/parent-experience/parent-experience-service.test.ts > marks own notification read and returns its link 1ms
+ ✓  domain-coverage  src/parent-experience/parent-experience-service.test.ts > does not expose another recipient notification 0ms
+ ✓  domain-coverage  src/parent-experience/parent-experience-service.test.ts > delegates linked-parent signup, swap, and cancellation outcomes 0ms
+ ✓  domain-coverage  src/import-migration/import-service.test.ts > binds commit to an immutable preview fingerprint and reports changed rows 6ms
+ ✓  domain-coverage  src/import-migration/import-service.test.ts > rejects stale preview bindings without publishing 0ms
+ ✓  domain-coverage  src/import-migration/import-service.test.ts > requires consent for optional profile imports 0ms
+ ✓  domain-coverage  src/import-migration/import-service.test.ts > stages and publishes together with no duplicate preview commit 0ms
+ ✓  domain-coverage  src/import-migration/import-service.test.ts > reconciles staged visibility after a committed import rollback 0ms
+ ✓  domain-coverage  src/import-migration/import-service.test.ts > requires all 17 mapped sheets and blocks hostile cell values 0ms
+ ✓  domain-coverage  src/import-migration/import-service.test.ts > persists sheet destinations and authorized conflict resolution 0ms
+ ✓  domain-coverage  src/import-migration/import-service.test.ts > only permits authorized open conflict resolution 0ms
+ ✓  domain-coverage  src/directory/directory-service.test.ts > creates relationships transactionally and recalculates visibility 2ms
+ ✓  domain-coverage  src/directory/directory-service.test.ts > returns a linked parent view without contact or optional fields 0ms
+ ✓  domain-coverage  src/directory/directory-service.test.ts > denies an unrelated parent without revealing the family 0ms
+ ✓  domain-coverage  src/directory/directory-service.test.ts > shows consented sensitive fields only to in-scope administrators 0ms
+ ✓  domain-coverage  src/directory/directory-service.test.ts > rejects duplicate parent links without changing relevance projections 0ms
+ ✓  domain-coverage  src/directory/directory-service.test.ts > rejects cross-organization links and parent mutations 0ms
+ ✓  domain-coverage  src/notifications/notification-service.test.ts > creates paired in-app and durable queued email outcomes at both thresholds 2ms
+ ✓  domain-coverage  src/notifications/notification-service.test.ts > creates missed threshold notification immediately once 0ms
+ ✓  domain-coverage  src/notifications/notification-service.test.ts > records privacy-safe queued status 0ms
+ ✓  domain-coverage  src/notifications/notification-service.test.ts > uses instants across Budapest DST boundaries without local-time arithmetic 0ms
+ ✓  domain-coverage  src/access/access-matrix.test.ts > enforces parent action-resource-field matrix 1ms
+ ✓  domain-coverage  src/notifications/durable-jobs.test.ts > dispatches due jobs and records retry state 1ms
+ ✓  domain-coverage  src/notifications/durable-jobs.test.ts > cancels stale duty jobs 0ms
+ ✓  domain-coverage  src/coordination/coordination-service.test.ts > signs up an eligible linked family and emits replacement event 2ms
+ ✓  domain-coverage  src/coordination/coordination-service.test.ts > rejects unrelated family signup without state 0ms
+ ✓  domain-coverage  src/coordination/coordination-service.test.ts > rolls back capacity conflicts 0ms
+ ✓  domain-coverage  src/coordination/coordination-service.test.ts > atomically swaps only after both authenticated families confirm 0ms
+ ✓  domain-coverage  src/staff-schedule/schedule-service.test.ts > returns only schedule projection fields for scoped staff 1ms
+ ✓  domain-coverage  src/staff-schedule/schedule-service.test.ts > returns generic denial without schedule existence 0ms
+ ✓  domain-coverage  src/staff-schedule/schedule-service.test.ts > rejects invalid and unbounded date ranges 0ms
+ ✓  domain-coverage  src/staff-schedule/schedule-service.test.ts > returns explicit empty state 0ms
+ ✓  domain-coverage  src/directory/field-policy.test.ts > documents optional profiles require explicit consent before administrative projection 1ms
+ ✓  domain-coverage  src/admin-experience/admin-service.test.ts > filters scoped open admin queues 1ms
+ ✓  domain-coverage  src/admin-experience/admin-service.test.ts > returns generic scope denial 0ms
+ ✓  domain-coverage  src/admin-experience/admin-service.test.ts > returns archived school year as read-only projection 0ms
+ ✓  domain-coverage  src/admin-experience/admin-service.test.ts > does not disclose other or missing school years 0ms
+ ✓  domain-coverage  src/application/authorization.test.ts > AuthorizationContract > exposes a versioned executable matrix 1ms
+ ✓  domain-coverage  src/application/authorization.test.ts > AuthorizationContract > allows a parent to read its linked family duties 0ms
+ ✓  domain-coverage  src/application/authorization.test.ts > AuthorizationContract > denies a parent requesting contact fields 0ms
+ ✓  domain-coverage  src/application/authorization.test.ts > AuthorizationContract > keeps Staff read-only 0ms
+ ✓  domain-coverage  src/application/authorization.test.ts > AuthorizationContract > denies Group Administrator import explicitly 0ms
+ ✓  domain-coverage  src/application/authorization.test.ts > AuthorizationContract > allows Kindergarten Administrator import at organization scope 0ms
+ ✓  domain-coverage  src/application/authorization.test.ts > AuthorizationContract > limits governance to Super Administrator 0ms
+ ✓  domain-coverage  src/application/authorization.test.ts > AuthorizationContract > invalidates the next request and clears protected cache after revocation 0ms
+ ✓  domain-coverage  src/application/authorization.test.ts > AuthorizationContract > builds role navigation without the Group Administrator import route 0ms
+ ✓  domain-coverage  src/application/contracts.test.ts > application contracts > normalizes equivalent whitespace 1ms
+ ✓  domain-coverage  src/application/contracts.test.ts > application contracts > returns a stable required-field error 1ms
+ ✓  domain-coverage  src/application/contracts.test.ts > application contracts > rejects invalid mutation metadata 0ms
+ ✓  domain-coverage  src/application/contracts.test.ts > application contracts > rejects schedule ranges beyond 31 days 0ms
+ ✓  domain-coverage  src/application/contracts.test.ts > application contracts > constructs retry metadata only for retryable failures 0ms
+ ✓  domain-coverage  src/application/contracts.test.ts > application contracts > maps unknown failures to terminal by default 0ms
+ ✓  domain-coverage  src/application/contracts.test.ts > application contracts > creates an immutable allowlisted projection 0ms
+ ✓  domain-coverage  src/application/contracts.test.ts > application contracts > rejects prohibited properties recursively 0ms
+ ✓  domain-coverage  src/application/contracts.test.ts > application contracts > records synthetic PASS but keeps linked targets OUTSTANDING 1ms
+ ✓  domain-coverage  src/application/contracts.test.ts > application contracts > publishes a privacy-minimized application event 0ms
+ ✓  domain-coverage  src/application/facades.test.ts > role application facades > returns an immutable parent duty list 1ms
+ ✓  domain-coverage  src/application/facades.test.ts > role application facades > does not invoke a Parent port before authorization 0ms
+ ✓  domain-coverage  src/application/facades.test.ts > role application facades > deduplicates Parent signup with the same key and fingerprint 0ms
+ ✓  domain-coverage  src/application/facades.test.ts > role application facades > rejects reuse of a signup key with different input 0ms
+ ✓  domain-coverage  src/application/facades.test.ts > role application facades > maps a classified Parent dependency failure to retryable 0ms
+ ✓  domain-coverage  src/application/facades.test.ts > role application facades > returns a Staff schedule without mutation or contact fields 0ms
+ ✓  domain-coverage  src/application/facades.test.ts > role application facades > validates a Staff date range before invoking its port 0ms
+ ✓  domain-coverage  src/application/facades.test.ts > role application facades > returns one authorized Staff schedule entry and hides missing entries 0ms
+ ✓  domain-coverage  src/application/facades.test.ts > role application facades > denies Group Administrator import before invoking its port 0ms
+ ✓  domain-coverage  src/application/facades.test.ts > role application facades > allows Kindergarten Administrator import through the public port 0ms
+ ✓  domain-coverage  src/application/facades.test.ts > role application facades > exposes the complete administrator workflow surface through one port 1ms
+ ✓  domain-coverage  src/application/facades.test.ts > role application facades > executes Parent request, notification, and note workflows 0ms
+ ✓  domain-coverage  src/application/facades.test.ts > role application facades > does not expose synthetic session selection in production 0ms
+ ✓  domain-coverage  src/application/facades.test.ts > role application facades > keeps invitation resend non-enumerating on adapter failure 0ms
+ ✓  domain-coverage  src/application/facades.test.ts > role application facades > resolves synthetic sessions, invitation destinations, and navigation 0ms
+ ✓  domain-coverage  src/admin-advanced/synthetic-advanced.test.ts > synthetic advanced administrator workflows > denies Group Administrator import before adapter state is created 1ms
+ ✓  domain-coverage  src/admin-advanced/synthetic-advanced.test.ts > synthetic advanced administrator workflows > validates, resolves, commits, and deduplicates one immutable import 6ms
+ ✓  domain-coverage  src/admin-advanced/synthetic-advanced.test.ts > synthetic advanced administrator workflows > rejects changed fingerprint and stale preview without partial commit 0ms
+ ✓  domain-coverage  src/admin-advanced/synthetic-advanced.test.ts > synthetic advanced administrator workflows > rejects malformed, oversized, missing-sheet, and missing-header workbooks 0ms
+ ✓  domain-coverage  src/admin-advanced/synthetic-advanced.test.ts > synthetic advanced administrator workflows > recovers an interrupted import using the original run identity 0ms
+ ✓  domain-coverage  src/admin-advanced/synthetic-advanced.test.ts > synthetic advanced administrator workflows > retries only classified reminder failures with the same correlation identity 0ms
+ ✓  domain-coverage  src/admin-advanced/synthetic-advanced.test.ts > synthetic advanced administrator workflows > enforces governance role, self-lockout, stale version, and next-request revocation 0ms
+ ✓  domain-coverage  src/admin-advanced/synthetic-advanced.test.ts > synthetic advanced administrator workflows > rechecks lifecycle blocker/version and performs one redacted atomic outcome 0ms
+ ✓  domain-coverage  src/admin-advanced/synthetic-advanced.test.ts > synthetic advanced administrator workflows > allowlists recipients and rejects stale or invented settings 0ms
+ ✓  domain-coverage  src/admin-advanced/synthetic-advanced.test.ts > synthetic advanced administrator workflows > maps retryable and terminal adapter failures without raw provider text 0ms
+ ✓  domain-coverage  src/admin-core/synthetic-admin.test.ts > SyntheticAdminPort scoped records > returns only invented records in the granted group 1ms
+ ✓  domain-coverage  src/admin-core/synthetic-admin.test.ts > SyntheticAdminPort scoped records > generically denies a crafted identifier outside the scope 0ms
+ ✓  domain-coverage  src/admin-core/synthetic-admin.test.ts > SyntheticAdminPort scoped records > returns empty for a filter without matches 0ms
+ ✓  domain-coverage  src/admin-core/synthetic-admin.test.ts > SyntheticAdminPort scoped records > rejects stale versions without changing the record 0ms
+ ✓  domain-coverage  src/admin-core/synthetic-admin.test.ts > SyntheticAdminPort scoped records > returns retryable and terminal dependency failures explicitly 0ms
+ ✓  domain-coverage  src/admin-core/synthetic-admin.test.ts > SyntheticAdminPort assignments and archive > assigns an eligible task once 0ms
+ ✓  domain-coverage  src/admin-core/synthetic-admin.test.ts > SyntheticAdminPort assignments and archive > maps ineligible and full capacity to distinct conflicts 0ms
+ ✓  domain-coverage  src/admin-core/synthetic-admin.test.ts > SyntheticAdminPort assignments and archive > leaves an archived record unchanged on restore conflict 0ms
+ ✓  domain-coverage  src/admin-core/synthetic-admin.test.ts > SyntheticAdminPort approval exact outcomes > returns approved and rejected outcomes 5ms
+ ✓  domain-coverage  src/admin-core/synthetic-admin.test.ts > SyntheticAdminPort approval exact outcomes > returns already-decided, invalidated, and denied without retry metadata 0ms
+ ✓  domain-coverage  src/admin-core/synthetic-admin.test.ts > SyntheticAdminPort approval exact outcomes > returns retry metadata only for retryable dependency failure 0ms
+ ✓  domain-coverage  src/admin-core/synthetic-admin.test.ts > SyntheticAdminPort authorization and redaction > invalidates the next request after authorization revocation 0ms
+ ✓  domain-coverage  src/admin-core/synthetic-admin.test.ts > SyntheticAdminPort authorization and redaction > denies a scope not granted by the session before the adapter runs 0ms
+ ✓  domain-coverage  src/admin-core/synthetic-admin.test.ts > SyntheticAdminPort authorization and redaction > never projects prohibited contact or profile fields 0ms
+ ✓  domain-coverage  src/staff-web/synthetic-staff.test.ts > synthetic Staff schedule > returns only the allowlisted schedule projection for a granted group 1ms
+ ✓  domain-coverage  src/staff-web/synthetic-staff.test.ts > synthetic Staff schedule > returns empty for a bounded range without entries 0ms
+ ✓  domain-coverage  src/staff-web/synthetic-staff.test.ts > synthetic Staff schedule > rejects a range longer than 31 days before calling the adapter 0ms
+ ✓  domain-coverage  src/staff-web/synthetic-staff.test.ts > synthetic Staff schedule > generically denies an ungranted group and row 0ms
+ ✓  domain-coverage  src/staff-web/synthetic-staff.test.ts > synthetic Staff schedule > enforces grant revocation on the next request 0ms
+ ✓  domain-coverage  src/staff-web/synthetic-staff.test.ts > synthetic Staff schedule > classifies retryable and terminal failures without leaking adapter details 0ms
+ ✓  domain-coverage  src/staff-web/synthetic-staff.test.ts > synthetic Staff schedule > keeps the adapter read-only 0ms
+ ✓  domain-coverage  src/parent-web/synthetic-parent.test.ts > synthetic Parent façade > returns only the linked family's invented duties 1ms
+ ✓  domain-coverage  src/parent-web/synthetic-parent.test.ts > synthetic Parent façade > generically denies unrelated and unknown duty detail 0ms
+ ✓  domain-coverage  src/parent-web/synthetic-parent.test.ts > synthetic Parent façade > creates exactly one eligible assignment for a repeated idempotency key 0ms
+ ✓  domain-coverage  src/parent-web/synthetic-parent.test.ts > synthetic Parent façade > keeps full, ineligible, and stale signup state unchanged 0ms
+ ✓  domain-coverage  src/parent-web/synthetic-parent.test.ts > synthetic Parent façade > maps swap success, conflict, and retryable dependency outcomes exactly 0ms
+ ✓  domain-coverage  src/parent-web/synthetic-parent.test.ts > synthetic Parent façade > maps cancellation validation, terminal dependency, and denial without a reason projection 0ms
+ ✓  domain-coverage  src/parent-web/synthetic-parent.test.ts > synthetic Parent façade > marks a notification read idempotently and rejects an unknown notification 0ms
+ ✓  domain-coverage  src/parent-web/synthetic-parent.test.ts > synthetic Parent façade > updates only the Parent's own contribution note 0ms
+ ✓  domain-coverage  src/parent-web/synthetic-parent.test.ts > synthetic invitation states > classifies valid, expired, used, and invalid tokens without account data 0ms
+
+ Test Files  20 passed (20)
+      Tests  128 passed (128)
+   Start at  16:00:31
+   Duration  1.63s (transform 4.46s, setup 0ms, import 5.69s, tests 78ms, environment 1ms)
+
+ % Coverage report from istanbul
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |   40.13 |     30.9 |   53.84 |   35.53 |                   
+ ...y-task-manager |       0 |      100 |       0 |       0 |                   
+  next.config.ts   |       0 |      100 |       0 |       0 | 3-17              
+  proxy.ts         |       0 |      100 |       0 |       0 | 4-31              
+ ...sk-manager/app |       0 |        0 |       0 |       0 |                   
+  layout.tsx       |       0 |      100 |       0 |       0 | 5-11              
+  page.tsx         |       0 |        0 |       0 |       0 | 8-31              
+ ...ager/app/admin |       0 |        0 |       0 |       0 |                   
+  actions.ts       |       0 |        0 |       0 |       0 | 35-226            
+  ...ed-actions.ts |       0 |        0 |       0 |       0 | 14-206            
+  error.tsx        |       0 |      100 |       0 |       0 | 9-13              
+  layout.tsx       |       0 |        0 |       0 |       0 | 7-16              
+  loading.tsx      |       0 |      100 |       0 |       0 | 2                 
+  page.tsx         |       0 |        0 |       0 |       0 | 7-85              
+ ...in/_components |       0 |        0 |       0 |       0 |                   
+  ...cessState.tsx |       0 |        0 |       0 |       0 | 8-25              
+  ...FilterBar.tsx |       0 |        0 |       0 |       0 | 8                 
+  ...ationForm.tsx |       0 |        0 |       0 |       0 | 12-60             
+  ...agination.tsx |       0 |      100 |       0 |       0 | 2                 
+  ...tatePanel.tsx |       0 |        0 |       0 |       0 | 17-40             
+  ...tWorkflow.tsx |       0 |        0 |       0 |       0 | 5-116             
+  ...ollection.tsx |       0 |      100 |       0 |       0 | 9-12              
+ ...app/admin/_lib |       0 |        0 |       0 |       0 |                   
+  action-state.ts  |       0 |        0 |       0 |       0 | 8-54              
+  facade.ts        |       0 |        0 |       0 |       0 | 8-10              
+  session.ts       |       0 |        0 |       0 |       0 | 14-95             
+ ...in/adatvedelem |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 10-33             
+ ...admin/archivum |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 8-28              
+ .../archivum/[id] |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 16-36             
+ ...in/beallitasok |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 8-79              
+ ...n/emlekeztetok |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 10-50             
+ ...dmin/feladatok |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 15-43             
+ ...feladatok/[id] |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 17-43             
+ ...n/feladatok/uj |       0 |      100 |       0 |       0 |                   
+  page.tsx         |       0 |      100 |       0 |       0 | 6                 
+ ...p/admin/import |       0 |        0 |       0 |       0 |                   
+  layout.tsx       |       0 |        0 |       0 |       0 | 8-15              
+  page.tsx         |       0 |        0 |       0 |       0 | 13-18             
+ ...n/jovahagyasok |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 14-43             
+ ...ahagyasok/[id] |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 17-44             
+ ...yilvantartasok |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 15-43             
+ ...ntartasok/[id] |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 10-29             
+ ...vantartasok/uj |       0 |      100 |       0 |       0 |                   
+  page.tsx         |       0 |      100 |       0 |       0 | 6                 
+ .../api/readiness |       0 |        0 |       0 |       0 |                   
+  route.ts         |       0 |        0 |       0 |       0 | 4-15              
+ ...ynthetic/reset |       0 |        0 |       0 |       0 |                   
+  route.ts         |       0 |        0 |       0 |       0 | 8-23              
+ ...thetic/session |       0 |        0 |       0 |       0 |                   
+  route.ts         |       0 |        0 |       0 |       0 | 14-52             
+ ...er/app/belepes |       0 |        0 |       0 |       0 |                   
+  ...tionEntry.tsx |       0 |        0 |       0 |       0 | 7-16              
+  actions.ts       |       0 |        0 |       0 |       0 | 23-53             
+  page.tsx         |       0 |        0 |       0 |       0 | 4-14              
+ ...res-megtagadva |       0 |      100 |       0 |       0 |                   
+  page.tsx         |       0 |      100 |       0 |       0 | 4                 
+ ...ghivas/[token] |       0 |        0 |       0 |       0 |                   
+  ...onActions.tsx |       0 |        0 |       0 |       0 | 13-40             
+  actions.ts       |       0 |        0 |       0 |       0 | 23-53             
+  page.tsx         |       0 |        0 |       0 |       0 | 5-28              
+ .../app/munkatars |       0 |        0 |       0 |       0 |                   
+  error.tsx        |       0 |      100 |       0 |       0 | 6-8               
+  layout.tsx       |       0 |        0 |       0 |       0 | 6-11              
+  loading.tsx      |       0 |      100 |       0 |       0 | 2                 
+ ...rs/_components |       0 |        0 |       0 |       0 |                   
+  ...teSection.tsx |       0 |      100 |       0 |       0 | 10-12             
+  ...cessState.tsx |       0 |        0 |       0 |       0 | 6-7               
+  ...tatePanel.tsx |       0 |        0 |       0 |       0 | 19-55             
+ ...munkatars/_lib |       0 |        0 |       0 |       0 |                   
+  facade.ts        |       0 |        0 |       0 |       0 | 10-12             
+  filters.ts       |       0 |        0 |       0 |       0 | 9-66              
+  session.ts       |       0 |        0 |       0 |       0 | 25-42             
+ ...atars/beosztas |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 11-37             
+ .../beosztas/[id] |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 16-43             
+ ...as/_components |       0 |        0 |       0 |       0 |                   
+  ...ollection.tsx |       0 |        0 |       0 |       0 | 11-97             
+  ...uleFilter.tsx |       0 |        0 |       0 |       0 | 6-22              
+ ...ager/app/szulo |       0 |        0 |       0 |       0 |                   
+  actions.ts       |       0 |        0 |       0 |       0 | 13-176            
+  layout.tsx       |       0 |        0 |       0 |       0 | 6-11              
+ ...lo/_components |       0 |        0 |       0 |       0 |                   
+  ...nReadForm.tsx |       0 |        0 |       0 |       0 | 7-10              
+  ...cessState.tsx |       0 |        0 |       0 |       0 | 4-15              
+  ...ationForm.tsx |       0 |        0 |       0 |       0 | 22-47             
+  ...tatePanel.tsx |       0 |        0 |       0 |       0 | 14-33             
+ ...app/szulo/_lib |       0 |        0 |       0 |       0 |                   
+  action-state.ts  |       0 |        0 |       0 |       0 | 24-62             
+  facade.ts        |       0 |        0 |       0 |       0 | 9-16              
+  session.ts       |       0 |        0 |       0 |       0 | 28-37             
+ ...lo/ertesitesek |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 6-39              
+ ...zulo/feladatok |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 5-81              
+ ...feladatok/[id] |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 15-127            
+ ...tok/[id]/csere |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 14-32             
+ .../[id]/lemondas |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 14-36             
+ ...anager/scripts |       0 |        0 |       0 |       0 |                   
+  start-smoke.mjs  |       0 |        0 |       0 |       0 | 4-89              
+  ...ime-config.ts |       0 |        0 |       0 |       0 | 5-32              
+  ...toolchain.mjs |       0 |        0 |     100 |       0 | 1-18              
+ ...s/verification |       0 |        0 |       0 |       0 |                   
+  ...e-evidence.ts |       0 |        0 |     100 |       0 | 4-13              
+  core.ts          |       0 |        0 |       0 |       0 | 5-359             
+  ...fox-launch.ts |       0 |        0 |       0 |       0 | 6-21              
+  ...rification.ts |       0 |        0 |       0 |       0 | 6-170             
+  ...-artifacts.ts |       0 |        0 |       0 |       0 | 4-111             
+  ...-manifests.ts |       0 |      100 |     100 |       0 | 3-4               
+ ...ger/src/access |   79.01 |     72.6 |      88 |    85.1 |                   
+  ...ss-service.ts |    86.2 |    81.53 |     100 |   90.24 | 28-31             
+  ...y-adapters.ts |     100 |        0 |     100 |     100 | 2-3               
+  ...te-adapter.ts |       0 |        0 |       0 |       0 | 5-7               
+ ...admin-advanced |   82.38 |    65.42 |    82.5 |   84.17 |                   
+  ...c-advanced.ts |   82.38 |    65.42 |    82.5 |   84.17 | ...36,352-359,374 
+ ...src/admin-core |   63.28 |       50 |   72.22 |   63.88 |                   
+  ...etic-admin.ts |   63.28 |       50 |   72.22 |   63.88 | ...46-351,368-370 
+ ...min-experience |      70 |    66.66 |   71.42 |     100 |                   
+  admin-service.ts |      70 |    66.66 |   71.42 |     100 | 10                
+ ...rc/application |      90 |    82.68 |   94.61 |   92.56 |                   
+  admin-facade.ts  |   93.33 |    85.71 |    97.5 |   96.36 | 399,498           
+  authorization.ts |   90.47 |    86.84 |     100 |   94.87 | 182-183           
+  contracts.ts     |       0 |      100 |       0 |       0 | 101-333           
+  evidence.ts      |     100 |       75 |     100 |     100 | 61                
+  ...e-pipeline.ts |   91.66 |    83.33 |      80 |    91.3 | 29,60             
+  idempotency.ts   |      80 |       90 |      80 |   84.21 | 26,60-61          
+  parent-facade.ts |    93.1 |    66.66 |   95.45 |   96.29 | 189               
+  projection.ts    |   94.11 |     87.5 |     100 |     100 | 39                
+  results.ts       |    90.9 |    66.66 |    90.9 |    90.9 | 34                
+  ...ion-facade.ts |   81.48 |    64.28 |     100 |   83.33 | 41,64,73,98       
+  staff-facade.ts  |      85 |       80 |    87.5 |   88.23 | 54,87             
+  validation.ts    |      95 |     93.1 |     100 |   94.73 | 63                
+ ...c/coordination |   71.42 |       50 |      75 |   72.72 |                   
+  ...on-service.ts |    60.6 |    48.27 |   53.33 |   68.42 | 20-25             
+  ...repository.ts |     100 |       75 |     100 |     100 | 2                 
+ .../src/directory |   73.33 |    66.66 |   74.41 |   78.68 |                   
+  ...ry-service.ts |   68.42 |    66.66 |   71.05 |   75.92 | 38-42,47,56,75-80 
+  ...repository.ts |     100 |      100 |     100 |     100 |                   
+ ...port-migration |   90.12 |    87.17 |   97.05 |     100 |                   
+  ...rt-service.ts |    90.9 |    89.18 |   95.45 |     100 | 33,35,39          
+  ...repository.ts |   88.46 |       50 |     100 |     100 | 2                 
+ .../notifications |    87.8 |    66.66 |   81.25 |   85.71 |                   
+  durable-jobs.ts  |   83.33 |       60 |      80 |     100 | 4                 
+  ...ifications.ts |     100 |      100 |     100 |     100 |                   
+  ...on-service.ts |   86.95 |    71.42 |   71.42 |      80 | 14                
+ ...ent-experience |      90 |    78.78 |      95 |     100 |                   
+  ...repository.ts |     100 |      100 |     100 |     100 |                   
+  ...ce-service.ts |    86.2 |    78.78 |    90.9 |     100 | 16,18-20          
+ ...src/parent-web |   75.22 |    63.15 |   70.37 |   83.13 |                   
+  ...tic-parent.ts |   75.22 |    63.15 |   70.37 |   83.13 | ...26,334,380-403 
+ .../privacy-audit |   89.65 |    65.21 |   77.77 |      50 |                   
+  ...le-service.ts |   89.65 |    65.21 |   77.77 |      50 | 6                 
+ ...er/src/runtime |       0 |        0 |       0 |       0 |                   
+  AppShell.tsx     |       0 |        0 |       0 |       0 | 11-50             
+  ...eSelector.tsx |       0 |      100 |       0 |       0 | 4-16              
+  ...tionError.tsx |       0 |      100 |       0 |       0 | 4                 
+  composition.ts   |       0 |        0 |       0 |       0 | 11-22             
+  config.ts        |       0 |        0 |       0 |       0 | 3-104             
+ ...ime/production |       0 |      100 |       0 |       0 |                   
+  composition.ts   |       0 |      100 |       0 |       0 | 9-16              
+ ...ntime/security |       0 |        0 |       0 |       0 |                   
+  origin.ts        |       0 |        0 |       0 |       0 | 2-9               
+ ...untime/session |       0 |        0 |       0 |       0 |                   
+  session.ts       |       0 |        0 |       0 |       0 | 5-84              
+ ...time/synthetic |   54.54 |      100 |       0 |      60 |                   
+  composition.ts   |       0 |      100 |       0 |       0 | 9-14              
+  profiles.ts      |      75 |      100 |       0 |   85.71 | 99                
+ ...staff-schedule |     100 |    91.66 |     100 |     100 |                   
+  ...le-service.ts |     100 |    91.66 |     100 |     100 | 13                
+ .../src/staff-web |    92.3 |    73.68 |     100 |     100 |                   
+  ...etic-staff.ts |    92.3 |    73.68 |     100 |     100 | ...05-106,126-140 
+-------------------|---------|----------|---------|---------|-------------------
+ERROR: Coverage for lines (35.53%) does not meet global threshold (80%)
+ERROR: Coverage for functions (53.84%) does not meet global threshold (80%)
+ERROR: Coverage for branches (30.9%) does not meet global threshold (80%)

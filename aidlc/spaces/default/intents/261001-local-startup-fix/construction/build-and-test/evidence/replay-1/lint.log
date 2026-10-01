@@ -1,0 +1,4 @@
+
+> waldorf-community-task-manager@0.2.0 lint
+> eslint app src/application src/runtime tests scripts *.config.* proxy.ts --max-warnings=0
+

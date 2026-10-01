@@ -1,0 +1,94 @@
+[
+  {
+    "path": "README.md",
+    "same_source_in_acceptance": true
+  },
+  {
+    "path": "package.json",
+    "same_source_in_acceptance": true
+  },
+  {
+    "path": "package-lock.json",
+    "same_source_in_acceptance": true
+  },
+  {
+    "path": "scripts/validate-runtime-config.ts",
+    "same_source_in_acceptance": true
+  },
+  {
+    "path": "tests/integration/runtime-config-cli.test.ts",
+    "same_source_in_acceptance": true
+  },
+  {
+    "path": "tests/unit/toolchain-validation.test.ts",
+    "same_source_in_acceptance": true
+  },
+  {
+    "path": "vitest.config.ts",
+    "same_source_in_acceptance": true
+  },
+  {
+    "path": "tests/coverage/admin-actions.test.ts",
+    "same_source_in_acceptance": true
+  },
+  {
+    "path": "tests/coverage/admin-pages.test.tsx",
+    "same_source_in_acceptance": true
+  },
+  {
+    "path": "tests/coverage/app-entrypoints.test.tsx",
+    "same_source_in_acceptance": true
+  },
+  {
+    "path": "tests/coverage/app-session-boundaries.test.ts",
+    "same_source_in_acceptance": true
+  },
+  {
+    "path": "tests/coverage/domain-adapter.test.ts",
+    "same_source_in_acceptance": true
+  },
+  {
+    "path": "tests/coverage/framework-entrypoints.test.ts",
+    "same_source_in_acceptance": true
+  },
+  {
+    "path": "tests/coverage/parent-actions.test.ts",
+    "same_source_in_acceptance": true
+  },
+  {
+    "path": "tests/coverage/parent-pages.test.tsx",
+    "same_source_in_acceptance": true
+  },
+  {
+    "path": "tests/coverage/production-inventory.test.ts",
+    "same_source_in_acceptance": true
+  },
+  {
+    "path": "tests/coverage/runtime-cli-instrumentation.test.ts",
+    "same_source_in_acceptance": true
+  },
+  {
+    "path": "tests/coverage/smoke-entrypoint.test.ts",
+    "same_source_in_acceptance": true
+  },
+  {
+    "path": "tests/coverage/staff-pages.test.tsx",
+    "same_source_in_acceptance": true
+  },
+  {
+    "path": "tests/coverage/support/node-test-adapter.ts",
+    "same_source_in_acceptance": true
+  },
+  {
+    "path": "tests/coverage/support/production-coverage-reporter.ts",
+    "same_source_in_acceptance": true
+  },
+  {
+    "path": "tests/coverage/support/production-inventory.ts",
+    "same_source_in_acceptance": true
+  },
+  {
+    "path": "tests/coverage/verification-entrypoints.test.ts",
+    "same_source_in_acceptance": true
+  }
+]

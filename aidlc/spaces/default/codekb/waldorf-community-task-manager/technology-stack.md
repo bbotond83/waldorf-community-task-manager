@@ -1,5 +1,7 @@
 # Technology Stack
 
+> Focused update, 2026-10-01: earlier repository-wide prose is preserved as historical static knowledge; its freshness was UNVERIFIED. Only the deep files listed in reverse-engineering-timestamp.md were analyzed for this update. No tests or runtime/external checks were executed.
+
 Versions come from committed manifest/lockfile evidence. Moving latest manifest entries are identified as such.
 
 ## Application and Runtime
@@ -44,3 +46,9 @@ The package uses Next.js scripts for dev/build/start, strict TypeScript checking
 ## Workflow Tooling and Deployment
 
 The project stamp/manifest identify AIDLC 2.10.0 on Codex. This is repository governance tooling, not the application runtime. No live Supabase database, email provider, scheduler, Vercel client, or production target is configured. GitHub Actions runs validation and provenance steps but does not deploy.
+
+## Focused Environment Loader and Toolchain Findings
+
+`@next/env` 16.3.6 is Next's environment loader and a transitive lockfile dependency, currently absent as an application-declared direct dependency. Installed Next documentation recommends it when loading environment files outside the framework runtime. Existing shell values take precedence; environment-specific local files precede `.env.local` (excluded in test), then environment-specific files and `.env`.
+
+The fresh scan confirms the declared Node 24.x/npm 11.x controls and the locked versions in the tables above. It did not execute installed version checks. The intent reports Homebrew Node 24.21.0/npm 11.19.0 at `/opt/homebrew/opt/node@24/bin`; README should explain selecting that existing bin directory in the current terminal and checking versions.

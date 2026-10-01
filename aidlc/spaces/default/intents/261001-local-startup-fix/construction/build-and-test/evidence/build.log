@@ -1,0 +1,65 @@
+
+> waldorf-community-task-manager@0.2.0 prebuild
+> npm run check:toolchain && node --experimental-strip-types scripts/validate-runtime-config.ts production
+
+
+> waldorf-community-task-manager@0.2.0 check:toolchain
+> node scripts/validate-toolchain.mjs
+
+TOOLCHAIN_VALID: Node 24.x / npm 11.x
+RUNTIME_CONFIG_VALID: synthetic
+
+> waldorf-community-task-manager@0.2.0 build
+> next build
+
+▲ Next.js 16.3.6 (Turbopack)
+- Environments: .env.local
+✓ Running next.config.ts took 14ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 2.4s
+  Running TypeScript ...
+  Finished TypeScript in 4.0s ...
+  Collecting page data using 13 workers ...
+  Generating static pages using 13 workers (0/3) ...
+✓ Generating static pages using 13 workers (3/3) in 62ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ƒ /
+├ ○ /_not-found
+├ ƒ /admin
+├ ƒ /admin/adatvedelem
+├ ƒ /admin/archivum
+├ ƒ /admin/archivum/[id]
+├ ƒ /admin/beallitasok
+├ ƒ /admin/emlekeztetok
+├ ƒ /admin/feladatok
+├ ƒ /admin/feladatok/[id]
+├ ƒ /admin/feladatok/uj
+├ ƒ /admin/import
+├ ƒ /admin/jovahagyasok
+├ ƒ /admin/jovahagyasok/[id]
+├ ƒ /admin/nyilvantartasok
+├ ƒ /admin/nyilvantartasok/[id]
+├ ƒ /admin/nyilvantartasok/uj
+├ ƒ /api/readiness
+├ ƒ /api/synthetic/reset
+├ ƒ /api/synthetic/session
+├ ƒ /belepes
+├ ○ /hozzaferes-megtagadva
+├ ƒ /meghivas/[token]
+├ ƒ /munkatars/beosztas
+├ ƒ /munkatars/beosztas/[id]
+├ ƒ /szulo/ertesitesek
+├ ƒ /szulo/feladatok
+├ ƒ /szulo/feladatok/[id]
+├ ƒ /szulo/feladatok/[id]/csere
+└ ƒ /szulo/feladatok/[id]/lemondas
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

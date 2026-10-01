@@ -1,0 +1,291 @@
+[
+  {
+    "check": "node-version",
+    "command": [
+      "node",
+      "--version"
+    ],
+    "raw_exit": 0,
+    "expected_exit": 0,
+    "seconds": 0.08,
+    "check_passed": true
+  },
+  {
+    "check": "npm-version",
+    "command": [
+      "npm",
+      "--version"
+    ],
+    "raw_exit": 0,
+    "expected_exit": 0,
+    "seconds": 0.77,
+    "check_passed": true
+  },
+  {
+    "check": "toolchain",
+    "command": [
+      "npm",
+      "run",
+      "check:toolchain"
+    ],
+    "raw_exit": 0,
+    "expected_exit": 0,
+    "seconds": 0.18,
+    "check_passed": true
+  },
+  {
+    "check": "format",
+    "command": [
+      "npm",
+      "run",
+      "format:check"
+    ],
+    "raw_exit": 0,
+    "expected_exit": 0,
+    "seconds": 0.83,
+    "check_passed": true
+  },
+  {
+    "check": "owned-format",
+    "command": [
+      "node",
+      "node_modules/prettier/bin/prettier.cjs",
+      "--check",
+      "--ignore-path",
+      "/dev/null",
+      "tests/coverage/**/*.ts",
+      "tests/coverage/**/*.tsx",
+      "vitest.config.ts"
+    ],
+    "raw_exit": 0,
+    "expected_exit": 0,
+    "seconds": 0.29,
+    "check_passed": true
+  },
+  {
+    "check": "lint",
+    "command": [
+      "npm",
+      "run",
+      "lint"
+    ],
+    "raw_exit": 0,
+    "expected_exit": 0,
+    "seconds": 3.07,
+    "check_passed": true
+  },
+  {
+    "check": "typecheck",
+    "command": [
+      "npm",
+      "run",
+      "typecheck"
+    ],
+    "raw_exit": 0,
+    "expected_exit": 0,
+    "seconds": 1.06,
+    "check_passed": true
+  },
+  {
+    "check": "startup",
+    "command": [
+      "npm",
+      "run",
+      "test:delivery",
+      "--",
+      "tests/integration/runtime-config-cli.test.ts",
+      "tests/unit/toolchain-validation.test.ts",
+      "tests/unit/runtime-boundaries.test.ts"
+    ],
+    "raw_exit": 0,
+    "expected_exit": 0,
+    "seconds": 7.64,
+    "check_passed": true
+  },
+  {
+    "check": "support",
+    "command": [
+      "npm",
+      "run",
+      "test:delivery",
+      "--",
+      "tests/coverage/domain-adapter.test.ts",
+      "tests/coverage/production-inventory.test.ts"
+    ],
+    "raw_exit": 0,
+    "expected_exit": 0,
+    "seconds": 1.43,
+    "check_passed": true
+  },
+  {
+    "check": "native",
+    "command": [
+      "node",
+      "--experimental-strip-types",
+      "--test",
+      "src/**/*.test.ts"
+    ],
+    "raw_exit": 0,
+    "expected_exit": 0,
+    "seconds": 0.4,
+    "check_passed": true
+  },
+  {
+    "check": "application",
+    "command": [
+      "npm",
+      "run",
+      "test:delivery",
+      "--",
+      "tests/coverage/app-entrypoints.test.tsx",
+      "tests/coverage/admin-pages.test.tsx",
+      "tests/coverage/parent-pages.test.tsx",
+      "tests/coverage/staff-pages.test.tsx",
+      "tests/coverage/admin-actions.test.ts",
+      "tests/coverage/parent-actions.test.ts",
+      "tests/coverage/app-session-boundaries.test.ts"
+    ],
+    "raw_exit": 0,
+    "expected_exit": 0,
+    "seconds": 2.05,
+    "check_passed": true
+  },
+  {
+    "check": "boundaries",
+    "command": [
+      "npm",
+      "run",
+      "test:delivery",
+      "--",
+      "tests/coverage/framework-entrypoints.test.ts",
+      "tests/coverage/runtime-cli-instrumentation.test.ts",
+      "tests/coverage/smoke-entrypoint.test.ts",
+      "tests/coverage/verification-entrypoints.test.ts"
+    ],
+    "raw_exit": 0,
+    "expected_exit": 0,
+    "seconds": 2.39,
+    "check_passed": true
+  },
+  {
+    "check": "admin-negative-floor",
+    "command": [
+      "node",
+      "node_modules/vitest/vitest.mjs",
+      "run",
+      "--config",
+      "vitest.config.ts",
+      "--coverage",
+      "--project",
+      "delivery",
+      "tests/coverage/admin-actions.test.ts"
+    ],
+    "raw_exit": 1,
+    "expected_exit": 1,
+    "seconds": 2.97,
+    "negative_probe": true,
+    "expected_tests": 28,
+    "measured_runtime_files": 124,
+    "check_passed": true
+  },
+  {
+    "check": "domain-negative-floor-verbose",
+    "command": [
+      "node",
+      "node_modules/vitest/vitest.mjs",
+      "run",
+      "--config",
+      "vitest.config.ts",
+      "--coverage",
+      "--project",
+      "domain-coverage",
+      "--reporter",
+      "verbose",
+      "--reporter",
+      "./tests/coverage/support/production-coverage-reporter.ts"
+    ],
+    "raw_exit": 1,
+    "expected_exit": 1,
+    "seconds": 2.2,
+    "negative_probe": true,
+    "expected_tests": 128,
+    "measured_runtime_files": 124,
+    "check_passed": true
+  },
+  {
+    "check": "domain-negative-floor",
+    "command": [
+      "node",
+      "node_modules/vitest/vitest.mjs",
+      "run",
+      "--config",
+      "vitest.config.ts",
+      "--coverage",
+      "--project",
+      "domain-coverage"
+    ],
+    "raw_exit": 1,
+    "expected_exit": 1,
+    "seconds": 2.41,
+    "negative_probe": true,
+    "expected_tests": 128,
+    "measured_runtime_files": 124,
+    "check_passed": true
+  },
+  {
+    "check": "tests",
+    "command": [
+      "npm",
+      "test"
+    ],
+    "raw_exit": 0,
+    "expected_exit": 0,
+    "seconds": 9.1,
+    "check_passed": true
+  },
+  {
+    "check": "explicit-coverage",
+    "command": [
+      "node",
+      "node_modules/vitest/vitest.mjs",
+      "run",
+      "--config",
+      "vitest.config.ts",
+      "--coverage",
+      "--project",
+      "delivery",
+      "--project",
+      "domain-coverage"
+    ],
+    "raw_exit": 0,
+    "expected_exit": 0,
+    "seconds": 9.57,
+    "check_passed": true
+  },
+  {
+    "check": "canonical-coverage",
+    "command": [
+      "npm",
+      "run",
+      "test:coverage"
+    ],
+    "raw_exit": 0,
+    "expected_exit": 0,
+    "seconds": 9.92,
+    "check_passed": true
+  },
+  {
+    "check": "audit",
+    "command": [
+      "npm",
+      "audit",
+      "--audit-level=high",
+      "--registry=https://registry.npmjs.org",
+      "--json"
+    ],
+    "raw_exit": 0,
+    "expected_exit": 0,
+    "seconds": 3.93,
+    "check_passed": true
+  }
+]

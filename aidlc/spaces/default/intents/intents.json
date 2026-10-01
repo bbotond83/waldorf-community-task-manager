@@ -12,5 +12,12 @@
     "dirName": "261001-bolt-document-delivery",
     "scope": "waldorf-bolt-document-delivery",
     "status": "in-flight"
+  },
+  {
+    "uuid": "01a0f6cb-1c06-7075-92c6-4609ecfa1388",
+    "slug": "local-startup-fix",
+    "dirName": "261001-local-startup-fix",
+    "scope": "bugfix",
+    "status": "complete"
   }
 ]

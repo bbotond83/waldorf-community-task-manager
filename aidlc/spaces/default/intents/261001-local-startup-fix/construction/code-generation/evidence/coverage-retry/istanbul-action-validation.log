@@ -1,0 +1,207 @@
+
+ RUN  v4.1.11 /Users/dev/Development/waldorf-community-task-manager
+      Coverage enabled with istanbul
+
+ ✓ |delivery| tests/coverage/admin-actions.test.ts (28 tests) 26ms
+
+ Test Files  1 passed (1)
+      Tests  28 passed (28)
+   Start at  15:15:43
+   Duration  2.68s (transform 708ms, setup 107ms, import 1.30s, tests 26ms, environment 450ms)
+
+ % Coverage report from istanbul
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |   22.22 |    16.79 |   23.22 |    24.9 |                   
+ ...y-task-manager |       0 |      100 |       0 |       0 |                   
+  next.config.ts   |       0 |      100 |       0 |       0 | 3-17              
+  proxy.ts         |       0 |      100 |       0 |       0 | 4-31              
+ ...sk-manager/app |       0 |        0 |       0 |       0 |                   
+  layout.tsx       |       0 |      100 |       0 |       0 | 5-11              
+  page.tsx         |       0 |        0 |       0 |       0 | 8-31              
+ ...ager/app/admin |   85.99 |    86.06 |   66.66 |   85.11 |                   
+  actions.ts       |   98.23 |    91.46 |     100 |   98.86 | 137               
+  error.tsx        |       0 |      100 |       0 |       0 | 9-13              
+  layout.tsx       |       0 |        0 |       0 |       0 | 7-16              
+  loading.tsx      |       0 |      100 |       0 |       0 | 2                 
+  page.tsx         |       0 |        0 |       0 |       0 | 7-85              
+ ...in/_components |       0 |        0 |       0 |       0 |                   
+  ...cessState.tsx |       0 |        0 |       0 |       0 | 8-25              
+  ...FilterBar.tsx |       0 |        0 |       0 |       0 | 8                 
+  ...ationForm.tsx |       0 |        0 |       0 |       0 | 12-60             
+  ...agination.tsx |       0 |      100 |       0 |       0 | 2                 
+  ...tatePanel.tsx |       0 |        0 |       0 |       0 | 17-40             
+  ...tWorkflow.tsx |       0 |        0 |       0 |       0 | 5-116             
+  ...ollection.tsx |       0 |      100 |       0 |       0 | 9-12              
+ ...app/admin/_lib |   79.59 |     67.5 |     100 |   85.71 |                   
+  action-state.ts  |   77.77 |    66.66 |     100 |   76.47 | 26,42,48,50       
+  facade.ts        |      75 |       75 |     100 |     100 | 9                 
+  session.ts       |   81.48 |    66.66 |     100 |    90.9 | 39,75             
+ ...in/adatvedelem |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 10-33             
+ ...admin/archivum |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 8-28              
+ .../archivum/[id] |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 16-36             
+ ...in/beallitasok |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 8-79              
+ ...n/emlekeztetok |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 10-50             
+ ...dmin/feladatok |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 15-43             
+ ...feladatok/[id] |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 17-43             
+ ...n/feladatok/uj |       0 |      100 |       0 |       0 |                   
+  page.tsx         |       0 |      100 |       0 |       0 | 6                 
+ ...p/admin/import |       0 |        0 |       0 |       0 |                   
+  layout.tsx       |       0 |        0 |       0 |       0 | 8-15              
+  page.tsx         |       0 |        0 |       0 |       0 | 13-18             
+ ...n/jovahagyasok |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 14-43             
+ ...ahagyasok/[id] |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 17-44             
+ ...yilvantartasok |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 15-43             
+ ...ntartasok/[id] |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 10-29             
+ ...vantartasok/uj |       0 |      100 |       0 |       0 |                   
+  page.tsx         |       0 |      100 |       0 |       0 | 6                 
+ .../api/readiness |       0 |        0 |       0 |       0 |                   
+  route.ts         |       0 |        0 |       0 |       0 | 4-15              
+ ...ynthetic/reset |       0 |        0 |       0 |       0 |                   
+  route.ts         |       0 |        0 |       0 |       0 | 8-23              
+ ...thetic/session |       0 |        0 |       0 |       0 |                   
+  route.ts         |       0 |        0 |       0 |       0 | 14-52             
+ ...er/app/belepes |       0 |        0 |       0 |       0 |                   
+  ...tionEntry.tsx |       0 |        0 |       0 |       0 | 7-16              
+  actions.ts       |       0 |        0 |       0 |       0 | 23-53             
+  page.tsx         |       0 |        0 |       0 |       0 | 4-14              
+ ...res-megtagadva |       0 |      100 |       0 |       0 |                   
+  page.tsx         |       0 |      100 |       0 |       0 | 4                 
+ ...ghivas/[token] |       0 |        0 |       0 |       0 |                   
+  ...onActions.tsx |       0 |        0 |       0 |       0 | 13-40             
+  actions.ts       |       0 |        0 |       0 |       0 | 23-53             
+  page.tsx         |       0 |        0 |       0 |       0 | 5-28              
+ .../app/munkatars |       0 |        0 |       0 |       0 |                   
+  error.tsx        |       0 |      100 |       0 |       0 | 6-8               
+  layout.tsx       |       0 |        0 |       0 |       0 | 6-11              
+  loading.tsx      |       0 |      100 |       0 |       0 | 2                 
+ ...rs/_components |       0 |        0 |       0 |       0 |                   
+  ...teSection.tsx |       0 |      100 |       0 |       0 | 10-12             
+  ...cessState.tsx |       0 |        0 |       0 |       0 | 6-7               
+  ...tatePanel.tsx |       0 |        0 |       0 |       0 | 19-55             
+ ...munkatars/_lib |       0 |        0 |       0 |       0 |                   
+  facade.ts        |       0 |        0 |       0 |       0 | 10-12             
+  filters.ts       |       0 |        0 |       0 |       0 | 9-66              
+  session.ts       |       0 |        0 |       0 |       0 | 25-42             
+ ...atars/beosztas |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 11-37             
+ .../beosztas/[id] |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 16-43             
+ ...as/_components |       0 |        0 |       0 |       0 |                   
+  ...ollection.tsx |       0 |        0 |       0 |       0 | 11-97             
+  ...uleFilter.tsx |       0 |        0 |       0 |       0 | 6-22              
+ ...ager/app/szulo |       0 |        0 |       0 |       0 |                   
+  actions.ts       |       0 |        0 |       0 |       0 | 13-176            
+  layout.tsx       |       0 |        0 |       0 |       0 | 6-11              
+ ...lo/_components |       0 |        0 |       0 |       0 |                   
+  ...nReadForm.tsx |       0 |        0 |       0 |       0 | 7-10              
+  ...cessState.tsx |       0 |        0 |       0 |       0 | 4-15              
+  ...ationForm.tsx |       0 |        0 |       0 |       0 | 22-47             
+  ...tatePanel.tsx |       0 |        0 |       0 |       0 | 14-33             
+ ...app/szulo/_lib |       0 |        0 |       0 |       0 |                   
+  action-state.ts  |       0 |        0 |       0 |       0 | 24-62             
+  facade.ts        |       0 |        0 |       0 |       0 | 9-16              
+  session.ts       |       0 |        0 |       0 |       0 | 28-37             
+ ...lo/ertesitesek |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 6-39              
+ ...zulo/feladatok |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 5-81              
+ ...feladatok/[id] |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 15-127            
+ ...tok/[id]/csere |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 14-32             
+ .../[id]/lemondas |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 14-36             
+ ...anager/scripts |       0 |        0 |       0 |       0 |                   
+  start-smoke.mjs  |       0 |        0 |       0 |       0 | 4-89              
+  ...ime-config.ts |       0 |        0 |       0 |       0 | 5-32              
+  ...toolchain.mjs |       0 |        0 |     100 |       0 | 1-18              
+ ...s/verification |       0 |        0 |       0 |       0 |                   
+  ...e-evidence.ts |       0 |        0 |     100 |       0 | 4-13              
+  core.ts          |       0 |        0 |       0 |       0 | 5-359             
+  ...fox-launch.ts |       0 |        0 |       0 |       0 | 6-21              
+  ...rification.ts |       0 |        0 |       0 |       0 | 6-170             
+  ...-artifacts.ts |       0 |        0 |       0 |       0 | 4-111             
+  ...-manifests.ts |       0 |      100 |     100 |       0 | 3-4               
+ ...ger/src/access |       0 |        0 |       0 |       0 |                   
+  ...ss-service.ts |       0 |        0 |       0 |       0 | 3-72              
+  ...y-adapters.ts |       0 |        0 |       0 |       0 | 2-4               
+  ...te-adapter.ts |       0 |        0 |       0 |       0 | 5-7               
+ ...admin-advanced |   44.02 |    24.29 |      70 |   41.72 |                   
+  ...c-advanced.ts |   44.02 |    24.29 |      70 |   41.72 | ...94-400,491,493 
+ ...src/admin-core |   65.62 |    48.18 |   69.44 |   65.74 |                   
+  ...etic-admin.ts |   65.62 |    48.18 |   69.44 |   65.74 | ...67,374,409-414 
+ ...min-experience |       0 |        0 |       0 |       0 |                   
+  admin-service.ts |       0 |        0 |       0 |       0 | 10                
+ ...rc/application |   39.65 |     39.1 |    42.3 |   40.89 |                   
+  admin-facade.ts  |   73.33 |    38.09 |    72.5 |   74.54 | ...99,492-493,498 
+  authorization.ts |   54.76 |    52.63 |   61.11 |   56.41 | ...95,216,242-246 
+  contracts.ts     |       0 |      100 |       0 |       0 | 101-333           
+  evidence.ts      |       0 |        0 |       0 |       0 | 18-82             
+  ...e-pipeline.ts |      75 |     62.5 |      80 |   73.91 | ...7,60,76,99-108 
+  idempotency.ts   |      75 |       80 |      80 |   78.94 | 26,47,60-61       
+  parent-facade.ts |       0 |        0 |       0 |       0 | 58-276            
+  projection.ts    |    5.88 |        0 |       0 |    6.66 | 26-47             
+  results.ts       |   45.45 |       40 |   45.45 |   45.45 | 34,56-89,108      
+  ...ion-facade.ts |       0 |        0 |       0 |       0 | 31-98             
+  staff-facade.ts  |       0 |        0 |       0 |       0 | 25-91             
+  validation.ts    |      45 |    44.82 |   66.66 |   47.36 | 38,45,62-76       
+ ...c/coordination |       0 |        0 |       0 |       0 |                   
+  ...on-service.ts |       0 |        0 |       0 |       0 | 3-28              
+  ...repository.ts |       0 |        0 |       0 |       0 | 2-4               
+ .../src/directory |       0 |        0 |       0 |       0 |                   
+  ...ry-service.ts |       0 |        0 |       0 |       0 | 4-104             
+  ...repository.ts |       0 |      100 |       0 |       0 | 3-10              
+ ...port-migration |       0 |        0 |       0 |       0 |                   
+  ...rt-service.ts |       0 |        0 |       0 |       0 | 5-40              
+  ...repository.ts |       0 |        0 |       0 |       0 | 2                 
+ .../notifications |       0 |        0 |       0 |       0 |                   
+  durable-jobs.ts  |       0 |        0 |       0 |       0 | 4                 
+  ...ifications.ts |       0 |      100 |       0 |       0 | 2                 
+  ...on-service.ts |       0 |        0 |       0 |       0 | 9-16              
+ ...ent-experience |       0 |        0 |       0 |       0 |                   
+  ...repository.ts |       0 |      100 |       0 |       0 | 2                 
+  ...ce-service.ts |       0 |        0 |       0 |       0 | 9-22              
+ ...src/parent-web |    9.17 |     2.63 |   18.51 |   12.04 |                   
+  ...tic-parent.ts |    9.17 |     2.63 |   18.51 |   12.04 | 183-403           
+ .../privacy-audit |       0 |        0 |       0 |       0 |                   
+  ...le-service.ts |       0 |        0 |       0 |       0 | 5-6               
+ ...er/src/runtime |   44.82 |    36.84 |   22.22 |   44.82 |                   
+  AppShell.tsx     |       0 |        0 |       0 |       0 | 11-50             
+  ...eSelector.tsx |       0 |      100 |       0 |       0 | 4-16              
+  ...tionError.tsx |       0 |      100 |       0 |       0 | 4                 
+  composition.ts   |    62.5 |       60 |     100 |    62.5 | 13,21-22          
+  config.ts        |      50 |    33.33 |   33.33 |      50 | 45,51,64,80-104   
+ ...ime/production |       0 |      100 |       0 |       0 |                   
+  composition.ts   |       0 |      100 |       0 |       0 | 9-16              
+ ...ntime/security |       0 |        0 |       0 |       0 |                   
+  origin.ts        |       0 |        0 |       0 |       0 | 2-9               
+ ...untime/session |   80.76 |       85 |   83.33 |      80 |                   
+  session.ts       |   80.76 |       85 |   83.33 |      80 | 58,66,71,79-84    
+ ...staff-schedule |       0 |        0 |       0 |       0 |                   
+  ...le-service.ts |       0 |        0 |       0 |       0 | 9-13              
+ .../src/staff-web |       0 |        0 |       0 |       0 |                   
+  ...etic-staff.ts |       0 |        0 |       0 |       0 | 12-134            
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 22.22% ( 541/2434 )
+Branches     : 16.79% ( 307/1828 )
+Functions    : 23.22% ( 157/676 )
+Lines        : 24.9% ( 471/1891 )
+================================================================================
+ERROR: Coverage for lines (24.9%) does not meet global threshold (80%)
+ERROR: Coverage for functions (23.22%) does not meet global threshold (80%)
+ERROR: Coverage for branches (16.79%) does not meet global threshold (80%)

@@ -1,0 +1,9 @@
+{
+  "command": "env PATH=/opt/homebrew/opt/node@24/bin:/opt/homebrew/bin:/usr/bin:/bin npm audit --audit-level=high --registry=https://registry.npmjs.org --json",
+  "recorded_at_utc": "2026-10-01 13:15:37 UTC",
+  "exit_code": 0,
+  "package_lock_sha256": "76c8d07b35e4faa7f5f1f8da1f80bf5a82f7b0370ad9edaca93184b6187b1886",
+  "package_json_sha256": "8687af62e2b6cac3fa484572eb31e06db7a051ee90c79c20f80bd71bb763fb6b",
+  "result_file": "npm-audit-after-provider.json",
+  "automatic_fixes": false
+}

@@ -1,0 +1,24 @@
+
+> waldorf-community-task-manager@0.2.0 prebuild
+> npm run check:toolchain && node --experimental-strip-types scripts/validate-runtime-config.ts production
+
+
+> waldorf-community-task-manager@0.2.0 check:toolchain
+> node scripts/validate-toolchain.mjs
+
+TOOLCHAIN_VALID: Node 24.x / npm 11.x
+RUNTIME_CONFIG_VALID: synthetic
+
+> waldorf-community-task-manager@0.2.0 build
+> next build
+
+▲ Next.js 16.3.6 (Turbopack)
+- Environments: .env.local
+✓ Running next.config.ts took 929ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 3.8s
+  Running TypeScript ...
+vitest.config.ts(3,40): error TS2307: Cannot find module './tests/coverage/support/production-coverage-reporter.ts' or its corresponding type declarations.
+Failed to type check.
+

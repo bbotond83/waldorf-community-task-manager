@@ -1,0 +1,20 @@
+diff --git a/.codex/hooks/aidlc-plan-approval-guard.ts b/.codex/hooks/aidlc-plan-approval-guard.ts
+--- a/.codex/hooks/aidlc-plan-approval-guard.ts
++++ b/.codex/hooks/aidlc-plan-approval-guard.ts
+@@ -643,10 +643,15 @@
+   }
+   if (noun !== "log" || (verb !== "decision" && verb !== "answer")) return false;
+ 
+   const routeArgs = args.slice(3);
++  // Summary confirmation precedes planning artifacts. Its logger validates
++  // the question evidence and human answer; it does not authorize generation.
++  // Keep this prerequisite reachable while Plan Approval is still pending.
+   return (
+     lastFlagValue(routeArgs, "--stage") === GUARDED_STAGE &&
+-    lastFlagValue(routeArgs, "--checkpoint") === "plan-approval"
++    ["summary-confirmation", "plan-approval"].includes(
++      lastFlagValue(routeArgs, "--checkpoint") ?? "",
++    )
+   );
+ }
+ 

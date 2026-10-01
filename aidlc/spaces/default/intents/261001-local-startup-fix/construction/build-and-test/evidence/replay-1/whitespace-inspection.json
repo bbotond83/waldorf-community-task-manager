@@ -1,0 +1,9 @@
+{
+  "acceptance_scope_command": "git diff --check HEAD -- README.md package.json package-lock.json scripts/validate-runtime-config.ts tests/integration/runtime-config-cli.test.ts tests/unit/toolchain-validation.test.ts vitest.config.ts tests/coverage",
+  "acceptance_scope_exit": 0,
+  "ancillary_workspace_command": "git diff --check",
+  "ancillary_workspace_exit": 2,
+  "ancillary_diagnostic": "Nine intentional two-space Markdown hard line breaks in the previously generated CodeKB component-inventory.md were reported as trailing whitespace.",
+  "required_formatter_and_linter": "passed",
+  "upstream_artifacts_modified": false
+}
