@@ -1,0 +1,1125 @@
+{
+  "candidates": 141,
+  "files": [
+    {
+      "path": "app/admin/_components/AdminAccessState.tsx",
+      "classification": "runtime",
+      "dependencies": [
+        "next/link"
+      ]
+    },
+    {
+      "path": "app/admin/_components/AdminFilterBar.tsx",
+      "classification": "runtime",
+      "dependencies": []
+    },
+    {
+      "path": "app/admin/_components/AdminMutationForm.tsx",
+      "classification": "runtime",
+      "dependencies": [
+        "react"
+      ]
+    },
+    {
+      "path": "app/admin/_components/AdminPagination.tsx",
+      "classification": "runtime",
+      "dependencies": []
+    },
+    {
+      "path": "app/admin/_components/AsyncStatePanel.tsx",
+      "classification": "runtime",
+      "dependencies": []
+    },
+    {
+      "path": "app/admin/_components/ImportWorkflow.tsx",
+      "classification": "runtime",
+      "dependencies": [
+        "./AdminMutationForm.tsx"
+      ]
+    },
+    {
+      "path": "app/admin/_components/ResponsiveCollection.tsx",
+      "classification": "runtime",
+      "dependencies": [
+        "next/link"
+      ]
+    },
+    {
+      "path": "app/admin/_lib/action-state.ts",
+      "classification": "runtime",
+      "dependencies": []
+    },
+    {
+      "path": "app/admin/_lib/facade.ts",
+      "classification": "runtime",
+      "dependencies": [
+        "server-only",
+        "../../../src/runtime/composition.ts",
+        "../../../src/admin-core/synthetic-admin.ts",
+        "../../../src/admin-advanced/index.ts"
+      ]
+    },
+    {
+      "path": "app/admin/_lib/session.ts",
+      "classification": "runtime",
+      "dependencies": [
+        "server-only",
+        "next/headers",
+        "../../../src/runtime/composition.ts",
+        "../../../src/runtime/session/session.ts",
+        "../../../src/admin-advanced/index.ts"
+      ]
+    },
+    {
+      "path": "app/admin/actions.ts",
+      "classification": "runtime",
+      "dependencies": [
+        "next/cache",
+        "../../src/application/index.ts",
+        "./_lib/action-state.ts",
+        "./_lib/facade.ts",
+        "./_lib/session.ts"
+      ]
+    },
+    {
+      "path": "app/admin/adatvedelem/page.tsx",
+      "classification": "runtime",
+      "dependencies": [
+        "../_components/AdminAccessState.tsx",
+        "../_components/AdminMutationForm.tsx",
+        "../advanced-actions.ts",
+        "../_lib/facade.ts",
+        "../_lib/session.ts"
+      ]
+    },
+    {
+      "path": "app/admin/advanced-actions.ts",
+      "classification": "runtime",
+      "dependencies": [
+        "next/cache",
+        "./_lib/action-state.ts",
+        "./_lib/facade.ts",
+        "./_lib/session.ts"
+      ]
+    },
+    {
+      "path": "app/admin/archivum/[id]/page.tsx",
+      "classification": "runtime",
+      "dependencies": [
+        "node:crypto",
+        "../../_components/AdminMutationForm.tsx",
+        "../../_components/AsyncStatePanel.tsx",
+        "../../actions.ts",
+        "../../_lib/facade.ts",
+        "../../_lib/session.ts",
+        "../../../../src/application/results.ts"
+      ]
+    },
+    {
+      "path": "app/admin/archivum/page.tsx",
+      "classification": "runtime",
+      "dependencies": [
+        "../_components/AsyncStatePanel.tsx",
+        "../_components/ResponsiveCollection.tsx",
+        "../_lib/facade.ts",
+        "../_lib/session.ts",
+        "../../../src/application/results.ts"
+      ]
+    },
+    {
+      "path": "app/admin/beallitasok/page.tsx",
+      "classification": "runtime",
+      "dependencies": [
+        "../_components/AdminAccessState.tsx",
+        "../_components/AdminMutationForm.tsx",
+        "../advanced-actions.ts",
+        "../_lib/facade.ts",
+        "../_lib/session.ts"
+      ]
+    },
+    {
+      "path": "app/admin/emlekeztetok/page.tsx",
+      "classification": "runtime",
+      "dependencies": [
+        "../_components/AdminAccessState.tsx",
+        "../_components/AdminMutationForm.tsx",
+        "../advanced-actions.ts",
+        "../_lib/facade.ts",
+        "../_lib/session.ts"
+      ]
+    },
+    {
+      "path": "app/admin/error.tsx",
+      "classification": "runtime",
+      "dependencies": [
+        "react"
+      ]
+    },
+    {
+      "path": "app/admin/feladatok/[id]/page.tsx",
+      "classification": "runtime",
+      "dependencies": [
+        "node:crypto",
+        "../../_components/AdminMutationForm.tsx",
+        "../../_components/AsyncStatePanel.tsx",
+        "../../actions.ts",
+        "../../_lib/facade.ts",
+        "../../_lib/session.ts",
+        "../../../../src/application/results.ts"
+      ]
+    },
+    {
+      "path": "app/admin/feladatok/page.tsx",
+      "classification": "runtime",
+      "dependencies": [
+        "next/link",
+        "../_components/AdminFilterBar.tsx",
+        "../_components/AdminPagination.tsx",
+        "../_components/AsyncStatePanel.tsx",
+        "../_components/ResponsiveCollection.tsx",
+        "../_lib/facade.ts",
+        "../_lib/session.ts",
+        "../../../src/application/results.ts"
+      ]
+    },
+    {
+      "path": "app/admin/feladatok/uj/page.tsx",
+      "classification": "runtime",
+      "dependencies": [
+        "node:crypto",
+        "../../_components/AdminMutationForm.tsx",
+        "../../actions.ts"
+      ]
+    },
+    {
+      "path": "app/admin/import/layout.tsx",
+      "classification": "runtime",
+      "dependencies": [
+        "../_components/AdminAccessState.tsx",
+        "../_lib/session.ts"
+      ]
+    },
+    {
+      "path": "app/admin/import/page.tsx",
+      "classification": "runtime",
+      "dependencies": [
+        "../_components/AdminAccessState.tsx",
+        "../_components/ImportWorkflow.tsx",
+        "../_lib/facade.ts",
+        "../_lib/session.ts",
+        "../advanced-actions.ts"
+      ]
+    },
+    {
+      "path": "app/admin/jovahagyasok/[id]/page.tsx",
+      "classification": "runtime",
+      "dependencies": [
+        "node:crypto",
+        "../../_components/AdminMutationForm.tsx",
+        "../../_components/AsyncStatePanel.tsx",
+        "../../actions.ts",
+        "../../_lib/facade.ts",
+        "../../_lib/session.ts",
+        "../../../../src/application/results.ts"
+      ]
+    },
+    {
+      "path": "app/admin/jovahagyasok/page.tsx",
+      "classification": "runtime",
+      "dependencies": [
+        "../_components/AdminFilterBar.tsx",
+        "../_components/AdminPagination.tsx",
+        "../_components/AsyncStatePanel.tsx",
+        "../_components/ResponsiveCollection.tsx",
+        "../_lib/facade.ts",
+        "../_lib/session.ts",
+        "../../../src/application/results.ts"
+      ]
+    },
+    {
+      "path": "app/admin/layout.tsx",
+      "classification": "runtime",
+      "dependencies": [
+        "next/navigation",
+        "../../src/runtime/AppShell.tsx",
+        "./_components/AdminAccessState.tsx",
+        "./_lib/session.ts"
+      ]
+    },
+    {
+      "path": "app/admin/loading.tsx",
+      "classification": "runtime",
+      "dependencies": []
+    },
+    {
+      "path": "app/admin/nyilvantartasok/[id]/page.tsx",
+      "classification": "runtime",
+      "dependencies": [
+        "node:crypto",
+        "../../_components/AdminMutationForm.tsx",
+        "../../_components/AsyncStatePanel.tsx",
+        "../../actions.ts",
+        "../../_lib/facade.ts",
+        "../../_lib/session.ts",
+        "../../../../src/application/results.ts"
+      ]
+    },
+    {
+      "path": "app/admin/nyilvantartasok/page.tsx",
+      "classification": "runtime",
+      "dependencies": [
+        "next/link",
+        "../_components/AdminFilterBar.tsx",
+        "../_components/AdminPagination.tsx",
+        "../_components/AsyncStatePanel.tsx",
+        "../_components/ResponsiveCollection.tsx",
+        "../_lib/facade.ts",
+        "../_lib/session.ts",
+        "../../../src/application/results.ts"
+      ]
+    },
+    {
+      "path": "app/admin/nyilvantartasok/uj/page.tsx",
+      "classification": "runtime",
+      "dependencies": [
+        "node:crypto",
+        "../../_components/AdminMutationForm.tsx",
+        "../../actions.ts"
+      ]
+    },
+    {
+      "path": "app/admin/page.tsx",
+      "classification": "runtime",
+      "dependencies": [
+        "./_components/AsyncStatePanel.tsx",
+        "./_lib/facade.ts",
+        "./_lib/session.ts",
+        "../../src/application/results.ts"
+      ]
+    },
+    {
+      "path": "app/api/readiness/route.ts",
+      "classification": "runtime",
+      "dependencies": [
+        "next/server",
+        "../../../src/runtime/composition"
+      ]
+    },
+    {
+      "path": "app/api/synthetic/reset/route.ts",
+      "classification": "runtime",
+      "dependencies": [
+        "next/server",
+        "../../../../src/admin-core/synthetic-admin.ts",
+        "../../../../src/admin-advanced/index.ts",
+        "../../../../src/parent-web/index.ts",
+        "../../../../src/runtime/composition",
+        "../../../../src/runtime/security/origin"
+      ]
+    },
+    {
+      "path": "app/api/synthetic/session/route.ts",
+      "classification": "runtime",
+      "dependencies": [
+        "next/server",
+        "../../../../src/runtime/composition",
+        "../../../../src/runtime/security/origin",
+        "../../../../src/runtime/session/session",
+        "../../../../src/runtime/synthetic/profiles"
+      ]
+    },
+    {
+      "path": "app/belepes/AuthenticationEntry.tsx",
+      "classification": "runtime",
+      "dependencies": [
+        "react",
+        "./actions.ts"
+      ]
+    },
+    {
+      "path": "app/belepes/actions.ts",
+      "classification": "runtime",
+      "dependencies": [
+        "next/headers",
+        "../../src/runtime/composition.ts",
+        "../../src/runtime/session/session.ts",
+        "../../src/runtime/synthetic/profiles.ts",
+        "../../src/parent-web/index.ts"
+      ]
+    },
+    {
+      "path": "app/belepes/page.tsx",
+      "classification": "runtime",
+      "dependencies": [
+        "../szulo/_lib/session.ts",
+        "./AuthenticationEntry.tsx"
+      ]
+    },
+    {
+      "path": "app/hozzaferes-megtagadva/page.tsx",
+      "classification": "runtime",
+      "dependencies": [
+        "next/link"
+      ]
+    },
+    {
+      "path": "app/layout.tsx",
+      "classification": "runtime",
+      "dependencies": [
+        "./globals.css"
+      ]
+    },
+    {
+      "path": "app/meghivas/[token]/InvitationActions.tsx",
+      "classification": "runtime",
+      "dependencies": [
+        "react",
+        "./actions.ts"
+      ]
+    },
+    {
+      "path": "app/meghivas/[token]/actions.ts",
+      "classification": "runtime",
+      "dependencies": [
+        "next/headers",
+        "../../../src/runtime/composition.ts",
+        "../../../src/parent-web/index.ts",
+        "../../../src/runtime/session/session.ts",
+        "../../../src/runtime/synthetic/profiles.ts"
+      ]
+    },
+    {
+      "path": "app/meghivas/[token]/page.tsx",
+      "classification": "runtime",
+      "dependencies": [
+        "../../../src/parent-web/index.ts",
+        "./InvitationActions.tsx",
+        "./actions.ts"
+      ]
+    },
+    {
+      "path": "app/munkatars/_components/FocusedStateSection.tsx",
+      "classification": "runtime",
+      "dependencies": [
+        "react"
+      ]
+    },
+    {
+      "path": "app/munkatars/_components/StaffAccessState.tsx",
+      "classification": "runtime",
+      "dependencies": [
+        "next/link"
+      ]
+    },
+    {
+      "path": "app/munkatars/_components/StaffStatePanel.tsx",
+      "classification": "runtime",
+      "dependencies": [
+        "next/link",
+        "./FocusedStateSection.tsx"
+      ]
+    },
+    {
+      "path": "app/munkatars/_lib/facade.ts",
+      "classification": "runtime",
+      "dependencies": [
+        "server-only",
+        "../../../src/runtime/composition.ts",
+        "../../../src/staff-web/index.ts"
+      ]
+    },
+    {
+      "path": "app/munkatars/_lib/filters.ts",
+      "classification": "runtime",
+      "dependencies": [
+        "../../../src/staff-web/index.ts"
+      ]
+    },
+    {
+      "path": "app/munkatars/_lib/session.ts",
+      "classification": "runtime",
+      "dependencies": [
+        "server-only",
+        "next/headers",
+        "../../../src/runtime/composition.ts",
+        "../../../src/runtime/session/session.ts",
+        "../../../src/staff-web/index.ts"
+      ]
+    },
+    {
+      "path": "app/munkatars/beosztas/[id]/page.tsx",
+      "classification": "runtime",
+      "dependencies": [
+        "next/link",
+        "../../_components/StaffStatePanel.tsx",
+        "../../_lib/facade.ts",
+        "../../_lib/filters.ts",
+        "../../_lib/session.ts",
+        "../_components/ScheduleCollection.tsx",
+        "../../../../src/staff-web/index.ts"
+      ]
+    },
+    {
+      "path": "app/munkatars/beosztas/_components/ScheduleCollection.tsx",
+      "classification": "runtime",
+      "dependencies": [
+        "next/link",
+        "../../_lib/filters.ts",
+        "../../../../src/staff-web/index.ts"
+      ]
+    },
+    {
+      "path": "app/munkatars/beosztas/_components/ScheduleFilter.tsx",
+      "classification": "runtime",
+      "dependencies": [
+        "next/link",
+        "../../../../src/staff-web/index.ts"
+      ]
+    },
+    {
+      "path": "app/munkatars/beosztas/page.tsx",
+      "classification": "runtime",
+      "dependencies": [
+        "./_components/ScheduleCollection.tsx",
+        "./_components/ScheduleFilter.tsx",
+        "../_components/StaffStatePanel.tsx",
+        "../_lib/filters.ts",
+        "../_lib/facade.ts",
+        "../_lib/session.ts"
+      ]
+    },
+    {
+      "path": "app/munkatars/error.tsx",
+      "classification": "runtime",
+      "dependencies": [
+        "react"
+      ]
+    },
+    {
+      "path": "app/munkatars/layout.tsx",
+      "classification": "runtime",
+      "dependencies": [
+        "../../src/runtime/AppShell.tsx",
+        "./_components/StaffAccessState.tsx",
+        "./_lib/session.ts"
+      ]
+    },
+    {
+      "path": "app/munkatars/loading.tsx",
+      "classification": "runtime",
+      "dependencies": []
+    },
+    {
+      "path": "app/page.tsx",
+      "classification": "runtime",
+      "dependencies": [
+        "next/headers",
+        "../src/runtime/AppShell",
+        "../src/runtime/composition",
+        "../src/runtime/ProfileSelector",
+        "../src/runtime/RuntimeConfigurationError",
+        "../src/runtime/session/session"
+      ]
+    },
+    {
+      "path": "app/szulo/_components/NotificationReadForm.tsx",
+      "classification": "runtime",
+      "dependencies": [
+        "react",
+        "../actions.ts"
+      ]
+    },
+    {
+      "path": "app/szulo/_components/ParentAccessState.tsx",
+      "classification": "runtime",
+      "dependencies": [
+        "next/link"
+      ]
+    },
+    {
+      "path": "app/szulo/_components/ParentMutationForm.tsx",
+      "classification": "runtime",
+      "dependencies": [
+        "react"
+      ]
+    },
+    {
+      "path": "app/szulo/_components/ParentStatePanel.tsx",
+      "classification": "runtime",
+      "dependencies": []
+    },
+    {
+      "path": "app/szulo/_lib/action-state.ts",
+      "classification": "runtime",
+      "dependencies": []
+    },
+    {
+      "path": "app/szulo/_lib/facade.ts",
+      "classification": "runtime",
+      "dependencies": [
+        "server-only",
+        "../../../src/parent-web/index.ts",
+        "../../../src/runtime/composition.ts"
+      ]
+    },
+    {
+      "path": "app/szulo/_lib/session.ts",
+      "classification": "runtime",
+      "dependencies": [
+        "server-only",
+        "next/headers",
+        "../../../src/runtime/composition.ts",
+        "../../../src/runtime/session/session.ts",
+        "../../../src/parent-web/index.ts"
+      ]
+    },
+    {
+      "path": "app/szulo/actions.ts",
+      "classification": "runtime",
+      "dependencies": [
+        "next/cache",
+        "../../src/application/index.ts",
+        "./_lib/action-state.ts",
+        "./_lib/facade.ts",
+        "./_lib/session.ts"
+      ]
+    },
+    {
+      "path": "app/szulo/ertesitesek/page.tsx",
+      "classification": "runtime",
+      "dependencies": [
+        "../_components/NotificationReadForm.tsx",
+        "../_components/ParentStatePanel.tsx",
+        "../_lib/facade.ts",
+        "../_lib/session.ts"
+      ]
+    },
+    {
+      "path": "app/szulo/feladatok/[id]/csere/page.tsx",
+      "classification": "runtime",
+      "dependencies": [
+        "../../../_components/ParentMutationForm.tsx",
+        "../../../_components/ParentStatePanel.tsx",
+        "../../../_lib/facade.ts",
+        "../../../_lib/session.ts",
+        "../../../actions.ts"
+      ]
+    },
+    {
+      "path": "app/szulo/feladatok/[id]/lemondas/page.tsx",
+      "classification": "runtime",
+      "dependencies": [
+        "../../../_components/ParentMutationForm.tsx",
+        "../../../_components/ParentStatePanel.tsx",
+        "../../../_lib/facade.ts",
+        "../../../_lib/session.ts",
+        "../../../actions.ts"
+      ]
+    },
+    {
+      "path": "app/szulo/feladatok/[id]/page.tsx",
+      "classification": "runtime",
+      "dependencies": [
+        "../../_components/ParentMutationForm.tsx",
+        "../../_components/ParentStatePanel.tsx",
+        "../../_lib/facade.ts",
+        "../../_lib/session.ts",
+        "../../actions.ts",
+        "../page.tsx"
+      ]
+    },
+    {
+      "path": "app/szulo/feladatok/page.tsx",
+      "classification": "runtime",
+      "dependencies": [
+        "../_components/ParentStatePanel.tsx",
+        "../_lib/facade.ts",
+        "../_lib/session.ts"
+      ]
+    },
+    {
+      "path": "app/szulo/layout.tsx",
+      "classification": "runtime",
+      "dependencies": [
+        "../../src/runtime/AppShell.tsx",
+        "./_components/ParentAccessState.tsx",
+        "./_lib/session.ts"
+      ]
+    },
+    {
+      "path": "next.config.ts",
+      "classification": "runtime",
+      "dependencies": []
+    },
+    {
+      "path": "proxy.ts",
+      "classification": "runtime",
+      "dependencies": [
+        "next/server"
+      ]
+    },
+    {
+      "path": "scripts/start-smoke.mjs",
+      "classification": "runtime",
+      "dependencies": [
+        "node:child_process",
+        "node:url"
+      ]
+    },
+    {
+      "path": "scripts/validate-runtime-config.ts",
+      "classification": "runtime",
+      "dependencies": [
+        "@next/env",
+        "../src/runtime/config.ts"
+      ]
+    },
+    {
+      "path": "scripts/validate-toolchain.mjs",
+      "classification": "runtime",
+      "dependencies": []
+    },
+    {
+      "path": "scripts/verification/aggregate-evidence.ts",
+      "classification": "runtime",
+      "dependencies": [
+        "node:path",
+        "./core.ts"
+      ]
+    },
+    {
+      "path": "scripts/verification/core.ts",
+      "classification": "runtime",
+      "dependencies": [
+        "node:crypto",
+        "node:fs",
+        "node:path"
+      ]
+    },
+    {
+      "path": "scripts/verification/firefox-launch.ts",
+      "classification": "runtime",
+      "dependencies": [
+        "node:fs",
+        "node:path",
+        "@playwright/test"
+      ]
+    },
+    {
+      "path": "scripts/verification/run-local-verification.ts",
+      "classification": "runtime",
+      "dependencies": [
+        "node:child_process",
+        "node:fs",
+        "node:path",
+        "./core.ts"
+      ]
+    },
+    {
+      "path": "scripts/verification/scan-artifacts.ts",
+      "classification": "runtime",
+      "dependencies": [
+        "node:fs",
+        "node:path"
+      ]
+    },
+    {
+      "path": "scripts/verification/validate-manifests.ts",
+      "classification": "runtime",
+      "dependencies": [
+        "./core.ts"
+      ]
+    },
+    {
+      "path": "src/access/access-service.ts",
+      "classification": "runtime",
+      "dependencies": []
+    },
+    {
+      "path": "src/access/in-memory-adapters.ts",
+      "classification": "runtime",
+      "dependencies": []
+    },
+    {
+      "path": "src/access/index.ts",
+      "classification": "linkage-only",
+      "dependencies": [
+        "./access-service.ts",
+        "./in-memory-adapters.ts"
+      ]
+    },
+    {
+      "path": "src/access/supabase-route-adapter.ts",
+      "classification": "runtime",
+      "dependencies": []
+    },
+    {
+      "path": "src/access/types.ts",
+      "classification": "type-only",
+      "dependencies": []
+    },
+    {
+      "path": "src/admin-advanced/index.ts",
+      "classification": "linkage-only",
+      "dependencies": [
+        "./synthetic-advanced.ts"
+      ]
+    },
+    {
+      "path": "src/admin-advanced/synthetic-advanced.ts",
+      "classification": "runtime",
+      "dependencies": [
+        "../application/index.ts"
+      ]
+    },
+    {
+      "path": "src/admin-core/synthetic-admin.ts",
+      "classification": "runtime",
+      "dependencies": [
+        "../application/index.ts"
+      ]
+    },
+    {
+      "path": "src/admin-experience/admin-service.ts",
+      "classification": "runtime",
+      "dependencies": [
+        "../import-migration/import-service.ts"
+      ]
+    },
+    {
+      "path": "src/admin-experience/index.ts",
+      "classification": "linkage-only",
+      "dependencies": [
+        "./admin-service.ts"
+      ]
+    },
+    {
+      "path": "src/application/admin-facade.ts",
+      "classification": "runtime",
+      "dependencies": [
+        "./validation.ts"
+      ]
+    },
+    {
+      "path": "src/application/authorization.ts",
+      "classification": "runtime",
+      "dependencies": [
+        "./results.ts"
+      ]
+    },
+    {
+      "path": "src/application/contracts.ts",
+      "classification": "runtime",
+      "dependencies": []
+    },
+    {
+      "path": "src/application/evidence.ts",
+      "classification": "runtime",
+      "dependencies": [
+        "./projection.ts"
+      ]
+    },
+    {
+      "path": "src/application/facade-pipeline.ts",
+      "classification": "runtime",
+      "dependencies": [
+        "./results.ts"
+      ]
+    },
+    {
+      "path": "src/application/idempotency.ts",
+      "classification": "runtime",
+      "dependencies": [
+        "./results.ts"
+      ]
+    },
+    {
+      "path": "src/application/index.ts",
+      "classification": "linkage-only",
+      "dependencies": [
+        "./admin-facade.ts",
+        "./authorization.ts",
+        "./evidence.ts",
+        "./facade-pipeline.ts",
+        "./idempotency.ts",
+        "./parent-facade.ts",
+        "./projection.ts",
+        "./results.ts",
+        "./staff-facade.ts",
+        "./session-facade.ts",
+        "./validation.ts"
+      ]
+    },
+    {
+      "path": "src/application/parent-facade.ts",
+      "classification": "runtime",
+      "dependencies": [
+        "./validation.ts"
+      ]
+    },
+    {
+      "path": "src/application/projection.ts",
+      "classification": "runtime",
+      "dependencies": []
+    },
+    {
+      "path": "src/application/results.ts",
+      "classification": "runtime",
+      "dependencies": []
+    },
+    {
+      "path": "src/application/session-facade.ts",
+      "classification": "runtime",
+      "dependencies": [
+        "./results.ts"
+      ]
+    },
+    {
+      "path": "src/application/staff-facade.ts",
+      "classification": "runtime",
+      "dependencies": [
+        "./validation.ts"
+      ]
+    },
+    {
+      "path": "src/application/validation.ts",
+      "classification": "runtime",
+      "dependencies": [
+        "./results.ts"
+      ]
+    },
+    {
+      "path": "src/coordination/coordination-service.ts",
+      "classification": "runtime",
+      "dependencies": []
+    },
+    {
+      "path": "src/coordination/in-memory-repository.ts",
+      "classification": "runtime",
+      "dependencies": []
+    },
+    {
+      "path": "src/coordination/index.ts",
+      "classification": "linkage-only",
+      "dependencies": [
+        "./coordination-service.ts",
+        "./in-memory-repository.ts"
+      ]
+    },
+    {
+      "path": "src/coordination/types.ts",
+      "classification": "type-only",
+      "dependencies": []
+    },
+    {
+      "path": "src/directory/directory-service.ts",
+      "classification": "runtime",
+      "dependencies": []
+    },
+    {
+      "path": "src/directory/in-memory-directory-repository.ts",
+      "classification": "runtime",
+      "dependencies": []
+    },
+    {
+      "path": "src/directory/index.ts",
+      "classification": "linkage-only",
+      "dependencies": [
+        "./directory-service.ts",
+        "./in-memory-directory-repository.ts"
+      ]
+    },
+    {
+      "path": "src/directory/types.ts",
+      "classification": "type-only",
+      "dependencies": []
+    },
+    {
+      "path": "src/import-migration/import-service.ts",
+      "classification": "runtime",
+      "dependencies": []
+    },
+    {
+      "path": "src/import-migration/in-memory-import-repository.ts",
+      "classification": "runtime",
+      "dependencies": []
+    },
+    {
+      "path": "src/import-migration/index.ts",
+      "classification": "linkage-only",
+      "dependencies": [
+        "./import-service.ts",
+        "./in-memory-import-repository.ts"
+      ]
+    },
+    {
+      "path": "src/notifications/durable-jobs.ts",
+      "classification": "runtime",
+      "dependencies": []
+    },
+    {
+      "path": "src/notifications/in-memory-notifications.ts",
+      "classification": "runtime",
+      "dependencies": []
+    },
+    {
+      "path": "src/notifications/index.ts",
+      "classification": "linkage-only",
+      "dependencies": [
+        "./notification-service.ts",
+        "./in-memory-notifications.ts",
+        "./durable-jobs.ts"
+      ]
+    },
+    {
+      "path": "src/notifications/notification-service.ts",
+      "classification": "runtime",
+      "dependencies": []
+    },
+    {
+      "path": "src/parent-experience/in-memory-parent-repository.ts",
+      "classification": "runtime",
+      "dependencies": []
+    },
+    {
+      "path": "src/parent-experience/index.ts",
+      "classification": "linkage-only",
+      "dependencies": [
+        "./parent-experience-service.ts",
+        "./in-memory-parent-repository.ts"
+      ]
+    },
+    {
+      "path": "src/parent-experience/parent-experience-service.ts",
+      "classification": "runtime",
+      "dependencies": []
+    },
+    {
+      "path": "src/parent-web/index.ts",
+      "classification": "linkage-only",
+      "dependencies": [
+        "./synthetic-parent.ts"
+      ]
+    },
+    {
+      "path": "src/parent-web/synthetic-parent.ts",
+      "classification": "runtime",
+      "dependencies": [
+        "../application/index.ts",
+        "../runtime/synthetic/profiles.ts"
+      ]
+    },
+    {
+      "path": "src/privacy-audit/index.ts",
+      "classification": "linkage-only",
+      "dependencies": [
+        "./lifecycle-service.ts"
+      ]
+    },
+    {
+      "path": "src/privacy-audit/lifecycle-service.ts",
+      "classification": "runtime",
+      "dependencies": []
+    },
+    {
+      "path": "src/runtime/AppShell.tsx",
+      "classification": "runtime",
+      "dependencies": []
+    },
+    {
+      "path": "src/runtime/ProfileSelector.tsx",
+      "classification": "runtime",
+      "dependencies": []
+    },
+    {
+      "path": "src/runtime/RuntimeConfigurationError.tsx",
+      "classification": "runtime",
+      "dependencies": []
+    },
+    {
+      "path": "src/runtime/composition.ts",
+      "classification": "runtime",
+      "dependencies": [
+        "./config.ts"
+      ]
+    },
+    {
+      "path": "src/runtime/config.ts",
+      "classification": "runtime",
+      "dependencies": [
+        "zod"
+      ]
+    },
+    {
+      "path": "src/runtime/production/composition.ts",
+      "classification": "runtime",
+      "dependencies": [
+        "../../application/index.ts"
+      ]
+    },
+    {
+      "path": "src/runtime/security/origin.ts",
+      "classification": "runtime",
+      "dependencies": []
+    },
+    {
+      "path": "src/runtime/session/session.ts",
+      "classification": "runtime",
+      "dependencies": [
+        "node:crypto",
+        "zod",
+        "../synthetic/profiles.ts"
+      ]
+    },
+    {
+      "path": "src/runtime/synthetic/composition.ts",
+      "classification": "runtime",
+      "dependencies": [
+        "./profiles.ts",
+        "../../application/index.ts"
+      ]
+    },
+    {
+      "path": "src/runtime/synthetic/profiles.ts",
+      "classification": "runtime",
+      "dependencies": [
+        "zod"
+      ]
+    },
+    {
+      "path": "src/runtime/types.ts",
+      "classification": "type-only",
+      "dependencies": []
+    },
+    {
+      "path": "src/staff-schedule/index.ts",
+      "classification": "linkage-only",
+      "dependencies": [
+        "./schedule-service.ts"
+      ]
+    },
+    {
+      "path": "src/staff-schedule/schedule-service.ts",
+      "classification": "runtime",
+      "dependencies": []
+    },
+    {
+      "path": "src/staff-web/index.ts",
+      "classification": "linkage-only",
+      "dependencies": [
+        "./synthetic-staff.ts"
+      ]
+    },
+    {
+      "path": "src/staff-web/synthetic-staff.ts",
+      "classification": "runtime",
+      "dependencies": [
+        "../application/index.ts"
+      ]
+    }
+  ],
+  "css": [
+    "app/globals.css"
+  ],
+  "measurementStatus": "UNVERIFIED"
+}

@@ -1,0 +1,44 @@
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - import "./tests/coverage/support/production-coverage-reporter" without a file extension (vitest.config.ts:3:40). Add the file extension
+  - import "./production-inventory" without a file extension (tests/coverage/support/production-coverage-reporter.ts:2:64). Add the file extension
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+
+ RUN  v4.1.11 /Users/dev/Development/waldorf-community-task-manager
+      Coverage enabled with v8
+
+ ✓ |domain-coverage| src/privacy-audit/lifecycle-service.test.ts (5 tests) 4ms
+ ✓ |domain-coverage| src/parent-experience/parent-experience-service.test.ts (6 tests) 4ms
+ ✓ |domain-coverage| src/access/access-service.test.ts (7 tests) 3ms
+ ✓ |domain-coverage| src/import-migration/import-service.test.ts (8 tests) 8ms
+ ✓ |domain-coverage| src/coordination/coordination-service.test.ts (4 tests) 3ms
+ ✓ |domain-coverage| src/directory/directory-service.test.ts (6 tests) 4ms
+ ✓ |domain-coverage| src/application/contracts.test.ts (10 tests) 4ms
+ ✓ |domain-coverage| src/application/authorization.test.ts (9 tests) 3ms
+ ✓ |domain-coverage| src/application/facades.test.ts (15 tests) 4ms
+ ✓ |domain-coverage| src/access/access-matrix.test.ts (1 test) 2ms
+ ✓ |domain-coverage| src/application/isolation.test.ts (2 tests) 3ms
+ ✓ |domain-coverage| src/staff-schedule/schedule-service.test.ts (4 tests) 2ms
+ ✓ |domain-coverage| src/admin-core/synthetic-admin.test.ts (14 tests) 9ms
+ ✓ |domain-coverage| src/admin-advanced/synthetic-advanced.test.ts (10 tests) 9ms
+ ✓ |domain-coverage| src/admin-experience/admin-service.test.ts (4 tests) 2ms
+ ✓ |domain-coverage| src/staff-web/synthetic-staff.test.ts (7 tests) 3ms
+ ✓ |domain-coverage| src/notifications/notification-service.test.ts (4 tests) 3ms
+ ✓ |domain-coverage| src/notifications/durable-jobs.test.ts (2 tests) 2ms
+ ✓ |domain-coverage| src/parent-web/synthetic-parent.test.ts (9 tests) 4ms
+ ✓ |domain-coverage| src/directory/field-policy.test.ts (1 test) 1ms
+
+⎯⎯⎯⎯⎯⎯ Unhandled Error ⎯⎯⎯⎯⎯⎯⎯
+Error: Unmeasured executable production files: app/admin/_components/AdminAccessState.tsx, app/admin/_components/AdminFilterBar.tsx, app/admin/_components/AdminMutationForm.tsx, app/admin/_components/AdminPagination.tsx, app/admin/_components/AsyncStatePanel.tsx, app/admin/_components/ImportWorkflow.tsx, app/admin/_components/ResponsiveCollection.tsx, app/admin/_lib/action-state.ts, app/admin/_lib/facade.ts, app/admin/_lib/session.ts, app/admin/actions.ts, app/admin/adatvedelem/page.tsx, app/admin/advanced-actions.ts, app/admin/archivum/[id]/page.tsx, app/admin/archivum/page.tsx, app/admin/beallitasok/page.tsx, app/admin/emlekeztetok/page.tsx, app/admin/error.tsx, app/admin/feladatok/[id]/page.tsx, app/admin/feladatok/page.tsx, app/admin/feladatok/uj/page.tsx, app/admin/import/layout.tsx, app/admin/import/page.tsx, app/admin/jovahagyasok/[id]/page.tsx, app/admin/jovahagyasok/page.tsx, app/admin/layout.tsx, app/admin/loading.tsx, app/admin/nyilvantartasok/[id]/page.tsx, app/admin/nyilvantartasok/page.tsx, app/admin/nyilvantartasok/uj/page.tsx, app/admin/page.tsx, app/api/readiness/route.ts, app/api/synthetic/reset/route.ts, app/api/synthetic/session/route.ts, app/belepes/AuthenticationEntry.tsx, app/belepes/actions.ts, app/belepes/page.tsx, app/hozzaferes-megtagadva/page.tsx, app/layout.tsx, app/meghivas/[token]/InvitationActions.tsx, app/meghivas/[token]/actions.ts, app/meghivas/[token]/page.tsx, app/munkatars/_components/FocusedStateSection.tsx, app/munkatars/_components/StaffAccessState.tsx, app/munkatars/_components/StaffStatePanel.tsx, app/munkatars/_lib/facade.ts, app/munkatars/_lib/filters.ts, app/munkatars/_lib/session.ts, app/munkatars/beosztas/[id]/page.tsx, app/munkatars/beosztas/_components/ScheduleCollection.tsx, app/munkatars/beosztas/_components/ScheduleFilter.tsx, app/munkatars/beosztas/page.tsx, app/munkatars/error.tsx, app/munkatars/layout.tsx, app/munkatars/loading.tsx, app/page.tsx, app/szulo/_components/NotificationReadForm.tsx, app/szulo/_components/ParentAccessState.tsx, app/szulo/_components/ParentMutationForm.tsx, app/szulo/_components/ParentStatePanel.tsx, app/szulo/_lib/action-state.ts, app/szulo/_lib/facade.ts, app/szulo/_lib/session.ts, app/szulo/actions.ts, app/szulo/ertesitesek/page.tsx, app/szulo/feladatok/[id]/csere/page.tsx, app/szulo/feladatok/[id]/lemondas/page.tsx, app/szulo/feladatok/[id]/page.tsx, app/szulo/feladatok/page.tsx, app/szulo/layout.tsx, next.config.ts, proxy.ts, scripts/start-smoke.mjs, scripts/validate-runtime-config.ts, scripts/validate-toolchain.mjs, scripts/verification/aggregate-evidence.ts, scripts/verification/core.ts, scripts/verification/firefox-launch.ts, scripts/verification/run-local-verification.ts, scripts/verification/scan-artifacts.ts, scripts/verification/validate-manifests.ts, src/access/access-service.ts, src/access/in-memory-adapters.ts, src/access/supabase-route-adapter.ts, src/admin-advanced/synthetic-advanced.ts, src/admin-core/synthetic-admin.ts, src/admin-experience/admin-service.ts, src/application/admin-facade.ts, src/application/authorization.ts, src/application/contracts.ts, src/application/evidence.ts, src/application/facade-pipeline.ts, src/application/idempotency.ts, src/application/parent-facade.ts, src/application/projection.ts, src/application/results.ts, src/application/session-facade.ts, src/application/staff-facade.ts, src/application/validation.ts, src/coordination/coordination-service.ts, src/coordination/in-memory-repository.ts, src/directory/directory-service.ts, src/directory/in-memory-directory-repository.ts, src/import-migration/import-service.ts, src/import-migration/in-memory-import-repository.ts, src/notifications/durable-jobs.ts, src/notifications/in-memory-notifications.ts, src/notifications/notification-service.ts, src/parent-experience/in-memory-parent-repository.ts, src/parent-experience/parent-experience-service.ts, src/parent-web/synthetic-parent.ts, src/privacy-audit/lifecycle-service.ts, src/runtime/AppShell.tsx, src/runtime/ProfileSelector.tsx, src/runtime/RuntimeConfigurationError.tsx, src/runtime/composition.ts, src/runtime/config.ts, src/runtime/production/composition.ts, src/runtime/security/origin.ts, src/runtime/session/session.ts, src/runtime/synthetic/composition.ts, src/runtime/synthetic/profiles.ts, src/staff-schedule/schedule-service.ts, src/staff-web/synthetic-staff.ts
+ ❯ validateProductionCoverage node_modules/.vite-temp/vitest.config.ts.timestamp-1790856663778-727abd8e48097.mjs:73:28
+ ❯ ProductionCoverageReporter.onCoverage node_modules/.vite-temp/vitest.config.ts.timestamp-1790856663778-727abd8e48097.mjs:92:18
+ ❯ node_modules/vitest/dist/chunks/cli-api.CnMVyzaz.js:14051:56
+ ❯ Vitest.report node_modules/vitest/dist/chunks/cli-api.CnMVyzaz.js:14051:36
+ ❯ TestRun.end node_modules/vitest/dist/chunks/cli-api.CnMVyzaz.js:12669:35
+ ❯ node_modules/vitest/dist/chunks/cli-api.CnMVyzaz.js:13674:26
+ ❯ node_modules/vitest/dist/chunks/cli-api.CnMVyzaz.js:13684:11
+ ❯ node_modules/vitest/dist/chunks/cli-api.CnMVyzaz.js:13546:19
+ ❯ startVitest node_modules/vitest/dist/chunks/cli-api.CnMVyzaz.js:14621:8
+
+
+
+

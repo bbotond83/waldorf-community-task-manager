@@ -1,5 +1,7 @@
 # Waldorf Community Task Manager — Business Overview
 
+> Focused update, 2026-10-01: earlier repository-wide prose is preserved as historical static knowledge; its freshness was UNVERIFIED. Only the deep files listed in reverse-engineering-timestamp.md were analyzed for this update. No tests or runtime/external checks were executed.
+
 ## Purpose and Domain
 
 The repository implements a Hungarian-language web application for coordinating Waldorf community activities across parent, staff, and administrator roles. Its observed capability model includes family and child directory data, community task sign-up, staff schedules, administration, legacy-data migration, notifications, and privacy governance. These capabilities are evidenced in source and local synthetic flows; the scan does not establish that every interface is an approved or currently operated business process.
@@ -34,3 +36,9 @@ The preserved 2026 archive describes an earlier domain-only repository and inclu
 ## Evidence Limits
 
 This is static analysis at commit d7995af0aacf59ff7aa75880c45cc5e0a50eda9e. No tests, builds, installs, audits, app sessions, external calls, database operations, or deployments were run.
+
+## Local Startup Investigation
+
+This bugfix supports a contributor using the documented synthetic local experience. README setup assumes `nvm`; the reported machine has an existing Homebrew Node 24 installation and no `nvm`. Current-terminal toolchain selection must retain Node 24.x/npm 11.x requirements and avoid global shell changes. Machine versions in the intent are supplied observations, not fresh verification.
+
+The local configuration recipe cannot reach framework startup when `APP_RUNTIME_MODE` is absent from the inherited shell: the shared npm validator runs before Next loads environment files. This affects dev, build, and start. See architecture.md for the process boundary and code-quality-assessment.md for verification gaps.

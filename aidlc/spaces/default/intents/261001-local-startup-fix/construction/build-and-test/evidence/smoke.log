@@ -1,0 +1,7 @@
+
+> waldorf-community-task-manager@0.2.0 smoke:start
+> node scripts/start-smoke.mjs
+
+TOOLCHAIN_VALID: Node 24.x / npm 11.x
+RUNTIME_CONFIG_VALID: synthetic
+SMOKE_START_OK: waldorf-local-ready

@@ -1,0 +1,17 @@
+{
+  "copies_removed": [
+    "/private/tmp/waldorf-istanbul-acceptance-b3cobl6l",
+    "/private/tmp/waldorf-istanbul-acceptance-3o2c89z_"
+  ],
+  "owned_ports_free": [
+    3511,
+    3512,
+    3513,
+    3520,
+    3521,
+    3522,
+    3530,
+    3531,
+    3532
+  ]
+}

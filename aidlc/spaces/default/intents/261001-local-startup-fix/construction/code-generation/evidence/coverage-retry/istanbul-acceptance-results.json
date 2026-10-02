@@ -1,0 +1,78 @@
+[
+  {
+    "check": "build",
+    "exit": 0
+  },
+  {
+    "check": "start",
+    "ready": true,
+    "port": 3511,
+    "APP_RUNTIME_MODE_exported": false,
+    "NODE_ENV_exported": false
+  },
+  {
+    "check": "dev",
+    "ready": true,
+    "port": 3512,
+    "APP_RUNTIME_MODE_exported": false,
+    "NODE_ENV_exported": false
+  },
+  {
+    "check": "smoke",
+    "exit": 0
+  },
+  {
+    "check": "browser",
+    "exit": 1
+  },
+  {
+    "check": "a11y",
+    "exit": 1
+  },
+  {
+    "check": "privacy",
+    "exit": 0
+  },
+  {
+    "check": "secrets",
+    "exit": 0
+  },
+  {
+    "check": "sast",
+    "exit": 0
+  },
+  {
+    "check": "no-deploy",
+    "exit": 0
+  },
+  {
+    "check": "acceptance-copy",
+    "path": "/private/tmp/waldorf-istanbul-acceptance-3o2c89z_",
+    "cleanup": "pending-parent-owned-retries-if-needed"
+  },
+  {
+    "check": "browser-escalated",
+    "exit": 0,
+    "passed": 96
+  },
+  {
+    "check": "a11y-escalated",
+    "exit": 0,
+    "passed": 15
+  },
+  {
+    "check": "cleanup",
+    "copies_removed": true,
+    "ports_free": [
+      3511,
+      3512,
+      3513,
+      3520,
+      3521,
+      3522,
+      3530,
+      3531,
+      3532
+    ]
+  }
+]

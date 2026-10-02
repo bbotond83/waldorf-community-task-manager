@@ -1,0 +1,15 @@
+{
+  "command": "npm install --save-dev --save-exact @vitest/coverage-istanbul@4.1.11 --ignore-scripts --no-audit --no-fund --registry=https://registry.npmjs.org",
+  "initial_exit": 1,
+  "initial_failure": "sandbox EPERM opening npm cache temporary file",
+  "escalated_retry_exit": 0,
+  "npm_output": "added 2 packages in 7s",
+  "added_locked_packages": {
+    "@vitest/coverage-istanbul": "4.1.11",
+    "@istanbuljs/schema": "0.1.6"
+  },
+  "retained": "@vitest/coverage-v84.1.11; existing startup metadata/scripts",
+  "node": "24.21.0",
+  "npm": "11.19.0",
+  "registry": "https://registry.npmjs.org"
+}

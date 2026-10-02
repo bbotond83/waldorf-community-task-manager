@@ -1,5 +1,7 @@
 # Architecture Analysis
 
+> Focused update, 2026-10-01: earlier repository-wide prose is preserved as historical static knowledge; its freshness was UNVERIFIED. Only the deep files listed in reverse-engineering-timestamp.md were analyzed for this update. No tests or runtime/external checks were executed.
+
 ## System Overview
 
 The repository is one private npm package and a single Next.js App Router application. App Router pages, layouts, server actions, and route handlers form the delivery layer. Runtime/session composition selects a synthetic or production composition. Role façades and shared application contracts coordinate in-process domain modules through typed ports. The linked local route ends in deterministic in-memory adapters.
@@ -104,3 +106,45 @@ Text fallback: production composition validates settings, but its authorization-
 - Keep the synthetic/production boundary explicit. Confirm data ownership and transaction semantics when a durable adapter is designed.
 - Current CI has validation and provenance work but no deploy job.
 - All architectural conclusions are static; no runtime or integration checks were performed.
+
+## Focused Startup Boundary
+
+The pure configuration schema is shared by the standalone lifecycle validator and application runtime composition. Each npm prehook first checks the toolchain, then starts the validator in a separate process. The validator currently reads only inherited `process.env`; Next's environment-file loading occurs later, after the prehook succeeds. Configuration failure therefore blocks the framework before `.env.local` can satisfy the documented recipe.
+
+## Interaction Diagrams: Local Startup
+
+```mermaid
+sequenceDiagram
+  actor Contributor
+  participant Npm as npm lifecycle
+  participant Tool as Toolchain validator
+  participant Validator as Runtime config CLI
+  participant Schema as Pure runtime schema
+  participant Next as Next.js CLI
+  Contributor->>Npm: Run dev, build, or start
+  Npm->>Tool: Check Node 24 and npm 11
+  Tool-->>Npm: Supported or stable failure
+  Npm->>Validator: Run prehook validator
+  Validator->>Schema: Validate inherited process.env
+  alt Missing or invalid runtime mode
+    Schema-->>Validator: Explicit error result
+    Validator-->>Npm: Safe error and nonzero exit
+    Npm-->>Contributor: Stop before framework startup
+  else Valid inherited configuration
+    Schema-->>Validator: Valid configuration
+    Validator-->>Npm: Successful exit
+    Npm->>Next: Run framework command
+    Next->>Next: Load environment files
+    Next-->>Contributor: Framework startup or build
+  end
+```
+
+Text fallback: npm checks the toolchain and validates inherited environment values before launching Next. Missing/invalid mode stops the command. Only successful validation lets Next load environment files. Thus a value present solely in `.env.local` arrives too late for the current prehook. The diagram syntax was manually checked before writing: declared participants, valid message arrows, and balanced `alt`/`else`/`end`.
+
+## Startup Design Constraints and Alternatives
+
+No new loader decision is accepted by this investigation. A framework-compatible loader such as `@next/env` is supported by the installed Next documentation and avoids a second interpretation of precedence; making its current transitive dependency explicit would stabilize ownership. A generic dotenv loader needs explicit reproduction of shell precedence, environment-file ordering, and command-specific `NODE_ENV` behavior. A blanket synthetic default would hide missing/invalid configuration and conflicts with the intent. Requirements and implementation planning must select the approach before code changes.
+
+The loader belongs at the CLI boundary; preserve pure schema validation, result states, secret-safe formatting, and mode-based composition. Dev defaults to development; build/start default to production. Runtime synthetic mode remains independent of `NODE_ENV`. No loading step may initiate a production target call.
+
+A validator subprocess cannot export file values back to npm. Existing start-shell host/port expansion still uses inherited shell values; nondefault file-based listener settings are outside this confirmed fix. Preserve default loopback behavior.

@@ -1,5 +1,7 @@
 # Code Structure
 
+> Focused update, 2026-10-01: earlier repository-wide prose is preserved as historical static knowledge; its freshness was UNVERIFIED. Only the deep files listed in reverse-engineering-timestamp.md were analyzed for this update. No tests or runtime/external checks were executed.
+
 ## Repository Shape
 
 One private npm ESM package, version 0.2.0, with no workspace or separately deployable service packages. The application is split between the Next.js delivery layer in app/ and TypeScript modules in src/. There are 15 top-level src modules.
@@ -49,3 +51,22 @@ The package is Node/npm with Next.js App Router, React, and TypeScript. Configur
 - **Governance:** aidlc/, .codex/, .agents/.
 
 See component-inventory.md for ownership and dependency summaries.
+
+## Focused Startup File Classification
+
+| File | Startup responsibility |
+|---|---|
+| README.md | Supported runtime selection and fresh-checkout procedure |
+| package.json | Node/npm engines, lifecycle hooks, build/start/check commands |
+| package-lock.json | Root metadata and exact framework/tool versions; unrelated entries not assessed |
+| .nvmrc / .npmrc | Node 24 selection hint and strict engine enforcement |
+| .env.example | Documented synthetic defaults and commented production variable names |
+| next.config.ts | Framework configuration |
+| scripts/validate-toolchain.mjs | Enforce Node/npm majors with stable errors |
+| scripts/validate-runtime-config.ts | Standalone prehook CLI; reads inherited env without file initialization |
+| scripts/start-smoke.mjs | Loopback readiness check; explicitly injects synthetic mode |
+| src/runtime/config.ts | Pure Zod schema, explicit result states, safe error formatting |
+| src/runtime/composition.ts | Validate then select synthetic or production composition |
+| src/runtime/production/composition.ts | Unlinked production adapter slot |
+
+This table is the fresh startup surface. Whole `scripts/` and `src/` directories were inventoried only beyond these files. Supporting installed Next documentation was read by the developer but is not repository-source coverage.

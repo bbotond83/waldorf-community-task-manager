@@ -1,0 +1,22 @@
+
+> waldorf-community-task-manager@0.2.0 test:a11y
+> playwright test --config playwright.config.ts --grep @a11y
+
+Error: EPERM: operation not permitted, open '/Users/dev/Library/Caches/ms-playwright/firefox-1538/firefox/Nightly.app/Contents/Resources/browser/waldorf-application.ini'
+    at writeFileSync (node:fs:2482:20)
+    at firefoxLaunchOptions (file:///private/tmp/waldorf-istanbul-acceptance-3o2c89z_/scripts/verification/firefox-launch.ts:19:3)
+    at file:///private/tmp/waldorf-istanbul-acceptance-3o2c89z_/playwright.config.ts:40:24
+    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at node:internal/modules/esm/loader:647:26
+    at requireOrImport (/private/tmp/waldorf-istanbul-acceptance-3o2c89z_/node_modules/playwright/lib/common/index.js:1136:12)
+    at loadUserConfig (/private/tmp/waldorf-istanbul-acceptance-3o2c89z_/node_modules/playwright/lib/common/index.js:1323:46)
+    at loadConfig (/private/tmp/waldorf-istanbul-acceptance-3o2c89z_/node_modules/playwright/lib/common/index.js:1330:22)
+    at Object.loadConfigFromFile (/private/tmp/waldorf-istanbul-acceptance-3o2c89z_/node_modules/playwright/lib/common/index.js:1546:10)
+    at runTests (/private/tmp/waldorf-istanbul-acceptance-3o2c89z_/node_modules/playwright/lib/cli/testActions.js:46:18)
+    at _Command.<anonymous> (/private/tmp/waldorf-istanbul-acceptance-3o2c89z_/node_modules/playwright/lib/program.js:55:7) {
+  errno: -1,
+  code: 'EPERM',
+  syscall: 'open',
+  path: '/Users/dev/Library/Caches/ms-playwright/firefox-1538/firefox/Nightly.app/Contents/Resources/browser/waldorf-application.ini'
+}

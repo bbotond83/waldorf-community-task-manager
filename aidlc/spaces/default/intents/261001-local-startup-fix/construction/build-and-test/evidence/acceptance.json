@@ -1,0 +1,89 @@
+[
+  {
+    "check": "isolated-toolchain",
+    "exit": 0
+  },
+  {
+    "check": "dev",
+    "result": "ready",
+    "readiness": {
+      "status": "ready",
+      "mode": "synthetic",
+      "marker": "waldorf-local-ready"
+    },
+    "root_marker": true,
+    "runtime_mode_exported": false
+  },
+  {
+    "check": "build",
+    "exit": 0
+  },
+  {
+    "check": "start",
+    "result": "ready",
+    "readiness": {
+      "status": "ready",
+      "mode": "synthetic",
+      "marker": "waldorf-local-ready"
+    },
+    "root_marker": true,
+    "runtime_mode_exported": false
+  },
+  {
+    "check": "smoke",
+    "exit": 0
+  },
+  {
+    "check": "browser",
+    "exit": 0
+  },
+  {
+    "check": "a11y",
+    "exit": 0
+  },
+  {
+    "check": "privacy",
+    "exit": 0
+  },
+  {
+    "check": "secrets",
+    "exit": 0
+  },
+  {
+    "check": "sast",
+    "exit": 0
+  },
+  {
+    "check": "no-deploy",
+    "exit": 0
+  },
+  {
+    "check": "owned-copy-cleanup",
+    "removed": true
+  },
+  {
+    "check": "port-cleanup",
+    "port": 3000,
+    "free": true
+  },
+  {
+    "check": "port-cleanup",
+    "port": 3100,
+    "free": false
+  },
+  {
+    "check": "port-cleanup",
+    "port": 3101,
+    "free": false
+  },
+  {
+    "check": "port-cleanup",
+    "port": 3102,
+    "free": false
+  },
+  {
+    "check": "port-cleanup",
+    "port": 3210,
+    "free": true
+  }
+]

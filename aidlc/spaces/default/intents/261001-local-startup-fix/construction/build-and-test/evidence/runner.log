@@ -1,0 +1,14 @@
+
+> waldorf-community-task-manager@0.2.0 test:delivery
+> vitest run --config vitest.config.ts tests/unit/runtime-boundaries.test.ts
+
+
+ RUN  v4.1.11 /Users/dev/Development/waldorf-community-task-manager
+
+ ✓ tests/unit/runtime-boundaries.test.ts (18 tests) 111ms
+
+ Test Files  1 passed (1)
+      Tests  18 passed (18)
+   Start at  13:33:58
+   Duration  7.59s (transform 84ms, setup 1.12s, import 356ms, tests 111ms, environment 5.76s)
+

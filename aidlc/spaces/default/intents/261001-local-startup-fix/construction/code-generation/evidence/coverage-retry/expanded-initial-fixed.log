@@ -1,0 +1,473 @@
+
+> waldorf-community-task-manager@0.2.0 test:coverage
+> npm run test:coverage:domain && npm run test:coverage:delivery
+
+
+> waldorf-community-task-manager@0.2.0 test:coverage:domain
+> node --experimental-strip-types --experimental-test-coverage --test-coverage-lines=80 --test-coverage-branches=80 --test-coverage-functions=80 --test "src/**/*.test.ts"
+
+✔ enforces parent action-resource-field matrix (4.831125ms)
+✔ allows organization admins across their organization (0.994125ms)
+✔ restricts group admins to their granted group (7.939917ms)
+✔ restricts parents to their linked family (0.12825ms)
+✔ limits staff to schedules and coordination display names (0.073709ms)
+✔ returns generic Hungarian denials and redacted audit evidence (0.079583ms)
+✔ revocation invalidates the next protected request (0.723125ms)
+✔ prevents kindergarten admins from changing super-admin governance (0.090917ms)
+▶ synthetic advanced administrator workflows
+  ✔ denies Group Administrator import before adapter state is created (1.067208ms)
+  ✔ validates, resolves, commits, and deduplicates one immutable import (5.836625ms)
+  ✔ rejects changed fingerprint and stale preview without partial commit (0.202459ms)
+  ✔ rejects malformed, oversized, missing-sheet, and missing-header workbooks (0.21ms)
+  ✔ recovers an interrupted import using the original run identity (0.203958ms)
+  ✔ retries only classified reminder failures with the same correlation identity (0.179542ms)
+  ✔ enforces governance role, self-lockout, stale version, and next-request revocation (1.015459ms)
+  ✔ rechecks lifecycle blocker/version and performs one redacted atomic outcome (0.2395ms)
+  ✔ allowlists recipients and rejects stale or invented settings (0.176459ms)
+  ✔ maps retryable and terminal adapter failures without raw provider text (0.247209ms)
+✔ synthetic advanced administrator workflows (10.137958ms)
+▶ SyntheticAdminPort scoped records
+  ✔ returns only invented records in the granted group (1.066292ms)
+  ✔ generically denies a crafted identifier outside the scope (0.161458ms)
+  ✔ returns empty for a filter without matches (0.106958ms)
+  ✔ rejects stale versions without changing the record (0.295708ms)
+  ✔ returns retryable and terminal dependency failures explicitly (0.181584ms)
+✔ SyntheticAdminPort scoped records (2.45275ms)
+▶ SyntheticAdminPort assignments and archive
+  ✔ assigns an eligible task once (0.228084ms)
+  ✔ maps ineligible and full capacity to distinct conflicts (0.106375ms)
+  ✔ leaves an archived record unchanged on restore conflict (0.112375ms)
+✔ SyntheticAdminPort assignments and archive (0.529959ms)
+▶ SyntheticAdminPort approval exact outcomes
+  ✔ returns approved and rejected outcomes (14.495042ms)
+  ✔ returns already-decided, invalidated, and denied without retry metadata (0.175375ms)
+  ✔ returns retry metadata only for retryable dependency failure (0.1435ms)
+✔ SyntheticAdminPort approval exact outcomes (14.912834ms)
+▶ SyntheticAdminPort authorization and redaction
+  ✔ invalidates the next request after authorization revocation (0.611791ms)
+  ✔ denies a scope not granted by the session before the adapter runs (0.076458ms)
+  ✔ never projects prohibited contact or profile fields (0.083375ms)
+✔ SyntheticAdminPort authorization and redaction (0.826541ms)
+✔ filters scoped open admin queues (0.982334ms)
+✔ returns generic scope denial (0.070083ms)
+✔ returns archived school year as read-only projection (0.08275ms)
+✔ does not disclose other or missing school years (0.048291ms)
+▶ AuthorizationContract
+  ✔ exposes a versioned executable matrix (0.458ms)
+  ✔ allows a parent to read its linked family duties (0.236042ms)
+  ✔ denies a parent requesting contact fields (0.075542ms)
+  ✔ keeps Staff read-only (0.052166ms)
+  ✔ denies Group Administrator import explicitly (0.061083ms)
+  ✔ allows Kindergarten Administrator import at organization scope (0.0585ms)
+  ✔ limits governance to Super Administrator (0.062042ms)
+  ✔ invalidates the next request and clears protected cache after revocation (0.494292ms)
+  ✔ builds role navigation without the Group Administrator import route (0.117792ms)
+✔ AuthorizationContract (2.295833ms)
+▶ application contracts
+  ✔ normalizes equivalent whitespace (0.531125ms)
+  ✔ returns a stable required-field error (0.516542ms)
+  ✔ rejects invalid mutation metadata (0.105625ms)
+  ✔ rejects schedule ranges beyond 31 days (0.07775ms)
+  ✔ constructs retry metadata only for retryable failures (0.055541ms)
+  ✔ maps unknown failures to terminal by default (0.085542ms)
+  ✔ creates an immutable allowlisted projection (0.139834ms)
+  ✔ rejects prohibited properties recursively (0.207958ms)
+  ✔ records synthetic PASS but keeps linked targets OUTSTANDING (1.20075ms)
+  ✔ publishes a privacy-minimized application event (0.57275ms)
+✔ application contracts (4.443666ms)
+▶ role application facades
+  ✔ returns an immutable parent duty list (0.766625ms)
+  ✔ does not invoke a Parent port before authorization (0.099458ms)
+  ✔ deduplicates Parent signup with the same key and fingerprint (0.437792ms)
+  ✔ rejects reuse of a signup key with different input (0.112417ms)
+  ✔ maps a classified Parent dependency failure to retryable (0.139541ms)
+  ✔ returns a Staff schedule without mutation or contact fields (0.188584ms)
+  ✔ validates a Staff date range before invoking its port (0.071166ms)
+  ✔ returns one authorized Staff schedule entry and hides missing entries (0.149041ms)
+  ✔ denies Group Administrator import before invoking its port (0.20475ms)
+  ✔ allows Kindergarten Administrator import through the public port (0.171417ms)
+  ✔ exposes the complete administrator workflow surface through one port (3.769334ms)
+  ✔ executes Parent request, notification, and note workflows (0.421541ms)
+  ✔ does not expose synthetic session selection in production (0.103458ms)
+  ✔ keeps invitation resend non-enumerating on adapter failure (0.105041ms)
+  ✔ resolves synthetic sessions, invitation destinations, and navigation (0.214833ms)
+✔ role application facades (7.841666ms)
+▶ application library isolation
+  ✔ has no framework, transport, environment, or concrete adapter imports (23.069542ms)
+  ✔ keeps user-facing presentation identifiers Hungarian-safe and stable (1.133125ms)
+✔ application library isolation (24.818708ms)
+✔ signs up an eligible linked family and emits replacement event (1.025375ms)
+✔ rejects unrelated family signup without state (0.088458ms)
+✔ rolls back capacity conflicts (0.231417ms)
+✔ atomically swaps only after both authenticated families confirm (0.757166ms)
+✔ creates relationships transactionally and recalculates visibility (11.494166ms)
+✔ returns a linked parent view without contact or optional fields (0.195208ms)
+✔ denies an unrelated parent without revealing the family (0.09525ms)
+✔ shows consented sensitive fields only to in-scope administrators (0.109125ms)
+✔ rejects duplicate parent links without changing relevance projections (0.273125ms)
+✔ rejects cross-organization links and parent mutations (0.099542ms)
+✔ documents optional profiles require explicit consent before administrative projection (0.412209ms)
+✔ binds commit to an immutable preview fingerprint and reports changed rows (13.656ms)
+✔ rejects stale preview bindings without publishing (0.266542ms)
+✔ requires consent for optional profile imports (0.0785ms)
+✔ stages and publishes together with no duplicate preview commit (0.09075ms)
+✔ reconciles staged visibility after a committed import rollback (0.084334ms)
+✔ requires all 17 mapped sheets and blocks hostile cell values (0.06275ms)
+✔ persists sheet destinations and authorized conflict resolution (0.152541ms)
+✔ only permits authorized open conflict resolution (0.042041ms)
+✔ dispatches due jobs and records retry state (1.242791ms)
+✔ cancels stale duty jobs (0.101167ms)
+✔ creates paired in-app and durable queued email outcomes at both thresholds (1.494917ms)
+✔ creates missed threshold notification immediately once (0.091666ms)
+✔ records privacy-safe queued status (0.069667ms)
+✔ uses instants across Budapest DST boundaries without local-time arithmetic (0.065833ms)
+✔ returns only the linked family assignments (0.92525ms)
+✔ returns generic denial for unrelated family (0.075542ms)
+✔ lists only the recipient notification centre (0.094333ms)
+✔ marks own notification read and returns its link (1.031541ms)
+✔ does not expose another recipient notification (0.126083ms)
+✔ delegates linked-parent signup, swap, and cancellation outcomes (0.393417ms)
+▶ synthetic Parent façade
+  ✔ returns only the linked family's invented duties (0.854208ms)
+  ✔ generically denies unrelated and unknown duty detail (0.150333ms)
+  ✔ creates exactly one eligible assignment for a repeated idempotency key (0.707833ms)
+  ✔ keeps full, ineligible, and stale signup state unchanged (0.136167ms)
+  ✔ maps swap success, conflict, and retryable dependency outcomes exactly (0.312083ms)
+  ✔ maps cancellation validation, terminal dependency, and denial without a reason projection (0.21875ms)
+  ✔ marks a notification read idempotently and rejects an unknown notification (0.120583ms)
+  ✔ updates only the Parent's own contribution note (0.1315ms)
+✔ synthetic Parent façade (3.243708ms)
+▶ synthetic invitation states
+  ✔ classifies valid, expired, used, and invalid tokens without account data (0.049416ms)
+✔ synthetic invitation states (0.075875ms)
+✔ rechecks final eligibility transactionally before deletion (0.933125ms)
+✔ defers when a sibling remains enrolled with redacted audit evidence (0.843958ms)
+✔ defers after re-enrolment or a hold (0.082292ms)
+✔ provides redacted deferral reason (0.0485ms)
+✔ keeps audit events within one-year retention (0.110042ms)
+✔ returns only schedule projection fields for scoped staff (1.047333ms)
+✔ returns generic denial without schedule existence (0.079167ms)
+✔ rejects invalid and unbounded date ranges (0.060667ms)
+✔ returns explicit empty state (0.050708ms)
+▶ synthetic Staff schedule
+  ✔ returns only the allowlisted schedule projection for a granted group (1.286583ms)
+  ✔ returns empty for a bounded range without entries (0.089417ms)
+  ✔ rejects a range longer than 31 days before calling the adapter (0.065667ms)
+  ✔ generically denies an ungranted group and row (0.153583ms)
+  ✔ enforces grant revocation on the next request (0.101042ms)
+  ✔ classifies retryable and terminal failures without leaking adapter details (0.162125ms)
+  ✔ keeps the adapter read-only (0.052166ms)
+✔ synthetic Staff schedule (2.568959ms)
+ℹ tests 128
+ℹ suites 12
+ℹ pass 128
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 314.311334
+ℹ start of coverage report
+ℹ -------------------------------------------------------------------------------------------------------------------------------------------------------------
+ℹ file                                 | line % | branch % | funcs % | uncovered lines
+ℹ -------------------------------------------------------------------------------------------------------------------------------------------------------------
+ℹ src                                  |        |          |         | 
+ℹ  access                              |        |          |         | 
+ℹ   access-service.ts                  |  94.52 |    88.10 |  100.00 | 28-31
+ℹ   in-memory-adapters.ts              | 100.00 |   100.00 |  100.00 | 
+ℹ   index.ts                           | 100.00 |   100.00 |  100.00 | 
+ℹ  admin-advanced                      |        |          |         | 
+ℹ   synthetic-advanced.ts              |  92.51 |    77.67 |   92.11 | 176 180-186 190 194-197 201 241-242 299-306 350-362
+ℹ  admin-core                          |        |          |         | 
+ℹ   synthetic-admin.ts                 |  79.63 |    75.31 |   81.82 | 151-154 163 171 175 177 181 185 187 192-202 237-248 250-251 256-272 280 284-304 343-355
+ℹ  admin-experience                    |        |          |         | 
+ℹ   admin-service.ts                   | 100.00 |    84.62 |   75.00 | 
+ℹ  application                         |        |          |         | 
+ℹ   admin-facade.ts                    |  98.21 |    94.55 |   97.83 | 399-406 498
+ℹ   authorization.ts                   |  98.79 |    90.00 |  100.00 | 182-184
+ℹ   evidence.ts                        | 100.00 |    92.31 |  100.00 | 
+ℹ   facade-pipeline.ts                 |  96.69 |    96.00 |   83.33 | 60-64
+ℹ   idempotency.ts                     |  92.19 |    88.89 |   85.71 | 26-27 60-62
+ℹ   index.ts                           | 100.00 |   100.00 |  100.00 | 
+ℹ   parent-facade.ts                   | 100.00 |    92.59 |   95.65 | 
+ℹ   projection.ts                      | 100.00 |    91.67 |  100.00 | 
+ℹ   results.ts                         |  96.46 |   100.00 |   90.91 | 32-35
+ℹ   session-facade.ts                  |  93.07 |    65.22 |  100.00 | 41-42 64-65 73 98-99
+ℹ   staff-facade.ts                    |  87.13 |    87.50 |   88.89 | 54-61 84-88
+ℹ   validation.ts                      |  97.40 |    88.24 |  100.00 | 63-64
+ℹ  coordination                        |        |          |         | 
+ℹ   coordination-service.ts            | 100.00 |    86.96 |   62.50 | 
+ℹ   in-memory-repository.ts            | 100.00 |    95.00 |  100.00 | 
+ℹ   index.ts                           | 100.00 |   100.00 |  100.00 | 
+ℹ  directory                           |        |          |         | 
+ℹ   directory-service.ts               |  86.54 |    81.48 |   77.78 | 38-44 75-81
+ℹ   in-memory-directory-repository.ts  | 100.00 |   100.00 |  100.00 | 
+ℹ   index.ts                           | 100.00 |   100.00 |  100.00 | 
+ℹ  import-migration                    |        |          |         | 
+ℹ   import-service.ts                  | 100.00 |    90.70 |   95.65 | 
+ℹ   in-memory-import-repository.ts     | 100.00 |    93.33 |  100.00 | 
+ℹ  notifications                       |        |          |         | 
+ℹ   durable-jobs.ts                    | 100.00 |    75.00 |   83.33 | 
+ℹ   in-memory-notifications.ts         | 100.00 |   100.00 |  100.00 | 
+ℹ   notification-service.ts            | 100.00 |    91.67 |   75.00 | 
+ℹ  parent-experience                   |        |          |         | 
+ℹ   in-memory-parent-repository.ts     | 100.00 |   100.00 |  100.00 | 
+ℹ   parent-experience-service.ts       | 100.00 |    68.18 |   91.67 | 
+ℹ  parent-web                          |        |          |         | 
+ℹ   index.ts                           | 100.00 |   100.00 |  100.00 | 
+ℹ   synthetic-parent.ts                |  88.08 |    75.00 |   86.36 | 209-215 284-288 326-327 334-335 378-398 400-411
+ℹ  privacy-audit                       |        |          |         | 
+ℹ   lifecycle-service.ts               |  83.33 |    85.71 |   80.00 | 6
+ℹ  runtime                             |        |          |         | 
+ℹ   synthetic                          |        |          |         | 
+ℹ    profiles.ts                       |  98.00 |   100.00 |    0.00 | 99-100
+ℹ  staff-schedule                      |        |          |         | 
+ℹ   schedule-service.ts                | 100.00 |    93.75 |  100.00 | 
+ℹ  staff-web                           |        |          |         | 
+ℹ   index.ts                           | 100.00 |   100.00 |  100.00 | 
+ℹ   synthetic-staff.ts                 | 100.00 |    82.61 |  100.00 | 
+ℹ -------------------------------------------------------------------------------------------------------------------------------------------------------------
+ℹ all files                            |  93.51 |    85.16 |   90.67 | 
+ℹ -------------------------------------------------------------------------------------------------------------------------------------------------------------
+ℹ end of coverage report
+
+> waldorf-community-task-manager@0.2.0 test:coverage:delivery
+> vitest run --config vitest.config.ts --coverage
+
+
+ RUN  v4.1.11 /Users/dev/Development/waldorf-community-task-manager
+      Coverage enabled with v8
+
+ ✓ |domain-coverage| src/admin-advanced/synthetic-advanced.test.ts (10 tests) 9ms
+ ✓ |delivery| tests/unit/toolchain-validation.test.ts (4 tests) 4ms
+ ✓ |domain-coverage| src/import-migration/import-service.test.ts (8 tests) 9ms
+ ✓ |domain-coverage| src/admin-core/synthetic-admin.test.ts (14 tests) 10ms
+ ✓ |domain-coverage| src/application/facades.test.ts (15 tests) 4ms
+ ✓ |domain-coverage| src/application/contracts.test.ts (10 tests) 6ms
+ ✓ |domain-coverage| src/access/access-service.test.ts (7 tests) 4ms
+ ✓ |domain-coverage| src/directory/directory-service.test.ts (6 tests) 4ms
+ ✓ |delivery| tests/coverage/domain-adapter.test.ts (3 tests) 3ms
+ ✓ |delivery| tests/unit/verification-core.test.ts (7 tests) 13ms
+ ✓ |domain-coverage| src/notifications/notification-service.test.ts (4 tests) 3ms
+ ✓ |domain-coverage| src/parent-web/synthetic-parent.test.ts (9 tests) 4ms
+ ✓ |domain-coverage| src/application/authorization.test.ts (9 tests) 3ms
+ ✓ |domain-coverage| src/application/isolation.test.ts (2 tests) 4ms
+ ✓ |domain-coverage| src/parent-experience/parent-experience-service.test.ts (6 tests) 3ms
+ ✓ |delivery| tests/integration/admin-advanced-components.test.tsx (3 tests) 151ms
+ ✓ |delivery| tests/unit/runtime-boundaries.test.ts (18 tests) 67ms
+ ✓ |delivery| tests/integration/runtime-shell.test.tsx (4 tests) 117ms
+ ✓ |domain-coverage| src/notifications/durable-jobs.test.ts (2 tests) 3ms
+ ✓ |domain-coverage| src/access/access-matrix.test.ts (1 test) 4ms
+ ✓ |domain-coverage| src/admin-experience/admin-service.test.ts (4 tests) 2ms
+ ✓ |domain-coverage| src/privacy-audit/lifecycle-service.test.ts (5 tests) 3ms
+ ✓ |delivery| tests/integration/parent-components.test.tsx (9 tests) 158ms
+ ✓ |domain-coverage| src/coordination/coordination-service.test.ts (4 tests) 3ms
+ ✓ |delivery| tests/integration/admin-components.test.tsx (17 tests) 177ms
+ ✓ |domain-coverage| src/staff-schedule/schedule-service.test.ts (4 tests) 2ms
+ ✓ |domain-coverage| src/staff-web/synthetic-staff.test.ts (7 tests) 3ms
+ ✓ |delivery| tests/integration/synthetic-route.test.ts (4 tests) 12ms
+ ✓ |delivery| tests/integration/staff-components.test.tsx (5 tests) 125ms
+ ✓ |domain-coverage| src/directory/field-policy.test.ts (1 test) 1ms
+ ✓ |delivery| tests/coverage/production-inventory.test.ts (6 tests) 304ms
+ ✓ |delivery| tests/integration/runtime-config-cli.test.ts (27 tests) 7388ms
+     ✓ predev loads local configuration without a runtime-mode export  717ms
+     ✓ prebuild loads local configuration without a runtime-mode export  634ms
+     ✓ prestart loads local configuration without a runtime-mode export  360ms
+     ✓ predev selects its intended default framework mode  310ms
+     ✓ prebuild selects its intended default framework mode  329ms
+     ✓ prestart selects its intended default framework mode  352ms
+     ✓ predev rejects missing configuration  348ms
+     ✓ prebuild rejects missing configuration  365ms
+     ✓ prestart rejects missing configuration  379ms
+     ✓ predev preserves inherited invalid mode over valid file values  353ms
+     ✓ prebuild preserves inherited invalid mode over valid file values  373ms
+     ✓ prestart preserves inherited invalid mode over valid file values  366ms
+     ✓ preserves every file precedence tier in development  362ms
+     ✓ preserves every file precedence tier in production  369ms
+     ✓ excludes local and non-test mode files in test mode  361ms
+
+ Test Files  32 passed (32)
+      Tests  235 passed (235)
+   Start at  14:12:27
+   Duration  8.22s (transform 1.68s, setup 2.10s, import 3.62s, tests 8.60s, environment 8.87s)
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |   50.66 |    44.96 |   64.54 |    48.4 |                   
+ ...y-task-manager |       0 |      100 |       0 |       0 |                   
+  next.config.ts   |       0 |      100 |       0 |       0 | 3-17              
+  proxy.ts         |       0 |      100 |       0 |       0 | 4-31              
+ ...sk-manager/app |       0 |        0 |       0 |       0 |                   
+  layout.tsx       |       0 |      100 |       0 |       0 | 5-11              
+  page.tsx         |       0 |        0 |       0 |       0 | 8-31              
+ ...ager/app/admin |       0 |        0 |       0 |       0 |                   
+  actions.ts       |       0 |        0 |       0 |       0 | 1-226             
+  ...ed-actions.ts |       0 |        0 |       0 |       0 | 1-206             
+  error.tsx        |       0 |      100 |       0 |       0 | 1-13              
+  layout.tsx       |       0 |        0 |       0 |       0 | 7-16              
+  loading.tsx      |       0 |      100 |       0 |       0 | 2                 
+  page.tsx         |       0 |        0 |       0 |       0 | 7-85              
+ ...in/_components |   84.21 |    81.03 |   88.23 |   86.11 |                   
+  ...cessState.tsx |     100 |     90.9 |     100 |     100 | 25                
+  ...ationForm.tsx |   66.66 |       75 |      60 |   72.72 | 54-60             
+  ...tatePanel.tsx |      80 |    66.66 |     100 |      80 | 26,34             
+  ...tWorkflow.tsx |     100 |    88.23 |     100 |     100 | 26,45             
+ ...app/admin/_lib |       0 |        0 |       0 |       0 |                   
+  action-state.ts  |       0 |        0 |       0 |       0 | 8-54              
+  facade.ts        |       0 |        0 |       0 |       0 | 8-10              
+  session.ts       |       0 |        0 |       0 |       0 | 14-95             
+ ...in/adatvedelem |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 10-33             
+ ...admin/archivum |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 8-28              
+ .../archivum/[id] |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 1-36              
+ ...in/beallitasok |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 8-79              
+ ...n/emlekeztetok |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 10-50             
+ ...dmin/feladatok |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 15-43             
+ ...feladatok/[id] |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 1-43              
+ ...n/feladatok/uj |       0 |      100 |       0 |       0 |                   
+  page.tsx         |       0 |      100 |       0 |       0 | 1-6               
+ ...p/admin/import |       0 |        0 |       0 |       0 |                   
+  layout.tsx       |       0 |        0 |       0 |       0 | 8-15              
+  page.tsx         |       0 |        0 |       0 |       0 | 13-18             
+ ...n/jovahagyasok |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 14-43             
+ ...ahagyasok/[id] |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 1-44              
+ ...yilvantartasok |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 15-43             
+ ...ntartasok/[id] |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 1-29              
+ ...vantartasok/uj |       0 |      100 |       0 |       0 |                   
+  page.tsx         |       0 |      100 |       0 |       0 | 1-6               
+ .../api/readiness |       0 |        0 |       0 |       0 |                   
+  route.ts         |       0 |        0 |       0 |       0 | 4-15              
+ ...ynthetic/reset |      40 |       50 |     100 |      40 |                   
+  route.ts         |      40 |       50 |     100 |      40 | 15-23             
+ ...thetic/session |    82.6 |    91.66 |     100 |    82.6 |                   
+  route.ts         |    82.6 |    91.66 |     100 |    82.6 | 29,34-36          
+ ...er/app/belepes |       0 |        0 |       0 |       0 |                   
+  ...tionEntry.tsx |       0 |        0 |       0 |       0 | 1-16              
+  actions.ts       |       0 |        0 |       0 |       0 | 1-53              
+  page.tsx         |       0 |        0 |       0 |       0 | 4-14              
+ ...res-megtagadva |       0 |      100 |       0 |       0 |                   
+  page.tsx         |       0 |      100 |       0 |       0 | 4                 
+ ...ghivas/[token] |       0 |        0 |       0 |       0 |                   
+  ...onActions.tsx |       0 |        0 |       0 |       0 | 1-40              
+  actions.ts       |       0 |        0 |       0 |       0 | 1-53              
+  page.tsx         |       0 |        0 |       0 |       0 | 5-28              
+ .../app/munkatars |       0 |        0 |       0 |       0 |                   
+  error.tsx        |       0 |      100 |       0 |       0 | 1-8               
+  layout.tsx       |       0 |        0 |       0 |       0 | 6-11              
+  loading.tsx      |       0 |      100 |       0 |       0 | 2                 
+ ...rs/_components |   82.35 |    67.74 |      75 |   81.25 |                   
+  ...cessState.tsx |       0 |        0 |       0 |       0 | 6-7               
+  ...tatePanel.tsx |      90 |       84 |     100 |      90 | 20                
+ ...munkatars/_lib |      40 |    34.48 |   57.14 |   47.82 |                   
+  facade.ts        |       0 |        0 |       0 |       0 | 10-12             
+  filters.ts       |    92.3 |     62.5 |     100 |     100 | 34-40,61-66       
+  session.ts       |       0 |        0 |       0 |       0 | 25-42             
+ ...atars/beosztas |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 11-37             
+ .../beosztas/[id] |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 16-43             
+ ...as/_components |     100 |       50 |     100 |     100 |                   
+  ...ollection.tsx |     100 |       50 |     100 |     100 | 12-70             
+  ...uleFilter.tsx |     100 |       50 |     100 |     100 | 26-48             
+ ...ager/app/szulo |       0 |        0 |       0 |       0 |                   
+  actions.ts       |       0 |        0 |       0 |       0 | 1-176             
+  layout.tsx       |       0 |        0 |       0 |       0 | 6-11              
+ ...lo/_components |      85 |       70 |   83.33 |      85 |                   
+  ...nReadForm.tsx |       0 |        0 |       0 |       0 | 1-10              
+  ...cessState.tsx |     100 |       75 |     100 |     100 | 24                
+  ...tatePanel.tsx |     100 |    92.85 |     100 |     100 | 25                
+ ...app/szulo/_lib |       0 |        0 |       0 |       0 |                   
+  action-state.ts  |       0 |        0 |       0 |       0 | 24-62             
+  facade.ts        |       0 |        0 |       0 |       0 | 9-16              
+  session.ts       |       0 |        0 |       0 |       0 | 28-37             
+ ...lo/ertesitesek |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 6-39              
+ ...zulo/feladatok |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 5-81              
+ ...feladatok/[id] |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 15-127            
+ ...tok/[id]/csere |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 14-32             
+ .../[id]/lemondas |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 14-36             
+ ...anager/scripts |       0 |        0 |       0 |       0 |                   
+  start-smoke.mjs  |       0 |        0 |       0 |       0 | 1-89              
+  ...ime-config.ts |       0 |        0 |       0 |       0 | 5-32              
+  ...toolchain.mjs |       0 |        0 |     100 |       0 | 1-18              
+ ...s/verification |   32.19 |    39.33 |   36.58 |   32.94 |                   
+  ...e-evidence.ts |       0 |        0 |     100 |       0 | 1-13              
+  core.ts          |    53.1 |    64.34 |   51.72 |   55.55 | ...45,252,257-359 
+  ...fox-launch.ts |       0 |        0 |       0 |       0 | 1-21              
+  ...rification.ts |       0 |        0 |       0 |       0 | 1-170             
+  ...-artifacts.ts |       0 |        0 |       0 |       0 | 1-111             
+  ...-manifests.ts |       0 |      100 |     100 |       0 | 3-4               
+ ...ger/src/access |   79.01 |    75.34 |      88 |    85.1 |                   
+  ...ss-service.ts |    86.2 |    81.53 |     100 |   90.24 | 28-31             
+  ...te-adapter.ts |       0 |        0 |       0 |       0 | 5-7               
+ ...admin-advanced |   82.38 |    66.35 |    82.5 |   84.17 |                   
+  ...c-advanced.ts |   82.38 |    66.35 |    82.5 |   84.17 | ...36,352-359,374 
+ ...src/admin-core |   64.84 |       50 |   72.22 |   65.74 |                   
+  ...etic-admin.ts |   64.84 |       50 |   72.22 |   65.74 | ...35,346-351,368 
+ ...min-experience |      70 |    66.66 |   71.42 |     100 |                   
+  admin-service.ts |      70 |    66.66 |   71.42 |     100 | 10                
+ ...rc/application |   90.27 |    86.03 |   95.31 |   92.88 |                   
+  admin-facade.ts  |   93.33 |    85.71 |    97.5 |   96.36 | 399,498           
+  authorization.ts |      90 |    89.47 |     100 |   94.59 | 182-183           
+  contracts.ts     |       0 |      100 |       0 |       0 | 101-333           
+  evidence.ts      |     100 |       75 |     100 |     100 | 61                
+  ...e-pipeline.ts |   91.66 |    83.33 |      80 |    91.3 | 29,60             
+  idempotency.ts   |      80 |       90 |      80 |   84.21 | 26,60-61          
+  parent-facade.ts |    93.1 |    66.66 |   95.45 |   96.29 | 189               
+  projection.ts    |   94.11 |     87.5 |     100 |     100 | 39                
+  ...ion-facade.ts |   81.48 |    64.28 |     100 |   83.33 | 41,64,73,98       
+  staff-facade.ts  |      85 |       80 |    87.5 |   88.23 | 54,87             
+  validation.ts    |      95 |     93.1 |     100 |   94.73 | 63                
+ ...c/coordination |   71.42 |       50 |      75 |   72.72 |                   
+  ...on-service.ts |    60.6 |    48.27 |   53.33 |   68.42 | 20-25             
+  ...repository.ts |     100 |       75 |     100 |     100 | 2                 
+ .../src/directory |   73.33 |    66.66 |   74.41 |   78.68 |                   
+  ...ry-service.ts |   68.42 |    66.66 |   71.05 |   75.92 | 38-42,47,56,75-80 
+ ...port-migration |   90.12 |    87.17 |   97.05 |     100 |                   
+  ...rt-service.ts |    90.9 |    89.18 |   95.45 |     100 | 33,35,39          
+  ...repository.ts |   88.46 |       50 |     100 |     100 | 2                 
+ .../notifications |    87.8 |    58.33 |   81.25 |   85.71 |                   
+  durable-jobs.ts  |   83.33 |       40 |      80 |     100 | 4                 
+  ...on-service.ts |   86.95 |    71.42 |   71.42 |      80 | 14                
+ ...ent-experience |      90 |    75.75 |      95 |     100 |                   
+  ...ce-service.ts |    86.2 |    75.75 |    90.9 |     100 | 14,16,18-20       
+ ...src/parent-web |   75.22 |    63.15 |   70.37 |   83.13 |                   
+  ...tic-parent.ts |   75.22 |    63.15 |   70.37 |   83.13 | ...26,334,380-403 
+ .../privacy-audit |   89.65 |    65.21 |   77.77 |      50 |                   
+  ...le-service.ts |   89.65 |    65.21 |   77.77 |      50 | 6                 
+ ...er/src/runtime |     100 |    94.73 |     100 |     100 |                   
+  config.ts        |     100 |    91.66 |     100 |     100 | 45                
+ ...ime/production |   33.33 |      100 |   33.33 |   33.33 |                   
+  composition.ts   |   33.33 |      100 |   33.33 |   33.33 | 15-16             
+ ...untime/session |   92.85 |       95 |     100 |    92.3 |                   
+  session.ts       |   92.85 |       95 |     100 |    92.3 | 71,79             
+ ...staff-schedule |     100 |    91.66 |     100 |     100 |                   
+  ...le-service.ts |     100 |    91.66 |     100 |     100 | 13                
+ .../src/staff-web |    92.3 |    78.94 |     100 |     100 |                   
+  ...etic-staff.ts |    92.3 |    78.94 |     100 |     100 | 105-106,126-140   
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 50.66% ( 1249/2465 )
+Branches     : 44.96% ( 822/1828 )
+Functions    : 64.54% ( 435/674 )
+Lines        : 48.4% ( 927/1915 )
+================================================================================
+ERROR: Coverage for lines (48.4%) does not meet global threshold (80%)
+ERROR: Coverage for functions (64.54%) does not meet global threshold (80%)
+ERROR: Coverage for branches (44.96%) does not meet global threshold (80%)

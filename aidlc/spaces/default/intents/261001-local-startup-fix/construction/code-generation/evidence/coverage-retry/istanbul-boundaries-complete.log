@@ -1,0 +1,20 @@
+
+> waldorf-community-task-manager@0.2.0 test:delivery
+> vitest run --config vitest.config.ts tests/coverage/framework-entrypoints.test.ts tests/coverage/runtime-cli-instrumentation.test.ts tests/coverage/smoke-entrypoint.test.ts tests/coverage/verification-entrypoints.test.ts
+
+
+ RUN  v4.1.11 /Users/dev/Development/waldorf-community-task-manager
+
+ ✓ |delivery| tests/coverage/smoke-entrypoint.test.ts (3 tests) 13ms
+ ✓ |delivery| tests/coverage/runtime-cli-instrumentation.test.ts (7 tests) 55ms
+ ✓ |delivery| tests/coverage/framework-entrypoints.test.ts (2 tests) 4ms
+ ✓ |delivery| tests/coverage/verification-entrypoints.test.ts (35 tests) 2732ms
+   ✓ rejects invalid evidence schema, timing, provenance and missing artifacts  343ms
+   ✓ executes real orchestration ordering with every subprocess safely simulated  473ms
+   ✓ rejects inconsistent manifest invalid-effect  326ms
+
+ Test Files  4 passed (4)
+      Tests  47 passed (47)
+   Start at  15:20:06
+   Duration  2.98s (transform 137ms, setup 386ms, import 137ms, tests 2.80s, environment 407ms)
+

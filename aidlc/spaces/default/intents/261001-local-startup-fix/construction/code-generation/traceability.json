@@ -1,0 +1,50 @@
+{
+  "stage": "code-generation",
+  "upstream_ids": [
+    "FR1",
+    "FR2",
+    "FR3",
+    "FR4",
+    "NFR1",
+    "NFR2",
+    "NFR3"
+  ],
+  "coverage": [
+    {
+      "id": "FR1",
+      "status": "OK",
+      "target": "README.md"
+    },
+    {
+      "id": "FR2",
+      "status": "OK",
+      "target": "scripts/validate-runtime-config.ts"
+    },
+    {
+      "id": "FR3",
+      "status": "OK",
+      "target": "README.md"
+    },
+    {
+      "id": "FR4",
+      "status": "OK",
+      "target": "tests/coverage/app-entrypoints.test.tsx"
+    },
+    {
+      "id": "NFR1",
+      "status": "OK",
+      "target": "tests/integration/runtime-config-cli.test.ts"
+    },
+    {
+      "id": "NFR2",
+      "status": "OK",
+      "target": "tests/integration/runtime-config-cli.test.ts"
+    },
+    {
+      "id": "NFR3",
+      "status": "OK",
+      "target": "tests/coverage/support/production-coverage-reporter.ts",
+      "note": "Current Istanbul4.1.11 full-production report validates124 executable files among141 inventory candidates and passes80/80/80: lines94.18%, branches80.14%, functions92.30%. Native/delivery399, build/start/smoke/browser/a11y and final-lock audit passed; historical V8 integrity failure retained separately."
+    }
+  ]
+}

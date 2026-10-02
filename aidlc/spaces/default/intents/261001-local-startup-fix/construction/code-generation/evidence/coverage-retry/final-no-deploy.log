@@ -1,0 +1,5 @@
+
+> waldorf-community-task-manager@0.2.0 verify:no-deploy
+> node --experimental-strip-types scripts/verification/scan-artifacts.ts no-deploy
+
+NO-DEPLOY_SCAN_PASS files=180

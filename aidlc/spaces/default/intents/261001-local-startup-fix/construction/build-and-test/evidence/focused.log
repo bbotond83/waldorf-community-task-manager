@@ -1,0 +1,32 @@
+
+> waldorf-community-task-manager@0.2.0 test:delivery
+> vitest run --config vitest.config.ts tests/integration/runtime-config-cli.test.ts tests/unit/toolchain-validation.test.ts tests/unit/runtime-boundaries.test.ts
+
+
+ RUN  v4.1.11 /Users/dev/Development/waldorf-community-task-manager
+
+ ✓ tests/unit/toolchain-validation.test.ts (4 tests) 3ms
+ ✓ tests/unit/runtime-boundaries.test.ts (18 tests) 102ms
+ ✓ tests/integration/runtime-config-cli.test.ts (27 tests) 7775ms
+     ✓ predev loads local configuration without a runtime-mode export  560ms
+     ✓ prebuild loads local configuration without a runtime-mode export  427ms
+     ✓ prestart loads local configuration without a runtime-mode export  356ms
+     ✓ predev selects its intended default framework mode  363ms
+     ✓ prebuild selects its intended default framework mode  354ms
+     ✓ prestart selects its intended default framework mode  388ms
+     ✓ predev rejects missing configuration  389ms
+     ✓ prebuild rejects missing configuration  362ms
+     ✓ prestart rejects missing configuration  410ms
+     ✓ predev preserves inherited invalid mode over valid file values  366ms
+     ✓ prebuild preserves inherited invalid mode over valid file values  323ms
+     ✓ prestart preserves inherited invalid mode over valid file values  336ms
+     ✓ honors explicit NODE_ENV=development over either command default  306ms
+     ✓ preserves every file precedence tier in development  416ms
+     ✓ preserves every file precedence tier in production  470ms
+     ✓ excludes local and non-test mode files in test mode  444ms
+
+ Test Files  3 passed (3)
+      Tests  49 passed (49)
+   Start at  13:34:06
+   Duration  8.12s (transform 136ms, setup 513ms, import 174ms, tests 7.88s, environment 606ms)
+

@@ -1,0 +1,24 @@
+
+> waldorf-community-task-manager@0.2.0 predev
+> npm run check:toolchain && node --experimental-strip-types scripts/validate-runtime-config.ts development
+
+
+> waldorf-community-task-manager@0.2.0 check:toolchain
+> node scripts/validate-toolchain.mjs
+
+TOOLCHAIN_VALID: Node 24.x / npm 11.x
+RUNTIME_CONFIG_VALID: synthetic
+
+> waldorf-community-task-manager@0.2.0 dev
+> next dev --hostname 127.0.0.1 --port 3382
+
+▲ Next.js 16.3.6 (Turbopack)
+- Local:         http://127.0.0.1:3382
+- Network:       http://127.0.0.1:3382
+- Environments: .env.local
+✓ Ready in 720ms
+✓ Running next.config.ts took 44ms
+
+ GET /api/readiness 200 in 358ms (next.js: 335ms, application-code: 23ms)
+ GET / 200 in 848ms (next.js: 748ms, proxy.ts: 27ms, application-code: 73ms)
+[?25h

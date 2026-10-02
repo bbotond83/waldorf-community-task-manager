@@ -1,0 +1,42 @@
+[
+  {
+    "check": "node-version",
+    "exit": 0
+  },
+  {
+    "check": "npm-version",
+    "exit": 0
+  },
+  {
+    "check": "toolchain",
+    "exit": 0
+  },
+  {
+    "check": "format",
+    "exit": 0
+  },
+  {
+    "check": "lint",
+    "exit": 0
+  },
+  {
+    "check": "typecheck",
+    "exit": 0
+  },
+  {
+    "check": "runner",
+    "exit": 0
+  },
+  {
+    "check": "focused",
+    "exit": 0
+  },
+  {
+    "check": "tests",
+    "exit": 0
+  },
+  {
+    "check": "coverage",
+    "exit": 0
+  }
+]

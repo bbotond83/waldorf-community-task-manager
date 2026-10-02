@@ -1,0 +1,114 @@
+[
+  {
+    "check": "isolated-toolchain",
+    "command": [
+      "npm",
+      "run",
+      "check:toolchain"
+    ],
+    "raw_exit": 0,
+    "expected_exit": 0,
+    "seconds": 0.18,
+    "check_passed": true
+  },
+  {
+    "check": "dev",
+    "check_passed": true,
+    "readiness": {
+      "status": "ready",
+      "mode": "synthetic",
+      "marker": "waldorf-local-ready"
+    },
+    "root_marker": true,
+    "runtime_mode_exported": false,
+    "node_env_exported": false
+  },
+  {
+    "check": "build",
+    "command": [
+      "npm",
+      "run",
+      "build"
+    ],
+    "raw_exit": 0,
+    "expected_exit": 0,
+    "seconds": 9.24,
+    "check_passed": true
+  },
+  {
+    "check": "start",
+    "check_passed": true,
+    "readiness": {
+      "status": "ready",
+      "mode": "synthetic",
+      "marker": "waldorf-local-ready"
+    },
+    "root_marker": true,
+    "runtime_mode_exported": false,
+    "node_env_exported": false
+  },
+  {
+    "check": "smoke",
+    "command": [
+      "npm",
+      "run",
+      "smoke:start"
+    ],
+    "raw_exit": 0,
+    "expected_exit": 0,
+    "seconds": 2.81,
+    "check_passed": true
+  },
+  {
+    "check": "privacy",
+    "command": [
+      "node",
+      "--experimental-strip-types",
+      "scripts/verification/scan-artifacts.ts",
+      "privacy"
+    ],
+    "raw_exit": 0,
+    "expected_exit": 0,
+    "seconds": 0.18,
+    "check_passed": true
+  },
+  {
+    "check": "secrets",
+    "command": [
+      "node",
+      "--experimental-strip-types",
+      "scripts/verification/scan-artifacts.ts",
+      "secrets"
+    ],
+    "raw_exit": 0,
+    "expected_exit": 0,
+    "seconds": 0.24,
+    "check_passed": true
+  },
+  {
+    "check": "sast",
+    "command": [
+      "node",
+      "--experimental-strip-types",
+      "scripts/verification/scan-artifacts.ts",
+      "sast"
+    ],
+    "raw_exit": 0,
+    "expected_exit": 0,
+    "seconds": 0.13,
+    "check_passed": true
+  },
+  {
+    "check": "no-deploy",
+    "command": [
+      "node",
+      "--experimental-strip-types",
+      "scripts/verification/scan-artifacts.ts",
+      "no-deploy"
+    ],
+    "raw_exit": 0,
+    "expected_exit": 0,
+    "seconds": 0.13,
+    "check_passed": true
+  }
+]

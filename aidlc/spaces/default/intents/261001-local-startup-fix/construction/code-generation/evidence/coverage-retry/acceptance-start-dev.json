@@ -1,0 +1,18 @@
+[
+  {
+    "command": "start",
+    "port": 3381,
+    "readiness": "ready/synthetic",
+    "root": "profile-selector",
+    "runtime_mode_exported": false,
+    "polling": false
+  },
+  {
+    "command": "dev",
+    "port": 3382,
+    "readiness": "ready/synthetic",
+    "root": "profile-selector",
+    "runtime_mode_exported": false,
+    "polling": true
+  }
+]
