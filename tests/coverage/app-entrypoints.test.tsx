@@ -92,7 +92,7 @@ it("creates and clears secure scoped session cookies", async () => {
   expect(selected.status).toBe(303);
   expect(selected.headers.get("set-cookie")).toContain("HttpOnly");
   expect(selected.headers.get("set-cookie")).toContain("SameSite=lax");
-  expect(selected.headers.get("clear-site-data")).toBe('"cache"');
+  expect(selected.headers.get("clear-site-data")).toBeNull();
   expect((await select(request(""))).headers.get("set-cookie")).toContain(
     "Expires=Thu, 01 Jan 1970",
   );

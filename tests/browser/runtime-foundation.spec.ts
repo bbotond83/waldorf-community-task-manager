@@ -39,3 +39,22 @@ test("@a11y root flow has no serious or critical accessibility violations", asyn
   );
   expect(blockingViolations).toEqual([]);
 });
+
+test("sign-out and history cannot restore a previous profile's protected content", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.getByTestId("profile-selector-parent-local-button").click();
+  await page.getByTestId("app-shell-navigation-parent-duties").click();
+  await expect(page.getByTestId("duty-list")).toBeVisible();
+  await page.getByTestId("app-shell-switch-profile-button").click();
+  await expect(page.getByTestId("profile-selector")).toBeVisible();
+  await page.goBack();
+  await expect(page.getByTestId("duty-list")).toHaveCount(0);
+  await expect(page.getByTestId("app-shell-profile-summary")).toHaveCount(0);
+  await page.goto("/");
+  await page.getByTestId("profile-selector-staff-local-button").click();
+  await page.goto("/szulo/feladatok");
+  await expect(page.getByRole("heading", { name: "Nincs jogosultság", exact: true })).toBeVisible();
+  await expect(page.getByTestId("duty-list")).toHaveCount(0);
+});

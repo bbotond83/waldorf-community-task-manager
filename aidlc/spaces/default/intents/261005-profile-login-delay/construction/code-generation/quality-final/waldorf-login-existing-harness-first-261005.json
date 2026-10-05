@@ -1,0 +1,459 @@
+{
+  "config": {
+    "argv": [
+      "/opt/homebrew/Cellar/node@24/24.21.0_1/bin/node",
+      "/Users/dev/Development/waldorf-community-task-manager/node_modules/.bin/playwright",
+      "test",
+      "--config",
+      "playwright.login-existing.config.ts",
+      "tests/browser/profile-login-existing.spec.ts",
+      "--project=chrome"
+    ],
+    "configFile": "/Users/dev/Development/waldorf-community-task-manager/playwright.login-existing.config.ts",
+    "rootDir": "/Users/dev/Development/waldorf-community-task-manager/tests/browser",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/Users/dev/Development/waldorf-community-task-manager/test-results/login-existing",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chrome",
+        "name": "chrome",
+        "testDir": "/Users/dev/Development/waldorf-community-task-manager/tests/browser",
+        "testIgnore": [],
+        "testMatch": [
+          "profile-login-existing.spec.ts"
+        ],
+        "timeout": 120000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results/login-existing.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.62.1",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "profile-login-existing.spec.ts",
+      "file": "profile-login-existing.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "existing server: parent-local usable main page first/repeated/switch within 5000 ms",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chrome",
+              "projectName": "chrome",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 6058,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveURL\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/\\/szulo\\/feladatok$/\u001b[39m\nReceived string:  \u001b[31m\"http://127.0.0.1:3000/szulo/feladatok?allapot=\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveURL\" with timeout 5000ms\u001b[22m\n\u001b[2m    14 × locator resolved to <html lang=\"hu\">…</html>\u001b[22m\n\u001b[2m       - unexpected value \"http://127.0.0.1:3000/szulo/feladatok?allapot=\"\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveURL\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/\\/szulo\\/feladatok$/\u001b[39m\nReceived string:  \u001b[31m\"http://127.0.0.1:3000/szulo/feladatok?allapot=\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveURL\" with timeout 5000ms\u001b[22m\n\u001b[2m    14 × locator resolved to <html lang=\"hu\">…</html>\u001b[22m\n\u001b[2m       - unexpected value \"http://127.0.0.1:3000/szulo/feladatok?allapot=\"\u001b[22m\n\n    at assertProfileMainReady (/Users/dev/Development/waldorf-community-task-manager/tests/browser/support/profile-login-measurement.ts:30:22)\n    at exercisePrimaryControl (/Users/dev/Development/waldorf-community-task-manager/tests/browser/support/profile-login-measurement.ts:149:5)\n    at /Users/dev/Development/waldorf-community-task-manager/tests/browser/profile-login-existing.spec.ts:31:9",
+                    "location": {
+                      "file": "/Users/dev/Development/waldorf-community-task-manager/tests/browser/support/profile-login-measurement.ts",
+                      "column": 22,
+                      "line": 30
+                    },
+                    "snippet": "\u001b[90m   at \u001b[39msupport/profile-login-measurement.ts:30\n\n  28 |     ),\n  29 |   ).toBeVisible();\n> 30 |   await expect(page).toHaveURL(new RegExp(`${profile.homePath.replaceAll(\"/\", \"\\\\/\")}$`));\n     |                      ^\n  31 |   await expect(page.getByTestId(\"app-shell-profile-summary\")).toContainText(profile.label);\n  32 |   for (const item of profile.navigation) {\n  33 |     const link = page.getByTestId(`app-shell-navigation-${item.id}`);"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/Users/dev/Development/waldorf-community-task-manager/tests/browser/support/profile-login-measurement.ts",
+                        "column": 22,
+                        "line": 30
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveURL\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/\\/szulo\\/feladatok$/\u001b[39m\nReceived string:  \u001b[31m\"http://127.0.0.1:3000/szulo/feladatok?allapot=\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveURL\" with timeout 5000ms\u001b[22m\n\u001b[2m    14 × locator resolved to <html lang=\"hu\">…</html>\u001b[22m\n\u001b[2m       - unexpected value \"http://127.0.0.1:3000/szulo/feladatok?allapot=\"\u001b[22m\n\n\n   at support/profile-login-measurement.ts:30\n\n  28 |     ),\n  29 |   ).toBeVisible();\n> 30 |   await expect(page).toHaveURL(new RegExp(`${profile.homePath.replaceAll(\"/\", \"\\\\/\")}$`));\n     |                      ^\n  31 |   await expect(page.getByTestId(\"app-shell-profile-summary\")).toContainText(profile.label);\n  32 |   for (const item of profile.navigation) {\n  33 |     const link = page.getByTestId(`app-shell-navigation-${item.id}`);\n    at assertProfileMainReady (/Users/dev/Development/waldorf-community-task-manager/tests/browser/support/profile-login-measurement.ts:30:22)\n    at exercisePrimaryControl (/Users/dev/Development/waldorf-community-task-manager/tests/browser/support/profile-login-measurement.ts:149:5)\n    at /Users/dev/Development/waldorf-community-task-manager/tests/browser/profile-login-existing.spec.ts:31:9"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-05T12:07:08.193Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "login-timings",
+                      "contentType": "application/json",
+                      "body": "ewogICJvcmlnaW4iOiAiaHR0cDovLzEyNy4wLjAuMTozMDAwIiwKICAiYnJvd3NlciI6ICIxNTQuMC44MDM3Ljk4IiwKICAibm9kZSI6ICJ2MjQuMjEuMCIsCiAgInByb2ZpbGUiOiAicGFyZW50LWxvY2FsIiwKICAiZnJvbSI6ICJzdGFmZi1sb2NhbCIsCiAgImJyb3dzZXJTdGF0ZSI6ICJmcmVzaCBjb250ZXh0OyBuYXR1cmFsIGNhY2hlIHJldGFpbmVkOyBleGlzdGluZyBzZXJ2ZXIgbm90IHJlc2V0IiwKICAibWVhc3VyZW1lbnRzIjogWwogICAgewogICAgICAia2luZCI6ICJmaXJzdCIsCiAgICAgICJwcm9maWxlIjogInBhcmVudC1sb2NhbCIsCiAgICAgICJkZXN0aW5hdGlvbiI6ICIvc3p1bG8vZmVsYWRhdG9rIiwKICAgICAgImVsYXBzZWQiOiAzMDcsCiAgICAgICJvYnNlcnZlZEVsYXBzZWQiOiAzNDEsCiAgICAgICJyZXN1bHQiOiAic3VjY2VzcyIsCiAgICAgICJyZXF1ZXN0cyI6IFsKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvYXBpL3N5bnRoZXRpYy9zZXNzaW9uIiwKICAgICAgICAgICJtZXRob2QiOiAiUE9TVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiA1CiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy9hcHBfZ2xvYmFsc18weWc0d2c4LmNzcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiAyCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDI3CiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy8lNUJ0dXJib3BhY2slNURfYnJvd3Nlcl9kZXZfaG1yLWNsaWVudF9obXItY2xpZW50X3RzXzFkaTc1b3QuXy5qcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiAxCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy9ub2RlX21vZHVsZXNfbmV4dF9kaXN0X2NvbXBpbGVkX25leHQtZGV2dG9vbHNfaW5kZXhfMDkwazJqbS5qcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiA2CiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy9ub2RlX21vZHVsZXNfbmV4dF9kaXN0X2NvbXBpbGVkX3JlYWN0LWRvbV8wOTZfOWEtLl8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogNgogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3Mvbm9kZV9tb2R1bGVzX25leHRfZGlzdF9jb21waWxlZF9yZWFjdC1zZXJ2ZXItZG9tLXR1cmJvcGFja18xNjRrcC02Ll8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogNgogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3Mvbm9kZV9tb2R1bGVzX25leHRfZGlzdF9jb21waWxlZF8xYW1vZmNtLl8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogNgogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3Mvbm9kZV9tb2R1bGVzX25leHRfZGlzdF9jbGllbnRfMF85MHUydC5fLmpzIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDYKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJwYXRoIjogIi9fbmV4dC9zdGF0aWMvY2h1bmtzL25vZGVfbW9kdWxlc19uZXh0X2Rpc3RfMWU4dmNzOC5fLmpzIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDYKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJwYXRoIjogIi9fbmV4dC9zdGF0aWMvY2h1bmtzL25vZGVfbW9kdWxlc18lNDBzd2NfaGVscGVyc19janNfMXI5dmJxdy5fLmpzIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDYKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJwYXRoIjogIi9fbmV4dC9zdGF0aWMvY2h1bmtzL18xYW52aGE0Ll8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogNgogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3MvdHVyYm9wYWNrLV8wOGJtMjg2Ll8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogNgogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3MvXzIxOXVxMXMuXy5qcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiA2CiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy9ub2RlX21vZHVsZXNfbmV4dF9kaXN0XzIwd2Vmel8uXy5qcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiA1CiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy8lNUJ0dXJib3BhY2slNURfYnJvd3Nlcl9kZXZfaG1yLWNsaWVudF9obXItY2xpZW50X3RzXzFtb2pzYXkuXy5qcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiA1CiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy9hcHBfZ2xvYmFsc18weWc0d2c4LmNzcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiAwCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvc3p1bG8vZmVsYWRhdG9rIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDQyCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy8lNUJ0dXJib3BhY2slNURfYnJvd3Nlcl9kZXZfaG1yLWNsaWVudF9obXItY2xpZW50X3RzXzFkaTc1b3QuXy5qcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiA0CiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy9ub2RlX21vZHVsZXNfbmV4dF9kaXN0X2NvbXBpbGVkX25leHQtZGV2dG9vbHNfaW5kZXhfMDkwazJqbS5qcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiA0CiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy9ub2RlX21vZHVsZXNfbmV4dF9kaXN0X2NvbXBpbGVkX3JlYWN0LWRvbV8wOTZfOWEtLl8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogNAogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3Mvbm9kZV9tb2R1bGVzX25leHRfZGlzdF9jb21waWxlZF9yZWFjdC1zZXJ2ZXItZG9tLXR1cmJvcGFja18xNjRrcC02Ll8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogNAogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3Mvbm9kZV9tb2R1bGVzX25leHRfZGlzdF9jb21waWxlZF8xYW1vZmNtLl8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogNAogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3Mvbm9kZV9tb2R1bGVzX25leHRfZGlzdF9jbGllbnRfMF85MHUydC5fLmpzIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDQKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJwYXRoIjogIi9fbmV4dC9zdGF0aWMvY2h1bmtzL25vZGVfbW9kdWxlc19uZXh0X2Rpc3RfMWU4dmNzOC5fLmpzIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDQKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJwYXRoIjogIi9fbmV4dC9zdGF0aWMvY2h1bmtzL25vZGVfbW9kdWxlc18lNDBzd2NfaGVscGVyc19janNfMXI5dmJxdy5fLmpzIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDQKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJwYXRoIjogIi9fbmV4dC9zdGF0aWMvY2h1bmtzL18xYW52aGE0Ll8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogNAogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3MvdHVyYm9wYWNrLV8wOGJtMjg2Ll8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogNAogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3Mvbm9kZV9tb2R1bGVzX25leHRfZGlzdF8yMHdlZnpfLl8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogNAogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3MvXzFfZ3QtZTkuXy5qcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiA0MgogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3Mvbm9kZV9tb2R1bGVzX25leHRfZGlzdF8wMHB3ZTA0Ll8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogNDIKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJwYXRoIjogIi9fbmV4dC9zdGF0aWMvY2h1bmtzLyU1QnR1cmJvcGFjayU1RF9icm93c2VyX2Rldl9obXItY2xpZW50X2htci1jbGllbnRfdHNfMW1vanNheS5fLmpzIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDQKICAgICAgICB9CiAgICAgIF0KICAgIH0KICBdCn0="
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/Users/dev/Development/waldorf-community-task-manager/test-results/login-existing/profile-login-existing-exi-43fdf-eated-switch-within-5000-ms-chrome/test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/Users/dev/Development/waldorf-community-task-manager/test-results/login-existing/profile-login-existing-exi-43fdf-eated-switch-within-5000-ms-chrome/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/Users/dev/Development/waldorf-community-task-manager/tests/browser/support/profile-login-measurement.ts",
+                    "column": 22,
+                    "line": 30
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "13516ba139e1e631d84c-dfcfbf8f0afffb144fc5",
+          "file": "profile-login-existing.spec.ts",
+          "line": 10,
+          "column": 3
+        },
+        {
+          "title": "existing server: staff-local usable main page first/repeated/switch within 5000 ms",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chrome",
+              "projectName": "chrome",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 5875,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveURL\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/\\/munkatars\\/beosztas$/\u001b[39m\nReceived string:  \u001b[31m\"http://127.0.0.1:3000/munkatars/beosztas?csoport=group-oak&kezdet=2026-08-12&veg=2026-08-20\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveURL\" with timeout 5000ms\u001b[22m\n\u001b[2m    14 × locator resolved to <html lang=\"hu\">…</html>\u001b[22m\n\u001b[2m       - unexpected value \"http://127.0.0.1:3000/munkatars/beosztas?csoport=group-oak&kezdet=2026-08-12&veg=2026-08-20\"\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveURL\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/\\/munkatars\\/beosztas$/\u001b[39m\nReceived string:  \u001b[31m\"http://127.0.0.1:3000/munkatars/beosztas?csoport=group-oak&kezdet=2026-08-12&veg=2026-08-20\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveURL\" with timeout 5000ms\u001b[22m\n\u001b[2m    14 × locator resolved to <html lang=\"hu\">…</html>\u001b[22m\n\u001b[2m       - unexpected value \"http://127.0.0.1:3000/munkatars/beosztas?csoport=group-oak&kezdet=2026-08-12&veg=2026-08-20\"\u001b[22m\n\n    at assertProfileMainReady (/Users/dev/Development/waldorf-community-task-manager/tests/browser/support/profile-login-measurement.ts:30:22)\n    at exercisePrimaryControl (/Users/dev/Development/waldorf-community-task-manager/tests/browser/support/profile-login-measurement.ts:152:5)\n    at /Users/dev/Development/waldorf-community-task-manager/tests/browser/profile-login-existing.spec.ts:31:9",
+                    "location": {
+                      "file": "/Users/dev/Development/waldorf-community-task-manager/tests/browser/support/profile-login-measurement.ts",
+                      "column": 22,
+                      "line": 30
+                    },
+                    "snippet": "\u001b[90m   at \u001b[39msupport/profile-login-measurement.ts:30\n\n  28 |     ),\n  29 |   ).toBeVisible();\n> 30 |   await expect(page).toHaveURL(new RegExp(`${profile.homePath.replaceAll(\"/\", \"\\\\/\")}$`));\n     |                      ^\n  31 |   await expect(page.getByTestId(\"app-shell-profile-summary\")).toContainText(profile.label);\n  32 |   for (const item of profile.navigation) {\n  33 |     const link = page.getByTestId(`app-shell-navigation-${item.id}`);"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/Users/dev/Development/waldorf-community-task-manager/tests/browser/support/profile-login-measurement.ts",
+                        "column": 22,
+                        "line": 30
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveURL\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/\\/munkatars\\/beosztas$/\u001b[39m\nReceived string:  \u001b[31m\"http://127.0.0.1:3000/munkatars/beosztas?csoport=group-oak&kezdet=2026-08-12&veg=2026-08-20\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveURL\" with timeout 5000ms\u001b[22m\n\u001b[2m    14 × locator resolved to <html lang=\"hu\">…</html>\u001b[22m\n\u001b[2m       - unexpected value \"http://127.0.0.1:3000/munkatars/beosztas?csoport=group-oak&kezdet=2026-08-12&veg=2026-08-20\"\u001b[22m\n\n\n   at support/profile-login-measurement.ts:30\n\n  28 |     ),\n  29 |   ).toBeVisible();\n> 30 |   await expect(page).toHaveURL(new RegExp(`${profile.homePath.replaceAll(\"/\", \"\\\\/\")}$`));\n     |                      ^\n  31 |   await expect(page.getByTestId(\"app-shell-profile-summary\")).toContainText(profile.label);\n  32 |   for (const item of profile.navigation) {\n  33 |     const link = page.getByTestId(`app-shell-navigation-${item.id}`);\n    at assertProfileMainReady (/Users/dev/Development/waldorf-community-task-manager/tests/browser/support/profile-login-measurement.ts:30:22)\n    at exercisePrimaryControl (/Users/dev/Development/waldorf-community-task-manager/tests/browser/support/profile-login-measurement.ts:152:5)\n    at /Users/dev/Development/waldorf-community-task-manager/tests/browser/profile-login-existing.spec.ts:31:9"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-05T12:07:14.934Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "login-timings",
+                      "contentType": "application/json",
+                      "body": "ewogICJvcmlnaW4iOiAiaHR0cDovLzEyNy4wLjAuMTozMDAwIiwKICAiYnJvd3NlciI6ICIxNTQuMC44MDM3Ljk4IiwKICAibm9kZSI6ICJ2MjQuMjEuMCIsCiAgInByb2ZpbGUiOiAic3RhZmYtbG9jYWwiLAogICJmcm9tIjogImdyb3VwLWFkbWluLWxvY2FsIiwKICAiYnJvd3NlclN0YXRlIjogImZyZXNoIGNvbnRleHQ7IG5hdHVyYWwgY2FjaGUgcmV0YWluZWQ7IGV4aXN0aW5nIHNlcnZlciBub3QgcmVzZXQiLAogICJtZWFzdXJlbWVudHMiOiBbCiAgICB7CiAgICAgICJraW5kIjogImZpcnN0IiwKICAgICAgInByb2ZpbGUiOiAic3RhZmYtbG9jYWwiLAogICAgICAiZGVzdGluYXRpb24iOiAiL211bmthdGFycy9iZW9zenRhcyIsCiAgICAgICJlbGFwc2VkIjogMzIwLjIwMDE5NTMxMjUsCiAgICAgICJvYnNlcnZlZEVsYXBzZWQiOiAzNTIsCiAgICAgICJyZXN1bHQiOiAic3VjY2VzcyIsCiAgICAgICJyZXF1ZXN0cyI6IFsKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvYXBpL3N5bnRoZXRpYy9zZXNzaW9uIiwKICAgICAgICAgICJtZXRob2QiOiAiUE9TVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiA0CiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy9hcHBfZ2xvYmFsc18weWc0d2c4LmNzcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiAyCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDI0CiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy8lNUJ0dXJib3BhY2slNURfYnJvd3Nlcl9kZXZfaG1yLWNsaWVudF9obXItY2xpZW50X3RzXzFkaTc1b3QuXy5qcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiAxCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy9ub2RlX21vZHVsZXNfbmV4dF9kaXN0X2NvbXBpbGVkX25leHQtZGV2dG9vbHNfaW5kZXhfMDkwazJqbS5qcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiAzCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy9ub2RlX21vZHVsZXNfbmV4dF9kaXN0X2NvbXBpbGVkX3JlYWN0LWRvbV8wOTZfOWEtLl8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogMwogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3Mvbm9kZV9tb2R1bGVzX25leHRfZGlzdF9jb21waWxlZF9yZWFjdC1zZXJ2ZXItZG9tLXR1cmJvcGFja18xNjRrcC02Ll8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogMwogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3Mvbm9kZV9tb2R1bGVzX25leHRfZGlzdF9jb21waWxlZF8xYW1vZmNtLl8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogMwogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3Mvbm9kZV9tb2R1bGVzX25leHRfZGlzdF9jbGllbnRfMF85MHUydC5fLmpzIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDMKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJwYXRoIjogIi9fbmV4dC9zdGF0aWMvY2h1bmtzL25vZGVfbW9kdWxlc19uZXh0X2Rpc3RfMWU4dmNzOC5fLmpzIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDMKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJwYXRoIjogIi9fbmV4dC9zdGF0aWMvY2h1bmtzL25vZGVfbW9kdWxlc18lNDBzd2NfaGVscGVyc19janNfMXI5dmJxdy5fLmpzIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDMKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJwYXRoIjogIi9fbmV4dC9zdGF0aWMvY2h1bmtzL18xYW52aGE0Ll8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogMwogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3MvdHVyYm9wYWNrLV8wOGJtMjg2Ll8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogMwogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3MvXzIxOXVxMXMuXy5qcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiAzCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy9ub2RlX21vZHVsZXNfbmV4dF9kaXN0XzIwd2Vmel8uXy5qcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiAzCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy8lNUJ0dXJib3BhY2slNURfYnJvd3Nlcl9kZXZfaG1yLWNsaWVudF9obXItY2xpZW50X3RzXzFtb2pzYXkuXy5qcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiAxMQogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3MvYXBwX2dsb2JhbHNfMHlnNHdnOC5jc3MiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogNgogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL211bmthdGFycy9iZW9zenRhcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiA1MwogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3Mvbm9kZV9tb2R1bGVzX25leHRfZGlzdF9jb21waWxlZF9uZXh0LWRldnRvb2xzX2luZGV4XzA5MGsyam0uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogOAogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3Mvbm9kZV9tb2R1bGVzX25leHRfZGlzdF9jb21waWxlZF9yZWFjdC1kb21fMDk2XzlhLS5fLmpzIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDgKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJwYXRoIjogIi9fbmV4dC9zdGF0aWMvY2h1bmtzL25vZGVfbW9kdWxlc19uZXh0X2Rpc3RfY29tcGlsZWRfcmVhY3Qtc2VydmVyLWRvbS10dXJib3BhY2tfMTY0a3AtNi5fLmpzIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDgKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJwYXRoIjogIi9fbmV4dC9zdGF0aWMvY2h1bmtzL25vZGVfbW9kdWxlc19uZXh0X2Rpc3RfY29tcGlsZWRfMWFtb2ZjbS5fLmpzIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDEwCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy8lNUJ0dXJib3BhY2slNURfYnJvd3Nlcl9kZXZfaG1yLWNsaWVudF9obXItY2xpZW50X3RzXzFkaTc1b3QuXy5qcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiAxMQogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3Mvbm9kZV9tb2R1bGVzX25leHRfZGlzdF9jbGllbnRfMF85MHUydC5fLmpzIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDExCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy9ub2RlX21vZHVsZXNfbmV4dF9kaXN0XzFlOHZjczguXy5qcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiAxMQogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3MvXzFhbnZoYTQuXy5qcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiAxMQogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3Mvbm9kZV9tb2R1bGVzXyU0MHN3Y19oZWxwZXJzX2Nqc18xcjl2YnF3Ll8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogMTEKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJwYXRoIjogIi9fbmV4dC9zdGF0aWMvY2h1bmtzL3R1cmJvcGFjay1fMDhibTI4Ni5fLmpzIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDExCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy9ub2RlX21vZHVsZXNfbmV4dF9kaXN0XzIwd2Vmel8uXy5qcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiAxMQogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3MvXzA3MWhyX3YuXy5qcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiAxMQogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3Mvbm9kZV9tb2R1bGVzX25leHRfZGlzdF8wMHB3ZTA0Ll8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogMTQKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJwYXRoIjogIi9fbmV4dC9zdGF0aWMvY2h1bmtzL18xajBqeDUzLl8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogMTQKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJwYXRoIjogIi9fbmV4dC9zdGF0aWMvY2h1bmtzL18xb251bWstLl8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogMTQKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJwYXRoIjogIi9fbmV4dC9zdGF0aWMvY2h1bmtzLyU1QnR1cmJvcGFjayU1RF9icm93c2VyX2Rldl9obXItY2xpZW50X2htci1jbGllbnRfdHNfMW1vanNheS5fLmpzIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDEKICAgICAgICB9CiAgICAgIF0KICAgIH0KICBdCn0="
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/Users/dev/Development/waldorf-community-task-manager/test-results/login-existing/profile-login-existing-exi-e7b38-eated-switch-within-5000-ms-chrome/test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/Users/dev/Development/waldorf-community-task-manager/test-results/login-existing/profile-login-existing-exi-e7b38-eated-switch-within-5000-ms-chrome/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/Users/dev/Development/waldorf-community-task-manager/tests/browser/support/profile-login-measurement.ts",
+                    "column": 22,
+                    "line": 30
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "13516ba139e1e631d84c-cdd107418a1d614ff21f",
+          "file": "profile-login-existing.spec.ts",
+          "line": 10,
+          "column": 3
+        },
+        {
+          "title": "existing server: group-admin-local usable main page first/repeated/switch within 5000 ms",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chrome",
+              "projectName": "chrome",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 5938,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('heading', { name: 'Feladatok', exact: true })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('heading', { name: 'Feladatok', exact: true })\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('heading', { name: 'Feladatok', exact: true })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('heading', { name: 'Feladatok', exact: true })\u001b[22m\n\n    at exercisePrimaryControl (/Users/dev/Development/waldorf-community-task-manager/tests/browser/support/profile-login-measurement.ts:156:81)\n    at /Users/dev/Development/waldorf-community-task-manager/tests/browser/profile-login-existing.spec.ts:31:9",
+                    "location": {
+                      "file": "/Users/dev/Development/waldorf-community-task-manager/tests/browser/support/profile-login-measurement.ts",
+                      "column": 81,
+                      "line": 156
+                    },
+                    "snippet": "\u001b[90m   at \u001b[39msupport/profile-login-measurement.ts:156\n\n  154 |     await page.getByTestId(\"app-shell-navigation-admin-tasks\").click();\n  155 |     await expect(page).toHaveURL(/\\/admin\\/feladatok$/);\n> 156 |     await expect(page.getByRole(\"heading\", { name: \"Feladatok és események\", exact: true })).toBeVisible();\n      |                                                                                 ^\n  157 |   }\n  158 | }\n  159 |"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/Users/dev/Development/waldorf-community-task-manager/tests/browser/support/profile-login-measurement.ts",
+                        "column": 81,
+                        "line": 156
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('heading', { name: 'Feladatok', exact: true })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('heading', { name: 'Feladatok', exact: true })\u001b[22m\n\n\n   at support/profile-login-measurement.ts:156\n\n  154 |     await page.getByTestId(\"app-shell-navigation-admin-tasks\").click();\n  155 |     await expect(page).toHaveURL(/\\/admin\\/feladatok$/);\n> 156 |     await expect(page.getByRole(\"heading\", { name: \"Feladatok és események\", exact: true })).toBeVisible();\n      |                                                                                 ^\n  157 |   }\n  158 | }\n  159 |\n    at exercisePrimaryControl (/Users/dev/Development/waldorf-community-task-manager/tests/browser/support/profile-login-measurement.ts:156:81)\n    at /Users/dev/Development/waldorf-community-task-manager/tests/browser/profile-login-existing.spec.ts:31:9"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-05T12:07:21.387Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "login-timings",
+                      "contentType": "application/json",
+                      "body": "ewogICJvcmlnaW4iOiAiaHR0cDovLzEyNy4wLjAuMTozMDAwIiwKICAiYnJvd3NlciI6ICIxNTQuMC44MDM3Ljk4IiwKICAibm9kZSI6ICJ2MjQuMjEuMCIsCiAgInByb2ZpbGUiOiAiZ3JvdXAtYWRtaW4tbG9jYWwiLAogICJmcm9tIjogImtpbmRlcmdhcnRlbi1hZG1pbi1sb2NhbCIsCiAgImJyb3dzZXJTdGF0ZSI6ICJmcmVzaCBjb250ZXh0OyBuYXR1cmFsIGNhY2hlIHJldGFpbmVkOyBleGlzdGluZyBzZXJ2ZXIgbm90IHJlc2V0IiwKICAibWVhc3VyZW1lbnRzIjogWwogICAgewogICAgICAia2luZCI6ICJmaXJzdCIsCiAgICAgICJwcm9maWxlIjogImdyb3VwLWFkbWluLWxvY2FsIiwKICAgICAgImRlc3RpbmF0aW9uIjogIi9hZG1pbiIsCiAgICAgICJlbGFwc2VkIjogMzE3LjE5OTk1MTE3MTg3NSwKICAgICAgIm9ic2VydmVkRWxhcHNlZCI6IDM2MCwKICAgICAgInJlc3VsdCI6ICJzdWNjZXNzIiwKICAgICAgInJlcXVlc3RzIjogWwogICAgICAgIHsKICAgICAgICAgICJwYXRoIjogIi9hcGkvc3ludGhldGljL3Nlc3Npb24iLAogICAgICAgICAgIm1ldGhvZCI6ICJQT1NUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDUKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJwYXRoIjogIi9fbmV4dC9zdGF0aWMvY2h1bmtzL2FwcF9nbG9iYWxzXzB5ZzR3ZzguY3NzIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDEKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJwYXRoIjogIi8iLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogMzIKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJwYXRoIjogIi9fbmV4dC9zdGF0aWMvY2h1bmtzLyU1QnR1cmJvcGFjayU1RF9icm93c2VyX2Rldl9obXItY2xpZW50X2htci1jbGllbnRfdHNfMWRpNzVvdC5fLmpzIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDEKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJwYXRoIjogIi9fbmV4dC9zdGF0aWMvY2h1bmtzL25vZGVfbW9kdWxlc19uZXh0X2Rpc3RfY29tcGlsZWRfbmV4dC1kZXZ0b29sc19pbmRleF8wOTBrMmptLmpzIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDMKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJwYXRoIjogIi9fbmV4dC9zdGF0aWMvY2h1bmtzL25vZGVfbW9kdWxlc19uZXh0X2Rpc3RfY29tcGlsZWRfcmVhY3QtZG9tXzA5Nl85YS0uXy5qcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiA2CiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy9ub2RlX21vZHVsZXNfbmV4dF9kaXN0X2NvbXBpbGVkX3JlYWN0LXNlcnZlci1kb20tdHVyYm9wYWNrXzE2NGtwLTYuXy5qcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiA2CiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy9ub2RlX21vZHVsZXNfbmV4dF9kaXN0X2NvbXBpbGVkXzFhbW9mY20uXy5qcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiAxMQogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3Mvbm9kZV9tb2R1bGVzX25leHRfZGlzdF9jbGllbnRfMF85MHUydC5fLmpzIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDExCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy9ub2RlX21vZHVsZXNfbmV4dF9kaXN0XzFlOHZjczguXy5qcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiAxMQogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3Mvbm9kZV9tb2R1bGVzXyU0MHN3Y19oZWxwZXJzX2Nqc18xcjl2YnF3Ll8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogMTEKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJwYXRoIjogIi9fbmV4dC9zdGF0aWMvY2h1bmtzL18xYW52aGE0Ll8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogMTEKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJwYXRoIjogIi9fbmV4dC9zdGF0aWMvY2h1bmtzL3R1cmJvcGFjay1fMDhibTI4Ni5fLmpzIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDExCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy9fMjE5dXExcy5fLmpzIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDExCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy9ub2RlX21vZHVsZXNfbmV4dF9kaXN0XzIwd2Vmel8uXy5qcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiAxMQogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3MvJTVCdHVyYm9wYWNrJTVEX2Jyb3dzZXJfZGV2X2htci1jbGllbnRfaG1yLWNsaWVudF90c18xbW9qc2F5Ll8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogMQogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3MvYXBwX2dsb2JhbHNfMHlnNHdnOC5jc3MiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogMAogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL2FkbWluIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDQwCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy8lNUJ0dXJib3BhY2slNURfYnJvd3Nlcl9kZXZfaG1yLWNsaWVudF9obXItY2xpZW50X3RzXzFkaTc1b3QuXy5qcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiAxCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy9ub2RlX21vZHVsZXNfbmV4dF9kaXN0X2NvbXBpbGVkX25leHQtZGV2dG9vbHNfaW5kZXhfMDkwazJqbS5qcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiAyCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy9ub2RlX21vZHVsZXNfbmV4dF9kaXN0X2NvbXBpbGVkX3JlYWN0LWRvbV8wOTZfOWEtLl8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogMwogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3Mvbm9kZV9tb2R1bGVzX25leHRfZGlzdF9jb21waWxlZF9yZWFjdC1zZXJ2ZXItZG9tLXR1cmJvcGFja18xNjRrcC02Ll8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogMwogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3Mvbm9kZV9tb2R1bGVzX25leHRfZGlzdF9jb21waWxlZF8xYW1vZmNtLl8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogMwogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3Mvbm9kZV9tb2R1bGVzX25leHRfZGlzdF9jbGllbnRfMF85MHUydC5fLmpzIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDMKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJwYXRoIjogIi9fbmV4dC9zdGF0aWMvY2h1bmtzL25vZGVfbW9kdWxlc19uZXh0X2Rpc3RfMWU4dmNzOC5fLmpzIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDMKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJwYXRoIjogIi9fbmV4dC9zdGF0aWMvY2h1bmtzL18xYW52aGE0Ll8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogMwogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3Mvbm9kZV9tb2R1bGVzXyU0MHN3Y19oZWxwZXJzX2Nqc18xcjl2YnF3Ll8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogMwogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3MvdHVyYm9wYWNrLV8wOGJtMjg2Ll8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogMwogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3Mvbm9kZV9tb2R1bGVzX25leHRfZGlzdF8yMHdlZnpfLl8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogNAogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3MvXzFmYXZfaC0uXy5qcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiA0CiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy9fMTh4Mng2di5fLmpzIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDQKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJwYXRoIjogIi9fbmV4dC9zdGF0aWMvY2h1bmtzL25vZGVfbW9kdWxlc19uZXh0X2Rpc3RfMDBwd2UwNC5fLmpzIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDQxCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy8lNUJ0dXJib3BhY2slNURfYnJvd3Nlcl9kZXZfaG1yLWNsaWVudF9obXItY2xpZW50X3RzXzFtb2pzYXkuXy5qcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiA0CiAgICAgICAgfQogICAgICBdCiAgICB9CiAgXQp9"
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/Users/dev/Development/waldorf-community-task-manager/test-results/login-existing/profile-login-existing-exi-ff94c-eated-switch-within-5000-ms-chrome/test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/Users/dev/Development/waldorf-community-task-manager/test-results/login-existing/profile-login-existing-exi-ff94c-eated-switch-within-5000-ms-chrome/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/Users/dev/Development/waldorf-community-task-manager/tests/browser/support/profile-login-measurement.ts",
+                    "column": 81,
+                    "line": 156
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "13516ba139e1e631d84c-7802d40fc7e7fc262867",
+          "file": "profile-login-existing.spec.ts",
+          "line": 10,
+          "column": 3
+        },
+        {
+          "title": "existing server: kindergarten-admin-local usable main page first/repeated/switch within 5000 ms",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chrome",
+              "projectName": "chrome",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 5835,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('heading', { name: 'Feladatok', exact: true })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('heading', { name: 'Feladatok', exact: true })\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('heading', { name: 'Feladatok', exact: true })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('heading', { name: 'Feladatok', exact: true })\u001b[22m\n\n    at exercisePrimaryControl (/Users/dev/Development/waldorf-community-task-manager/tests/browser/support/profile-login-measurement.ts:156:81)\n    at /Users/dev/Development/waldorf-community-task-manager/tests/browser/profile-login-existing.spec.ts:31:9",
+                    "location": {
+                      "file": "/Users/dev/Development/waldorf-community-task-manager/tests/browser/support/profile-login-measurement.ts",
+                      "column": 81,
+                      "line": 156
+                    },
+                    "snippet": "\u001b[90m   at \u001b[39msupport/profile-login-measurement.ts:156\n\n  154 |     await page.getByTestId(\"app-shell-navigation-admin-tasks\").click();\n  155 |     await expect(page).toHaveURL(/\\/admin\\/feladatok$/);\n> 156 |     await expect(page.getByRole(\"heading\", { name: \"Feladatok és események\", exact: true })).toBeVisible();\n      |                                                                                 ^\n  157 |   }\n  158 | }\n  159 |"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/Users/dev/Development/waldorf-community-task-manager/tests/browser/support/profile-login-measurement.ts",
+                        "column": 81,
+                        "line": 156
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('heading', { name: 'Feladatok', exact: true })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('heading', { name: 'Feladatok', exact: true })\u001b[22m\n\n\n   at support/profile-login-measurement.ts:156\n\n  154 |     await page.getByTestId(\"app-shell-navigation-admin-tasks\").click();\n  155 |     await expect(page).toHaveURL(/\\/admin\\/feladatok$/);\n> 156 |     await expect(page.getByRole(\"heading\", { name: \"Feladatok és események\", exact: true })).toBeVisible();\n      |                                                                                 ^\n  157 |   }\n  158 | }\n  159 |\n    at exercisePrimaryControl (/Users/dev/Development/waldorf-community-task-manager/tests/browser/support/profile-login-measurement.ts:156:81)\n    at /Users/dev/Development/waldorf-community-task-manager/tests/browser/profile-login-existing.spec.ts:31:9"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-05T12:07:27.880Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "login-timings",
+                      "contentType": "application/json",
+                      "body": "ewogICJvcmlnaW4iOiAiaHR0cDovLzEyNy4wLjAuMTozMDAwIiwKICAiYnJvd3NlciI6ICIxNTQuMC44MDM3Ljk4IiwKICAibm9kZSI6ICJ2MjQuMjEuMCIsCiAgInByb2ZpbGUiOiAia2luZGVyZ2FydGVuLWFkbWluLWxvY2FsIiwKICAiZnJvbSI6ICJzdXBlci1hZG1pbi1sb2NhbCIsCiAgImJyb3dzZXJTdGF0ZSI6ICJmcmVzaCBjb250ZXh0OyBuYXR1cmFsIGNhY2hlIHJldGFpbmVkOyBleGlzdGluZyBzZXJ2ZXIgbm90IHJlc2V0IiwKICAibWVhc3VyZW1lbnRzIjogWwogICAgewogICAgICAia2luZCI6ICJmaXJzdCIsCiAgICAgICJwcm9maWxlIjogImtpbmRlcmdhcnRlbi1hZG1pbi1sb2NhbCIsCiAgICAgICJkZXN0aW5hdGlvbiI6ICIvYWRtaW4iLAogICAgICAiZWxhcHNlZCI6IDMzMS44MDAwNDg4MjgxMjUsCiAgICAgICJvYnNlcnZlZEVsYXBzZWQiOiAzNjAsCiAgICAgICJyZXN1bHQiOiAic3VjY2VzcyIsCiAgICAgICJyZXF1ZXN0cyI6IFsKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvYXBpL3N5bnRoZXRpYy9zZXNzaW9uIiwKICAgICAgICAgICJtZXRob2QiOiAiUE9TVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiA0CiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy9hcHBfZ2xvYmFsc18weWc0d2c4LmNzcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiAyCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDI1CiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy8lNUJ0dXJib3BhY2slNURfYnJvd3Nlcl9kZXZfaG1yLWNsaWVudF9obXItY2xpZW50X3RzXzFkaTc1b3QuXy5qcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiAxCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy9ub2RlX21vZHVsZXNfbmV4dF9kaXN0X2NvbXBpbGVkX25leHQtZGV2dG9vbHNfaW5kZXhfMDkwazJqbS5qcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiAzCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy9ub2RlX21vZHVsZXNfbmV4dF9kaXN0X2NvbXBpbGVkX3JlYWN0LWRvbV8wOTZfOWEtLl8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogMwogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3Mvbm9kZV9tb2R1bGVzX25leHRfZGlzdF9jb21waWxlZF9yZWFjdC1zZXJ2ZXItZG9tLXR1cmJvcGFja18xNjRrcC02Ll8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogMwogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3Mvbm9kZV9tb2R1bGVzX25leHRfZGlzdF9jb21waWxlZF8xYW1vZmNtLl8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogMwogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3Mvbm9kZV9tb2R1bGVzX25leHRfZGlzdF9jbGllbnRfMF85MHUydC5fLmpzIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDQKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJwYXRoIjogIi9fbmV4dC9zdGF0aWMvY2h1bmtzL25vZGVfbW9kdWxlc19uZXh0X2Rpc3RfMWU4dmNzOC5fLmpzIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDQKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJwYXRoIjogIi9fbmV4dC9zdGF0aWMvY2h1bmtzL25vZGVfbW9kdWxlc18lNDBzd2NfaGVscGVyc19janNfMXI5dmJxdy5fLmpzIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDQKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJwYXRoIjogIi9fbmV4dC9zdGF0aWMvY2h1bmtzL18xYW52aGE0Ll8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogOQogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3MvdHVyYm9wYWNrLV8wOGJtMjg2Ll8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogOQogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3MvXzIxOXVxMXMuXy5qcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiA5CiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy9ub2RlX21vZHVsZXNfbmV4dF9kaXN0XzIwd2Vmel8uXy5qcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiA5CiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy8lNUJ0dXJib3BhY2slNURfYnJvd3Nlcl9kZXZfaG1yLWNsaWVudF9obXItY2xpZW50X3RzXzFtb2pzYXkuXy5qcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiA3CiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy9hcHBfZ2xvYmFsc18weWc0d2c4LmNzcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiAxCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvYWRtaW4iLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogNTEKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJwYXRoIjogIi9fbmV4dC9zdGF0aWMvY2h1bmtzLyU1QnR1cmJvcGFjayU1RF9icm93c2VyX2Rldl9obXItY2xpZW50X2htci1jbGllbnRfdHNfMWRpNzVvdC5fLmpzIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDMKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJwYXRoIjogIi9fbmV4dC9zdGF0aWMvY2h1bmtzL25vZGVfbW9kdWxlc19uZXh0X2Rpc3RfY29tcGlsZWRfbmV4dC1kZXZ0b29sc19pbmRleF8wOTBrMmptLmpzIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDQKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJwYXRoIjogIi9fbmV4dC9zdGF0aWMvY2h1bmtzL25vZGVfbW9kdWxlc19uZXh0X2Rpc3RfY29tcGlsZWRfcmVhY3QtZG9tXzA5Nl85YS0uXy5qcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiA0CiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy9ub2RlX21vZHVsZXNfbmV4dF9kaXN0X2NvbXBpbGVkX3JlYWN0LXNlcnZlci1kb20tdHVyYm9wYWNrXzE2NGtwLTYuXy5qcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiA0CiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy9ub2RlX21vZHVsZXNfbmV4dF9kaXN0X2NvbXBpbGVkXzFhbW9mY20uXy5qcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiA0CiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy9ub2RlX21vZHVsZXNfbmV4dF9kaXN0X2NsaWVudF8wXzkwdTJ0Ll8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogNAogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3Mvbm9kZV9tb2R1bGVzX25leHRfZGlzdF8xZTh2Y3M4Ll8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogNAogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3Mvbm9kZV9tb2R1bGVzXyU0MHN3Y19oZWxwZXJzX2Nqc18xcjl2YnF3Ll8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogMwogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3MvXzFhbnZoYTQuXy5qcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiAzCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy90dXJib3BhY2stXzA4Ym0yODYuXy5qcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiAzCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy9ub2RlX21vZHVsZXNfbmV4dF9kaXN0XzIwd2Vmel8uXy5qcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiAzCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy9fMWZhdl9oLS5fLmpzIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDMKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJwYXRoIjogIi9fbmV4dC9zdGF0aWMvY2h1bmtzL18xOHgyeDZ2Ll8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogMwogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3Mvbm9kZV9tb2R1bGVzX25leHRfZGlzdF8wMHB3ZTA0Ll8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogMwogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3MvJTVCdHVyYm9wYWNrJTVEX2Jyb3dzZXJfZGV2X2htci1jbGllbnRfaG1yLWNsaWVudF90c18xbW9qc2F5Ll8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogNQogICAgICAgIH0KICAgICAgXQogICAgfQogIF0KfQ=="
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/Users/dev/Development/waldorf-community-task-manager/test-results/login-existing/profile-login-existing-exi-989f8-eated-switch-within-5000-ms-chrome/test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/Users/dev/Development/waldorf-community-task-manager/test-results/login-existing/profile-login-existing-exi-989f8-eated-switch-within-5000-ms-chrome/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/Users/dev/Development/waldorf-community-task-manager/tests/browser/support/profile-login-measurement.ts",
+                    "column": 81,
+                    "line": 156
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "13516ba139e1e631d84c-6bc736b8eb7ca64ebf28",
+          "file": "profile-login-existing.spec.ts",
+          "line": 10,
+          "column": 3
+        },
+        {
+          "title": "existing server: super-admin-local usable main page first/repeated/switch within 5000 ms",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chrome",
+              "projectName": "chrome",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 5909,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('heading', { name: 'Feladatok', exact: true })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('heading', { name: 'Feladatok', exact: true })\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('heading', { name: 'Feladatok', exact: true })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('heading', { name: 'Feladatok', exact: true })\u001b[22m\n\n    at exercisePrimaryControl (/Users/dev/Development/waldorf-community-task-manager/tests/browser/support/profile-login-measurement.ts:156:81)\n    at /Users/dev/Development/waldorf-community-task-manager/tests/browser/profile-login-existing.spec.ts:31:9",
+                    "location": {
+                      "file": "/Users/dev/Development/waldorf-community-task-manager/tests/browser/support/profile-login-measurement.ts",
+                      "column": 81,
+                      "line": 156
+                    },
+                    "snippet": "\u001b[90m   at \u001b[39msupport/profile-login-measurement.ts:156\n\n  154 |     await page.getByTestId(\"app-shell-navigation-admin-tasks\").click();\n  155 |     await expect(page).toHaveURL(/\\/admin\\/feladatok$/);\n> 156 |     await expect(page.getByRole(\"heading\", { name: \"Feladatok és események\", exact: true })).toBeVisible();\n      |                                                                                 ^\n  157 |   }\n  158 | }\n  159 |"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/Users/dev/Development/waldorf-community-task-manager/tests/browser/support/profile-login-measurement.ts",
+                        "column": 81,
+                        "line": 156
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('heading', { name: 'Feladatok', exact: true })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('heading', { name: 'Feladatok', exact: true })\u001b[22m\n\n\n   at support/profile-login-measurement.ts:156\n\n  154 |     await page.getByTestId(\"app-shell-navigation-admin-tasks\").click();\n  155 |     await expect(page).toHaveURL(/\\/admin\\/feladatok$/);\n> 156 |     await expect(page.getByRole(\"heading\", { name: \"Feladatok és események\", exact: true })).toBeVisible();\n      |                                                                                 ^\n  157 |   }\n  158 | }\n  159 |\n    at exercisePrimaryControl (/Users/dev/Development/waldorf-community-task-manager/tests/browser/support/profile-login-measurement.ts:156:81)\n    at /Users/dev/Development/waldorf-community-task-manager/tests/browser/profile-login-existing.spec.ts:31:9"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-05T12:07:34.336Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "login-timings",
+                      "contentType": "application/json",
+                      "body": "ewogICJvcmlnaW4iOiAiaHR0cDovLzEyNy4wLjAuMTozMDAwIiwKICAiYnJvd3NlciI6ICIxNTQuMC44MDM3Ljk4IiwKICAibm9kZSI6ICJ2MjQuMjEuMCIsCiAgInByb2ZpbGUiOiAic3VwZXItYWRtaW4tbG9jYWwiLAogICJmcm9tIjogInBhcmVudC1sb2NhbCIsCiAgImJyb3dzZXJTdGF0ZSI6ICJmcmVzaCBjb250ZXh0OyBuYXR1cmFsIGNhY2hlIHJldGFpbmVkOyBleGlzdGluZyBzZXJ2ZXIgbm90IHJlc2V0IiwKICAibWVhc3VyZW1lbnRzIjogWwogICAgewogICAgICAia2luZCI6ICJmaXJzdCIsCiAgICAgICJwcm9maWxlIjogInN1cGVyLWFkbWluLWxvY2FsIiwKICAgICAgImRlc3RpbmF0aW9uIjogIi9hZG1pbiIsCiAgICAgICJlbGFwc2VkIjogMzYzLjUsCiAgICAgICJvYnNlcnZlZEVsYXBzZWQiOiAzOTksCiAgICAgICJyZXN1bHQiOiAic3VjY2VzcyIsCiAgICAgICJyZXF1ZXN0cyI6IFsKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvYXBpL3N5bnRoZXRpYy9zZXNzaW9uIiwKICAgICAgICAgICJtZXRob2QiOiAiUE9TVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiA1CiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy9hcHBfZ2xvYmFsc18weWc0d2c4LmNzcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiAyCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDM3CiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy8lNUJ0dXJib3BhY2slNURfYnJvd3Nlcl9kZXZfaG1yLWNsaWVudF9obXItY2xpZW50X3RzXzFkaTc1b3QuXy5qcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiAyCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy9ub2RlX21vZHVsZXNfbmV4dF9kaXN0X2NvbXBpbGVkX25leHQtZGV2dG9vbHNfaW5kZXhfMDkwazJqbS5qcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiA0CiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy9ub2RlX21vZHVsZXNfbmV4dF9kaXN0X2NvbXBpbGVkX3JlYWN0LWRvbV8wOTZfOWEtLl8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogNAogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3Mvbm9kZV9tb2R1bGVzX25leHRfZGlzdF9jb21waWxlZF9yZWFjdC1zZXJ2ZXItZG9tLXR1cmJvcGFja18xNjRrcC02Ll8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogMwogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3Mvbm9kZV9tb2R1bGVzX25leHRfZGlzdF9jb21waWxlZF8xYW1vZmNtLl8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogNAogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3Mvbm9kZV9tb2R1bGVzX25leHRfZGlzdF9jbGllbnRfMF85MHUydC5fLmpzIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDQKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJwYXRoIjogIi9fbmV4dC9zdGF0aWMvY2h1bmtzL25vZGVfbW9kdWxlc19uZXh0X2Rpc3RfMWU4dmNzOC5fLmpzIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDQKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJwYXRoIjogIi9fbmV4dC9zdGF0aWMvY2h1bmtzL25vZGVfbW9kdWxlc18lNDBzd2NfaGVscGVyc19janNfMXI5dmJxdy5fLmpzIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDkKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJwYXRoIjogIi9fbmV4dC9zdGF0aWMvY2h1bmtzL18xYW52aGE0Ll8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogMTAKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJwYXRoIjogIi9fbmV4dC9zdGF0aWMvY2h1bmtzL3R1cmJvcGFjay1fMDhibTI4Ni5fLmpzIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDEwCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy9fMjE5dXExcy5fLmpzIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDEwCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy9ub2RlX21vZHVsZXNfbmV4dF9kaXN0XzIwd2Vmel8uXy5qcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiAxMAogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3MvJTVCdHVyYm9wYWNrJTVEX2Jyb3dzZXJfZGV2X2htci1jbGllbnRfaG1yLWNsaWVudF90c18xbW9qc2F5Ll8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogMgogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3MvYXBwX2dsb2JhbHNfMHlnNHdnOC5jc3MiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogMQogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL2FkbWluIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDMzCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy8lNUJ0dXJib3BhY2slNURfYnJvd3Nlcl9kZXZfaG1yLWNsaWVudF9obXItY2xpZW50X3RzXzFkaTc1b3QuXy5qcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiAxCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy9ub2RlX21vZHVsZXNfbmV4dF9kaXN0X2NvbXBpbGVkX25leHQtZGV2dG9vbHNfaW5kZXhfMDkwazJqbS5qcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiAyCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy9ub2RlX21vZHVsZXNfbmV4dF9kaXN0X2NvbXBpbGVkX3JlYWN0LWRvbV8wOTZfOWEtLl8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogMgogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3Mvbm9kZV9tb2R1bGVzX25leHRfZGlzdF9jb21waWxlZF9yZWFjdC1zZXJ2ZXItZG9tLXR1cmJvcGFja18xNjRrcC02Ll8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogMgogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3Mvbm9kZV9tb2R1bGVzX25leHRfZGlzdF9jb21waWxlZF8xYW1vZmNtLl8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogMwogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3Mvbm9kZV9tb2R1bGVzX25leHRfZGlzdF9jbGllbnRfMF85MHUydC5fLmpzIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDMKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJwYXRoIjogIi9fbmV4dC9zdGF0aWMvY2h1bmtzL25vZGVfbW9kdWxlc19uZXh0X2Rpc3RfMWU4dmNzOC5fLmpzIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDMKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJwYXRoIjogIi9fbmV4dC9zdGF0aWMvY2h1bmtzL25vZGVfbW9kdWxlc18lNDBzd2NfaGVscGVyc19janNfMXI5dmJxdy5fLmpzIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDMKICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJwYXRoIjogIi9fbmV4dC9zdGF0aWMvY2h1bmtzL18xYW52aGE0Ll8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogMwogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3MvdHVyYm9wYWNrLV8wOGJtMjg2Ll8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogMwogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3MvXzFmYXZfaC0uXy5qcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiAzCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy9ub2RlX21vZHVsZXNfbmV4dF9kaXN0XzIwd2Vmel8uXy5qcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiAzCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy9fMTh4Mng2di5fLmpzIiwKICAgICAgICAgICJtZXRob2QiOiAiR0VUIiwKICAgICAgICAgICJkdXJhdGlvbiI6IDQwCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAicGF0aCI6ICIvX25leHQvc3RhdGljL2NodW5rcy9ub2RlX21vZHVsZXNfbmV4dF9kaXN0XzAwcHdlMDQuXy5qcyIsCiAgICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgICAiZHVyYXRpb24iOiA0MAogICAgICAgIH0sCiAgICAgICAgewogICAgICAgICAgInBhdGgiOiAiL19uZXh0L3N0YXRpYy9jaHVua3MvJTVCdHVyYm9wYWNrJTVEX2Jyb3dzZXJfZGV2X2htci1jbGllbnRfaG1yLWNsaWVudF90c18xbW9qc2F5Ll8uanMiLAogICAgICAgICAgIm1ldGhvZCI6ICJHRVQiLAogICAgICAgICAgImR1cmF0aW9uIjogNQogICAgICAgIH0KICAgICAgXQogICAgfQogIF0KfQ=="
+                    },
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/Users/dev/Development/waldorf-community-task-manager/test-results/login-existing/profile-login-existing-exi-bdb12-eated-switch-within-5000-ms-chrome/test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/Users/dev/Development/waldorf-community-task-manager/test-results/login-existing/profile-login-existing-exi-bdb12-eated-switch-within-5000-ms-chrome/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/Users/dev/Development/waldorf-community-task-manager/tests/browser/support/profile-login-measurement.ts",
+                    "column": 81,
+                    "line": 156
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "13516ba139e1e631d84c-137baf08bd39f54a5f2d",
+          "file": "profile-login-existing.spec.ts",
+          "line": 10,
+          "column": 3
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-05T12:07:07.921Z",
+    "duration": 32681.588000000003,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 5,
+    "flaky": 0
+  }
+}

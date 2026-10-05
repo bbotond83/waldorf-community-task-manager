@@ -1,0 +1,4 @@
+gitSha=85dab6b5c7762265357146a54e1612479e8c4302
+node=v24.21.0
+npm=11.19.0
+commands=toolchain,manifests,format,lint,typecheck,tests,coverage,security,build,smoke,browser

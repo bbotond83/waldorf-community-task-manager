@@ -1,0 +1,12 @@
+
+Running 5 tests using 1 worker
+
+  ✓  1 [chrome] › tests/browser/profile-login-existing.spec.ts:15:3 › existing server: parent-local usable main page first/repeated/switch within 5000 ms (6.1s)
+  ✓  2 [chrome] › tests/browser/profile-login-existing.spec.ts:15:3 › existing server: staff-local usable main page first/repeated/switch within 5000 ms (6.0s)
+  ✓  3 [chrome] › tests/browser/profile-login-existing.spec.ts:15:3 › existing server: group-admin-local usable main page first/repeated/switch within 5000 ms (5.5s)
+  ✓  4 [chrome] › tests/browser/profile-login-existing.spec.ts:15:3 › existing server: kindergarten-admin-local usable main page first/repeated/switch within 5000 ms (5.3s)
+  ✓  5 [chrome] › tests/browser/profile-login-existing.spec.ts:15:3 › existing server: super-admin-local usable main page first/repeated/switch within 5000 ms (5.3s)
+
+  5 passed (29.0s)
+(node:19327) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)

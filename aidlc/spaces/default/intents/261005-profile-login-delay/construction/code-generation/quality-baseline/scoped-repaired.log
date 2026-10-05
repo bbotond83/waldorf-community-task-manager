@@ -1,0 +1,12 @@
+
+ RUN  v4.1.11 /private/tmp/waldorf-quality-baseline-261005
+
+ ✓ |delivery| tests/unit/runtime-boundaries.test.ts (23 tests) 60ms
+ ✓ |delivery| tests/integration/runtime-shell.test.tsx (4 tests) 95ms
+ ✓ |delivery| tests/integration/synthetic-route.test.ts (11 tests) 14ms
+
+ Test Files  3 passed (3)
+      Tests  38 passed (38)
+   Start at  13:51:27
+   Duration  7.67s (transform 230ms, setup 3.50s, import 429ms, tests 169ms, environment 17.94s)
+

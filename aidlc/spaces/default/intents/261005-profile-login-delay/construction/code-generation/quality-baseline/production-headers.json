@@ -1,0 +1,181 @@
+{
+  "origin": "http://127.0.0.1:4220",
+  "rows": [
+    {
+      "profile": null,
+      "path": "/",
+      "status": 200,
+      "headers": {
+        "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate",
+        "content-type": "text/html; charset=utf-8",
+        "clear-site-data": null,
+        "location": null
+      }
+    },
+    {
+      "profile": "parent-local",
+      "path": "/api/synthetic/session",
+      "status": 303,
+      "headers": {
+        "cache-control": null,
+        "content-type": null,
+        "clear-site-data": "\"cache\"",
+        "location": "http://127.0.0.1:4220/"
+      }
+    },
+    {
+      "profile": "parent-local",
+      "path": "/",
+      "status": 200,
+      "headers": {
+        "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate",
+        "content-type": "text/html; charset=utf-8",
+        "clear-site-data": null,
+        "location": null
+      }
+    },
+    {
+      "profile": "parent-local",
+      "path": "/szulo/feladatok",
+      "status": 200,
+      "headers": {
+        "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate",
+        "content-type": "text/html; charset=utf-8",
+        "clear-site-data": null,
+        "location": null
+      }
+    },
+    {
+      "profile": "staff-local",
+      "path": "/api/synthetic/session",
+      "status": 303,
+      "headers": {
+        "cache-control": null,
+        "content-type": null,
+        "clear-site-data": "\"cache\"",
+        "location": "http://127.0.0.1:4220/"
+      }
+    },
+    {
+      "profile": "staff-local",
+      "path": "/",
+      "status": 200,
+      "headers": {
+        "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate",
+        "content-type": "text/html; charset=utf-8",
+        "clear-site-data": null,
+        "location": null
+      }
+    },
+    {
+      "profile": "staff-local",
+      "path": "/munkatars/beosztas",
+      "status": 200,
+      "headers": {
+        "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate",
+        "content-type": "text/html; charset=utf-8",
+        "clear-site-data": null,
+        "location": null
+      }
+    },
+    {
+      "profile": "group-admin-local",
+      "path": "/api/synthetic/session",
+      "status": 303,
+      "headers": {
+        "cache-control": null,
+        "content-type": null,
+        "clear-site-data": "\"cache\"",
+        "location": "http://127.0.0.1:4220/"
+      }
+    },
+    {
+      "profile": "group-admin-local",
+      "path": "/",
+      "status": 200,
+      "headers": {
+        "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate",
+        "content-type": "text/html; charset=utf-8",
+        "clear-site-data": null,
+        "location": null
+      }
+    },
+    {
+      "profile": "group-admin-local",
+      "path": "/admin",
+      "status": 200,
+      "headers": {
+        "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate",
+        "content-type": "text/html; charset=utf-8",
+        "clear-site-data": null,
+        "location": null
+      }
+    },
+    {
+      "profile": "kindergarten-admin-local",
+      "path": "/api/synthetic/session",
+      "status": 303,
+      "headers": {
+        "cache-control": null,
+        "content-type": null,
+        "clear-site-data": "\"cache\"",
+        "location": "http://127.0.0.1:4220/"
+      }
+    },
+    {
+      "profile": "kindergarten-admin-local",
+      "path": "/",
+      "status": 200,
+      "headers": {
+        "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate",
+        "content-type": "text/html; charset=utf-8",
+        "clear-site-data": null,
+        "location": null
+      }
+    },
+    {
+      "profile": "kindergarten-admin-local",
+      "path": "/admin",
+      "status": 200,
+      "headers": {
+        "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate",
+        "content-type": "text/html; charset=utf-8",
+        "clear-site-data": null,
+        "location": null
+      }
+    },
+    {
+      "profile": "super-admin-local",
+      "path": "/api/synthetic/session",
+      "status": 303,
+      "headers": {
+        "cache-control": null,
+        "content-type": null,
+        "clear-site-data": "\"cache\"",
+        "location": "http://127.0.0.1:4220/"
+      }
+    },
+    {
+      "profile": "super-admin-local",
+      "path": "/",
+      "status": 200,
+      "headers": {
+        "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate",
+        "content-type": "text/html; charset=utf-8",
+        "clear-site-data": null,
+        "location": null
+      }
+    },
+    {
+      "profile": "super-admin-local",
+      "path": "/admin",
+      "status": 200,
+      "headers": {
+        "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate",
+        "content-type": "text/html; charset=utf-8",
+        "clear-site-data": null,
+        "location": null
+      }
+    }
+  ]
+}

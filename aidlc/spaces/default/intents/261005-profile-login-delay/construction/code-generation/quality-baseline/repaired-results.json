@@ -1,0 +1,44 @@
+[
+  {
+    "key": "scoped-repaired",
+    "args": [
+      "exec",
+      "--",
+      "vitest",
+      "run",
+      "--config",
+      "vitest.config.ts",
+      "tests/unit/runtime-boundaries.test.ts",
+      "tests/integration/synthetic-route.test.ts",
+      "tests/integration/runtime-shell.test.tsx"
+    ],
+    "exit": 0,
+    "finishedAt": "2026-10-05T11:51:35.367Z"
+  },
+  {
+    "key": "typecheck-repaired",
+    "args": [
+      "run",
+      "typecheck"
+    ],
+    "exit": 0,
+    "finishedAt": "2026-10-05T11:51:37.743Z"
+  },
+  {
+    "key": "tests-repaired",
+    "args": [
+      "test"
+    ],
+    "exit": 0,
+    "finishedAt": "2026-10-05T11:51:48.181Z"
+  },
+  {
+    "key": "coverage-repaired",
+    "args": [
+      "run",
+      "test:coverage"
+    ],
+    "exit": 0,
+    "finishedAt": "2026-10-05T11:52:00.207Z"
+  }
+]

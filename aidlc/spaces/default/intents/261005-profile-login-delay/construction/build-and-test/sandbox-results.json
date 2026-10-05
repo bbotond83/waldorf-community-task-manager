@@ -1,0 +1,23 @@
+{
+  "cwd": "/private/tmp/waldorf-quality-final-261005",
+  "node": "v24.21.0",
+  "commands": [
+    {
+      "key": "existing",
+      "args": [
+        "exec",
+        "--",
+        "playwright",
+        "test",
+        "--config",
+        "playwright.login-existing.config.ts",
+        "tests/browser/profile-login-existing.spec.ts",
+        "--project=chrome"
+      ],
+      "startedAt": "2026-10-05T12:42:41.671Z",
+      "finishedAt": "2026-10-05T12:42:47.627Z",
+      "exit": 1,
+      "signal": null
+    }
+  ]
+}

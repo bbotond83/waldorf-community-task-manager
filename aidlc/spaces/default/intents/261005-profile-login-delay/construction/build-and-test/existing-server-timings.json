@@ -1,0 +1,470 @@
+{
+  "stats": {
+    "startTime": "2026-10-05T12:43:15.767Z",
+    "duration": 28953.721,
+    "expected": 5,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "targets": 30,
+  "setups": 15,
+  "maxTargetMs": 382.10009765625,
+  "bundles": [
+    {
+      "origin": "http://127.0.0.1:3000",
+      "browser": "154.0.8037.98",
+      "node": "v24.21.0",
+      "profile": "parent-local",
+      "from": "staff-local",
+      "browserState": "fresh context; natural cache retained; existing server not reset",
+      "measurements": [
+        {
+          "kind": "first",
+          "profile": "parent-local",
+          "destination": "/szulo/feladatok",
+          "elapsed": 382.10009765625,
+          "observedElapsed": 422,
+          "requestElapsedLowerBound": 368,
+          "result": "success"
+        },
+        {
+          "kind": "first-repeat-1",
+          "profile": "parent-local",
+          "destination": "/szulo/feladatok",
+          "elapsed": 261.699951171875,
+          "observedElapsed": 302,
+          "requestElapsedLowerBound": 246,
+          "result": "success"
+        },
+        {
+          "kind": "first-repeat-2",
+          "profile": "parent-local",
+          "destination": "/szulo/feladatok",
+          "elapsed": 274,
+          "observedElapsed": 325,
+          "requestElapsedLowerBound": 259,
+          "result": "success"
+        },
+        {
+          "kind": "switch-source-setup",
+          "profile": "staff-local",
+          "destination": "/munkatars/beosztas",
+          "elapsed": 361.300048828125,
+          "observedElapsed": 451,
+          "requestElapsedLowerBound": 345,
+          "result": "success"
+        },
+        {
+          "kind": "switch",
+          "profile": "parent-local",
+          "destination": "/szulo/feladatok",
+          "elapsed": 275.7998046875,
+          "observedElapsed": 357,
+          "requestElapsedLowerBound": 261,
+          "result": "success"
+        },
+        {
+          "kind": "switch-source-setup",
+          "profile": "staff-local",
+          "destination": "/munkatars/beosztas",
+          "elapsed": 282,
+          "observedElapsed": 325,
+          "requestElapsedLowerBound": 267,
+          "result": "success"
+        },
+        {
+          "kind": "switch-repeat-1",
+          "profile": "parent-local",
+          "destination": "/szulo/feladatok",
+          "elapsed": 261.900146484375,
+          "observedElapsed": 313,
+          "requestElapsedLowerBound": 247,
+          "result": "success"
+        },
+        {
+          "kind": "switch-source-setup",
+          "profile": "staff-local",
+          "destination": "/munkatars/beosztas",
+          "elapsed": 305,
+          "observedElapsed": 352,
+          "requestElapsedLowerBound": 290,
+          "result": "success"
+        },
+        {
+          "kind": "switch-repeat-2",
+          "profile": "parent-local",
+          "destination": "/szulo/feladatok",
+          "elapsed": 284.10009765625,
+          "observedElapsed": 331,
+          "requestElapsedLowerBound": 268,
+          "result": "success"
+        }
+      ]
+    },
+    {
+      "origin": "http://127.0.0.1:3000",
+      "browser": "154.0.8037.98",
+      "node": "v24.21.0",
+      "profile": "staff-local",
+      "from": "group-admin-local",
+      "browserState": "fresh context; natural cache retained; existing server not reset",
+      "measurements": [
+        {
+          "kind": "first",
+          "profile": "staff-local",
+          "destination": "/munkatars/beosztas",
+          "elapsed": 327.5,
+          "observedElapsed": 358,
+          "requestElapsedLowerBound": 312,
+          "result": "success"
+        },
+        {
+          "kind": "first-repeat-1",
+          "profile": "staff-local",
+          "destination": "/munkatars/beosztas",
+          "elapsed": 268.300048828125,
+          "observedElapsed": 319,
+          "requestElapsedLowerBound": 253,
+          "result": "success"
+        },
+        {
+          "kind": "first-repeat-2",
+          "profile": "staff-local",
+          "destination": "/munkatars/beosztas",
+          "elapsed": 247.099853515625,
+          "observedElapsed": 298,
+          "requestElapsedLowerBound": 232,
+          "result": "success"
+        },
+        {
+          "kind": "switch-source-setup",
+          "profile": "group-admin-local",
+          "destination": "/admin",
+          "elapsed": 317.7001953125,
+          "observedElapsed": 376,
+          "requestElapsedLowerBound": 302,
+          "result": "success"
+        },
+        {
+          "kind": "switch",
+          "profile": "staff-local",
+          "destination": "/munkatars/beosztas",
+          "elapsed": 328.60009765625,
+          "observedElapsed": 374,
+          "requestElapsedLowerBound": 311,
+          "result": "success"
+        },
+        {
+          "kind": "switch-source-setup",
+          "profile": "group-admin-local",
+          "destination": "/admin",
+          "elapsed": 289,
+          "observedElapsed": 332,
+          "requestElapsedLowerBound": 274,
+          "result": "success"
+        },
+        {
+          "kind": "switch-repeat-1",
+          "profile": "staff-local",
+          "destination": "/munkatars/beosztas",
+          "elapsed": 318.89990234375,
+          "observedElapsed": 366,
+          "requestElapsedLowerBound": 303,
+          "result": "success"
+        },
+        {
+          "kind": "switch-source-setup",
+          "profile": "group-admin-local",
+          "destination": "/admin",
+          "elapsed": 271.5,
+          "observedElapsed": 320,
+          "requestElapsedLowerBound": 256,
+          "result": "success"
+        },
+        {
+          "kind": "switch-repeat-2",
+          "profile": "staff-local",
+          "destination": "/munkatars/beosztas",
+          "elapsed": 292.800048828125,
+          "observedElapsed": 334,
+          "requestElapsedLowerBound": 278,
+          "result": "success"
+        }
+      ]
+    },
+    {
+      "origin": "http://127.0.0.1:3000",
+      "browser": "154.0.8037.98",
+      "node": "v24.21.0",
+      "profile": "group-admin-local",
+      "from": "kindergarten-admin-local",
+      "browserState": "fresh context; natural cache retained; existing server not reset",
+      "measurements": [
+        {
+          "kind": "first",
+          "profile": "group-admin-local",
+          "destination": "/admin",
+          "elapsed": 317.900146484375,
+          "observedElapsed": 355,
+          "requestElapsedLowerBound": 303,
+          "result": "success"
+        },
+        {
+          "kind": "first-repeat-1",
+          "profile": "group-admin-local",
+          "destination": "/admin",
+          "elapsed": 304.5,
+          "observedElapsed": 356,
+          "requestElapsedLowerBound": 288,
+          "result": "success"
+        },
+        {
+          "kind": "first-repeat-2",
+          "profile": "group-admin-local",
+          "destination": "/admin",
+          "elapsed": 281.199951171875,
+          "observedElapsed": 332,
+          "requestElapsedLowerBound": 265,
+          "result": "success"
+        },
+        {
+          "kind": "switch-source-setup",
+          "profile": "kindergarten-admin-local",
+          "destination": "/admin",
+          "elapsed": 323,
+          "observedElapsed": 415,
+          "requestElapsedLowerBound": 308,
+          "result": "success"
+        },
+        {
+          "kind": "switch",
+          "profile": "group-admin-local",
+          "destination": "/admin",
+          "elapsed": 268.5,
+          "observedElapsed": 320,
+          "requestElapsedLowerBound": 253,
+          "result": "success"
+        },
+        {
+          "kind": "switch-source-setup",
+          "profile": "kindergarten-admin-local",
+          "destination": "/admin",
+          "elapsed": 271.699951171875,
+          "observedElapsed": 325,
+          "requestElapsedLowerBound": 257,
+          "result": "success"
+        },
+        {
+          "kind": "switch-repeat-1",
+          "profile": "group-admin-local",
+          "destination": "/admin",
+          "elapsed": 276.400146484375,
+          "observedElapsed": 316,
+          "requestElapsedLowerBound": 260,
+          "result": "success"
+        },
+        {
+          "kind": "switch-source-setup",
+          "profile": "kindergarten-admin-local",
+          "destination": "/admin",
+          "elapsed": 273.199951171875,
+          "observedElapsed": 322,
+          "requestElapsedLowerBound": 257,
+          "result": "success"
+        },
+        {
+          "kind": "switch-repeat-2",
+          "profile": "group-admin-local",
+          "destination": "/admin",
+          "elapsed": 281.400146484375,
+          "observedElapsed": 328,
+          "requestElapsedLowerBound": 266,
+          "result": "success"
+        }
+      ]
+    },
+    {
+      "origin": "http://127.0.0.1:3000",
+      "browser": "154.0.8037.98",
+      "node": "v24.21.0",
+      "profile": "kindergarten-admin-local",
+      "from": "super-admin-local",
+      "browserState": "fresh context; natural cache retained; existing server not reset",
+      "measurements": [
+        {
+          "kind": "first",
+          "profile": "kindergarten-admin-local",
+          "destination": "/admin",
+          "elapsed": 321.000244140625,
+          "observedElapsed": 360,
+          "requestElapsedLowerBound": 306,
+          "result": "success"
+        },
+        {
+          "kind": "first-repeat-1",
+          "profile": "kindergarten-admin-local",
+          "destination": "/admin",
+          "elapsed": 274.39990234375,
+          "observedElapsed": 326,
+          "requestElapsedLowerBound": 258,
+          "result": "success"
+        },
+        {
+          "kind": "first-repeat-2",
+          "profile": "kindergarten-admin-local",
+          "destination": "/admin",
+          "elapsed": 267.2998046875,
+          "observedElapsed": 321,
+          "requestElapsedLowerBound": 252,
+          "result": "success"
+        },
+        {
+          "kind": "switch-source-setup",
+          "profile": "super-admin-local",
+          "destination": "/admin",
+          "elapsed": 291.500244140625,
+          "observedElapsed": 372,
+          "requestElapsedLowerBound": 288,
+          "result": "success"
+        },
+        {
+          "kind": "switch",
+          "profile": "kindergarten-admin-local",
+          "destination": "/admin",
+          "elapsed": 291.30029296875,
+          "observedElapsed": 340,
+          "requestElapsedLowerBound": 279,
+          "result": "success"
+        },
+        {
+          "kind": "switch-source-setup",
+          "profile": "super-admin-local",
+          "destination": "/admin",
+          "elapsed": 300.39990234375,
+          "observedElapsed": 353,
+          "requestElapsedLowerBound": 285,
+          "result": "success"
+        },
+        {
+          "kind": "switch-repeat-1",
+          "profile": "kindergarten-admin-local",
+          "destination": "/admin",
+          "elapsed": 293,
+          "observedElapsed": 340,
+          "requestElapsedLowerBound": 276,
+          "result": "success"
+        },
+        {
+          "kind": "switch-source-setup",
+          "profile": "super-admin-local",
+          "destination": "/admin",
+          "elapsed": 277.400146484375,
+          "observedElapsed": 354,
+          "requestElapsedLowerBound": 273,
+          "result": "success"
+        },
+        {
+          "kind": "switch-repeat-2",
+          "profile": "kindergarten-admin-local",
+          "destination": "/admin",
+          "elapsed": 273.699951171875,
+          "observedElapsed": 317,
+          "requestElapsedLowerBound": 258,
+          "result": "success"
+        }
+      ]
+    },
+    {
+      "origin": "http://127.0.0.1:3000",
+      "browser": "154.0.8037.98",
+      "node": "v24.21.0",
+      "profile": "super-admin-local",
+      "from": "parent-local",
+      "browserState": "fresh context; natural cache retained; existing server not reset",
+      "measurements": [
+        {
+          "kind": "first",
+          "profile": "super-admin-local",
+          "destination": "/admin",
+          "elapsed": 331.400146484375,
+          "observedElapsed": 367,
+          "requestElapsedLowerBound": 295,
+          "result": "success"
+        },
+        {
+          "kind": "first-repeat-1",
+          "profile": "super-admin-local",
+          "destination": "/admin",
+          "elapsed": 295.60009765625,
+          "observedElapsed": 336,
+          "requestElapsedLowerBound": 280,
+          "result": "success"
+        },
+        {
+          "kind": "first-repeat-2",
+          "profile": "super-admin-local",
+          "destination": "/admin",
+          "elapsed": 293.89990234375,
+          "observedElapsed": 349,
+          "requestElapsedLowerBound": 278,
+          "result": "success"
+        },
+        {
+          "kind": "switch-source-setup",
+          "profile": "parent-local",
+          "destination": "/szulo/feladatok",
+          "elapsed": 277.199951171875,
+          "observedElapsed": 356,
+          "requestElapsedLowerBound": 261,
+          "result": "success"
+        },
+        {
+          "kind": "switch",
+          "profile": "super-admin-local",
+          "destination": "/admin",
+          "elapsed": 278.400146484375,
+          "observedElapsed": 335,
+          "requestElapsedLowerBound": 262,
+          "result": "success"
+        },
+        {
+          "kind": "switch-source-setup",
+          "profile": "parent-local",
+          "destination": "/szulo/feladatok",
+          "elapsed": 284,
+          "observedElapsed": 341,
+          "requestElapsedLowerBound": 269,
+          "result": "success"
+        },
+        {
+          "kind": "switch-repeat-1",
+          "profile": "super-admin-local",
+          "destination": "/admin",
+          "elapsed": 271.69970703125,
+          "observedElapsed": 325,
+          "requestElapsedLowerBound": 255,
+          "result": "success"
+        },
+        {
+          "kind": "switch-source-setup",
+          "profile": "parent-local",
+          "destination": "/szulo/feladatok",
+          "elapsed": 257.300048828125,
+          "observedElapsed": 312,
+          "requestElapsedLowerBound": 241,
+          "result": "success"
+        },
+        {
+          "kind": "switch-repeat-2",
+          "profile": "super-admin-local",
+          "destination": "/admin",
+          "elapsed": 279.80029296875,
+          "observedElapsed": 321,
+          "requestElapsedLowerBound": 265,
+          "result": "success"
+        }
+      ]
+    }
+  ]
+}

@@ -144,6 +144,29 @@ with `npx playwright install` if the local machine does not already have them. C
 desktop and mobile-Safari smoke evidence is not produced by this local scaffold and remains an
 explicit release blocker/outstanding item until recorded on a supported Apple environment.
 
+## Profile login timing regression
+
+The session form rotates the signed HttpOnly cookie and redirects through a full document
+navigation. It does not clear the browser's entire HTTP cache: Chromium can defer the redirect
+while processing `Clear-Site-Data`, causing a long wait even after the server responds.
+Protected pages remain dynamically authorized and return private, no-store responses in production builds.
+
+These opt-in suites measure actual form submission through immediate navigation to each role's
+usable main page, including successful content and enabled controls, with a 5000 ms limit:
+
+```bash
+npx playwright test --config playwright.login-existing.config.ts tests/browser/profile-login-existing.spec.ts --project=chrome
+npx playwright test --config playwright.login-performance.config.ts tests/browser/profile-login-performance.spec.ts --project=chromium
+```
+
+The first command requires an already-running synthetic server at `http://127.0.0.1:3000`
+and installed Chrome. It records 30 target selections/switches plus 15 source setup attempts
+without starting, stopping or resetting that server. Its fresh Chrome contexts do not reproduce
+the user's existing browser state; original-tab evidence must be collected separately when a
+reported delay depends on that state. The second command owns isolated development/production
+servers and is supplemental evidence. Both record failed samples before asserting; neither runs
+as part of the canonical suite. Do not reset the affected browser cache to hide a reported delay.
+
 ## Fresh-checkout local acceptance
 
 Select Node 24/npm 11 using either current-terminal route in **Supported local runtime**, then use

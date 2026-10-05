@@ -1,0 +1,18 @@
+{
+  "stage": "code-generation",
+  "version": 1,
+  "writes": [
+    { "path": "app/api/synthetic/session/route.ts" },
+    { "path": "tests/integration/synthetic-route.test.ts" },
+    { "path": "README.md" },
+    { "path": "playwright.config.ts" },
+    { "path": "playwright.login-existing.config.ts" },
+    { "path": "tests/browser/profile-login-existing.spec.ts" },
+    { "path": "tests/browser/profile-login-performance.spec.ts" },
+    { "path": "tests/browser/runtime-foundation.spec.ts" },
+    { "path": "tests/browser/support/profile-login-measurement.ts" },
+    { "path": "tests/browser/support/profile-login-server.ts" },
+    { "path": "tests/unit/runtime-boundaries.test.ts" },
+    { "path": "tests/coverage/app-entrypoints.test.tsx" }
+  ]
+}

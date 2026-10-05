@@ -48,6 +48,5 @@ export async function POST(request: NextRequest) {
     createSyntheticSessionToken(profile),
     sessionCookieOptions(false),
   );
-  response.headers.set("Clear-Site-Data", '"cache"');
   return response;
 }
