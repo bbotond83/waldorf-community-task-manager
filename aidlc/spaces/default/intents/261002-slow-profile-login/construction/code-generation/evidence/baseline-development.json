@@ -1,0 +1,77 @@
+{
+  "node": "v24.21.0",
+  "browser": "151.0.7922.34",
+  "machine": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "cpu": "Apple M4 Pro"
+  },
+  "cache": "unique empty .next/login-performance-* distDir per first-use profile; isolated process and browser context; no reset/session setup POST",
+  "results": [
+    {
+      "mode": "development",
+      "profile": "parent-local",
+      "kind": "first",
+      "elapsed": 354.5
+    },
+    {
+      "mode": "development",
+      "profile": "parent-local",
+      "from": "staff-local",
+      "kind": "switch",
+      "elapsed": 102.39990234375
+    },
+    {
+      "mode": "development",
+      "profile": "staff-local",
+      "kind": "first",
+      "elapsed": 348.7998046875
+    },
+    {
+      "mode": "development",
+      "profile": "staff-local",
+      "from": "group-admin-local",
+      "kind": "switch",
+      "elapsed": 116.5
+    },
+    {
+      "mode": "development",
+      "profile": "group-admin-local",
+      "kind": "first",
+      "elapsed": 340.499755859375
+    },
+    {
+      "mode": "development",
+      "profile": "group-admin-local",
+      "from": "kindergarten-admin-local",
+      "kind": "switch",
+      "elapsed": 108.60009765625
+    },
+    {
+      "mode": "development",
+      "profile": "kindergarten-admin-local",
+      "kind": "first",
+      "elapsed": 248.699951171875
+    },
+    {
+      "mode": "development",
+      "profile": "kindergarten-admin-local",
+      "from": "super-admin-local",
+      "kind": "switch",
+      "elapsed": 110.89990234375
+    },
+    {
+      "mode": "development",
+      "profile": "super-admin-local",
+      "kind": "first",
+      "elapsed": 296.39990234375
+    },
+    {
+      "mode": "development",
+      "profile": "super-admin-local",
+      "from": "parent-local",
+      "kind": "switch",
+      "elapsed": 117.400146484375
+    }
+  ]
+}

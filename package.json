@@ -27,6 +27,7 @@
     "test:coverage:delivery": "vitest run --config vitest.config.ts --coverage",
     "test:coverage": "npm run test:coverage:domain && npm run test:coverage:delivery",
     "test:browser": "playwright test --config playwright.config.ts",
+    "test:login-performance": "playwright test --config playwright.login-performance.config.ts",
     "test:a11y": "playwright test --config playwright.config.ts --grep @a11y",
     "smoke:start": "node scripts/start-smoke.mjs",
     "verify:manifests": "node --experimental-strip-types scripts/verification/validate-manifests.ts",
@@ -45,6 +46,11 @@
     "react": "latest",
     "react-dom": "latest",
     "zod": "latest"
+  },
+  "overrides": {
+    "@next/eslint-plugin-next": {
+      "fast-glob": "npm:tinyglobby@0.2.17"
+    }
   },
   "devDependencies": {
     "@axe-core/playwright": "latest",

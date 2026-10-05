@@ -1,5 +1,8 @@
 # Component Inventory
 
+> Focused merge, 2026-10-02 (`261002-slow-profile-login`): the earlier sections are preserved historical prose from an UNVERIFIED store, including the prior startup diagnosis and pending loader choices. They are not current defect claims. Fresh conclusions are in the profile-login update below; exact newly analyzed files appear in reverse-engineering-timestamp.md. No tests, latency measurements, browser sessions, or backend calls were performed.
+
+
 > Focused update, 2026-10-01: earlier repository-wide prose is preserved as historical static knowledge; its freshness was UNVERIFIED. Only the deep files listed in reverse-engineering-timestamp.md were analyzed for this update. No tests or runtime/external checks were executed.
 
 One Next.js package contains these in-process responsibility areas. They are not independently deployed services. Component headings are the canonical names used in the timestamp scope block.
@@ -136,3 +139,38 @@ One Next.js package contains these in-process responsibility areas. They are not
 **Responsibility:** Run loopback production output and request documented readiness route.  
 **Depends on:** npm start and loopback HTTP readiness.  
 **Assessment:** Explicit synthetic-mode injection bypasses the env-file startup symptom. Handler body and test assertions were not scanned.
+
+## Synthetic profile login boundary
+
+**Location:** `src/runtime/ProfileSelector.tsx`, `app/api/synthetic/session/route.ts`, `src/runtime/session/session.ts`, origin/profile/runtime wiring.  
+**Responsibility:** Submit fixed profile selection, validate mode/origin/profile, own the local signed-session token lifecycle and root redirect.  
+**Depends on:** Next response/cookie APIs, local crypto and Zod, runtime composition.  
+**Assessment:** At risk for an unmeasured latency regression; broad browser cache clearing is observed, with no proven causal effect.
+
+## Profile landing and role navigation
+
+**Location:** `app/page.tsx`, `src/runtime/AppShell.tsx`, `proxy.ts`, and freshly read parent/staff/admin layout/session/facade/landing files.  
+**Responsibility:** Resolve the selected profile, render greeting/navigation and separately load role projections; does not own session mutation.  
+**Depends on:** runtime composition and local role facades.  
+**Assessment:** Dynamic profile isolation is explicit; repeated resolution/composition exists, elapsed cost unknown. Coverage applies only to listed deep files.
+
+## Parent authentication entry
+
+**Location:** `app/belepes/page.tsx`, `actions.ts`, `AuthenticationEntry.tsx`, `src/application/session-facade.ts`.  
+**Responsibility:** Synthetic identifier validation and safe parent-destination continuation; delegates token ownership to the session boundary.  
+**Depends on:** local parent/session facade and cookie helper.  
+**Assessment:** Separate flow with pending state and manual continuation; signed-out action timing is uncovered.
+
+## Local synthetic session adapters
+
+**Location:** freshly read parent/staff/admin synthetic adapters and runtime composition.  
+**Responsibility:** Own local fixtures/projections and wire profile role experiences; advanced-admin internals remain shallow.  
+**Depends on:** application barrel, authorization/session contracts and domain seams.  
+**Assessment:** In-process Maps/global containers and fixed staff schedule; no durable or external auth integration on the inspected path.
+
+## Login regression surface
+
+**Location:** the focused runtime unit/integration/browser files listed in the timestamp.  
+**Responsibility:** Specify functional session/profile isolation and role navigation, with role-page performance coverage after selection.  
+**Depends on:** Node/Vitest/Playwright tooling and synthetic fixture reset.  
+**Assessment:** At risk: click-to-profile-ready timing and first-use conditions are absent. No suite ran.

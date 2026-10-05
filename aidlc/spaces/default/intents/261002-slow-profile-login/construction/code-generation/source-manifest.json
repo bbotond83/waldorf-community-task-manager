@@ -1,0 +1,14 @@
+{
+  "stage": "code-generation",
+  "version": 1,
+  "writes": [
+    { "path": "next.config.ts" },
+    { "path": "package.json" },
+    { "path": "playwright.config.ts" },
+    { "path": "playwright.login-performance.config.ts" },
+    { "path": "tests/unit/runtime-boundaries.test.ts" },
+    { "path": "tests/integration/synthetic-route.test.ts" },
+    { "path": "tests/browser/profile-login-performance.spec.ts" },
+    { "path": "tests/browser/support/profile-login-server.ts" }
+  ]
+}

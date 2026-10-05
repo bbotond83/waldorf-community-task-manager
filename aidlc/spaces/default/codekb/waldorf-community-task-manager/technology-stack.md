@@ -1,5 +1,8 @@
 # Technology Stack
 
+> Focused merge, 2026-10-02 (`261002-slow-profile-login`): the earlier sections are preserved historical prose from an UNVERIFIED store, including the prior startup diagnosis and pending loader choices. They are not current defect claims. Fresh conclusions are in the profile-login update below; exact newly analyzed files appear in reverse-engineering-timestamp.md. No tests, latency measurements, browser sessions, or backend calls were performed.
+
+
 > Focused update, 2026-10-01: earlier repository-wide prose is preserved as historical static knowledge; its freshness was UNVERIFIED. Only the deep files listed in reverse-engineering-timestamp.md were analyzed for this update. No tests or runtime/external checks were executed.
 
 Versions come from committed manifest/lockfile evidence. Moving latest manifest entries are identified as such.
@@ -52,3 +55,9 @@ The project stamp/manifest identify AIDLC 2.10.0 on Codex. This is repository go
 `@next/env` 16.3.6 is Next's environment loader and a transitive lockfile dependency, currently absent as an application-declared direct dependency. Installed Next documentation recommends it when loading environment files outside the framework runtime. Existing shell values take precedence; environment-specific local files precede `.env.local` (excluded in test), then environment-specific files and `.env`.
 
 The fresh scan confirms the declared Node 24.x/npm 11.x controls and the locked versions in the tables above. It did not execute installed version checks. The intent reports Homebrew Node 24.21.0/npm 11.19.0 at `/opt/homebrew/opt/node@24/bin`; README should explain selecting that existing bin directory in the current terminal and checking versions.
+
+## Profile Login Stack Update — 2026-10-02
+
+The focused scan freshly confirms manifest Next 16.3.6 / `@next/env` 16.3.6 and selected lock entries for React/React DOM 19.2.8, Zod 4.4.3, TypeScript 5.9.3, Vitest 4.1.11, Playwright test 1.62.1, ESLint 9.39.5 and Prettier 3.9.6. These are repository-recorded versions, not current public release claims or installed-version checks. Remaining version/configuration tables above are preserved historical knowledge.
+
+Node 24.x and npm 11.x remain enforced toolchain requirements. Native form/anchor navigation, Next dynamic server rendering and local signed-cookie sessions define the inspected login transport. No remote authentication SDK is declared. The prior loader selection discussion is historical; this login investigation does not establish a current startup-loader defect. No local Next guide was read in this scan because application code was not changed.

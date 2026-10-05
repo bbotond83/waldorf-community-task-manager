@@ -1,0 +1,21 @@
+{
+  "stage": "code-generation",
+  "upstream_ids": ["FR1", "FR1.1", "FR1.2", "FR1.3", "FR2", "FR2.1", "FR2.2", "FR2.3", "FR3", "FR3.1", "FR3.2", "FR3.3", "NFR1", "NFR2", "NFR3"],
+  "coverage": [
+    { "id": "FR1", "status": "OK", "target": "tests/browser/profile-login-performance.spec.ts" },
+    { "id": "FR1.1", "status": "OK", "target": "tests/browser/profile-login-performance.spec.ts" },
+    { "id": "FR1.2", "status": "OK", "target": "tests/browser/profile-login-performance.spec.ts" },
+    { "id": "FR1.3", "status": "OK", "target": "tests/integration/synthetic-route.test.ts" },
+    { "id": "FR2", "status": "OK", "target": "tests/unit/runtime-boundaries.test.ts" },
+    { "id": "FR2.1", "status": "OK", "target": "tests/unit/runtime-boundaries.test.ts" },
+    { "id": "FR2.2", "status": "OK", "target": "tests/integration/synthetic-route.test.ts" },
+    { "id": "FR2.3", "status": "OK", "target": "tests/browser/profile-login-performance.spec.ts" },
+    { "id": "FR3", "status": "OK", "target": "tests/browser/profile-login-performance.spec.ts" },
+    { "id": "FR3.1", "status": "OK", "target": "tests/browser/support/profile-login-server.ts" },
+    { "id": "FR3.2", "status": "OK", "target": "tests/browser/profile-login-performance.spec.ts" },
+    { "id": "FR3.3", "status": "OK", "target": "tests/browser/profile-login-performance.spec.ts" },
+    { "id": "NFR1", "status": "OK", "target": "tests/browser/support/profile-login-server.ts" },
+    { "id": "NFR2", "status": "OK", "target": "tests/browser/profile-login-performance.spec.ts" },
+    { "id": "NFR3", "status": "OK", "target": "vitest.config.ts" }
+  ]
+}

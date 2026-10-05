@@ -1,4 +1,5 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { assertLoginDuration } from "../browser/support/profile-login-server.ts";
 import { composeRuntime } from "../../src/runtime/composition.ts";
 import { formatRuntimeConfigError, validateRuntimeConfig } from "../../src/runtime/config.ts";
 import { isSameOrigin } from "../../src/runtime/security/origin.ts";
@@ -9,6 +10,36 @@ import {
   sessionCookieOptions,
 } from "../../src/runtime/session/session.ts";
 import { getSyntheticProfile, SYNTHETIC_PROFILES } from "../../src/runtime/synthetic/profiles.ts";
+
+describe("profile login measurement boundary", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.resetModules();
+  });
+
+  it("accepts the inclusive five-second boundary", () => {
+    expect(() => assertLoginDuration(5000)).not.toThrow();
+  });
+  it("rejects a successful but over-budget login", () => {
+    expect(() => assertLoginDuration(5001)).toThrow("within 5000 ms");
+    expect(() => assertLoginDuration(Number.NaN)).toThrow();
+    expect(() => assertLoginDuration(-1)).toThrow();
+  });
+  it("leaves normal Next output unchanged", async () => {
+    vi.stubEnv("APP_LOGIN_TEST_DIST_DIR", undefined);
+    expect((await import("../../next.config.ts")).default.distDir).toBeUndefined();
+  });
+  it("isolates test output inside the ignored generated tree", async () => {
+    vi.stubEnv("APP_LOGIN_TEST_DIST_DIR", ".next/login-performance-unit-1");
+    expect((await import("../../next.config.ts")).default.distDir).toBe(
+      ".next/login-performance-unit-1",
+    );
+  });
+  it("rejects output outside the dedicated test namespace", async () => {
+    vi.stubEnv("APP_LOGIN_TEST_DIST_DIR", "../outside");
+    await expect(import("../../next.config.ts")).rejects.toThrow("dedicated");
+  });
+});
 
 describe("runtime configuration", () => {
   it("accepts privacy-safe synthetic defaults", () => {
