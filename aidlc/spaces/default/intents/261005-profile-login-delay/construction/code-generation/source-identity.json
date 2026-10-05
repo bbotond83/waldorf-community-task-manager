@@ -1,0 +1,56 @@
+{
+  "revision": "85dab6b5c7762265357146a54e1612479e8c4302",
+  "recordedAt": "2026-10-05T12:22:12.755Z",
+  "ownedFiles": [
+    {
+      "path": "app/api/synthetic/session/route.ts",
+      "sha256": "21a701b754f28e85051331bca1693868b555ab13707e332f0dcc4279a77e66aa"
+    },
+    {
+      "path": "tests/integration/synthetic-route.test.ts",
+      "sha256": "d0369c154d5b5841e15fc23418e51182608f395a0d83c0df6a274fab29502ccb"
+    },
+    {
+      "path": "README.md",
+      "sha256": "48492c99a2c38c3a3d31f1301ba5c9b68691777dbc6800768cf79036929c5172"
+    },
+    {
+      "path": "playwright.config.ts",
+      "sha256": "b35c33f1e261fc85d1ca1a12f8573450fc1850180fb75c67d0681883459ee81d"
+    },
+    {
+      "path": "playwright.login-existing.config.ts",
+      "sha256": "96fae9848722be1c63c16e76165d337a9b181db01de61a68156139061bfb2575"
+    },
+    {
+      "path": "tests/browser/profile-login-existing.spec.ts",
+      "sha256": "e8423af39f48f59e430a6a75f1c23358b08a1bfeed0f64e67153b3d05920b5c9"
+    },
+    {
+      "path": "tests/browser/profile-login-performance.spec.ts",
+      "sha256": "11f7199139dca85c2519055dcc7a67cf3c656345d5900c530688c6eb105ecbc1"
+    },
+    {
+      "path": "tests/browser/runtime-foundation.spec.ts",
+      "sha256": "d177de9e14c19a5cb2bbfc8369455bd6f92602bf5667c90413e7e48875e8e82f"
+    },
+    {
+      "path": "tests/browser/support/profile-login-measurement.ts",
+      "sha256": "f204d0689c34fd2fded1fcf95cfb3aed9c3d40fcf33ca417b0c4d9495500078a"
+    },
+    {
+      "path": "tests/browser/support/profile-login-server.ts",
+      "sha256": "35dd20f24cd1ff193222ec0882530fe16229686c61f1dc3b8a412a97b4eb3aa8"
+    },
+    {
+      "path": "tests/unit/runtime-boundaries.test.ts",
+      "sha256": "86bfa014f23f37ef2b33ea0cc97b215d2b171aea971143b37008f1f4a5091dc9"
+    },
+    {
+      "path": "tests/coverage/app-entrypoints.test.tsx",
+      "sha256": "07a23ae179f6bb8fb05a969e1de90d51940b439e0567902b2950e42a68dac2b6"
+    }
+  ],
+  "aggregateSha256": "c3f3511ec0483b35067e53ec9e51788c27fe40c48d11a96dc213a53dd9d23aff",
+  "unownedChanges": "Existing CodeKB/audit/intent and Next-generated next-env.d.ts preserved; not claimed as implementation writes"
+}

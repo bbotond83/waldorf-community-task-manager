@@ -1,0 +1,375 @@
+{
+  "stats": {
+    "startTime": "2026-10-05T12:46:07.017Z",
+    "duration": 39491.704,
+    "expected": 10,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "targets": 20,
+  "setups": 10,
+  "maxTargetMs": 980.5,
+  "bundles": [
+    {
+      "browser": "151.0.7922.34",
+      "node": "v24.21.0",
+      "profile": "parent-local",
+      "from": "staff-local",
+      "mode": "development",
+      "measurements": [
+        {
+          "kind": "first",
+          "profile": "parent-local",
+          "destination": "/szulo/feladatok",
+          "elapsed": 727.900146484375,
+          "observedElapsed": 745,
+          "requestElapsedLowerBound": 723,
+          "result": "success"
+        },
+        {
+          "kind": "switch-source-setup",
+          "profile": "staff-local",
+          "destination": "/munkatars/beosztas",
+          "elapsed": 445,
+          "observedElapsed": 529,
+          "requestElapsedLowerBound": 439,
+          "result": "success"
+        },
+        {
+          "kind": "switch",
+          "profile": "parent-local",
+          "destination": "/szulo/feladatok",
+          "elapsed": 256.199951171875,
+          "observedElapsed": 342,
+          "requestElapsedLowerBound": 250,
+          "result": "success"
+        }
+      ]
+    },
+    {
+      "browser": "151.0.7922.34",
+      "node": "v24.21.0",
+      "profile": "staff-local",
+      "from": "group-admin-local",
+      "mode": "development",
+      "measurements": [
+        {
+          "kind": "first",
+          "profile": "staff-local",
+          "destination": "/munkatars/beosztas",
+          "elapsed": 796.69970703125,
+          "observedElapsed": 810,
+          "requestElapsedLowerBound": 790,
+          "result": "success"
+        },
+        {
+          "kind": "switch-source-setup",
+          "profile": "group-admin-local",
+          "destination": "/admin",
+          "elapsed": 619.5,
+          "observedElapsed": 711,
+          "requestElapsedLowerBound": 614,
+          "result": "success"
+        },
+        {
+          "kind": "switch",
+          "profile": "staff-local",
+          "destination": "/munkatars/beosztas",
+          "elapsed": 282.39990234375,
+          "observedElapsed": 384,
+          "requestElapsedLowerBound": 276,
+          "result": "success"
+        }
+      ]
+    },
+    {
+      "browser": "151.0.7922.34",
+      "node": "v24.21.0",
+      "profile": "group-admin-local",
+      "from": "kindergarten-admin-local",
+      "mode": "development",
+      "measurements": [
+        {
+          "kind": "first",
+          "profile": "group-admin-local",
+          "destination": "/admin",
+          "elapsed": 980.5,
+          "observedElapsed": 999,
+          "requestElapsedLowerBound": 974,
+          "result": "success"
+        },
+        {
+          "kind": "switch-source-setup",
+          "profile": "kindergarten-admin-local",
+          "destination": "/admin",
+          "elapsed": 284.899658203125,
+          "observedElapsed": 369,
+          "requestElapsedLowerBound": 282,
+          "result": "success"
+        },
+        {
+          "kind": "switch",
+          "profile": "group-admin-local",
+          "destination": "/admin",
+          "elapsed": 258.099853515625,
+          "observedElapsed": 352,
+          "requestElapsedLowerBound": 252,
+          "result": "success"
+        }
+      ]
+    },
+    {
+      "browser": "151.0.7922.34",
+      "node": "v24.21.0",
+      "profile": "kindergarten-admin-local",
+      "from": "super-admin-local",
+      "mode": "development",
+      "measurements": [
+        {
+          "kind": "first",
+          "profile": "kindergarten-admin-local",
+          "destination": "/admin",
+          "elapsed": 907.300048828125,
+          "observedElapsed": 924,
+          "requestElapsedLowerBound": 901,
+          "result": "success"
+        },
+        {
+          "kind": "switch-source-setup",
+          "profile": "super-admin-local",
+          "destination": "/admin",
+          "elapsed": 294.2001953125,
+          "observedElapsed": 377,
+          "requestElapsedLowerBound": 287,
+          "result": "success"
+        },
+        {
+          "kind": "switch",
+          "profile": "kindergarten-admin-local",
+          "destination": "/admin",
+          "elapsed": 283.599853515625,
+          "observedElapsed": 370,
+          "requestElapsedLowerBound": 278,
+          "result": "success"
+        }
+      ]
+    },
+    {
+      "browser": "151.0.7922.34",
+      "node": "v24.21.0",
+      "profile": "super-admin-local",
+      "from": "parent-local",
+      "mode": "development",
+      "measurements": [
+        {
+          "kind": "first",
+          "profile": "super-admin-local",
+          "destination": "/admin",
+          "elapsed": 813.10009765625,
+          "observedElapsed": 831,
+          "requestElapsedLowerBound": 786,
+          "result": "success"
+        },
+        {
+          "kind": "switch-source-setup",
+          "profile": "parent-local",
+          "destination": "/szulo/feladatok",
+          "elapsed": 473.89990234375,
+          "observedElapsed": 573,
+          "requestElapsedLowerBound": 469,
+          "result": "success"
+        },
+        {
+          "kind": "switch",
+          "profile": "super-admin-local",
+          "destination": "/admin",
+          "elapsed": 285.199951171875,
+          "observedElapsed": 372,
+          "requestElapsedLowerBound": 280,
+          "result": "success"
+        }
+      ]
+    },
+    {
+      "browser": "151.0.7922.34",
+      "node": "v24.21.0",
+      "profile": "parent-local",
+      "from": "staff-local",
+      "mode": "production",
+      "measurements": [
+        {
+          "kind": "first",
+          "profile": "parent-local",
+          "destination": "/szulo/feladatok",
+          "elapsed": 150.2998046875,
+          "observedElapsed": 165,
+          "requestElapsedLowerBound": 144,
+          "result": "success"
+        },
+        {
+          "kind": "switch-source-setup",
+          "profile": "staff-local",
+          "destination": "/munkatars/beosztas",
+          "elapsed": 144.199951171875,
+          "observedElapsed": 187,
+          "requestElapsedLowerBound": 137,
+          "result": "success"
+        },
+        {
+          "kind": "switch",
+          "profile": "parent-local",
+          "destination": "/szulo/feladatok",
+          "elapsed": 119.699951171875,
+          "observedElapsed": 170,
+          "requestElapsedLowerBound": 112,
+          "result": "success"
+        }
+      ]
+    },
+    {
+      "browser": "151.0.7922.34",
+      "node": "v24.21.0",
+      "profile": "staff-local",
+      "from": "group-admin-local",
+      "mode": "production",
+      "measurements": [
+        {
+          "kind": "first",
+          "profile": "staff-local",
+          "destination": "/munkatars/beosztas",
+          "elapsed": 170.2998046875,
+          "observedElapsed": 187,
+          "requestElapsedLowerBound": 164,
+          "result": "success"
+        },
+        {
+          "kind": "switch-source-setup",
+          "profile": "group-admin-local",
+          "destination": "/admin",
+          "elapsed": 131.7001953125,
+          "observedElapsed": 182,
+          "requestElapsedLowerBound": 126,
+          "result": "success"
+        },
+        {
+          "kind": "switch",
+          "profile": "staff-local",
+          "destination": "/munkatars/beosztas",
+          "elapsed": 122.300048828125,
+          "observedElapsed": 165,
+          "requestElapsedLowerBound": 116,
+          "result": "success"
+        }
+      ]
+    },
+    {
+      "browser": "151.0.7922.34",
+      "node": "v24.21.0",
+      "profile": "group-admin-local",
+      "from": "kindergarten-admin-local",
+      "mode": "production",
+      "measurements": [
+        {
+          "kind": "first",
+          "profile": "group-admin-local",
+          "destination": "/admin",
+          "elapsed": 149.2998046875,
+          "observedElapsed": 164,
+          "requestElapsedLowerBound": 142,
+          "result": "success"
+        },
+        {
+          "kind": "switch-source-setup",
+          "profile": "kindergarten-admin-local",
+          "destination": "/admin",
+          "elapsed": 142.600341796875,
+          "observedElapsed": 185,
+          "requestElapsedLowerBound": 136,
+          "result": "success"
+        },
+        {
+          "kind": "switch",
+          "profile": "group-admin-local",
+          "destination": "/admin",
+          "elapsed": 123.699951171875,
+          "observedElapsed": 168,
+          "requestElapsedLowerBound": 117,
+          "result": "success"
+        }
+      ]
+    },
+    {
+      "browser": "151.0.7922.34",
+      "node": "v24.21.0",
+      "profile": "kindergarten-admin-local",
+      "from": "super-admin-local",
+      "mode": "production",
+      "measurements": [
+        {
+          "kind": "first",
+          "profile": "kindergarten-admin-local",
+          "destination": "/admin",
+          "elapsed": 183.60009765625,
+          "observedElapsed": 199,
+          "requestElapsedLowerBound": 176,
+          "result": "success"
+        },
+        {
+          "kind": "switch-source-setup",
+          "profile": "super-admin-local",
+          "destination": "/admin",
+          "elapsed": 163.199951171875,
+          "observedElapsed": 207,
+          "requestElapsedLowerBound": 134,
+          "result": "success"
+        },
+        {
+          "kind": "switch",
+          "profile": "kindergarten-admin-local",
+          "destination": "/admin",
+          "elapsed": 137.699951171875,
+          "observedElapsed": 181,
+          "requestElapsedLowerBound": 131,
+          "result": "success"
+        }
+      ]
+    },
+    {
+      "browser": "151.0.7922.34",
+      "node": "v24.21.0",
+      "profile": "super-admin-local",
+      "from": "parent-local",
+      "mode": "production",
+      "measurements": [
+        {
+          "kind": "first",
+          "profile": "super-admin-local",
+          "destination": "/admin",
+          "elapsed": 175.89990234375,
+          "observedElapsed": 197,
+          "requestElapsedLowerBound": 151,
+          "result": "success"
+        },
+        {
+          "kind": "switch-source-setup",
+          "profile": "parent-local",
+          "destination": "/szulo/feladatok",
+          "elapsed": 129.800048828125,
+          "observedElapsed": 172,
+          "requestElapsedLowerBound": 123,
+          "result": "success"
+        },
+        {
+          "kind": "switch",
+          "profile": "super-admin-local",
+          "destination": "/admin",
+          "elapsed": 139.10009765625,
+          "observedElapsed": 183,
+          "requestElapsedLowerBound": 132,
+          "result": "success"
+        }
+      ]
+    }
+  ]
+}

@@ -1,5 +1,11 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { assertLoginDuration } from "../browser/support/profile-login-server.ts";
+import {
+  measureProfileLogin,
+  permittedNavigationIds,
+  type LoginMeasurement,
+} from "../browser/support/profile-login-measurement.ts";
+import type { Page, Request as BrowserRequest } from "@playwright/test";
 import { composeRuntime } from "../../src/runtime/composition.ts";
 import { formatRuntimeConfigError, validateRuntimeConfig } from "../../src/runtime/config.ts";
 import { isSameOrigin } from "../../src/runtime/security/origin.ts";
@@ -20,10 +26,77 @@ describe("profile login measurement boundary", () => {
   it("accepts the inclusive five-second boundary", () => {
     expect(() => assertLoginDuration(5000)).not.toThrow();
   });
+  it("includes the existing scoped administrator core links without granting parent or staff access", () => {
+    expect(permittedNavigationIds(SYNTHETIC_PROFILES[2]).has("admin-archive")).toBe(true);
+    expect(permittedNavigationIds(SYNTHETIC_PROFILES[2]).has("admin-records")).toBe(true);
+    expect(permittedNavigationIds(SYNTHETIC_PROFILES[2]).has("admin-import")).toBe(false);
+    expect([...permittedNavigationIds(SYNTHETIC_PROFILES[0])]).toEqual([
+      "parent-duties",
+      "parent-notifications",
+    ]);
+    expect([...permittedNavigationIds(SYNTHETIC_PROFILES[1])]).toEqual(["staff-schedule"]);
+  });
   it("rejects a successful but over-budget login", () => {
     expect(() => assertLoginDuration(5001)).toThrow("within 5000 ms");
     expect(() => assertLoginDuration(Number.NaN)).toThrow();
     expect(() => assertLoginDuration(-1)).toThrow();
+  });
+  it.each([123, null, Number.NaN, -1])(
+    "records a failed selection before propagating it (timer %s)",
+    async (elapsed) => {
+      const failure = new Error("session request failed");
+      const page = {
+        on: vi.fn(),
+        off: vi.fn(),
+        evaluate: vi.fn().mockResolvedValueOnce(undefined).mockResolvedValueOnce(elapsed),
+        getByTestId: vi.fn().mockReturnValue({ click: vi.fn().mockRejectedValue(failure) }),
+      } as unknown as Page;
+      const records: LoginMeasurement[] = [];
+      await expect(
+        measureProfileLogin(page, SYNTHETIC_PROFILES[0], (record) => records.push(record)),
+      ).rejects.toBe(failure);
+      expect(records).toEqual([
+        expect.objectContaining({
+          profile: "parent-local",
+          destination: "/szulo/feladatok",
+          elapsed,
+          observedElapsed: expect.any(Number),
+          result: "failed",
+          error: "session request failed",
+        }),
+      ]);
+      expect(page.off).toHaveBeenCalledTimes(3);
+    },
+  );
+  it("preserves host observation when the renderer cannot return the submission timer", async () => {
+    const failure = new Error("browser disconnected");
+    let onRequest: ((request: BrowserRequest) => void) | undefined;
+    const page = {
+      on: vi.fn((event, listener) => {
+        if (event === "request") onRequest = listener;
+      }),
+      off: vi.fn(),
+      evaluate: vi.fn().mockResolvedValueOnce(undefined).mockRejectedValueOnce(failure),
+      getByTestId: vi.fn().mockReturnValue({
+        click: vi.fn(async () => {
+          onRequest?.({
+            method: () => "POST",
+            url: () => "http://127.0.0.1:3000/api/synthetic/session",
+          } as BrowserRequest);
+          throw failure;
+        }),
+      }),
+    } as unknown as Page;
+    const record = vi.fn();
+    await expect(measureProfileLogin(page, SYNTHETIC_PROFILES[0], record)).rejects.toBe(failure);
+    expect(record).toHaveBeenCalledWith(
+      expect.objectContaining({
+        elapsed: null,
+        observedElapsed: expect.any(Number),
+        requestElapsedLowerBound: expect.any(Number),
+        result: "failed",
+      }),
+    );
   });
   it("leaves normal Next output unchanged", async () => {
     vi.stubEnv("APP_LOGIN_TEST_DIST_DIR", undefined);

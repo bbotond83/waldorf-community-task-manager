@@ -1,0 +1,5 @@
+
+> waldorf-community-task-manager@0.2.0 typecheck
+> tsc --noEmit
+
+vitest.config.ts(3,40): error TS2307: Cannot find module './tests/coverage/support/production-coverage-reporter.ts' or its corresponding type declarations.

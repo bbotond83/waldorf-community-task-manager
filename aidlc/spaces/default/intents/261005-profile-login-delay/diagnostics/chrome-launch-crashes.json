@@ -1,0 +1,103 @@
+{
+  "sandboxLaunchPids": [
+    19182,
+    19185,
+    19188,
+    19191,
+    19194
+  ],
+  "matchedReports": [
+    {
+      "filename": "Google Chrome-2026-10-05-144248.000.ips",
+      "timestamp": "2026-10-05 14:42:48.00 +0200",
+      "pid": 19188,
+      "signal": "SIGABRT",
+      "frames": [
+        "__pthread_kill",
+        "pthread_kill",
+        "abort",
+        "___RegisterApplication_block_invoke",
+        "_dispatch_client_callout",
+        "_dispatch_once_callout",
+        "_RegisterApplication",
+        "TransformProcessType",
+        "ChromeMain",
+        "ChromeMain"
+      ]
+    },
+    {
+      "filename": "Google Chrome-2026-10-05-144248.0004.ips",
+      "timestamp": "2026-10-05 14:42:48.00 +0200",
+      "pid": 19194,
+      "signal": "SIGABRT",
+      "frames": [
+        "__pthread_kill",
+        "pthread_kill",
+        "abort",
+        "___RegisterApplication_block_invoke",
+        "_dispatch_client_callout",
+        "_dispatch_once_callout",
+        "_RegisterApplication",
+        "TransformProcessType",
+        "ChromeMain",
+        "ChromeMain"
+      ]
+    },
+    {
+      "filename": "Google Chrome-2026-10-05-144248.0003.ips",
+      "timestamp": "2026-10-05 14:42:48.00 +0200",
+      "pid": 19191,
+      "signal": "SIGABRT",
+      "frames": [
+        "__pthread_kill",
+        "pthread_kill",
+        "abort",
+        "___RegisterApplication_block_invoke",
+        "_dispatch_client_callout",
+        "_dispatch_once_callout",
+        "_RegisterApplication",
+        "TransformProcessType",
+        "ChromeMain",
+        "ChromeMain"
+      ]
+    },
+    {
+      "filename": "Google Chrome-2026-10-05-144248.ips",
+      "timestamp": "2026-10-05 14:42:48.00 +0200",
+      "pid": 19185,
+      "signal": "SIGABRT",
+      "frames": [
+        "__pthread_kill",
+        "pthread_kill",
+        "abort",
+        "___RegisterApplication_block_invoke",
+        "_dispatch_client_callout",
+        "_dispatch_once_callout",
+        "_RegisterApplication",
+        "TransformProcessType",
+        "ChromeMain",
+        "ChromeMain"
+      ]
+    },
+    {
+      "filename": "Google Chrome-2026-10-05-144248.0002.ips",
+      "timestamp": "2026-10-05 14:42:48.00 +0200",
+      "pid": 19182,
+      "signal": "SIGABRT",
+      "frames": [
+        "__pthread_kill",
+        "pthread_kill",
+        "abort",
+        "___RegisterApplication_block_invoke",
+        "_dispatch_client_callout",
+        "_dispatch_once_callout",
+        "_RegisterApplication",
+        "TransformProcessType",
+        "ChromeMain",
+        "ChromeMain"
+      ]
+    }
+  ],
+  "successfulRun": "construction/build-and-test/execution-results.json",
+  "latestChromeCrashOn20261005": "Google Chrome-2026-10-05-144248.ips"
+}

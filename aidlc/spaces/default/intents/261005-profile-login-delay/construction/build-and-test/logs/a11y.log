@@ -1,0 +1,36 @@
+
+> waldorf-community-task-manager@0.2.0 test:a11y
+> playwright test --config playwright.config.ts --grep @a11y
+
+
+Running 15 tests using 1 worker
+
+  ✓   1 [chromium] › tests/browser/admin-advanced.spec.ts:122:1 › @a11y advanced admin supports keyboard, focus, zoom, mobile touch, and axe (746ms)
+  ✓   2 [chromium] › tests/browser/admin-core.spec.ts:95:1 › @a11y administrator keyboard and automated accessibility checks pass (551ms)
+  ✓   3 [chromium] › tests/browser/parent-web.spec.ts:147:1 › @a11y Parent flow passes keyboard, focus, zoom, and axe checks (536ms)
+  ✓   4 [chromium] › tests/browser/runtime-foundation.spec.ts:34:1 › @a11y root flow has no serious or critical accessibility violations (743ms)
+  ✓   5 [chromium] › tests/browser/staff-web.spec.ts:130:1 › @a11y Staff supports keyboard, focus, zoom, touch, mobile cards, and axe (866ms)
+  ✓   6 [firefox] › tests/browser/admin-advanced.spec.ts:122:1 › @a11y advanced admin supports keyboard, focus, zoom, mobile touch, and axe (1.5s)
+  ✓   7 [firefox] › tests/browser/admin-core.spec.ts:95:1 › @a11y administrator keyboard and automated accessibility checks pass (817ms)
+  ✓   8 [firefox] › tests/browser/parent-web.spec.ts:147:1 › @a11y Parent flow passes keyboard, focus, zoom, and axe checks (779ms)
+  ✓   9 [firefox] › tests/browser/runtime-foundation.spec.ts:34:1 › @a11y root flow has no serious or critical accessibility violations (566ms)
+  ✓  10 [firefox] › tests/browser/staff-web.spec.ts:130:1 › @a11y Staff supports keyboard, focus, zoom, touch, mobile cards, and axe (931ms)
+  ✓  11 [mobile-chrome] › tests/browser/admin-advanced.spec.ts:122:1 › @a11y advanced admin supports keyboard, focus, zoom, mobile touch, and axe (981ms)
+  ✓  12 [mobile-chrome] › tests/browser/admin-core.spec.ts:95:1 › @a11y administrator keyboard and automated accessibility checks pass (632ms)
+  ✓  13 [mobile-chrome] › tests/browser/parent-web.spec.ts:147:1 › @a11y Parent flow passes keyboard, focus, zoom, and axe checks (568ms)
+  ✓  14 [mobile-chrome] › tests/browser/runtime-foundation.spec.ts:34:1 › @a11y root flow has no serious or critical accessibility violations (431ms)
+  ✓  15 [mobile-chrome] › tests/browser/staff-web.spec.ts:130:1 › @a11y Staff supports keyboard, focus, zoom, touch, mobile cards, and axe (558ms)
+
+  15 passed (15.7s)
+[WebServer] (node:24542) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:24608) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:24673) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+(node:24674) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:24690) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:24714) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)

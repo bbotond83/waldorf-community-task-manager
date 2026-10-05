@@ -1,13 +1,6 @@
 import { spawn } from "node:child_process";
 import { readFile, writeFile } from "node:fs/promises";
-import type { Page } from "@playwright/test";
-import type { SyntheticProfile } from "../../../src/runtime/synthetic/profiles.ts";
-
-export function assertLoginDuration(elapsed: number) {
-  if (!Number.isFinite(elapsed) || elapsed < 0 || elapsed > 5000) {
-    throw new Error(`Profile login must complete within 5000 ms; observed ${elapsed} ms`);
-  }
-}
+export { assertLoginDuration, measureProfileLogin } from "./profile-login-measurement.ts";
 
 async function restoreGeneratedTypes(distDir: string, previousEnv: string) {
   const configPath = "tsconfig.json";
@@ -118,35 +111,4 @@ export async function startLoginServer(mode: "development" | "production", port:
     await stop();
     throw error;
   }
-}
-
-export async function measureProfileLogin(page: Page, profile: SyntheticProfile) {
-  await page.evaluate(() => {
-    document.addEventListener(
-      "submit",
-      () => {
-        sessionStorage.setItem(
-          "login-performance-start",
-          String(performance.timeOrigin + performance.now()),
-        );
-      },
-      { once: true },
-    );
-  });
-  await page.getByTestId(`profile-selector-${profile.id}-button`).click();
-  await page.getByRole("heading", { name: `Üdvözlünk, ${profile.label}!`, exact: true }).waitFor();
-  for (const item of profile.navigation) {
-    const link = page.getByTestId(`app-shell-navigation-${item.id}`);
-    await link.waitFor();
-    if (!(await link.isEnabled()) || (await link.getAttribute("href")) !== item.href) {
-      throw new Error(`Selected-profile navigation is unusable: ${item.id}`);
-    }
-  }
-  const elapsed = await page.evaluate(() => {
-    const start = sessionStorage.getItem("login-performance-start");
-    if (start === null) throw new Error("Login submission timer was not recorded");
-    return performance.timeOrigin + performance.now() - Number(start);
-  });
-  assertLoginDuration(elapsed);
-  return elapsed;
 }

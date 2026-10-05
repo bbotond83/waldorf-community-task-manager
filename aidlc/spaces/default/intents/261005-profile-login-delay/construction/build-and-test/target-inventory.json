@@ -1,0 +1,82 @@
+[
+  [
+    "LOGIN",
+    "NFR1 / plan Measurement Protocol",
+    "Every flow<=5000ms"
+  ],
+  [
+    "SESSION",
+    "NFR2 / FR4",
+    "Session/origin/role/isolation checks pass"
+  ],
+  [
+    "FORMAT",
+    "NFR3",
+    "Formatter passes"
+  ],
+  [
+    "LINT",
+    "NFR3",
+    "Lint passes"
+  ],
+  [
+    "TYPES",
+    "NFR3",
+    "Strict types pass"
+  ],
+  [
+    "TESTS",
+    "NFR3",
+    "Existing tests green"
+  ],
+  [
+    "LINES",
+    "NFR3 / Testing Contract",
+    ">=80% production lines"
+  ],
+  [
+    "BRANCHES",
+    "NFR3 / Testing Contract",
+    ">=80% production branches"
+  ],
+  [
+    "FUNCTIONS",
+    "NFR3 / Testing Contract",
+    ">=80% production functions"
+  ],
+  [
+    "BUILD",
+    "NFR3",
+    "Production build passes"
+  ],
+  [
+    "SMOKE",
+    "NFR3",
+    "Deterministic start smoke passes"
+  ],
+  [
+    "BROWSER",
+    "NFR3",
+    "Critical browser flows pass"
+  ],
+  [
+    "A11Y",
+    "NFR3",
+    "Zero serious/critical axe violations"
+  ],
+  [
+    "DEPENDENCIES",
+    "NFR3",
+    "Zero high/critical vulnerabilities"
+  ],
+  [
+    "SAST",
+    "NFR3",
+    "No high/critical findings"
+  ],
+  [
+    "SECRETS",
+    "NFR3",
+    "Secrets/privacy/no-deploy pass"
+  ]
+]

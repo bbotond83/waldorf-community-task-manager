@@ -2,9 +2,13 @@ import { cpus, platform, release } from "node:os";
 import { expect, test } from "@playwright/test";
 import { SYNTHETIC_PROFILES } from "../../src/runtime/synthetic/profiles.ts";
 import { measureProfileLogin, startLoginServer } from "./support/profile-login-server.ts";
+import {
+  permittedNavigationIds,
+  type LoginMeasurement,
+} from "./support/profile-login-measurement.ts";
 
 const allLinks = [
-  ...new Set(SYNTHETIC_PROFILES.flatMap((profile) => profile.navigation.map((item) => item.id))),
+  ...new Set(SYNTHETIC_PROFILES.flatMap((profile) => [...permittedNavigationIds(profile)])),
 ];
 
 for (const mode of ["development", "production"] as const) {
@@ -14,21 +18,25 @@ for (const mode of ["development", "production"] as const) {
       browser,
     }, testInfo) => {
       const server = await startLoginServer(mode, 3800 + index);
-      const measurements: { kind: string; elapsed: number }[] = [];
+      const measurements: (LoginMeasurement & { kind: string })[] = [];
       try {
         await page.goto(server.origin);
         await expect(page.getByTestId("profile-selector")).toBeVisible();
-        measurements.push({ kind: "first", elapsed: await measureProfileLogin(page, profile) });
-        const forbidden = allLinks.filter(
-          (id) => !profile.navigation.some((item) => item.id === id),
+        await measureProfileLogin(page, profile, (measurement) =>
+          measurements.push({ kind: "first", ...measurement }),
         );
+        const forbidden = allLinks.filter((id) => !permittedNavigationIds(profile).has(id));
         for (const id of forbidden)
           await expect(page.getByTestId(`app-shell-navigation-${id}`)).toHaveCount(0);
         await page.getByTestId("app-shell-switch-profile-button").click();
         const previous = SYNTHETIC_PROFILES[(index + 1) % SYNTHETIC_PROFILES.length];
-        await measureProfileLogin(page, previous);
+        await measureProfileLogin(page, previous, (measurement) =>
+          measurements.push({ kind: "switch-source-setup", ...measurement }),
+        );
         await page.getByTestId("app-shell-switch-profile-button").click();
-        measurements.push({ kind: "switch", elapsed: await measureProfileLogin(page, profile) });
+        await measureProfileLogin(page, profile, (measurement) =>
+          measurements.push({ kind: "switch", ...measurement }),
+        );
         for (const id of forbidden)
           await expect(page.getByTestId(`app-shell-navigation-${id}`)).toHaveCount(0);
         await expect(

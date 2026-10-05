@@ -1,0 +1,5 @@
+
+> waldorf-community-task-manager@0.2.0 verify:manifests
+> node --experimental-strip-types scripts/verification/validate-manifests.ts
+
+VERIFICATION_MANIFESTS_VALID scenarios=39

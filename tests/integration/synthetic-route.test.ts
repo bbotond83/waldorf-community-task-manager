@@ -30,6 +30,8 @@ describe("synthetic-only route boundary", () => {
       const second = await selectSyntheticProfile(formRequest(profile.id));
       expect(first.status).toBe(303);
       expect(first.headers.get("location")).toBe(`${localOrigin}/`);
+      expect(first.headers.get("clear-site-data")).toBeNull();
+      expect(second.headers.get("clear-site-data")).toBeNull();
       const token = first.cookies.get(SESSION_COOKIE_NAME)?.value;
       expect(resolveSyntheticSession(token)?.profile.id).toBe(profile.id);
       expect(second.cookies.get(SESSION_COOKIE_NAME)?.value).not.toBe(token);
@@ -43,6 +45,7 @@ describe("synthetic-only route boundary", () => {
     expect(response.status).toBe(303);
     expect(response.cookies.get(SESSION_COOKIE_NAME)?.value).toBe("");
     expect(response.headers.get("location")).toBe(`${localOrigin}/`);
+    expect(response.headers.get("clear-site-data")).toBeNull();
   });
   it("rejects malformed form bodies without creating a session", async () => {
     vi.stubEnv("APP_RUNTIME_MODE", "synthetic");
@@ -79,12 +82,15 @@ describe("synthetic-only route boundary", () => {
     );
     expect(response.status).toBe(403);
     expect(response.cookies.get(SESSION_COOKIE_NAME)).toBeUndefined();
+    expect(response.headers.get("clear-site-data")).toBeNull();
   });
 
   it("returns a generic validation error for an unknown profile", async () => {
     vi.stubEnv("APP_RUNTIME_MODE", "synthetic");
     const response = await selectSyntheticProfile(formRequest("unknown-profile"));
     expect(response.status).toBe(400);
+    expect(response.cookies.get(SESSION_COOKIE_NAME)).toBeUndefined();
+    expect(response.headers.get("clear-site-data")).toBeNull();
     await expect(response.json()).resolves.toEqual({
       error: { code: "SYNTHETIC_PROFILE_INVALID" },
     });

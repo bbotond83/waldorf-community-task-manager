@@ -1,0 +1,943 @@
+{
+  "source": "Sanitized native Chrome HAR export; cookies, tokens, bodies, unrelated requests excluded. Only approved invented profile IDs extracted.",
+  "entries": [
+    {
+      "start": "2026-10-05T11:56:34.446Z",
+      "method": "POST",
+      "url": "http://127.0.0.1:3000/api/synthetic/session",
+      "status": 303,
+      "timeMs": 52.09900001957267,
+      "timings": {
+        "blocked": 1.918999990426004,
+        "dns": 0.008000000000000007,
+        "ssl": -1,
+        "connect": 0.264,
+        "send": 0.1279999999999999,
+        "wait": 49.022000019919126,
+        "receive": 0.7580000092275441,
+        "_blocked_queueing": 0.5949999904260039,
+        "_workerStart": -1,
+        "_workerReady": -1,
+        "_workerFetchStart": -1,
+        "_workerRespondWithSettled": -1
+      },
+      "bodySize": 0,
+      "resourceType": "document",
+      "headers": {
+        "location": "http://127.0.0.1:3000/"
+      },
+      "profileId": "",
+      "kind": "sign-out"
+    },
+    {
+      "start": "2026-10-05T11:56:34.498Z",
+      "method": "GET",
+      "url": "http://127.0.0.1:3000/",
+      "status": 200,
+      "timeMs": 46.833999978844076,
+      "timings": {
+        "blocked": 0.9819999822601676,
+        "dns": -1,
+        "ssl": -1,
+        "connect": -1,
+        "send": 0.10599999999999998,
+        "wait": 45.017999982960525,
+        "receive": 0.7280000136233866,
+        "_blocked_queueing": 0.2269999822601676,
+        "_workerStart": -1,
+        "_workerReady": -1,
+        "_workerFetchStart": -1,
+        "_workerRespondWithSettled": -1
+      },
+      "bodySize": 4406,
+      "resourceType": "document",
+      "headers": {
+        "Cache-Control": "no-cache, must-revalidate"
+      }
+    },
+    {
+      "start": "2026-10-05T11:57:26.963Z",
+      "method": "POST",
+      "url": "http://127.0.0.1:3000/api/synthetic/session",
+      "status": 303,
+      "timeMs": 22.857000003568828,
+      "timings": {
+        "blocked": 2.09600000243634,
+        "dns": -1,
+        "ssl": -1,
+        "connect": -1,
+        "send": 0.09200000000000008,
+        "wait": 19.848999985467643,
+        "receive": 0.8200000156648457,
+        "_blocked_queueing": 0.5660000024363399,
+        "_workerStart": -1,
+        "_workerReady": -1,
+        "_workerFetchStart": -1,
+        "_workerRespondWithSettled": -1
+      },
+      "bodySize": 0,
+      "resourceType": "document",
+      "headers": {
+        "location": "http://127.0.0.1:3000/"
+      },
+      "profileId": "parent-local",
+      "kind": "selection"
+    },
+    {
+      "start": "2026-10-05T11:57:26.986Z",
+      "method": "GET",
+      "url": "http://127.0.0.1:3000/",
+      "status": 200,
+      "timeMs": 22.72199996514246,
+      "timings": {
+        "blocked": 1.0040000088326633,
+        "dns": -1,
+        "ssl": -1,
+        "connect": -1,
+        "send": 0.08900000000000008,
+        "wait": 20.90400002373755,
+        "receive": 0.7249999325722456,
+        "_blocked_queueing": 0.2840000088326633,
+        "_workerStart": -1,
+        "_workerReady": -1,
+        "_workerFetchStart": -1,
+        "_workerRespondWithSettled": -1
+      },
+      "bodySize": 4510,
+      "resourceType": "document",
+      "headers": {
+        "Cache-Control": "no-cache, must-revalidate"
+      }
+    },
+    {
+      "start": "2026-10-05T11:57:36.620Z",
+      "method": "GET",
+      "url": "http://127.0.0.1:3000/szulo/feladatok",
+      "status": 200,
+      "timeMs": 64.19800000730902,
+      "timings": {
+        "blocked": 4.677999962840229,
+        "dns": -1,
+        "ssl": -1,
+        "connect": -1,
+        "send": 0.3460000000000001,
+        "wait": 57.630999995045364,
+        "receive": 1.5430000494234264,
+        "_blocked_queueing": 1.9749999628402293,
+        "_workerStart": -1,
+        "_workerReady": -1,
+        "_workerFetchStart": -1,
+        "_workerRespondWithSettled": -1
+      },
+      "bodySize": 6117,
+      "resourceType": "document",
+      "headers": {
+        "Cache-Control": "no-cache, must-revalidate"
+      }
+    },
+    {
+      "start": "2026-10-05T11:58:24.227Z",
+      "method": "POST",
+      "url": "http://127.0.0.1:3000/api/synthetic/session",
+      "status": 303,
+      "timeMs": 11.752000002413988,
+      "timings": {
+        "blocked": 2.3249999961964787,
+        "dns": 0.010000000000000009,
+        "ssl": -1,
+        "connect": 0.34799999999999986,
+        "send": 0.14100000000000001,
+        "wait": 8.004000013552606,
+        "receive": 0.9239999926649034,
+        "_blocked_queueing": 0.7409999961964786,
+        "_workerStart": -1,
+        "_workerReady": -1,
+        "_workerFetchStart": -1,
+        "_workerRespondWithSettled": -1
+      },
+      "bodySize": 0,
+      "resourceType": "document",
+      "headers": {
+        "location": "http://127.0.0.1:3000/"
+      },
+      "profileId": "",
+      "kind": "sign-out"
+    },
+    {
+      "start": "2026-10-05T11:58:24.238Z",
+      "method": "GET",
+      "url": "http://127.0.0.1:3000/",
+      "status": 200,
+      "timeMs": 22.123000002466142,
+      "timings": {
+        "blocked": 0.9250000262595713,
+        "dns": -1,
+        "ssl": -1,
+        "connect": -1,
+        "send": 0.09399999999999997,
+        "wait": 20.233999987270682,
+        "receive": 0.8699999889358878,
+        "_blocked_queueing": 0.2710000262595713,
+        "_workerStart": -1,
+        "_workerReady": -1,
+        "_workerFetchStart": -1,
+        "_workerRespondWithSettled": -1
+      },
+      "bodySize": 4404,
+      "resourceType": "document",
+      "headers": {
+        "Cache-Control": "no-cache, must-revalidate"
+      }
+    },
+    {
+      "start": "2026-10-05T11:58:44.236Z",
+      "method": "POST",
+      "url": "http://127.0.0.1:3000/api/synthetic/session",
+      "status": 303,
+      "timeMs": 13.643000039357691,
+      "timings": {
+        "blocked": 1.2240000195503236,
+        "dns": 0.008000000000000007,
+        "ssl": -1,
+        "connect": 3.867,
+        "send": 0.1589999999999998,
+        "wait": 7.505000012934208,
+        "receive": 0.8800000068731606,
+        "_blocked_queueing": 0.7670000195503235,
+        "_workerStart": -1,
+        "_workerReady": -1,
+        "_workerFetchStart": -1,
+        "_workerRespondWithSettled": -1
+      },
+      "bodySize": 0,
+      "resourceType": "document",
+      "headers": {
+        "location": "http://127.0.0.1:3000/"
+      },
+      "profileId": "parent-local",
+      "kind": "selection"
+    },
+    {
+      "start": "2026-10-05T11:58:44.250Z",
+      "method": "GET",
+      "url": "http://127.0.0.1:3000/",
+      "status": 200,
+      "timeMs": 23.212999978568405,
+      "timings": {
+        "blocked": 0.8020000023953616,
+        "dns": -1,
+        "ssl": -1,
+        "connect": -1,
+        "send": 0.09000000000000008,
+        "wait": 21.646000016871838,
+        "receive": 0.6749999593012035,
+        "_blocked_queueing": 0.22200000239536166,
+        "_workerStart": -1,
+        "_workerReady": -1,
+        "_workerFetchStart": -1,
+        "_workerRespondWithSettled": -1
+      },
+      "bodySize": 4507,
+      "resourceType": "document",
+      "headers": {
+        "Cache-Control": "no-cache, must-revalidate"
+      }
+    },
+    {
+      "start": "2026-10-05T11:58:45.381Z",
+      "method": "GET",
+      "url": "http://127.0.0.1:3000/szulo/feladatok",
+      "status": 200,
+      "timeMs": 34.2100000125356,
+      "timings": {
+        "blocked": 1.6780000142902136,
+        "dns": -1,
+        "ssl": -1,
+        "connect": -1,
+        "send": 0.11999999999999988,
+        "wait": 31.338000027559698,
+        "receive": 1.0739999706856906,
+        "_blocked_queueing": 0.6440000142902136,
+        "_workerStart": -1,
+        "_workerReady": -1,
+        "_workerFetchStart": -1,
+        "_workerRespondWithSettled": -1
+      },
+      "bodySize": 6113,
+      "resourceType": "document",
+      "headers": {
+        "Cache-Control": "no-cache, must-revalidate"
+      }
+    },
+    {
+      "start": "2026-10-05T11:59:04.752Z",
+      "method": "POST",
+      "url": "http://127.0.0.1:3000/api/synthetic/session",
+      "status": 303,
+      "timeMs": 11.533999990206212,
+      "timings": {
+        "blocked": 2.5839999818727373,
+        "dns": -1,
+        "ssl": -1,
+        "connect": -1,
+        "send": 0.08999999999999986,
+        "wait": 7.939999987918884,
+        "receive": 0.9200000204145908,
+        "_blocked_queueing": 1.2359999818727374,
+        "_workerStart": -1,
+        "_workerReady": -1,
+        "_workerFetchStart": -1,
+        "_workerRespondWithSettled": -1
+      },
+      "bodySize": 0,
+      "resourceType": "document",
+      "headers": {
+        "location": "http://127.0.0.1:3000/"
+      },
+      "profileId": "",
+      "kind": "sign-out"
+    },
+    {
+      "start": "2026-10-05T11:59:04.763Z",
+      "method": "GET",
+      "url": "http://127.0.0.1:3000/",
+      "status": 200,
+      "timeMs": 25.36500000860542,
+      "timings": {
+        "blocked": 0.9949999550208449,
+        "dns": -1,
+        "ssl": -1,
+        "connect": -1,
+        "send": 0.14600000000000002,
+        "wait": 23.41700002049282,
+        "receive": 0.8070000330917537,
+        "_blocked_queueing": 0.25399995502084494,
+        "_workerStart": -1,
+        "_workerReady": -1,
+        "_workerFetchStart": -1,
+        "_workerRespondWithSettled": -1
+      },
+      "bodySize": 4404,
+      "resourceType": "document",
+      "headers": {
+        "Cache-Control": "no-cache, must-revalidate"
+      }
+    },
+    {
+      "start": "2026-10-05T11:59:05.915Z",
+      "method": "POST",
+      "url": "http://127.0.0.1:3000/api/synthetic/session",
+      "status": 303,
+      "timeMs": 7.01100000878796,
+      "timings": {
+        "blocked": 2.697999987207353,
+        "dns": -1,
+        "ssl": -1,
+        "connect": -1,
+        "send": 0.17900000000000027,
+        "wait": 3.3760000123530625,
+        "receive": 0.7580000092275441,
+        "_blocked_queueing": 0.5639999872073531,
+        "_workerStart": -1,
+        "_workerReady": -1,
+        "_workerFetchStart": -1,
+        "_workerRespondWithSettled": -1
+      },
+      "bodySize": 0,
+      "resourceType": "document",
+      "headers": {
+        "location": "http://127.0.0.1:3000/"
+      },
+      "profileId": "staff-local",
+      "kind": "selection"
+    },
+    {
+      "start": "2026-10-05T11:59:05.922Z",
+      "method": "GET",
+      "url": "http://127.0.0.1:3000/",
+      "status": 200,
+      "timeMs": 18.281999975442886,
+      "timings": {
+        "blocked": 0.8299999795518815,
+        "dns": -1,
+        "ssl": -1,
+        "connect": -1,
+        "send": 0.08599999999999997,
+        "wait": 16.593999996475876,
+        "receive": 0.7719999994151294,
+        "_blocked_queueing": 0.21899997955188155,
+        "_workerStart": -1,
+        "_workerReady": -1,
+        "_workerFetchStart": -1,
+        "_workerRespondWithSettled": -1
+      },
+      "bodySize": 4481,
+      "resourceType": "document",
+      "headers": {
+        "Cache-Control": "no-cache, must-revalidate"
+      }
+    },
+    {
+      "start": "2026-10-05T11:59:06.764Z",
+      "method": "GET",
+      "url": "http://127.0.0.1:3000/munkatars/beosztas",
+      "status": 200,
+      "timeMs": 63.482999976258725,
+      "timings": {
+        "blocked": 2.1659999958425757,
+        "dns": -1,
+        "ssl": -1,
+        "connect": -1,
+        "send": 0.10099999999999998,
+        "wait": 60.19500000584498,
+        "receive": 1.0209999745711684,
+        "_blocked_queueing": 0.610999995842576,
+        "_workerStart": -1,
+        "_workerReady": -1,
+        "_workerFetchStart": -1,
+        "_workerRespondWithSettled": -1
+      },
+      "bodySize": 6975,
+      "resourceType": "document",
+      "headers": {
+        "Cache-Control": "no-cache, must-revalidate"
+      }
+    },
+    {
+      "start": "2026-10-05T12:00:36.142Z",
+      "method": "POST",
+      "url": "http://127.0.0.1:3000/api/synthetic/session",
+      "status": 303,
+      "timeMs": 10.250999999698251,
+      "timings": {
+        "blocked": 1.4909999943114816,
+        "dns": -1,
+        "ssl": -1,
+        "connect": -1,
+        "send": 0.10300000000000009,
+        "wait": 6.896999991640449,
+        "receive": 1.7600000137463212,
+        "_blocked_queueing": 0.5419999943114817,
+        "_workerStart": -1,
+        "_workerReady": -1,
+        "_workerFetchStart": -1,
+        "_workerRespondWithSettled": -1
+      },
+      "bodySize": 0,
+      "resourceType": "document",
+      "headers": {
+        "location": "http://127.0.0.1:3000/"
+      },
+      "profileId": "",
+      "kind": "sign-out"
+    },
+    {
+      "start": "2026-10-05T12:00:36.153Z",
+      "method": "GET",
+      "url": "http://127.0.0.1:3000/",
+      "status": 200,
+      "timeMs": 23.369000002276152,
+      "timings": {
+        "blocked": 0.928000007301569,
+        "dns": -1,
+        "ssl": -1,
+        "connect": -1,
+        "send": 0.09700000000000009,
+        "wait": 21.665000005215408,
+        "receive": 0.678999989759177,
+        "_blocked_queueing": 0.21500000730156898,
+        "_workerStart": -1,
+        "_workerReady": -1,
+        "_workerFetchStart": -1,
+        "_workerRespondWithSettled": -1
+      },
+      "bodySize": 4408,
+      "resourceType": "document",
+      "headers": {
+        "Cache-Control": "no-cache, must-revalidate"
+      }
+    },
+    {
+      "start": "2026-10-05T12:00:37.288Z",
+      "method": "POST",
+      "url": "http://127.0.0.1:3000/api/synthetic/session",
+      "status": 303,
+      "timeMs": 6.825999997090548,
+      "timings": {
+        "blocked": 1.6849999670721592,
+        "dns": -1,
+        "ssl": -1,
+        "connect": -1,
+        "send": 0.11399999999999988,
+        "wait": 3.6120000239275396,
+        "receive": 1.4150000060908496,
+        "_blocked_queueing": 0.568999967072159,
+        "_workerStart": -1,
+        "_workerReady": -1,
+        "_workerFetchStart": -1,
+        "_workerRespondWithSettled": -1
+      },
+      "bodySize": 0,
+      "resourceType": "document",
+      "headers": {
+        "location": "http://127.0.0.1:3000/"
+      },
+      "profileId": "group-admin-local",
+      "kind": "selection"
+    },
+    {
+      "start": "2026-10-05T12:00:37.295Z",
+      "method": "GET",
+      "url": "http://127.0.0.1:3000/",
+      "status": 200,
+      "timeMs": 19.47999995900318,
+      "timings": {
+        "blocked": 0.9939999810829758,
+        "dns": -1,
+        "ssl": -1,
+        "connect": -1,
+        "send": 0.10000000000000009,
+        "wait": 17.641000009473412,
+        "receive": 0.7449999684467912,
+        "_blocked_queueing": 0.28799998108297586,
+        "_workerStart": -1,
+        "_workerReady": -1,
+        "_workerFetchStart": -1,
+        "_workerRespondWithSettled": -1
+      },
+      "bodySize": 4579,
+      "resourceType": "document",
+      "headers": {
+        "Cache-Control": "no-cache, must-revalidate"
+      }
+    },
+    {
+      "start": "2026-10-05T12:00:38.428Z",
+      "method": "GET",
+      "url": "http://127.0.0.1:3000/admin",
+      "status": 200,
+      "timeMs": 52.36400000285357,
+      "timings": {
+        "blocked": 2.338000001925975,
+        "dns": -1,
+        "ssl": -1,
+        "connect": -1,
+        "send": 0.1160000000000001,
+        "wait": 49.106999998293816,
+        "receive": 0.8030000026337802,
+        "_blocked_queueing": 0.5430000019259751,
+        "_workerStart": -1,
+        "_workerReady": -1,
+        "_workerFetchStart": -1,
+        "_workerRespondWithSettled": -1
+      },
+      "bodySize": 5411,
+      "resourceType": "document",
+      "headers": {
+        "Cache-Control": "no-cache, must-revalidate"
+      }
+    },
+    {
+      "start": "2026-10-05T12:00:44.782Z",
+      "method": "POST",
+      "url": "http://127.0.0.1:3000/api/synthetic/session",
+      "status": 303,
+      "timeMs": 11.406000005081296,
+      "timings": {
+        "blocked": 2.1049999860301614,
+        "dns": -1,
+        "ssl": -1,
+        "connect": -1,
+        "send": 0.09400000000000008,
+        "wait": 8.420999971240759,
+        "receive": 0.7860000478103757,
+        "_blocked_queueing": 0.6249999860301614,
+        "_workerStart": -1,
+        "_workerReady": -1,
+        "_workerFetchStart": -1,
+        "_workerRespondWithSettled": -1
+      },
+      "bodySize": 0,
+      "resourceType": "document",
+      "headers": {
+        "location": "http://127.0.0.1:3000/"
+      },
+      "profileId": "",
+      "kind": "sign-out"
+    },
+    {
+      "start": "2026-10-05T12:00:44.794Z",
+      "method": "GET",
+      "url": "http://127.0.0.1:3000/",
+      "status": 200,
+      "timeMs": 20.824999955948442,
+      "timings": {
+        "blocked": 0.9859999719373882,
+        "dns": -1,
+        "ssl": -1,
+        "connect": -1,
+        "send": 0.10599999999999998,
+        "wait": 19.09799998004362,
+        "receive": 0.6350000039674342,
+        "_blocked_queueing": 0.21799997193738818,
+        "_workerStart": -1,
+        "_workerReady": -1,
+        "_workerFetchStart": -1,
+        "_workerRespondWithSettled": -1
+      },
+      "bodySize": 4404,
+      "resourceType": "document",
+      "headers": {
+        "Cache-Control": "no-cache, must-revalidate"
+      }
+    },
+    {
+      "start": "2026-10-05T12:00:45.959Z",
+      "method": "POST",
+      "url": "http://127.0.0.1:3000/api/synthetic/session",
+      "status": 303,
+      "timeMs": 10.735000018030405,
+      "timings": {
+        "blocked": 2.217000015467405,
+        "dns": -1,
+        "ssl": -1,
+        "connect": -1,
+        "send": 0.127,
+        "wait": 7.609999992825091,
+        "receive": 0.7810000097379088,
+        "_blocked_queueing": 0.5830000154674053,
+        "_workerStart": -1,
+        "_workerReady": -1,
+        "_workerFetchStart": -1,
+        "_workerRespondWithSettled": -1
+      },
+      "bodySize": 0,
+      "resourceType": "document",
+      "headers": {
+        "location": "http://127.0.0.1:3000/"
+      },
+      "profileId": "kindergarten-admin-local",
+      "kind": "selection"
+    },
+    {
+      "start": "2026-10-05T12:00:45.969Z",
+      "method": "GET",
+      "url": "http://127.0.0.1:3000/",
+      "status": 200,
+      "timeMs": 20.488000009208918,
+      "timings": {
+        "blocked": 0.9150000149160623,
+        "dns": -1,
+        "ssl": -1,
+        "connect": -1,
+        "send": 0.1100000000000001,
+        "wait": 18.687000022627412,
+        "receive": 0.775999971665442,
+        "_blocked_queueing": 0.21600001491606236,
+        "_workerStart": -1,
+        "_workerReady": -1,
+        "_workerFetchStart": -1,
+        "_workerRespondWithSettled": -1
+      },
+      "bodySize": 4890,
+      "resourceType": "document",
+      "headers": {
+        "Cache-Control": "no-cache, must-revalidate"
+      }
+    },
+    {
+      "start": "2026-10-05T12:00:47.100Z",
+      "method": "GET",
+      "url": "http://127.0.0.1:3000/admin",
+      "status": 200,
+      "timeMs": 32.7640000032261,
+      "timings": {
+        "blocked": 1.5320000257901847,
+        "dns": -1,
+        "ssl": -1,
+        "connect": -1,
+        "send": 0.10499999999999998,
+        "wait": 30.12900000337511,
+        "receive": 0.9979999740608037,
+        "_blocked_queueing": 0.5920000257901847,
+        "_workerStart": -1,
+        "_workerReady": -1,
+        "_workerFetchStart": -1,
+        "_workerRespondWithSettled": -1
+      },
+      "bodySize": 5677,
+      "resourceType": "document",
+      "headers": {
+        "Cache-Control": "no-cache, must-revalidate"
+      }
+    },
+    {
+      "start": "2026-10-05T12:00:56.405Z",
+      "method": "POST",
+      "url": "http://127.0.0.1:3000/api/synthetic/session",
+      "status": 303,
+      "timeMs": 10.13899995907396,
+      "timings": {
+        "blocked": 0.8119999948218465,
+        "dns": 0.008000000000000007,
+        "ssl": -1,
+        "connect": 0.374,
+        "send": 0.131,
+        "wait": 8.018000014919787,
+        "receive": 0.7959999493323267,
+        "_blocked_queueing": 0.5649999948218465,
+        "_workerStart": -1,
+        "_workerReady": -1,
+        "_workerFetchStart": -1,
+        "_workerRespondWithSettled": -1
+      },
+      "bodySize": 0,
+      "resourceType": "document",
+      "headers": {
+        "location": "http://127.0.0.1:3000/"
+      },
+      "profileId": "",
+      "kind": "sign-out"
+    },
+    {
+      "start": "2026-10-05T12:00:56.415Z",
+      "method": "GET",
+      "url": "http://127.0.0.1:3000/",
+      "status": 200,
+      "timeMs": 21.000000007916242,
+      "timings": {
+        "blocked": 0.850000024728477,
+        "dns": -1,
+        "ssl": -1,
+        "connect": -1,
+        "send": 0.09099999999999997,
+        "wait": 19.2240000279285,
+        "receive": 0.8349999552592635,
+        "_blocked_queueing": 0.202000024728477,
+        "_workerStart": -1,
+        "_workerReady": -1,
+        "_workerFetchStart": -1,
+        "_workerRespondWithSettled": -1
+      },
+      "bodySize": 4404,
+      "resourceType": "document",
+      "headers": {
+        "Cache-Control": "no-cache, must-revalidate"
+      }
+    },
+    {
+      "start": "2026-10-05T12:00:57.549Z",
+      "method": "POST",
+      "url": "http://127.0.0.1:3000/api/synthetic/session",
+      "status": 303,
+      "timeMs": 6.517000030726194,
+      "timings": {
+        "blocked": 1.8250000142902136,
+        "dns": -1,
+        "ssl": -1,
+        "connect": -1,
+        "send": 0.139,
+        "wait": 3.685999992135912,
+        "receive": 0.8670000243000686,
+        "_blocked_queueing": 0.6440000142902136,
+        "_workerStart": -1,
+        "_workerReady": -1,
+        "_workerFetchStart": -1,
+        "_workerRespondWithSettled": -1
+      },
+      "bodySize": 0,
+      "resourceType": "document",
+      "headers": {
+        "location": "http://127.0.0.1:3000/"
+      },
+      "profileId": "super-admin-local",
+      "kind": "selection"
+    },
+    {
+      "start": "2026-10-05T12:00:57.555Z",
+      "method": "GET",
+      "url": "http://127.0.0.1:3000/",
+      "status": 200,
+      "timeMs": 20.61799995135516,
+      "timings": {
+        "blocked": 1.7579999496042729,
+        "dns": -1,
+        "ssl": -1,
+        "connect": -1,
+        "send": 0.11999999999999988,
+        "wait": 18.055999973919242,
+        "receive": 0.6840000278316438,
+        "_blocked_queueing": 0.23799994960427284,
+        "_workerStart": -1,
+        "_workerReady": -1,
+        "_workerFetchStart": -1,
+        "_workerRespondWithSettled": -1
+      },
+      "bodySize": 4882,
+      "resourceType": "document",
+      "headers": {
+        "Cache-Control": "no-cache, must-revalidate"
+      }
+    },
+    {
+      "start": "2026-10-05T12:00:58.671Z",
+      "method": "GET",
+      "url": "http://127.0.0.1:3000/admin",
+      "status": 200,
+      "timeMs": 37.34500001883134,
+      "timings": {
+        "blocked": 1.5650000176653265,
+        "dns": -1,
+        "ssl": -1,
+        "connect": -1,
+        "send": 0.122,
+        "wait": 34.658000011876226,
+        "receive": 0.9999999892897904,
+        "_blocked_queueing": 0.5680000176653266,
+        "_workerStart": -1,
+        "_workerReady": -1,
+        "_workerFetchStart": -1,
+        "_workerRespondWithSettled": -1
+      },
+      "bodySize": 5692,
+      "resourceType": "document",
+      "headers": {
+        "Cache-Control": "no-cache, must-revalidate"
+      }
+    },
+    {
+      "start": "2026-10-05T12:01:14.517Z",
+      "method": "POST",
+      "url": "http://127.0.0.1:3000/api/synthetic/session",
+      "status": 303,
+      "timeMs": 10.397000005468726,
+      "timings": {
+        "blocked": 2.0599999924674632,
+        "dns": -1,
+        "ssl": -1,
+        "connect": -1,
+        "send": 0.08600000000000008,
+        "wait": 7.407999996826053,
+        "receive": 0.8430000161752105,
+        "_blocked_queueing": 0.686999992467463,
+        "_workerStart": -1,
+        "_workerReady": -1,
+        "_workerFetchStart": -1,
+        "_workerRespondWithSettled": -1
+      },
+      "bodySize": 0,
+      "resourceType": "document",
+      "headers": {
+        "location": "http://127.0.0.1:3000/"
+      },
+      "profileId": "",
+      "kind": "sign-out"
+    },
+    {
+      "start": "2026-10-05T12:01:14.527Z",
+      "method": "GET",
+      "url": "http://127.0.0.1:3000/",
+      "status": 200,
+      "timeMs": 20.317999995313585,
+      "timings": {
+        "blocked": 0.9560000029057264,
+        "dns": -1,
+        "ssl": -1,
+        "connect": -1,
+        "send": 0.10999999999999999,
+        "wait": 18.53899997658655,
+        "receive": 0.7130000158213079,
+        "_blocked_queueing": 0.24500000290572643,
+        "_workerStart": -1,
+        "_workerReady": -1,
+        "_workerFetchStart": -1,
+        "_workerRespondWithSettled": -1
+      },
+      "bodySize": 4408,
+      "resourceType": "document",
+      "headers": {
+        "Cache-Control": "no-cache, must-revalidate"
+      }
+    },
+    {
+      "start": "2026-10-05T12:01:15.674Z",
+      "method": "POST",
+      "url": "http://127.0.0.1:3000/api/synthetic/session",
+      "status": 303,
+      "timeMs": 6.976000033318996,
+      "timings": {
+        "blocked": 2.2130000350922345,
+        "dns": -1,
+        "ssl": -1,
+        "connect": -1,
+        "send": 0.10699999999999998,
+        "wait": 3.8599999906867746,
+        "receive": 0.7960000075399876,
+        "_blocked_queueing": 0.5550000350922346,
+        "_workerStart": -1,
+        "_workerReady": -1,
+        "_workerFetchStart": -1,
+        "_workerRespondWithSettled": -1
+      },
+      "bodySize": 0,
+      "resourceType": "document",
+      "headers": {
+        "location": "http://127.0.0.1:3000/"
+      },
+      "profileId": "parent-local",
+      "kind": "selection"
+    },
+    {
+      "start": "2026-10-05T12:01:15.681Z",
+      "method": "GET",
+      "url": "http://127.0.0.1:3000/",
+      "status": 200,
+      "timeMs": 18.452999996952713,
+      "timings": {
+        "blocked": 0.875000004593283,
+        "dns": -1,
+        "ssl": -1,
+        "connect": -1,
+        "send": 0.10999999999999999,
+        "wait": 16.739999978736044,
+        "receive": 0.7280000136233866,
+        "_blocked_queueing": 0.20700000459328294,
+        "_workerStart": -1,
+        "_workerReady": -1,
+        "_workerFetchStart": -1,
+        "_workerRespondWithSettled": -1
+      },
+      "bodySize": 4507,
+      "resourceType": "document",
+      "headers": {
+        "Cache-Control": "no-cache, must-revalidate"
+      }
+    },
+    {
+      "start": "2026-10-05T12:01:16.799Z",
+      "method": "GET",
+      "url": "http://127.0.0.1:3000/szulo/feladatok",
+      "status": 200,
+      "timeMs": 49.07199996523559,
+      "timings": {
+        "blocked": 1.5939999648742378,
+        "dns": -1,
+        "ssl": -1,
+        "connect": -1,
+        "send": 0.11099999999999999,
+        "wait": 46.423999979436395,
+        "receive": 0.9430000209249556,
+        "_blocked_queueing": 0.5839999648742378,
+        "_workerStart": -1,
+        "_workerReady": -1,
+        "_workerFetchStart": -1,
+        "_workerRespondWithSettled": -1
+      },
+      "bodySize": 6114,
+      "resourceType": "document",
+      "headers": {
+        "Cache-Control": "no-cache, must-revalidate"
+      }
+    }
+  ]
+}

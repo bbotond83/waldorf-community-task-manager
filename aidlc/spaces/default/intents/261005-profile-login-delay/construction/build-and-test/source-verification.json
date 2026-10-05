@@ -1,0 +1,953 @@
+{
+  "revision": "85dab6b5c7762265357146a54e1612479e8c4302",
+  "snapshot": "/private/tmp/waldorf-quality-final-261005",
+  "owned": [
+    {
+      "path": "app/api/synthetic/session/route.ts",
+      "expected": "21a701b754f28e85051331bca1693868b555ab13707e332f0dcc4279a77e66aa",
+      "workspace": "21a701b754f28e85051331bca1693868b555ab13707e332f0dcc4279a77e66aa",
+      "snapshot": "21a701b754f28e85051331bca1693868b555ab13707e332f0dcc4279a77e66aa",
+      "match": true
+    },
+    {
+      "path": "tests/integration/synthetic-route.test.ts",
+      "expected": "d0369c154d5b5841e15fc23418e51182608f395a0d83c0df6a274fab29502ccb",
+      "workspace": "d0369c154d5b5841e15fc23418e51182608f395a0d83c0df6a274fab29502ccb",
+      "snapshot": "d0369c154d5b5841e15fc23418e51182608f395a0d83c0df6a274fab29502ccb",
+      "match": true
+    },
+    {
+      "path": "README.md",
+      "expected": "48492c99a2c38c3a3d31f1301ba5c9b68691777dbc6800768cf79036929c5172",
+      "workspace": "48492c99a2c38c3a3d31f1301ba5c9b68691777dbc6800768cf79036929c5172",
+      "snapshot": "48492c99a2c38c3a3d31f1301ba5c9b68691777dbc6800768cf79036929c5172",
+      "match": true
+    },
+    {
+      "path": "playwright.config.ts",
+      "expected": "b35c33f1e261fc85d1ca1a12f8573450fc1850180fb75c67d0681883459ee81d",
+      "workspace": "b35c33f1e261fc85d1ca1a12f8573450fc1850180fb75c67d0681883459ee81d",
+      "snapshot": "b35c33f1e261fc85d1ca1a12f8573450fc1850180fb75c67d0681883459ee81d",
+      "match": true
+    },
+    {
+      "path": "playwright.login-existing.config.ts",
+      "expected": "96fae9848722be1c63c16e76165d337a9b181db01de61a68156139061bfb2575",
+      "workspace": "96fae9848722be1c63c16e76165d337a9b181db01de61a68156139061bfb2575",
+      "snapshot": "96fae9848722be1c63c16e76165d337a9b181db01de61a68156139061bfb2575",
+      "match": true
+    },
+    {
+      "path": "tests/browser/profile-login-existing.spec.ts",
+      "expected": "e8423af39f48f59e430a6a75f1c23358b08a1bfeed0f64e67153b3d05920b5c9",
+      "workspace": "e8423af39f48f59e430a6a75f1c23358b08a1bfeed0f64e67153b3d05920b5c9",
+      "snapshot": "e8423af39f48f59e430a6a75f1c23358b08a1bfeed0f64e67153b3d05920b5c9",
+      "match": true
+    },
+    {
+      "path": "tests/browser/profile-login-performance.spec.ts",
+      "expected": "11f7199139dca85c2519055dcc7a67cf3c656345d5900c530688c6eb105ecbc1",
+      "workspace": "11f7199139dca85c2519055dcc7a67cf3c656345d5900c530688c6eb105ecbc1",
+      "snapshot": "11f7199139dca85c2519055dcc7a67cf3c656345d5900c530688c6eb105ecbc1",
+      "match": true
+    },
+    {
+      "path": "tests/browser/runtime-foundation.spec.ts",
+      "expected": "d177de9e14c19a5cb2bbfc8369455bd6f92602bf5667c90413e7e48875e8e82f",
+      "workspace": "d177de9e14c19a5cb2bbfc8369455bd6f92602bf5667c90413e7e48875e8e82f",
+      "snapshot": "d177de9e14c19a5cb2bbfc8369455bd6f92602bf5667c90413e7e48875e8e82f",
+      "match": true
+    },
+    {
+      "path": "tests/browser/support/profile-login-measurement.ts",
+      "expected": "f204d0689c34fd2fded1fcf95cfb3aed9c3d40fcf33ca417b0c4d9495500078a",
+      "workspace": "f204d0689c34fd2fded1fcf95cfb3aed9c3d40fcf33ca417b0c4d9495500078a",
+      "snapshot": "f204d0689c34fd2fded1fcf95cfb3aed9c3d40fcf33ca417b0c4d9495500078a",
+      "match": true
+    },
+    {
+      "path": "tests/browser/support/profile-login-server.ts",
+      "expected": "35dd20f24cd1ff193222ec0882530fe16229686c61f1dc3b8a412a97b4eb3aa8",
+      "workspace": "35dd20f24cd1ff193222ec0882530fe16229686c61f1dc3b8a412a97b4eb3aa8",
+      "snapshot": "35dd20f24cd1ff193222ec0882530fe16229686c61f1dc3b8a412a97b4eb3aa8",
+      "match": true
+    },
+    {
+      "path": "tests/unit/runtime-boundaries.test.ts",
+      "expected": "86bfa014f23f37ef2b33ea0cc97b215d2b171aea971143b37008f1f4a5091dc9",
+      "workspace": "86bfa014f23f37ef2b33ea0cc97b215d2b171aea971143b37008f1f4a5091dc9",
+      "snapshot": "86bfa014f23f37ef2b33ea0cc97b215d2b171aea971143b37008f1f4a5091dc9",
+      "match": true
+    },
+    {
+      "path": "tests/coverage/app-entrypoints.test.tsx",
+      "expected": "07a23ae179f6bb8fb05a969e1de90d51940b439e0567902b2950e42a68dac2b6",
+      "workspace": "07a23ae179f6bb8fb05a969e1de90d51940b439e0567902b2950e42a68dac2b6",
+      "snapshot": "07a23ae179f6bb8fb05a969e1de90d51940b439e0567902b2950e42a68dac2b6",
+      "match": true
+    }
+  ],
+  "allExecutableInputs": [
+    {
+      "path": "app/layout.tsx",
+      "match": true
+    },
+    {
+      "path": "app/page.tsx",
+      "match": true
+    },
+    {
+      "path": "app/globals.css",
+      "match": true
+    },
+    {
+      "path": "app/szulo/actions.ts",
+      "match": true
+    },
+    {
+      "path": "app/szulo/layout.tsx",
+      "match": true
+    },
+    {
+      "path": "app/munkatars/layout.tsx",
+      "match": true
+    },
+    {
+      "path": "app/munkatars/error.tsx",
+      "match": true
+    },
+    {
+      "path": "app/munkatars/loading.tsx",
+      "match": true
+    },
+    {
+      "path": "app/belepes/AuthenticationEntry.tsx",
+      "match": true
+    },
+    {
+      "path": "app/belepes/actions.ts",
+      "match": true
+    },
+    {
+      "path": "app/belepes/page.tsx",
+      "match": true
+    },
+    {
+      "path": "app/admin/advanced-actions.ts",
+      "match": true
+    },
+    {
+      "path": "app/admin/actions.ts",
+      "match": true
+    },
+    {
+      "path": "app/admin/layout.tsx",
+      "match": true
+    },
+    {
+      "path": "app/admin/error.tsx",
+      "match": true
+    },
+    {
+      "path": "app/admin/loading.tsx",
+      "match": true
+    },
+    {
+      "path": "app/admin/page.tsx",
+      "match": true
+    },
+    {
+      "path": "app/hozzaferes-megtagadva/page.tsx",
+      "match": true
+    },
+    {
+      "path": "app/api/readiness/route.ts",
+      "match": true
+    },
+    {
+      "path": "app/api/synthetic/reset/route.ts",
+      "match": true
+    },
+    {
+      "path": "app/api/synthetic/session/route.ts",
+      "match": true
+    },
+    {
+      "path": "app/admin/emlekeztetok/page.tsx",
+      "match": true
+    },
+    {
+      "path": "app/admin/archivum/page.tsx",
+      "match": true
+    },
+    {
+      "path": "app/admin/jovahagyasok/page.tsx",
+      "match": true
+    },
+    {
+      "path": "app/admin/beallitasok/page.tsx",
+      "match": true
+    },
+    {
+      "path": "app/admin/_lib/action-state.ts",
+      "match": true
+    },
+    {
+      "path": "app/admin/_lib/session.ts",
+      "match": true
+    },
+    {
+      "path": "app/admin/_lib/facade.ts",
+      "match": true
+    },
+    {
+      "path": "app/admin/nyilvantartasok/page.tsx",
+      "match": true
+    },
+    {
+      "path": "app/admin/adatvedelem/page.tsx",
+      "match": true
+    },
+    {
+      "path": "app/admin/_components/AsyncStatePanel.tsx",
+      "match": true
+    },
+    {
+      "path": "app/admin/_components/AdminPagination.tsx",
+      "match": true
+    },
+    {
+      "path": "app/admin/_components/ImportWorkflow.tsx",
+      "match": true
+    },
+    {
+      "path": "app/admin/_components/AdminAccessState.tsx",
+      "match": true
+    },
+    {
+      "path": "app/admin/_components/ResponsiveCollection.tsx",
+      "match": true
+    },
+    {
+      "path": "app/admin/_components/AdminFilterBar.tsx",
+      "match": true
+    },
+    {
+      "path": "app/admin/_components/AdminMutationForm.tsx",
+      "match": true
+    },
+    {
+      "path": "app/admin/feladatok/page.tsx",
+      "match": true
+    },
+    {
+      "path": "app/admin/import/layout.tsx",
+      "match": true
+    },
+    {
+      "path": "app/admin/import/page.tsx",
+      "match": true
+    },
+    {
+      "path": "app/admin/feladatok/uj/page.tsx",
+      "match": true
+    },
+    {
+      "path": "app/admin/feladatok/[id]/page.tsx",
+      "match": true
+    },
+    {
+      "path": "app/admin/nyilvantartasok/uj/page.tsx",
+      "match": true
+    },
+    {
+      "path": "app/admin/nyilvantartasok/[id]/page.tsx",
+      "match": true
+    },
+    {
+      "path": "app/admin/jovahagyasok/[id]/page.tsx",
+      "match": true
+    },
+    {
+      "path": "app/admin/archivum/[id]/page.tsx",
+      "match": true
+    },
+    {
+      "path": "app/meghivas/[token]/InvitationActions.tsx",
+      "match": true
+    },
+    {
+      "path": "app/meghivas/[token]/actions.ts",
+      "match": true
+    },
+    {
+      "path": "app/meghivas/[token]/page.tsx",
+      "match": true
+    },
+    {
+      "path": "app/munkatars/beosztas/page.tsx",
+      "match": true
+    },
+    {
+      "path": "app/munkatars/_lib/filters.ts",
+      "match": true
+    },
+    {
+      "path": "app/munkatars/_lib/session.ts",
+      "match": true
+    },
+    {
+      "path": "app/munkatars/_lib/facade.ts",
+      "match": true
+    },
+    {
+      "path": "app/munkatars/_components/StaffStatePanel.tsx",
+      "match": true
+    },
+    {
+      "path": "app/munkatars/_components/FocusedStateSection.tsx",
+      "match": true
+    },
+    {
+      "path": "app/munkatars/_components/StaffAccessState.tsx",
+      "match": true
+    },
+    {
+      "path": "app/munkatars/beosztas/_components/ScheduleCollection.tsx",
+      "match": true
+    },
+    {
+      "path": "app/munkatars/beosztas/_components/ScheduleFilter.tsx",
+      "match": true
+    },
+    {
+      "path": "app/munkatars/beosztas/[id]/page.tsx",
+      "match": true
+    },
+    {
+      "path": "app/szulo/_lib/action-state.ts",
+      "match": true
+    },
+    {
+      "path": "app/szulo/_lib/session.ts",
+      "match": true
+    },
+    {
+      "path": "app/szulo/_lib/facade.ts",
+      "match": true
+    },
+    {
+      "path": "app/szulo/ertesitesek/page.tsx",
+      "match": true
+    },
+    {
+      "path": "app/szulo/_components/ParentMutationForm.tsx",
+      "match": true
+    },
+    {
+      "path": "app/szulo/_components/ParentAccessState.tsx",
+      "match": true
+    },
+    {
+      "path": "app/szulo/_components/NotificationReadForm.tsx",
+      "match": true
+    },
+    {
+      "path": "app/szulo/_components/ParentStatePanel.tsx",
+      "match": true
+    },
+    {
+      "path": "app/szulo/feladatok/page.tsx",
+      "match": true
+    },
+    {
+      "path": "app/szulo/feladatok/[id]/page.tsx",
+      "match": true
+    },
+    {
+      "path": "app/szulo/feladatok/[id]/csere/page.tsx",
+      "match": true
+    },
+    {
+      "path": "app/szulo/feladatok/[id]/lemondas/page.tsx",
+      "match": true
+    },
+    {
+      "path": "src/parent-web/synthetic-parent.ts",
+      "match": true
+    },
+    {
+      "path": "src/parent-web/index.ts",
+      "match": true
+    },
+    {
+      "path": "src/parent-web/synthetic-parent.test.ts",
+      "match": true
+    },
+    {
+      "path": "src/staff-web/synthetic-staff.test.ts",
+      "match": true
+    },
+    {
+      "path": "src/staff-web/index.ts",
+      "match": true
+    },
+    {
+      "path": "src/staff-web/synthetic-staff.ts",
+      "match": true
+    },
+    {
+      "path": "src/coordination/in-memory-repository.ts",
+      "match": true
+    },
+    {
+      "path": "src/coordination/coordination-service.ts",
+      "match": true
+    },
+    {
+      "path": "src/coordination/types.ts",
+      "match": true
+    },
+    {
+      "path": "src/coordination/index.ts",
+      "match": true
+    },
+    {
+      "path": "src/coordination/coordination-service.test.ts",
+      "match": true
+    },
+    {
+      "path": "src/access/in-memory-adapters.ts",
+      "match": true
+    },
+    {
+      "path": "src/access/access-matrix.test.ts",
+      "match": true
+    },
+    {
+      "path": "src/access/supabase-route-adapter.ts",
+      "match": true
+    },
+    {
+      "path": "src/access/access-service.ts",
+      "match": true
+    },
+    {
+      "path": "src/access/types.ts",
+      "match": true
+    },
+    {
+      "path": "src/access/index.ts",
+      "match": true
+    },
+    {
+      "path": "src/access/access-service.test.ts",
+      "match": true
+    },
+    {
+      "path": "src/staff-schedule/schedule-service.test.ts",
+      "match": true
+    },
+    {
+      "path": "src/staff-schedule/schedule-service.ts",
+      "match": true
+    },
+    {
+      "path": "src/staff-schedule/index.ts",
+      "match": true
+    },
+    {
+      "path": "src/runtime/RuntimeConfigurationError.tsx",
+      "match": true
+    },
+    {
+      "path": "src/runtime/composition.ts",
+      "match": true
+    },
+    {
+      "path": "src/runtime/AppShell.tsx",
+      "match": true
+    },
+    {
+      "path": "src/runtime/types.ts",
+      "match": true
+    },
+    {
+      "path": "src/runtime/ProfileSelector.tsx",
+      "match": true
+    },
+    {
+      "path": "src/runtime/config.ts",
+      "match": true
+    },
+    {
+      "path": "src/admin-core/synthetic-admin.ts",
+      "match": true
+    },
+    {
+      "path": "src/admin-core/synthetic-admin.test.ts",
+      "match": true
+    },
+    {
+      "path": "src/directory/field-policy.test.ts",
+      "match": true
+    },
+    {
+      "path": "src/directory/directory-service.test.ts",
+      "match": true
+    },
+    {
+      "path": "src/directory/in-memory-directory-repository.ts",
+      "match": true
+    },
+    {
+      "path": "src/directory/types.ts",
+      "match": true
+    },
+    {
+      "path": "src/directory/directory-service.ts",
+      "match": true
+    },
+    {
+      "path": "src/directory/index.ts",
+      "match": true
+    },
+    {
+      "path": "src/privacy-audit/lifecycle-service.test.ts",
+      "match": true
+    },
+    {
+      "path": "src/privacy-audit/lifecycle-service.ts",
+      "match": true
+    },
+    {
+      "path": "src/privacy-audit/index.ts",
+      "match": true
+    },
+    {
+      "path": "src/admin-experience/admin-service.ts",
+      "match": true
+    },
+    {
+      "path": "src/admin-experience/index.ts",
+      "match": true
+    },
+    {
+      "path": "src/admin-experience/admin-service.test.ts",
+      "match": true
+    },
+    {
+      "path": "src/parent-experience/in-memory-parent-repository.ts",
+      "match": true
+    },
+    {
+      "path": "src/parent-experience/parent-experience-service.test.ts",
+      "match": true
+    },
+    {
+      "path": "src/parent-experience/index.ts",
+      "match": true
+    },
+    {
+      "path": "src/parent-experience/parent-experience-service.ts",
+      "match": true
+    },
+    {
+      "path": "src/application/validation.ts",
+      "match": true
+    },
+    {
+      "path": "src/application/parent-facade.ts",
+      "match": true
+    },
+    {
+      "path": "src/application/evidence.ts",
+      "match": true
+    },
+    {
+      "path": "src/application/admin-facade.ts",
+      "match": true
+    },
+    {
+      "path": "src/application/projection.ts",
+      "match": true
+    },
+    {
+      "path": "src/application/staff-facade.ts",
+      "match": true
+    },
+    {
+      "path": "src/application/contracts.ts",
+      "match": true
+    },
+    {
+      "path": "src/application/isolation.test.ts",
+      "match": true
+    },
+    {
+      "path": "src/application/facade-pipeline.ts",
+      "match": true
+    },
+    {
+      "path": "src/application/authorization.ts",
+      "match": true
+    },
+    {
+      "path": "src/application/authorization.test.ts",
+      "match": true
+    },
+    {
+      "path": "src/application/idempotency.ts",
+      "match": true
+    },
+    {
+      "path": "src/application/results.ts",
+      "match": true
+    },
+    {
+      "path": "src/application/index.ts",
+      "match": true
+    },
+    {
+      "path": "src/application/facades.test.ts",
+      "match": true
+    },
+    {
+      "path": "src/application/session-facade.ts",
+      "match": true
+    },
+    {
+      "path": "src/application/contracts.test.ts",
+      "match": true
+    },
+    {
+      "path": "src/import-migration/import-service.ts",
+      "match": true
+    },
+    {
+      "path": "src/import-migration/in-memory-import-repository.ts",
+      "match": true
+    },
+    {
+      "path": "src/import-migration/import-service.test.ts",
+      "match": true
+    },
+    {
+      "path": "src/import-migration/index.ts",
+      "match": true
+    },
+    {
+      "path": "src/admin-advanced/synthetic-advanced.ts",
+      "match": true
+    },
+    {
+      "path": "src/admin-advanced/synthetic-advanced.test.ts",
+      "match": true
+    },
+    {
+      "path": "src/admin-advanced/index.ts",
+      "match": true
+    },
+    {
+      "path": "src/notifications/durable-jobs.ts",
+      "match": true
+    },
+    {
+      "path": "src/notifications/in-memory-notifications.ts",
+      "match": true
+    },
+    {
+      "path": "src/notifications/notification-service.test.ts",
+      "match": true
+    },
+    {
+      "path": "src/notifications/notification-service.ts",
+      "match": true
+    },
+    {
+      "path": "src/notifications/index.ts",
+      "match": true
+    },
+    {
+      "path": "src/notifications/durable-jobs.test.ts",
+      "match": true
+    },
+    {
+      "path": "src/runtime/security/origin.ts",
+      "match": true
+    },
+    {
+      "path": "src/runtime/synthetic/profiles.ts",
+      "match": true
+    },
+    {
+      "path": "src/runtime/synthetic/composition.ts",
+      "match": true
+    },
+    {
+      "path": "src/runtime/production/composition.ts",
+      "match": true
+    },
+    {
+      "path": "src/runtime/session/session.ts",
+      "match": true
+    },
+    {
+      "path": "tests/setup.ts",
+      "match": true
+    },
+    {
+      "path": "tests/unit/toolchain-validation.test.ts",
+      "match": true
+    },
+    {
+      "path": "tests/unit/eslint-glob-compatibility.test.ts",
+      "match": true
+    },
+    {
+      "path": "tests/unit/verification-core.test.ts",
+      "match": true
+    },
+    {
+      "path": "tests/unit/runtime-boundaries.test.ts",
+      "match": true
+    },
+    {
+      "path": "tests/integration/runtime-config-cli.test.ts",
+      "match": true
+    },
+    {
+      "path": "tests/integration/admin-advanced-components.test.tsx",
+      "match": true
+    },
+    {
+      "path": "tests/integration/admin-components.test.tsx",
+      "match": true
+    },
+    {
+      "path": "tests/integration/parent-components.test.tsx",
+      "match": true
+    },
+    {
+      "path": "tests/integration/staff-components.test.tsx",
+      "match": true
+    },
+    {
+      "path": "tests/integration/synthetic-route.test.ts",
+      "match": true
+    },
+    {
+      "path": "tests/integration/runtime-shell.test.tsx",
+      "match": true
+    },
+    {
+      "path": "tests/browser/admin-core.spec.ts",
+      "match": true
+    },
+    {
+      "path": "tests/browser/staff-web.spec.ts",
+      "match": true
+    },
+    {
+      "path": "tests/browser/profile-login-performance.spec.ts",
+      "match": true
+    },
+    {
+      "path": "tests/browser/admin-advanced.spec.ts",
+      "match": true
+    },
+    {
+      "path": "tests/browser/runtime-foundation.spec.ts",
+      "match": true
+    },
+    {
+      "path": "tests/browser/profile-login-existing.spec.ts",
+      "match": true
+    },
+    {
+      "path": "tests/browser/parent-web.spec.ts",
+      "match": true
+    },
+    {
+      "path": "tests/coverage/app-session-boundaries.test.ts",
+      "match": true
+    },
+    {
+      "path": "tests/coverage/admin-pages.test.tsx",
+      "match": true
+    },
+    {
+      "path": "tests/coverage/parent-pages.test.tsx",
+      "match": true
+    },
+    {
+      "path": "tests/coverage/staff-pages.test.tsx",
+      "match": true
+    },
+    {
+      "path": "tests/coverage/admin-actions.test.ts",
+      "match": true
+    },
+    {
+      "path": "tests/coverage/verification-entrypoints.test.ts",
+      "match": true
+    },
+    {
+      "path": "tests/coverage/app-entrypoints.test.tsx",
+      "match": true
+    },
+    {
+      "path": "tests/coverage/smoke-entrypoint.test.ts",
+      "match": true
+    },
+    {
+      "path": "tests/coverage/domain-adapter.test.ts",
+      "match": true
+    },
+    {
+      "path": "tests/coverage/framework-entrypoints.test.ts",
+      "match": true
+    },
+    {
+      "path": "tests/coverage/parent-actions.test.ts",
+      "match": true
+    },
+    {
+      "path": "tests/coverage/runtime-cli-instrumentation.test.ts",
+      "match": true
+    },
+    {
+      "path": "tests/coverage/production-inventory.test.ts",
+      "match": true
+    },
+    {
+      "path": "tests/coverage/support/production-inventory.ts",
+      "match": true
+    },
+    {
+      "path": "tests/coverage/support/node-test-adapter.ts",
+      "match": true
+    },
+    {
+      "path": "tests/coverage/support/production-coverage-reporter.ts",
+      "match": true
+    },
+    {
+      "path": "tests/browser/support/profile-login-measurement.ts",
+      "match": true
+    },
+    {
+      "path": "tests/browser/support/profile-login-server.ts",
+      "match": true
+    },
+    {
+      "path": "scripts/validate-toolchain.mjs",
+      "match": true
+    },
+    {
+      "path": "scripts/start-smoke.mjs",
+      "match": true
+    },
+    {
+      "path": "scripts/validate-runtime-config.ts",
+      "match": true
+    },
+    {
+      "path": "scripts/verification/aggregate-evidence.ts",
+      "match": true
+    },
+    {
+      "path": "scripts/verification/validate-manifests.ts",
+      "match": true
+    },
+    {
+      "path": "scripts/verification/scan-artifacts.ts",
+      "match": true
+    },
+    {
+      "path": "scripts/verification/run-local-verification.ts",
+      "match": true
+    },
+    {
+      "path": "scripts/verification/core.ts",
+      "match": true
+    },
+    {
+      "path": "scripts/verification/firefox-launch.ts",
+      "match": true
+    },
+    {
+      "path": "verification/sensitive-fields.json",
+      "match": true
+    },
+    {
+      "path": "verification/AUTHORIZATION.md",
+      "match": true
+    },
+    {
+      "path": "verification/RUNBOOK.md",
+      "match": true
+    },
+    {
+      "path": "verification/fixtures.json",
+      "match": true
+    },
+    {
+      "path": "verification/authorization-matrix.json",
+      "match": true
+    },
+    {
+      "path": "verification/scenarios.json",
+      "match": true
+    },
+    {
+      "path": "verification/evidence.schema.json",
+      "match": true
+    },
+    {
+      "path": "playwright.login-existing.config.ts",
+      "match": true
+    },
+    {
+      "path": "playwright.login-performance.config.ts",
+      "match": true
+    },
+    {
+      "path": "playwright.config.ts",
+      "match": true
+    },
+    {
+      "path": "vitest.config.ts",
+      "match": true
+    },
+    {
+      "path": "eslint.config.mjs",
+      "match": true
+    },
+    {
+      "path": "next.config.ts",
+      "match": true
+    },
+    {
+      "path": "package.json",
+      "match": true
+    },
+    {
+      "path": "package-lock.json",
+      "match": true
+    },
+    {
+      "path": "tsconfig.json",
+      "match": true
+    },
+    {
+      "path": "proxy.ts",
+      "match": true
+    },
+    {
+      "path": "next-env.d.ts",
+      "match": true
+    }
+  ],
+  "preparation": "Initial comparison detected only regenerated verification/reports outputs and next-env.d.ts. Excluded generated reports from executable inventory; copied current next-env.d.ts into snapshot. Original checkout unchanged."
+}

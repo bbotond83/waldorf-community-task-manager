@@ -1,0 +1,6 @@
+
+> waldorf-community-task-manager@0.2.0 format:check
+> prettier --check app src/application src/runtime tests scripts verification *.config.* next-env.d.ts README.md
+
+Checking formatting...
+All matched files use Prettier code style!

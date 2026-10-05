@@ -1,0 +1,155 @@
+{
+  "cwd": "/private/tmp/waldorf-quality-baseline-261005",
+  "node": "v24.21.0",
+  "commands": [
+    {
+      "key": "toolchain",
+      "args": [
+        "run",
+        "check:toolchain"
+      ],
+      "exit": 0,
+      "startedAt": "2026-10-05T11:50:05.168Z",
+      "finishedAt": "2026-10-05T11:50:06.419Z",
+      "log": "toolchain.log"
+    },
+    {
+      "key": "scoped",
+      "args": [
+        "exec",
+        "--",
+        "vitest",
+        "run",
+        "--config",
+        "vitest.config.ts",
+        "tests/unit/runtime-boundaries.test.ts",
+        "tests/integration/synthetic-route.test.ts",
+        "tests/integration/runtime-shell.test.tsx"
+      ],
+      "exit": 1,
+      "startedAt": "2026-10-05T11:50:06.422Z",
+      "finishedAt": "2026-10-05T11:50:12.555Z",
+      "log": "scoped.log"
+    },
+    {
+      "key": "format",
+      "args": [
+        "run",
+        "format:check"
+      ],
+      "exit": 0,
+      "startedAt": "2026-10-05T11:50:12.556Z",
+      "finishedAt": "2026-10-05T11:50:14.980Z",
+      "log": "format.log"
+    },
+    {
+      "key": "lint",
+      "args": [
+        "run",
+        "lint"
+      ],
+      "exit": 0,
+      "startedAt": "2026-10-05T11:50:14.982Z",
+      "finishedAt": "2026-10-05T11:50:31.447Z",
+      "log": "lint.log"
+    },
+    {
+      "key": "typecheck",
+      "args": [
+        "run",
+        "typecheck"
+      ],
+      "exit": 2,
+      "startedAt": "2026-10-05T11:50:31.448Z",
+      "finishedAt": "2026-10-05T11:50:36.842Z",
+      "log": "typecheck.log"
+    },
+    {
+      "key": "tests",
+      "args": [
+        "test"
+      ],
+      "exit": 1,
+      "startedAt": "2026-10-05T11:50:36.843Z",
+      "finishedAt": "2026-10-05T11:50:38.090Z",
+      "log": "tests.log"
+    },
+    {
+      "key": "coverage",
+      "args": [
+        "run",
+        "test:coverage"
+      ],
+      "exit": 1,
+      "startedAt": "2026-10-05T11:50:38.091Z",
+      "finishedAt": "2026-10-05T11:50:39.056Z",
+      "log": "coverage.log"
+    },
+    {
+      "key": "security",
+      "args": [
+        "run",
+        "verify:security"
+      ],
+      "exit": 0,
+      "startedAt": "2026-10-05T11:50:39.057Z",
+      "finishedAt": "2026-10-05T11:50:41.096Z",
+      "log": "security.log"
+    },
+    {
+      "key": "build",
+      "args": [
+        "run",
+        "build"
+      ],
+      "exit": 0,
+      "startedAt": "2026-10-05T11:50:41.110Z",
+      "finishedAt": "2026-10-05T11:50:52.985Z",
+      "log": "build.log"
+    },
+    {
+      "key": "smoke",
+      "args": [
+        "run",
+        "smoke:start"
+      ],
+      "exit": 0,
+      "startedAt": "2026-10-05T11:50:52.988Z",
+      "finishedAt": "2026-10-05T11:50:55.895Z",
+      "log": "smoke.log"
+    },
+    {
+      "key": "browser",
+      "args": [
+        "run",
+        "test:browser"
+      ],
+      "exit": 0,
+      "startedAt": "2026-10-05T11:50:55.900Z",
+      "finishedAt": "2026-10-05T11:51:54.182Z",
+      "log": "browser.log"
+    },
+    {
+      "key": "a11y",
+      "args": [
+        "run",
+        "test:a11y"
+      ],
+      "exit": 0,
+      "startedAt": "2026-10-05T11:51:54.183Z",
+      "finishedAt": "2026-10-05T11:52:10.410Z",
+      "log": "a11y.log"
+    },
+    {
+      "key": "canonical",
+      "args": [
+        "run",
+        "verify:local"
+      ],
+      "exit": 0,
+      "startedAt": "2026-10-05T11:52:10.411Z",
+      "finishedAt": "2026-10-05T11:53:48.979Z",
+      "log": "canonical.log"
+    }
+  ]
+}

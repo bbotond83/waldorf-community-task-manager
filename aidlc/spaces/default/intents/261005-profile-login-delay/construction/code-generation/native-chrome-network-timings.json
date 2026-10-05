@@ -1,0 +1,94 @@
+{
+  "source": "Chrome sanitized HAR exported via native UI",
+  "origin": "http://127.0.0.1:3000",
+  "entries": [
+    {
+      "startedDateTime": "2026-10-05T11:33:45.684Z",
+      "method": "POST",
+      "url": "http://127.0.0.1:3000/api/synthetic/session",
+      "status": 303,
+      "timeMs": 131508.26099997814,
+      "timings": {
+        "blocked": 0.8789999828115105,
+        "dns": 0.008000000000000007,
+        "ssl": -1,
+        "connect": 0.292,
+        "send": 0.11099999999999999,
+        "wait": 10.953999997664242,
+        "receive": 131496.01699999766,
+        "_blocked_queueing": 0.5939999828115106,
+        "_workerStart": -1,
+        "_workerReady": -1,
+        "_workerFetchStart": -1,
+        "_workerRespondWithSettled": -1
+      },
+      "bodySize": 0,
+      "headers": [
+        {
+          "name": "clear-site-data",
+          "value": "\"cache\""
+        },
+        {
+          "name": "location",
+          "value": "http://127.0.0.1:3000/"
+        }
+      ]
+    },
+    {
+      "startedDateTime": "2026-10-05T11:35:57.193Z",
+      "method": "GET",
+      "url": "http://127.0.0.1:3000/",
+      "status": 200,
+      "timeMs": 49.4820000038594,
+      "timings": {
+        "blocked": 2.3380000274032353,
+        "dns": 0.03799999999999992,
+        "ssl": -1,
+        "connect": 1.008,
+        "send": 1.0209999999999997,
+        "wait": 44.02299998343736,
+        "receive": 1.053999993018806,
+        "_blocked_queueing": 1.3490000274032354,
+        "_workerStart": -1,
+        "_workerReady": -1,
+        "_workerFetchStart": -1,
+        "_workerRespondWithSettled": -1
+      },
+      "bodySize": 4507,
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "text/html; charset=utf-8"
+        }
+      ]
+    },
+    {
+      "startedDateTime": "2026-10-05T11:36:49.654Z",
+      "method": "GET",
+      "url": "http://127.0.0.1:3000/szulo/feladatok",
+      "status": 200,
+      "timeMs": 74.33100003981963,
+      "timings": {
+        "blocked": 1.2890000213943422,
+        "dns": -1,
+        "ssl": -1,
+        "connect": -1,
+        "send": 0.07599999999999996,
+        "wait": 71.95099997312576,
+        "receive": 1.01500004529953,
+        "_blocked_queueing": 0.6220000213943422,
+        "_workerStart": -1,
+        "_workerReady": -1,
+        "_workerFetchStart": -1,
+        "_workerRespondWithSettled": -1
+      },
+      "bodySize": 6118,
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "text/html; charset=utf-8"
+        }
+      ]
+    }
+  ]
+}

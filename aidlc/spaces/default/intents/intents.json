@@ -26,5 +26,12 @@
     "dirName": "261002-slow-profile-login",
     "scope": "bugfix",
     "status": "complete"
+  },
+  {
+    "uuid": "01a10b4a-9b43-7453-ad9a-ed8a638c890b",
+    "slug": "profile-login-delay",
+    "dirName": "261005-profile-login-delay",
+    "scope": "bugfix",
+    "status": "complete"
   }
 ]

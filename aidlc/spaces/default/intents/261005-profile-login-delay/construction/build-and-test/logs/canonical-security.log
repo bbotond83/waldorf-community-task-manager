@@ -1,0 +1,25 @@
+
+> waldorf-community-task-manager@0.2.0 verify:security
+> npm run scan:privacy && npm run scan:secrets && npm run scan:sast && npm run verify:no-deploy && npm audit --audit-level=high
+
+
+> waldorf-community-task-manager@0.2.0 scan:privacy
+> node --experimental-strip-types scripts/verification/scan-artifacts.ts privacy
+
+PRIVACY_SCAN_PASS files=16
+
+> waldorf-community-task-manager@0.2.0 scan:secrets
+> node --experimental-strip-types scripts/verification/scan-artifacts.ts secrets
+
+SECRETS_SCAN_PASS files=228
+
+> waldorf-community-task-manager@0.2.0 scan:sast
+> node --experimental-strip-types scripts/verification/scan-artifacts.ts sast
+
+SAST_SCAN_PASS files=185
+
+> waldorf-community-task-manager@0.2.0 verify:no-deploy
+> node --experimental-strip-types scripts/verification/scan-artifacts.ts no-deploy
+
+NO-DEPLOY_SCAN_PASS files=185
+found 0 vulnerabilities
