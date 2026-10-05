@@ -10,7 +10,15 @@ const securityHeaders = [
   },
 ];
 
+const loginTestDistDir = process.env.APP_LOGIN_TEST_DIST_DIR;
+if (loginTestDistDir && !/^\.next\/login-performance-[a-z0-9-]+$/.test(loginTestDistDir)) {
+  throw new Error(
+    "APP_LOGIN_TEST_DIST_DIR must be a dedicated .next/login-performance-* directory",
+  );
+}
+
 const nextConfig: NextConfig = {
+  ...(loginTestDistDir ? { distDir: loginTestDistDir } : {}),
   poweredByHeader: false,
   reactStrictMode: true,
   async headers() {

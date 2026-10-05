@@ -1,5 +1,8 @@
 # Dependencies
 
+> Focused merge, 2026-10-02 (`261002-slow-profile-login`): the earlier sections are preserved historical prose from an UNVERIFIED store, including the prior startup diagnosis and pending loader choices. They are not current defect claims. Fresh conclusions are in the profile-login update below; exact newly analyzed files appear in reverse-engineering-timestamp.md. No tests, latency measurements, browser sessions, or backend calls were performed.
+
+
 > Focused update, 2026-10-01: earlier repository-wide prose is preserved as historical static knowledge; its freshness was UNVERIFIED. Only the deep files listed in reverse-engineering-timestamp.md were analyzed for this update. No tests or runtime/external checks were executed.
 
 ## Package Graph
@@ -48,3 +51,11 @@ No CI deployment dependency or deploy job exists.
 All lifecycle prehooks call toolchain validation, then the configuration CLI; the CLI imports the pure runtime schema and Zod. Next initialization follows only after those checks. Next 16.3.6 depends transitively on `@next/env` 16.3.6. Selecting that loader for the fix would require a direct application dependency and corresponding lockfile update rather than assuming a transitive package remains available.
 
 Loader choice is pending; retain the dependency direction from environment initialization at the CLI boundary into pure schema validation. No new domain or external-service dependency is required by the diagnosis.
+
+## Focused Login Dependencies — 2026-10-02
+
+The selector couples a native browser form to the synthetic session handler, local runtime/session signing and a root GET. Root and role resolvers compose runtime independently; role facade creation can compose it again. Synthetic composition imports runtime values through the broad `src/application/index.ts` re-export barrel. Its compiled-module and first-use latency effects have not been measured.
+
+Parent fixtures use in-process Maps with a cached parent facade; admin core and the skimmed advanced adapter use lazy global containers; staff schedule is fixed local data. Session signing uses local HMAC, JSON, random nonce and Zod. No network authentication, database query, remote timeout or seed import appears on the scanned selector/root path. No InsForge or Supabase SDK is declared in the manifest; production composition exposes `supabase-unlinked` and makes no target call. Unrelated SQL/RPC prose above remains historical.
+
+The earlier pending-loader statements describe the previous startup investigation; this focused login scan does not establish a current loader defect. Prehooks run at process startup, not per login. See technology-stack.md for locally recorded versions.

@@ -1,0 +1,41 @@
+
+> waldorf-community-task-manager@0.2.0 predev
+> npm run check:toolchain && node --experimental-strip-types scripts/validate-runtime-config.ts development
+
+
+> waldorf-community-task-manager@0.2.0 check:toolchain
+> node scripts/validate-toolchain.mjs
+
+TOOLCHAIN_VALID: Node 24.x / npm 11.x
+RUNTIME_CONFIG_VALID: synthetic
+
+> waldorf-community-task-manager@0.2.0 dev
+> next dev --hostname 127.0.0.1 --port 3704
+
+▲ Next.js 16.3.6 (Turbopack)
+- Local:         http://127.0.0.1:3704
+- Network:       http://127.0.0.1:3704
+- Environments: .env.local
+✓ Ready in 313ms
+✓ Running next.config.ts took 32ms
+
+  We detected TypeScript in your project and reconfigured your tsconfig.json file for you.
+  The following suggested values were added to your tsconfig.json. These values can be changed to fit your project's needs:
+
+  	- include was updated to add '.next/login-performance-1790943308243-4/types/**/*.ts'
+  	- include was updated to add '.next/login-performance-1790943308243-4/dev/types/**/*.ts'
+
+
+ GET /api/readiness 200 in 441ms (next.js: 423ms, application-code: 19ms)
+ GET / 200 in 794ms (next.js: 692ms, proxy.ts: 28ms, application-code: 75ms)
+ POST /api/synthetic/session 303 in 143ms (next.js: 137ms, application-code: 6ms)
+ GET / 200 in 22ms (next.js: 1.2ms, proxy.ts: 3ms, application-code: 18ms)
+ POST /api/synthetic/session 303 in 3ms (next.js: 1.0ms, application-code: 2ms)
+ GET / 200 in 19ms (next.js: 1.3ms, proxy.ts: 1.7ms, application-code: 16ms)
+ POST /api/synthetic/session 303 in 3ms (next.js: 0.9ms, application-code: 1.7ms)
+ GET / 200 in 18ms (next.js: 1.2ms, proxy.ts: 2ms, application-code: 14ms)
+ POST /api/synthetic/session 303 in 3ms (next.js: 1.0ms, application-code: 1.8ms)
+ GET / 200 in 17ms (next.js: 1.0ms, proxy.ts: 1.6ms, application-code: 15ms)
+ POST /api/synthetic/session 303 in 3ms (next.js: 1.0ms, application-code: 2ms)
+ GET / 200 in 23ms (next.js: 1.1ms, proxy.ts: 1.7ms, application-code: 20ms)
+[?25h

@@ -1,0 +1,232 @@
+[
+  {
+    "mode": "development",
+    "profile": "parent-local",
+    "from": "staff-local",
+    "measurements": [
+      {
+        "kind": "first",
+        "elapsed": 333.89990234375
+      },
+      {
+        "kind": "switch",
+        "elapsed": 157.300048828125
+      }
+    ],
+    "cache": ".next/login-performance-30985-1790946117566",
+    "node": "v24.21.0",
+    "browser": "151.0.7922.34",
+    "machine": {
+      "platform": "darwin",
+      "release": "27.0.0",
+      "cpu": "Apple M4 Pro"
+    }
+  },
+  {
+    "mode": "development",
+    "profile": "staff-local",
+    "from": "group-admin-local",
+    "measurements": [
+      {
+        "kind": "first",
+        "elapsed": 319.10009765625
+      },
+      {
+        "kind": "switch",
+        "elapsed": 107.5
+      }
+    ],
+    "cache": ".next/login-performance-30985-1790946122726",
+    "node": "v24.21.0",
+    "browser": "151.0.7922.34",
+    "machine": {
+      "platform": "darwin",
+      "release": "27.0.0",
+      "cpu": "Apple M4 Pro"
+    }
+  },
+  {
+    "mode": "development",
+    "profile": "group-admin-local",
+    "from": "kindergarten-admin-local",
+    "measurements": [
+      {
+        "kind": "first",
+        "elapsed": 313.500244140625
+      },
+      {
+        "kind": "switch",
+        "elapsed": 112.600341796875
+      }
+    ],
+    "cache": ".next/login-performance-30985-1790946126539",
+    "node": "v24.21.0",
+    "browser": "151.0.7922.34",
+    "machine": {
+      "platform": "darwin",
+      "release": "27.0.0",
+      "cpu": "Apple M4 Pro"
+    }
+  },
+  {
+    "mode": "development",
+    "profile": "kindergarten-admin-local",
+    "from": "super-admin-local",
+    "measurements": [
+      {
+        "kind": "first",
+        "elapsed": 351.89990234375
+      },
+      {
+        "kind": "switch",
+        "elapsed": 163.2998046875
+      }
+    ],
+    "cache": ".next/login-performance-30985-1790946129822",
+    "node": "v24.21.0",
+    "browser": "151.0.7922.34",
+    "machine": {
+      "platform": "darwin",
+      "release": "27.0.0",
+      "cpu": "Apple M4 Pro"
+    }
+  },
+  {
+    "mode": "development",
+    "profile": "super-admin-local",
+    "from": "parent-local",
+    "measurements": [
+      {
+        "kind": "first",
+        "elapsed": 347.800048828125
+      },
+      {
+        "kind": "switch",
+        "elapsed": 137.89990234375
+      }
+    ],
+    "cache": ".next/login-performance-30985-1790946133302",
+    "node": "v24.21.0",
+    "browser": "151.0.7922.34",
+    "machine": {
+      "platform": "darwin",
+      "release": "27.0.0",
+      "cpu": "Apple M4 Pro"
+    }
+  },
+  {
+    "mode": "production",
+    "profile": "parent-local",
+    "from": "staff-local",
+    "measurements": [
+      {
+        "kind": "first",
+        "elapsed": 62.10009765625
+      },
+      {
+        "kind": "switch",
+        "elapsed": 50.69970703125
+      }
+    ],
+    "cache": "prebuilt fresh process",
+    "node": "v24.21.0",
+    "browser": "151.0.7922.34",
+    "machine": {
+      "platform": "darwin",
+      "release": "27.0.0",
+      "cpu": "Apple M4 Pro"
+    }
+  },
+  {
+    "mode": "production",
+    "profile": "staff-local",
+    "from": "group-admin-local",
+    "measurements": [
+      {
+        "kind": "first",
+        "elapsed": 59.599853515625
+      },
+      {
+        "kind": "switch",
+        "elapsed": 46.39990234375
+      }
+    ],
+    "cache": "prebuilt fresh process",
+    "node": "v24.21.0",
+    "browser": "151.0.7922.34",
+    "machine": {
+      "platform": "darwin",
+      "release": "27.0.0",
+      "cpu": "Apple M4 Pro"
+    }
+  },
+  {
+    "mode": "production",
+    "profile": "group-admin-local",
+    "from": "kindergarten-admin-local",
+    "measurements": [
+      {
+        "kind": "first",
+        "elapsed": 65.800048828125
+      },
+      {
+        "kind": "switch",
+        "elapsed": 56.89990234375
+      }
+    ],
+    "cache": "prebuilt fresh process",
+    "node": "v24.21.0",
+    "browser": "151.0.7922.34",
+    "machine": {
+      "platform": "darwin",
+      "release": "27.0.0",
+      "cpu": "Apple M4 Pro"
+    }
+  },
+  {
+    "mode": "production",
+    "profile": "kindergarten-admin-local",
+    "from": "super-admin-local",
+    "measurements": [
+      {
+        "kind": "first",
+        "elapsed": 81.69970703125
+      },
+      {
+        "kind": "switch",
+        "elapsed": 67.499755859375
+      }
+    ],
+    "cache": "prebuilt fresh process",
+    "node": "v24.21.0",
+    "browser": "151.0.7922.34",
+    "machine": {
+      "platform": "darwin",
+      "release": "27.0.0",
+      "cpu": "Apple M4 Pro"
+    }
+  },
+  {
+    "mode": "production",
+    "profile": "super-admin-local",
+    "from": "parent-local",
+    "measurements": [
+      {
+        "kind": "first",
+        "elapsed": 99.7998046875
+      },
+      {
+        "kind": "switch",
+        "elapsed": 66.699951171875
+      }
+    ],
+    "cache": "prebuilt fresh process",
+    "node": "v24.21.0",
+    "browser": "151.0.7922.34",
+    "machine": {
+      "platform": "darwin",
+      "release": "27.0.0",
+      "cpu": "Apple M4 Pro"
+    }
+  }
+]

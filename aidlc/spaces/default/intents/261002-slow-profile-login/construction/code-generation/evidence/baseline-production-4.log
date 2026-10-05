@@ -1,0 +1,19 @@
+
+> waldorf-community-task-manager@0.2.0 prestart
+> npm run check:toolchain && node --experimental-strip-types scripts/validate-runtime-config.ts production
+
+
+> waldorf-community-task-manager@0.2.0 check:toolchain
+> node scripts/validate-toolchain.mjs
+
+TOOLCHAIN_VALID: Node 24.x / npm 11.x
+RUNTIME_CONFIG_VALID: synthetic
+
+> waldorf-community-task-manager@0.2.0 start
+> next start --hostname ${APP_HOST:-127.0.0.1} --port ${APP_PORT:-3000}
+
+▲ Next.js 16.3.6
+- Local:         http://127.0.0.1:3704
+- Network:       http://127.0.0.1:3704
+✓ Ready in 126ms
+✓ Running next.config.ts took 22ms

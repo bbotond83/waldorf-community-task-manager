@@ -1,5 +1,8 @@
 # Architecture Analysis
 
+> Focused merge, 2026-10-02 (`261002-slow-profile-login`): the earlier sections are preserved historical prose from an UNVERIFIED store, including the prior startup diagnosis and pending loader choices. They are not current defect claims. Fresh conclusions are in the profile-login update below; exact newly analyzed files appear in reverse-engineering-timestamp.md. No tests, latency measurements, browser sessions, or backend calls were performed.
+
+
 > Focused update, 2026-10-01: earlier repository-wide prose is preserved as historical static knowledge; its freshness was UNVERIFIED. Only the deep files listed in reverse-engineering-timestamp.md were analyzed for this update. No tests or runtime/external checks were executed.
 
 ## System Overview
@@ -148,3 +151,69 @@ No new loader decision is accepted by this investigation. A framework-compatible
 The loader belongs at the CLI boundary; preserve pure schema validation, result states, secret-safe formatting, and mode-based composition. Dev defaults to development; build/start default to production. Runtime synthetic mode remains independent of `NODE_ENV`. No loading step may initiate a production target call.
 
 A validator subprocess cannot export file values back to npm. Existing start-shell host/port expansion still uses inherited shell values; nondefault file-based listener settings are outside this confirmed fix. Preserve default loopback behavior.
+
+## Profile Login Architecture Update — 2026-10-02
+
+### System Overview and Data Flow
+
+The freshly analyzed selector path stays within the Next.js process and browser: native form submission, local session creation, 303 root navigation, then dynamic profile greeting. Production composition remains an unlinked placeholder. No remote authentication or database bootstrap appears on this path. Role page loading occurs after a separate native anchor navigation; layout/page session resolution and facade composition can repeat local work.
+
+### Key Design Decisions
+
+These describe source behavior, without selecting a fix. Local HMAC-signed sessions, token rotation and origin validation isolate synthetic profiles. Dynamic page rendering and per-request session lookup preserve profile-specific output. Cache invalidation currently requests origin-wide browser cache clearing on every successful selection; its causal latency effect is unknown. Targeted invalidation and preserving cache with independently verified session isolation are alternatives to evaluate against measurements; changing transport to client navigation adds state/redirect complexity. No alternative is accepted here.
+
+### Interaction Diagrams
+
+#### Synthetic Profile Selection
+
+```mermaid
+sequenceDiagram
+  actor User
+  participant Browser
+  participant Selector as Profile selector
+  participant API as Synthetic session route
+  participant Runtime as Runtime composition
+  participant Session as Local signed session
+  participant Home as Dynamic home page
+  User->>Selector: Choose profile
+  Selector->>Browser: Submit native form
+  Browser->>API: POST profileId
+  API->>Runtime: Validate mode and compose runtime
+  API->>API: Validate origin and selected profile
+  API->>Session: Sign rotated session cookie
+  Session-->>API: Token
+  API-->>Browser: 303 to root, cookie, cache-clear header
+  Browser->>Home: GET root with cookie
+  Home->>Runtime: Compose runtime and resolve session
+  Runtime-->>Home: Selected local profile
+  Home-->>Browser: Greeting and role navigation
+```
+
+Text fallback: profile selection posts to the synthetic session route. It validates runtime/origin/profile, signs the cookie and sends a cache-clear request with a 303 to root. The browser requests root with the cookie; runtime resolves it and renders the profile greeting. The role dashboard is a later request. A failed validation returns the explicit API error described in api-documentation.md.
+
+#### Parent Authentication Entry
+
+```mermaid
+sequenceDiagram
+  actor Parent
+  participant Browser
+  participant Entry as Parent authentication entry
+  participant Action as Parent authentication action
+  participant Session as Local session
+  Parent->>Entry: Submit identifier and destination
+  Entry->>Action: Invoke server action
+  Action->>Action: Validate synthetic identifier and safe destination
+  Action->>Session: Set signed parent cookie on success
+  Action-->>Entry: Success with destination or explicit error
+  Entry-->>Parent: Show continuation link on success
+  Parent->>Browser: Follow continuation link
+  Browser->>Browser: Navigate to safe parent destination
+```
+
+Text fallback: the signed-out parent submits the authentication form. Synthetic `parent-local` success creates a cookie and returns a safe destination. The entry displays a link; the parent explicitly follows it. Invalid input returns an error state. Manual continuation must be distinguished from action latency when defining the target.
+
+The new diagrams were manually syntax-validated before writing: declared unique participants, valid Mermaid message arrows, and no unbalanced control blocks. Preserved historical flow/sequence blocks were also checked for declarations and balanced control blocks.
+
+### Improvement Opportunities and Impact
+
+Cache clearing, first-use development route compilation/module loading, broad application-barrel imports and full reload cost are hypotheses requiring click-to-ready measurements. Repeated composition is verified, but the small local work has no measured multi-second cost. Capture first and repeat selections in development and built start before choosing the smallest fix. Preserve cookie rotation, expiry, origin checks, authorization versions, mode separation and absence of prior profile projections; globally cached session-specific output would violate that boundary. Add focused timing coverage after requirements resolve readiness. See dependencies.md for coupling and code-quality-assessment.md for the regression gap.

@@ -2,7 +2,8 @@ import { NextRequest } from "next/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { POST as resetSyntheticFixtures } from "../../app/api/synthetic/reset/route";
 import { POST as selectSyntheticProfile } from "../../app/api/synthetic/session/route";
-import { SESSION_COOKIE_NAME } from "../../src/runtime/session/session.ts";
+import { resolveSyntheticSession, SESSION_COOKIE_NAME } from "../../src/runtime/session/session.ts";
+import { SYNTHETIC_PROFILES } from "../../src/runtime/synthetic/profiles.ts";
 
 const localOrigin = "http://127.0.0.1:3400";
 
@@ -21,6 +22,45 @@ function formRequest(profileId: string, origin = localOrigin) {
 afterEach(() => vi.unstubAllEnvs());
 
 describe("synthetic-only route boundary", () => {
+  it.each(SYNTHETIC_PROFILES)(
+    "selects and rotates $id without changing the root destination",
+    async (profile) => {
+      vi.stubEnv("APP_RUNTIME_MODE", "synthetic");
+      const first = await selectSyntheticProfile(formRequest(profile.id));
+      const second = await selectSyntheticProfile(formRequest(profile.id));
+      expect(first.status).toBe(303);
+      expect(first.headers.get("location")).toBe(`${localOrigin}/`);
+      const token = first.cookies.get(SESSION_COOKIE_NAME)?.value;
+      expect(resolveSyntheticSession(token)?.profile.id).toBe(profile.id);
+      expect(second.cookies.get(SESSION_COOKIE_NAME)?.value).not.toBe(token);
+      expect(first.headers.get("set-cookie")).toContain("HttpOnly");
+      expect(first.headers.get("set-cookie")).toContain("SameSite=lax");
+    },
+  );
+  it("clears the active session on explicit profile switch/sign-out", async () => {
+    vi.stubEnv("APP_RUNTIME_MODE", "synthetic");
+    const response = await selectSyntheticProfile(formRequest(""));
+    expect(response.status).toBe(303);
+    expect(response.cookies.get(SESSION_COOKIE_NAME)?.value).toBe("");
+    expect(response.headers.get("location")).toBe(`${localOrigin}/`);
+  });
+  it("rejects malformed form bodies without creating a session", async () => {
+    vi.stubEnv("APP_RUNTIME_MODE", "synthetic");
+    const response = await selectSyntheticProfile(
+      new NextRequest(`${localOrigin}/api/synthetic/session`, {
+        method: "POST",
+        headers: {
+          host: "127.0.0.1:3400",
+          origin: localOrigin,
+          "content-type": "application/json",
+        },
+        body: "{",
+      }),
+    );
+    expect(response.status).toBe(400);
+    expect(response.cookies.get(SESSION_COOKIE_NAME)).toBeUndefined();
+    await expect(response.json()).resolves.toEqual({ error: { code: "REQUEST_BODY_INVALID" } });
+  });
   it("creates a rotated HTTP-only session in synthetic mode", async () => {
     vi.stubEnv("APP_RUNTIME_MODE", "synthetic");
     vi.stubEnv("APP_SYNTHETIC_FIXTURE_VERSION", "waldorf-local-v1");

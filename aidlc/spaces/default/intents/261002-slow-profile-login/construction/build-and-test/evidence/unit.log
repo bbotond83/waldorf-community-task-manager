@@ -1,0 +1,10 @@
+
+ RUN  v4.1.11 /Users/dev/Development/waldorf-community-task-manager
+
+ ✓ |delivery| tests/unit/runtime-boundaries.test.ts (23 tests) 211ms
+
+ Test Files  1 passed (1)
+      Tests  23 passed (23)
+   Start at  15:01:12
+   Duration  7.88s (transform 212ms, setup 197ms, import 263ms, tests 211ms, environment 6.92s)
+

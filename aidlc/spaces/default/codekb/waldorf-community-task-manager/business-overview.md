@@ -1,5 +1,8 @@
 # Waldorf Community Task Manager — Business Overview
 
+> Focused merge, 2026-10-02 (`261002-slow-profile-login`): the earlier sections are preserved historical prose from an UNVERIFIED store, including the prior startup diagnosis and pending loader choices. They are not current defect claims. Fresh conclusions are in the profile-login update below; exact newly analyzed files appear in reverse-engineering-timestamp.md. No tests, latency measurements, browser sessions, or backend calls were performed.
+
+
 > Focused update, 2026-10-01: earlier repository-wide prose is preserved as historical static knowledge; its freshness was UNVERIFIED. Only the deep files listed in reverse-engineering-timestamp.md were analyzed for this update. No tests or runtime/external checks were executed.
 
 ## Purpose and Domain
@@ -42,3 +45,9 @@ This is static analysis at commit d7995af0aacf59ff7aa75880c45cc5e0a50eda9e. No t
 This bugfix supports a contributor using the documented synthetic local experience. README setup assumes `nvm`; the reported machine has an existing Homebrew Node 24 installation and no `nvm`. Current-terminal toolchain selection must retain Node 24.x/npm 11.x requirements and avoid global shell changes. Machine versions in the intent are supplied observations, not fresh verification.
 
 The local configuration recipe cannot reach framework startup when `APP_RUNTIME_MODE` is absent from the inherited shell: the shared npm validator runs before Next loads environment files. This affects dev, build, and start. See architecture.md for the process boundary and code-quality-assessment.md for verification gaps.
+
+## Profile Login Update — 2026-10-02
+
+The active bugfix requests profile login in no more than five seconds. In synthetic mode the selector offers five fixed profiles and, after selection, displays the home greeting and role navigation. Role dashboards are reached through a subsequent navigation. Parent `/belepes` is a separate action-driven entry with a success message and explicit continuation link.
+
+Requirements must define whether readiness means the home greeting or the role work page, whether `/belepes` is included, and which development/built-start and first-use conditions apply. No elapsed baseline or proven cause exists. See architecture.md for the observed flow and code-quality-assessment.md for the timing coverage gap.

@@ -1,5 +1,8 @@
 # Code Structure
 
+> Focused merge, 2026-10-02 (`261002-slow-profile-login`): the earlier sections are preserved historical prose from an UNVERIFIED store, including the prior startup diagnosis and pending loader choices. They are not current defect claims. Fresh conclusions are in the profile-login update below; exact newly analyzed files appear in reverse-engineering-timestamp.md. No tests, latency measurements, browser sessions, or backend calls were performed.
+
+
 > Focused update, 2026-10-01: earlier repository-wide prose is preserved as historical static knowledge; its freshness was UNVERIFIED. Only the deep files listed in reverse-engineering-timestamp.md were analyzed for this update. No tests or runtime/external checks were executed.
 
 ## Repository Shape
@@ -70,3 +73,17 @@ See component-inventory.md for ownership and dependency summaries.
 | src/runtime/production/composition.ts | Unlinked production adapter slot |
 
 This table is the fresh startup surface. Whole `scripts/` and `src/` directories were inventoried only beyond these files. Supporting installed Next documentation was read by the developer but is not repository-source coverage.
+
+## Focused Profile Login File Classification — 2026-10-02
+
+| Area | Role in this investigation |
+| --- | --- |
+| `src/runtime/ProfileSelector.tsx`, `app/api/synthetic/session/route.ts` | Native profile form and local session mutation/redirect |
+| `src/runtime/session/session.ts`, `src/runtime/synthetic/profiles.ts` | HMAC cookie lifecycle and five local profile definitions |
+| `app/page.tsx`, `src/runtime/AppShell.tsx`, `proxy.ts` | Dynamic greeting, role navigation, request CSP nonce |
+| `app/belepes/` | Separate parent authentication form, action, continuation |
+| Role layouts/pages and `_lib/session.ts` / `_lib/facade.ts` | Local session resolution and later role landing projections |
+| Runtime composition and synthetic role adapters | Mode validation, local profile/fixture wiring, facade construction |
+| Focused runtime/route/browser tests | Functional session boundaries and existing role-page timing assertions |
+
+The exact 51 deep files are recorded once in reverse-engineering-timestamp.md. Remaining route/domain internals, root test configuration and CI were not freshly analyzed. Earlier startup tables remain historical: this run read the current validator but does not reassert the prior missing-file-loader defect.

@@ -1,0 +1,11 @@
+
+ RUN  v4.1.11 /Users/dev/Development/waldorf-community-task-manager
+
+ ✓ |delivery| tests/integration/runtime-shell.test.tsx (4 tests) 96ms
+ ✓ |delivery| tests/integration/synthetic-route.test.ts (11 tests) 28ms
+
+ Test Files  2 passed (2)
+      Tests  15 passed (15)
+   Start at  15:01:12
+   Duration  8.01s (transform 333ms, setup 386ms, import 767ms, tests 124ms, environment 13.86s)
+

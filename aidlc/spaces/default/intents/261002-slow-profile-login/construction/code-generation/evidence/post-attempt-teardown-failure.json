@@ -1,0 +1,599 @@
+{
+  "config": {
+    "argv": [
+      "/opt/homebrew/Cellar/node@24/24.21.0/bin/node",
+      "/Users/dev/Development/waldorf-community-task-manager/node_modules/.bin/playwright",
+      "test",
+      "--config",
+      "playwright.login-performance.config.ts",
+      "tests/browser/profile-login-performance.spec.ts",
+      "--project=chromium",
+      "--workers=1",
+      "--retries=0"
+    ],
+    "configFile": "/Users/dev/Development/waldorf-community-task-manager/playwright.login-performance.config.ts",
+    "rootDir": "/Users/dev/Development/waldorf-community-task-manager/tests/browser",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/Users/dev/Development/waldorf-community-task-manager/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/Users/dev/Development/waldorf-community-task-manager/tests/browser",
+        "testIgnore": [],
+        "testMatch": [
+          "profile-login-performance.spec.ts"
+        ],
+        "timeout": 120000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results/login-performance.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.62.1",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "profile-login-performance.spec.ts",
+      "file": "profile-login-performance.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "development: first and switch to parent-local complete within 5000 ms",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4141,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-02T12:27:23.940Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "login-timings",
+                      "contentType": "application/json",
+                      "body": "ewogICJtb2RlIjogImRldmVsb3BtZW50IiwKICAicHJvZmlsZSI6ICJwYXJlbnQtbG9jYWwiLAogICJmcm9tIjogInN0YWZmLWxvY2FsIiwKICAibWVhc3VyZW1lbnRzIjogWwogICAgewogICAgICAia2luZCI6ICJmaXJzdCIsCiAgICAgICJlbGFwc2VkIjogMjU5LjM5OTkwMjM0Mzc1CiAgICB9LAogICAgewogICAgICAia2luZCI6ICJzd2l0Y2giLAogICAgICAiZWxhcHNlZCI6IDExMC42OTk5NTExNzE4NzUKICAgIH0KICBdLAogICJjYWNoZSI6ICIubmV4dC9sb2dpbi1wZXJmb3JtYW5jZS05MDg0Mi0xNzkwOTQ0MDQ0MDk4IiwKICAibm9kZSI6ICJ2MjQuMjEuMCIsCiAgImJyb3dzZXIiOiAiMTUxLjAuNzkyMi4zNCIsCiAgIm1hY2hpbmUiOiB7CiAgICAicGxhdGZvcm0iOiAiZGFyd2luIiwKICAgICJyZWxlYXNlIjogIjI3LjAuMCIsCiAgICAiY3B1IjogIkFwcGxlIE00IFBybyIKICB9Cn0="
+                    },
+                    {
+                      "name": "server-output",
+                      "contentType": "text/plain",
+                      "body": "Cj4gd2FsZG9yZi1jb21tdW5pdHktdGFzay1tYW5hZ2VyQDAuMi4wIHByZWRldgo+IG5wbSBydW4gY2hlY2s6dG9vbGNoYWluICYmIG5vZGUgLS1leHBlcmltZW50YWwtc3RyaXAtdHlwZXMgc2NyaXB0cy92YWxpZGF0ZS1ydW50aW1lLWNvbmZpZy50cyBkZXZlbG9wbWVudAoKCj4gd2FsZG9yZi1jb21tdW5pdHktdGFzay1tYW5hZ2VyQDAuMi4wIGNoZWNrOnRvb2xjaGFpbgo+IG5vZGUgc2NyaXB0cy92YWxpZGF0ZS10b29sY2hhaW4ubWpzCgpUT09MQ0hBSU5fVkFMSUQ6IE5vZGUgMjQueCAvIG5wbSAxMS54ClJVTlRJTUVfQ09ORklHX1ZBTElEOiBzeW50aGV0aWMKCj4gd2FsZG9yZi1jb21tdW5pdHktdGFzay1tYW5hZ2VyQDAuMi4wIGRldgo+IG5leHQgZGV2IC0taG9zdG5hbWUgMTI3LjAuMC4xIC0tcG9ydCAzODAwCgoobm9kZTo5MDkzMCkgV2FybmluZzogVGhlICdOT19DT0xPUicgZW52IGlzIGlnbm9yZWQgZHVlIHRvIHRoZSAnRk9SQ0VfQ09MT1InIGVudiBiZWluZyBzZXQuCihVc2UgYG5vZGUgLS10cmFjZS13YXJuaW5ncyAuLi5gIHRvIHNob3cgd2hlcmUgdGhlIHdhcm5pbmcgd2FzIGNyZWF0ZWQpCihub2RlOjkwOTMxKSBXYXJuaW5nOiBUaGUgJ05PX0NPTE9SJyBlbnYgaXMgaWdub3JlZCBkdWUgdG8gdGhlICdGT1JDRV9DT0xPUicgZW52IGJlaW5nIHNldC4KKFVzZSBgbm9kZSAtLXRyYWNlLXdhcm5pbmdzIC4uLmAgdG8gc2hvdyB3aGVyZSB0aGUgd2FybmluZyB3YXMgY3JlYXRlZCkK4payIE5leHQuanMgMTYuMy42IChUdXJib3BhY2spCi0gTG9jYWw6ICAgICAgICAgaHR0cDovLzEyNy4wLjAuMTozODAwCi0gTmV0d29yazogICAgICAgaHR0cDovLzEyNy4wLjAuMTozODAwCi0gRW52aXJvbm1lbnRzOiAuZW52LmxvY2FsCuKckyBSZWFkeSBpbiAzNTBtcwrinJMgUnVubmluZyBuZXh0LmNvbmZpZy50cyB0b29rIDIxbXMKCiAgV2UgZGV0ZWN0ZWQgVHlwZVNjcmlwdCBpbiB5b3VyIHByb2plY3QgYW5kIHJlY29uZmlndXJlZCB5b3VyIHRzY29uZmlnLmpzb24gZmlsZSBmb3IgeW91LgogIFRoZSBmb2xsb3dpbmcgc3VnZ2VzdGVkIHZhbHVlcyB3ZXJlIGFkZGVkIHRvIHlvdXIgdHNjb25maWcuanNvbi4gVGhlc2UgdmFsdWVzIGNhbiBiZSBjaGFuZ2VkIHRvIGZpdCB5b3VyIHByb2plY3QncyBuZWVkczoKCiAgCS0gaW5jbHVkZSB3YXMgdXBkYXRlZCB0byBhZGQgJy5uZXh0L2xvZ2luLXBlcmZvcm1hbmNlLTkwODQyLTE3OTA5NDQwNDQwOTgvdHlwZXMvKiovKi50cycKICAJLSBpbmNsdWRlIHdhcyB1cGRhdGVkIHRvIGFkZCAnLm5leHQvbG9naW4tcGVyZm9ybWFuY2UtOTA4NDItMTc5MDk0NDA0NDA5OC9kZXYvdHlwZXMvKiovKi50cycKCgogR0VUIC9hcGkvcmVhZGluZXNzIDIwMCBpbiA0MDhtcyAobmV4dC5qczogMzkxbXMsIGFwcGxpY2F0aW9uLWNvZGU6IDE3bXMpCiBHRVQgLyAyMDAgaW4gNzMybXMgKG5leHQuanM6IDYxOG1zLCBwcm94eS50czogMjdtcywgYXBwbGljYXRpb24tY29kZTogODdtcykKIFBPU1QgL2FwaS9zeW50aGV0aWMvc2Vzc2lvbiAzMDMgaW4gMTIzbXMgKG5leHQuanM6IDExN21zLCBhcHBsaWNhdGlvbi1jb2RlOiA2bXMpCiBHRVQgLyAyMDAgaW4gMTltcyAobmV4dC5qczogMS4wbXMsIHByb3h5LnRzOiAybXMsIGFwcGxpY2F0aW9uLWNvZGU6IDE2bXMpCiBQT1NUIC9hcGkvc3ludGhldGljL3Nlc3Npb24gMzAzIGluIDNtcyAobmV4dC5qczogMS4xbXMsIGFwcGxpY2F0aW9uLWNvZGU6IDJtcykKIEdFVCAvIDIwMCBpbiAxOW1zIChuZXh0LmpzOiAxLjRtcywgcHJveHkudHM6IDEuOG1zLCBhcHBsaWNhdGlvbi1jb2RlOiAxNm1zKQogUE9TVCAvYXBpL3N5bnRoZXRpYy9zZXNzaW9uIDMwMyBpbiAzbXMgKG5leHQuanM6IDEuMW1zLCBhcHBsaWNhdGlvbi1jb2RlOiAybXMpCiBHRVQgLyAyMDAgaW4gMTdtcyAobmV4dC5qczogMS4xbXMsIHByb3h5LnRzOiAxLjVtcywgYXBwbGljYXRpb24tY29kZTogMTRtcykKIFBPU1QgL2FwaS9zeW50aGV0aWMvc2Vzc2lvbiAzMDMgaW4gM21zIChuZXh0LmpzOiAxLjBtcywgYXBwbGljYXRpb24tY29kZTogMS43bXMpCiBHRVQgLyAyMDAgaW4gMThtcyAobmV4dC5qczogMS4ybXMsIHByb3h5LnRzOiAxLjVtcywgYXBwbGljYXRpb24tY29kZTogMTVtcykKIFBPU1QgL2FwaS9zeW50aGV0aWMvc2Vzc2lvbiAzMDMgaW4gM21zIChuZXh0LmpzOiAwLjltcywgYXBwbGljYXRpb24tY29kZTogMS42bXMpCiBHRVQgLyAyMDAgaW4gMTVtcyAobmV4dC5qczogMS4wbXMsIHByb3h5LnRzOiAxLjVtcywgYXBwbGljYXRpb24tY29kZTogMTNtcykKIEdFVCAvYWRtaW4vaW1wb3J0IDIwMCBpbiAzOTdtcyAobmV4dC5qczogMzA3bXMsIHByb3h5LnRzOiAxLjdtcywgYXBwbGljYXRpb24tY29kZTogODhtcykKG1s/MjVoCg=="
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "dae90d4949994d1e432b-62ebb07b21b3ebfcf569",
+          "file": "profile-login-performance.spec.ts",
+          "line": 12,
+          "column": 5
+        },
+        {
+          "title": "development: first and switch to staff-local complete within 5000 ms",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3996,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-02T12:27:28.176Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "login-timings",
+                      "contentType": "application/json",
+                      "body": "ewogICJtb2RlIjogImRldmVsb3BtZW50IiwKICAicHJvZmlsZSI6ICJzdGFmZi1sb2NhbCIsCiAgImZyb20iOiAiZ3JvdXAtYWRtaW4tbG9jYWwiLAogICJtZWFzdXJlbWVudHMiOiBbCiAgICB7CiAgICAgICJraW5kIjogImZpcnN0IiwKICAgICAgImVsYXBzZWQiOiAzMTcuMzk5OTAyMzQzNzUKICAgIH0sCiAgICB7CiAgICAgICJraW5kIjogInN3aXRjaCIsCiAgICAgICJlbGFwc2VkIjogMTE2LjcwMDE5NTMxMjUKICAgIH0KICBdLAogICJjYWNoZSI6ICIubmV4dC9sb2dpbi1wZXJmb3JtYW5jZS05MDg0Mi0xNzkwOTQ0MDQ4MjE2IiwKICAibm9kZSI6ICJ2MjQuMjEuMCIsCiAgImJyb3dzZXIiOiAiMTUxLjAuNzkyMi4zNCIsCiAgIm1hY2hpbmUiOiB7CiAgICAicGxhdGZvcm0iOiAiZGFyd2luIiwKICAgICJyZWxlYXNlIjogIjI3LjAuMCIsCiAgICAiY3B1IjogIkFwcGxlIE00IFBybyIKICB9Cn0="
+                    },
+                    {
+                      "name": "server-output",
+                      "contentType": "text/plain",
+                      "body": "Cj4gd2FsZG9yZi1jb21tdW5pdHktdGFzay1tYW5hZ2VyQDAuMi4wIHByZWRldgo+IG5wbSBydW4gY2hlY2s6dG9vbGNoYWluICYmIG5vZGUgLS1leHBlcmltZW50YWwtc3RyaXAtdHlwZXMgc2NyaXB0cy92YWxpZGF0ZS1ydW50aW1lLWNvbmZpZy50cyBkZXZlbG9wbWVudAoKCj4gd2FsZG9yZi1jb21tdW5pdHktdGFzay1tYW5hZ2VyQDAuMi4wIGNoZWNrOnRvb2xjaGFpbgo+IG5vZGUgc2NyaXB0cy92YWxpZGF0ZS10b29sY2hhaW4ubWpzCgpUT09MQ0hBSU5fVkFMSUQ6IE5vZGUgMjQueCAvIG5wbSAxMS54ClJVTlRJTUVfQ09ORklHX1ZBTElEOiBzeW50aGV0aWMKCj4gd2FsZG9yZi1jb21tdW5pdHktdGFzay1tYW5hZ2VyQDAuMi4wIGRldgo+IG5leHQgZGV2IC0taG9zdG5hbWUgMTI3LjAuMC4xIC0tcG9ydCAzODAxCgoobm9kZTo5MTA0MCkgV2FybmluZzogVGhlICdOT19DT0xPUicgZW52IGlzIGlnbm9yZWQgZHVlIHRvIHRoZSAnRk9SQ0VfQ09MT1InIGVudiBiZWluZyBzZXQuCihVc2UgYG5vZGUgLS10cmFjZS13YXJuaW5ncyAuLi5gIHRvIHNob3cgd2hlcmUgdGhlIHdhcm5pbmcgd2FzIGNyZWF0ZWQpCihub2RlOjkxMDQxKSBXYXJuaW5nOiBUaGUgJ05PX0NPTE9SJyBlbnYgaXMgaWdub3JlZCBkdWUgdG8gdGhlICdGT1JDRV9DT0xPUicgZW52IGJlaW5nIHNldC4KKFVzZSBgbm9kZSAtLXRyYWNlLXdhcm5pbmdzIC4uLmAgdG8gc2hvdyB3aGVyZSB0aGUgd2FybmluZyB3YXMgY3JlYXRlZCkK4payIE5leHQuanMgMTYuMy42IChUdXJib3BhY2spCi0gTG9jYWw6ICAgICAgICAgaHR0cDovLzEyNy4wLjAuMTozODAxCi0gTmV0d29yazogICAgICAgaHR0cDovLzEyNy4wLjAuMTozODAxCi0gRW52aXJvbm1lbnRzOiAuZW52LmxvY2FsCuKckyBSZWFkeSBpbiAyNzdtcwrinJMgUnVubmluZyBuZXh0LmNvbmZpZy50cyB0b29rIDIwbXMKCiAgV2UgZGV0ZWN0ZWQgVHlwZVNjcmlwdCBpbiB5b3VyIHByb2plY3QgYW5kIHJlY29uZmlndXJlZCB5b3VyIHRzY29uZmlnLmpzb24gZmlsZSBmb3IgeW91LgogIFRoZSBmb2xsb3dpbmcgc3VnZ2VzdGVkIHZhbHVlcyB3ZXJlIGFkZGVkIHRvIHlvdXIgdHNjb25maWcuanNvbi4gVGhlc2UgdmFsdWVzIGNhbiBiZSBjaGFuZ2VkIHRvIGZpdCB5b3VyIHByb2plY3QncyBuZWVkczoKCiAgCS0gaW5jbHVkZSB3YXMgdXBkYXRlZCB0byBhZGQgJy5uZXh0L2xvZ2luLXBlcmZvcm1hbmNlLTkwODQyLTE3OTA5NDQwNDgyMTYvdHlwZXMvKiovKi50cycKICAJLSBpbmNsdWRlIHdhcyB1cGRhdGVkIHRvIGFkZCAnLm5leHQvbG9naW4tcGVyZm9ybWFuY2UtOTA4NDItMTc5MDk0NDA0ODIxNi9kZXYvdHlwZXMvKiovKi50cycKCgogR0VUIC9hcGkvcmVhZGluZXNzIDIwMCBpbiA0MDhtcyAobmV4dC5qczogMzkwbXMsIGFwcGxpY2F0aW9uLWNvZGU6IDE4bXMpCiBHRVQgLyAyMDAgaW4gODAwbXMgKG5leHQuanM6IDY4N21zLCBwcm94eS50czogMjdtcywgYXBwbGljYXRpb24tY29kZTogODdtcykKIFBPU1QgL2FwaS9zeW50aGV0aWMvc2Vzc2lvbiAzMDMgaW4gMTgwbXMgKG5leHQuanM6IDE3NG1zLCBhcHBsaWNhdGlvbi1jb2RlOiA2bXMpCiBHRVQgLyAyMDAgaW4gMjBtcyAobmV4dC5qczogMS4ybXMsIHByb3h5LnRzOiAzbXMsIGFwcGxpY2F0aW9uLWNvZGU6IDE2bXMpCiBQT1NUIC9hcGkvc3ludGhldGljL3Nlc3Npb24gMzAzIGluIDNtcyAobmV4dC5qczogMS4xbXMsIGFwcGxpY2F0aW9uLWNvZGU6IDJtcykKIEdFVCAvIDIwMCBpbiAyMG1zIChuZXh0LmpzOiAxLjNtcywgcHJveHkudHM6IDEuNm1zLCBhcHBsaWNhdGlvbi1jb2RlOiAxN21zKQogUE9TVCAvYXBpL3N5bnRoZXRpYy9zZXNzaW9uIDMwMyBpbiAzbXMgKG5leHQuanM6IDEuMG1zLCBhcHBsaWNhdGlvbi1jb2RlOiAxLjhtcykKIEdFVCAvIDIwMCBpbiAxN21zIChuZXh0LmpzOiAxLjJtcywgcHJveHkudHM6IDEuNm1zLCBhcHBsaWNhdGlvbi1jb2RlOiAxNG1zKQogUE9TVCAvYXBpL3N5bnRoZXRpYy9zZXNzaW9uIDMwMyBpbiAzbXMgKG5leHQuanM6IDEuMW1zLCBhcHBsaWNhdGlvbi1jb2RlOiAxLjhtcykKIEdFVCAvIDIwMCBpbiAxOW1zIChuZXh0LmpzOiAxLjJtcywgcHJveHkudHM6IDEuOG1zLCBhcHBsaWNhdGlvbi1jb2RlOiAxNm1zKQogUE9TVCAvYXBpL3N5bnRoZXRpYy9zZXNzaW9uIDMwMyBpbiAzbXMgKG5leHQuanM6IDEuMG1zLCBhcHBsaWNhdGlvbi1jb2RlOiAxLjltcykKIEdFVCAvIDIwMCBpbiAyMW1zIChuZXh0LmpzOiAxLjJtcywgcHJveHkudHM6IDEuNm1zLCBhcHBsaWNhdGlvbi1jb2RlOiAxOG1zKQogR0VUIC9hZG1pbi9pbXBvcnQgMjAwIGluIDM3Mm1zIChuZXh0LmpzOiAzMzNtcywgcHJveHkudHM6IDEuN21zLCBhcHBsaWNhdGlvbi1jb2RlOiAzN21zKQobWz8yNWgK"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "dae90d4949994d1e432b-a5e47b019809f5671b9f",
+          "file": "profile-login-performance.spec.ts",
+          "line": 12,
+          "column": 5
+        },
+        {
+          "title": "development: first and switch to group-admin-local complete within 5000 ms",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3491,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-02T12:27:32.176Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "login-timings",
+                      "contentType": "application/json",
+                      "body": "ewogICJtb2RlIjogImRldmVsb3BtZW50IiwKICAicHJvZmlsZSI6ICJncm91cC1hZG1pbi1sb2NhbCIsCiAgImZyb20iOiAia2luZGVyZ2FydGVuLWFkbWluLWxvY2FsIiwKICAibWVhc3VyZW1lbnRzIjogWwogICAgewogICAgICAia2luZCI6ICJmaXJzdCIsCiAgICAgICJlbGFwc2VkIjogMzI3LjY5OTk1MTE3MTg3NQogICAgfSwKICAgIHsKICAgICAgImtpbmQiOiAic3dpdGNoIiwKICAgICAgImVsYXBzZWQiOiAxMzguMDAwMjQ0MTQwNjI1CiAgICB9CiAgXSwKICAiY2FjaGUiOiAiLm5leHQvbG9naW4tcGVyZm9ybWFuY2UtOTA4NDItMTc5MDk0NDA1MjIxNCIsCiAgIm5vZGUiOiAidjI0LjIxLjAiLAogICJicm93c2VyIjogIjE1MS4wLjc5MjIuMzQiLAogICJtYWNoaW5lIjogewogICAgInBsYXRmb3JtIjogImRhcndpbiIsCiAgICAicmVsZWFzZSI6ICIyNy4wLjAiLAogICAgImNwdSI6ICJBcHBsZSBNNCBQcm8iCiAgfQp9"
+                    },
+                    {
+                      "name": "server-output",
+                      "contentType": "text/plain",
+                      "body": "Cj4gd2FsZG9yZi1jb21tdW5pdHktdGFzay1tYW5hZ2VyQDAuMi4wIHByZWRldgo+IG5wbSBydW4gY2hlY2s6dG9vbGNoYWluICYmIG5vZGUgLS1leHBlcmltZW50YWwtc3RyaXAtdHlwZXMgc2NyaXB0cy92YWxpZGF0ZS1ydW50aW1lLWNvbmZpZy50cyBkZXZlbG9wbWVudAoKCj4gd2FsZG9yZi1jb21tdW5pdHktdGFzay1tYW5hZ2VyQDAuMi4wIGNoZWNrOnRvb2xjaGFpbgo+IG5vZGUgc2NyaXB0cy92YWxpZGF0ZS10b29sY2hhaW4ubWpzCgpUT09MQ0hBSU5fVkFMSUQ6IE5vZGUgMjQueCAvIG5wbSAxMS54ClJVTlRJTUVfQ09ORklHX1ZBTElEOiBzeW50aGV0aWMKCj4gd2FsZG9yZi1jb21tdW5pdHktdGFzay1tYW5hZ2VyQDAuMi4wIGRldgo+IG5leHQgZGV2IC0taG9zdG5hbWUgMTI3LjAuMC4xIC0tcG9ydCAzODAyCgoobm9kZTo5MTE0NCkgV2FybmluZzogVGhlICdOT19DT0xPUicgZW52IGlzIGlnbm9yZWQgZHVlIHRvIHRoZSAnRk9SQ0VfQ09MT1InIGVudiBiZWluZyBzZXQuCihVc2UgYG5vZGUgLS10cmFjZS13YXJuaW5ncyAuLi5gIHRvIHNob3cgd2hlcmUgdGhlIHdhcm5pbmcgd2FzIGNyZWF0ZWQpCihub2RlOjkxMTQ3KSBXYXJuaW5nOiBUaGUgJ05PX0NPTE9SJyBlbnYgaXMgaWdub3JlZCBkdWUgdG8gdGhlICdGT1JDRV9DT0xPUicgZW52IGJlaW5nIHNldC4KKFVzZSBgbm9kZSAtLXRyYWNlLXdhcm5pbmdzIC4uLmAgdG8gc2hvdyB3aGVyZSB0aGUgd2FybmluZyB3YXMgY3JlYXRlZCkK4payIE5leHQuanMgMTYuMy42IChUdXJib3BhY2spCi0gTG9jYWw6ICAgICAgICAgaHR0cDovLzEyNy4wLjAuMTozODAyCi0gTmV0d29yazogICAgICAgaHR0cDovLzEyNy4wLjAuMTozODAyCi0gRW52aXJvbm1lbnRzOiAuZW52LmxvY2FsCuKckyBSZWFkeSBpbiAyNDVtcwrinJMgUnVubmluZyBuZXh0LmNvbmZpZy50cyB0b29rIDIwbXMKCiAgV2UgZGV0ZWN0ZWQgVHlwZVNjcmlwdCBpbiB5b3VyIHByb2plY3QgYW5kIHJlY29uZmlndXJlZCB5b3VyIHRzY29uZmlnLmpzb24gZmlsZSBmb3IgeW91LgogIFRoZSBmb2xsb3dpbmcgc3VnZ2VzdGVkIHZhbHVlcyB3ZXJlIGFkZGVkIHRvIHlvdXIgdHNjb25maWcuanNvbi4gVGhlc2UgdmFsdWVzIGNhbiBiZSBjaGFuZ2VkIHRvIGZpdCB5b3VyIHByb2plY3QncyBuZWVkczoKCiAgCS0gaW5jbHVkZSB3YXMgdXBkYXRlZCB0byBhZGQgJy5uZXh0L2xvZ2luLXBlcmZvcm1hbmNlLTkwODQyLTE3OTA5NDQwNTIyMTQvdHlwZXMvKiovKi50cycKICAJLSBpbmNsdWRlIHdhcyB1cGRhdGVkIHRvIGFkZCAnLm5leHQvbG9naW4tcGVyZm9ybWFuY2UtOTA4NDItMTc5MDk0NDA1MjIxNC9kZXYvdHlwZXMvKiovKi50cycKCgogR0VUIC9hcGkvcmVhZGluZXNzIDIwMCBpbiAzOTBtcyAobmV4dC5qczogMzcybXMsIGFwcGxpY2F0aW9uLWNvZGU6IDE4bXMpCiBHRVQgLyAyMDAgaW4gODI0bXMgKG5leHQuanM6IDcxNm1zLCBwcm94eS50czogMjVtcywgYXBwbGljYXRpb24tY29kZTogODRtcykKIFBPU1QgL2FwaS9zeW50aGV0aWMvc2Vzc2lvbiAzMDMgaW4gMTg4bXMgKG5leHQuanM6IDE4M21zLCBhcHBsaWNhdGlvbi1jb2RlOiA1bXMpCiBHRVQgLyAyMDAgaW4gMjBtcyAobmV4dC5qczogMS4xbXMsIHByb3h5LnRzOiAybXMsIGFwcGxpY2F0aW9uLWNvZGU6IDE3bXMpCiBQT1NUIC9hcGkvc3ludGhldGljL3Nlc3Npb24gMzAzIGluIDNtcyAobmV4dC5qczogMS4wbXMsIGFwcGxpY2F0aW9uLWNvZGU6IDJtcykKIEdFVCAvIDIwMCBpbiAxN21zIChuZXh0LmpzOiAxLjFtcywgcHJveHkudHM6IDEuNW1zLCBhcHBsaWNhdGlvbi1jb2RlOiAxNW1zKQogUE9TVCAvYXBpL3N5bnRoZXRpYy9zZXNzaW9uIDMwMyBpbiAzbXMgKG5leHQuanM6IDAuOW1zLCBhcHBsaWNhdGlvbi1jb2RlOiAybXMpCiBHRVQgLyAyMDAgaW4gMThtcyAobmV4dC5qczogMS4zbXMsIHByb3h5LnRzOiAxLjVtcywgYXBwbGljYXRpb24tY29kZTogMTVtcykKIFBPU1QgL2FwaS9zeW50aGV0aWMvc2Vzc2lvbiAzMDMgaW4gM21zIChuZXh0LmpzOiAxLjBtcywgYXBwbGljYXRpb24tY29kZTogMS43bXMpCiBHRVQgLyAyMDAgaW4gMThtcyAobmV4dC5qczogMS4xbXMsIHByb3h5LnRzOiAxLjZtcywgYXBwbGljYXRpb24tY29kZTogMTVtcykKIFBPU1QgL2FwaS9zeW50aGV0aWMvc2Vzc2lvbiAzMDMgaW4gM21zIChuZXh0LmpzOiAwLjltcywgYXBwbGljYXRpb24tY29kZTogMS44bXMpCiBHRVQgLyAyMDAgaW4gMTVtcyAobmV4dC5qczogMS4wbXMsIHByb3h5LnRzOiAxLjZtcywgYXBwbGljYXRpb24tY29kZTogMTNtcykKG1s/MjVoCg=="
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "dae90d4949994d1e432b-d3ada7413e9d30983912",
+          "file": "profile-login-performance.spec.ts",
+          "line": 12,
+          "column": 5
+        },
+        {
+          "title": "development: first and switch to kindergarten-admin-local complete within 5000 ms",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3439,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-02T12:27:35.672Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "login-timings",
+                      "contentType": "application/json",
+                      "body": "ewogICJtb2RlIjogImRldmVsb3BtZW50IiwKICAicHJvZmlsZSI6ICJraW5kZXJnYXJ0ZW4tYWRtaW4tbG9jYWwiLAogICJmcm9tIjogInN1cGVyLWFkbWluLWxvY2FsIiwKICAibWVhc3VyZW1lbnRzIjogWwogICAgewogICAgICAia2luZCI6ICJmaXJzdCIsCiAgICAgICJlbGFwc2VkIjogMzMwCiAgICB9LAogICAgewogICAgICAia2luZCI6ICJzd2l0Y2giLAogICAgICAiZWxhcHNlZCI6IDEzNS42OTk5NTExNzE4NzUKICAgIH0KICBdLAogICJjYWNoZSI6ICIubmV4dC9sb2dpbi1wZXJmb3JtYW5jZS05MDg0Mi0xNzkwOTQ0MDU1NzEzIiwKICAibm9kZSI6ICJ2MjQuMjEuMCIsCiAgImJyb3dzZXIiOiAiMTUxLjAuNzkyMi4zNCIsCiAgIm1hY2hpbmUiOiB7CiAgICAicGxhdGZvcm0iOiAiZGFyd2luIiwKICAgICJyZWxlYXNlIjogIjI3LjAuMCIsCiAgICAiY3B1IjogIkFwcGxlIE00IFBybyIKICB9Cn0="
+                    },
+                    {
+                      "name": "server-output",
+                      "contentType": "text/plain",
+                      "body": "Cj4gd2FsZG9yZi1jb21tdW5pdHktdGFzay1tYW5hZ2VyQDAuMi4wIHByZWRldgo+IG5wbSBydW4gY2hlY2s6dG9vbGNoYWluICYmIG5vZGUgLS1leHBlcmltZW50YWwtc3RyaXAtdHlwZXMgc2NyaXB0cy92YWxpZGF0ZS1ydW50aW1lLWNvbmZpZy50cyBkZXZlbG9wbWVudAoKCj4gd2FsZG9yZi1jb21tdW5pdHktdGFzay1tYW5hZ2VyQDAuMi4wIGNoZWNrOnRvb2xjaGFpbgo+IG5vZGUgc2NyaXB0cy92YWxpZGF0ZS10b29sY2hhaW4ubWpzCgpUT09MQ0hBSU5fVkFMSUQ6IE5vZGUgMjQueCAvIG5wbSAxMS54ClJVTlRJTUVfQ09ORklHX1ZBTElEOiBzeW50aGV0aWMKCj4gd2FsZG9yZi1jb21tdW5pdHktdGFzay1tYW5hZ2VyQDAuMi4wIGRldgo+IG5leHQgZGV2IC0taG9zdG5hbWUgMTI3LjAuMC4xIC0tcG9ydCAzODAzCgoobm9kZTo5MTI0NSkgV2FybmluZzogVGhlICdOT19DT0xPUicgZW52IGlzIGlnbm9yZWQgZHVlIHRvIHRoZSAnRk9SQ0VfQ09MT1InIGVudiBiZWluZyBzZXQuCihVc2UgYG5vZGUgLS10cmFjZS13YXJuaW5ncyAuLi5gIHRvIHNob3cgd2hlcmUgdGhlIHdhcm5pbmcgd2FzIGNyZWF0ZWQpCihub2RlOjkxMjQ2KSBXYXJuaW5nOiBUaGUgJ05PX0NPTE9SJyBlbnYgaXMgaWdub3JlZCBkdWUgdG8gdGhlICdGT1JDRV9DT0xPUicgZW52IGJlaW5nIHNldC4KKFVzZSBgbm9kZSAtLXRyYWNlLXdhcm5pbmdzIC4uLmAgdG8gc2hvdyB3aGVyZSB0aGUgd2FybmluZyB3YXMgY3JlYXRlZCkK4payIE5leHQuanMgMTYuMy42IChUdXJib3BhY2spCi0gTG9jYWw6ICAgICAgICAgaHR0cDovLzEyNy4wLjAuMTozODAzCi0gTmV0d29yazogICAgICAgaHR0cDovLzEyNy4wLjAuMTozODAzCi0gRW52aXJvbm1lbnRzOiAuZW52LmxvY2FsCuKckyBSZWFkeSBpbiAyNzNtcwrinJMgUnVubmluZyBuZXh0LmNvbmZpZy50cyB0b29rIDIxbXMKCiAgV2UgZGV0ZWN0ZWQgVHlwZVNjcmlwdCBpbiB5b3VyIHByb2plY3QgYW5kIHJlY29uZmlndXJlZCB5b3VyIHRzY29uZmlnLmpzb24gZmlsZSBmb3IgeW91LgogIFRoZSBmb2xsb3dpbmcgc3VnZ2VzdGVkIHZhbHVlcyB3ZXJlIGFkZGVkIHRvIHlvdXIgdHNjb25maWcuanNvbi4gVGhlc2UgdmFsdWVzIGNhbiBiZSBjaGFuZ2VkIHRvIGZpdCB5b3VyIHByb2plY3QncyBuZWVkczoKCiAgCS0gaW5jbHVkZSB3YXMgdXBkYXRlZCB0byBhZGQgJy5uZXh0L2xvZ2luLXBlcmZvcm1hbmNlLTkwODQyLTE3OTA5NDQwNTU3MTMvdHlwZXMvKiovKi50cycKICAJLSBpbmNsdWRlIHdhcyB1cGRhdGVkIHRvIGFkZCAnLm5leHQvbG9naW4tcGVyZm9ybWFuY2UtOTA4NDItMTc5MDk0NDA1NTcxMy9kZXYvdHlwZXMvKiovKi50cycKCgogR0VUIC9hcGkvcmVhZGluZXNzIDIwMCBpbiAzMTFtcyAobmV4dC5qczogMjkybXMsIGFwcGxpY2F0aW9uLWNvZGU6IDE5bXMpCiBHRVQgLyAyMDAgaW4gNzIzbXMgKG5leHQuanM6IDYxNW1zLCBwcm94eS50czogMjZtcywgYXBwbGljYXRpb24tY29kZTogODJtcykKIFBPU1QgL2FwaS9zeW50aGV0aWMvc2Vzc2lvbiAzMDMgaW4gMTczbXMgKG5leHQuanM6IDE2N21zLCBhcHBsaWNhdGlvbi1jb2RlOiA2bXMpCiBHRVQgLyAyMDAgaW4gMjFtcyAobmV4dC5qczogMS4zbXMsIHByb3h5LnRzOiAzbXMsIGFwcGxpY2F0aW9uLWNvZGU6IDE3bXMpCiBQT1NUIC9hcGkvc3ludGhldGljL3Nlc3Npb24gMzAzIGluIDNtcyAobmV4dC5qczogMS4xbXMsIGFwcGxpY2F0aW9uLWNvZGU6IDJtcykKIEdFVCAvIDIwMCBpbiAxOG1zIChuZXh0LmpzOiAxLjJtcywgcHJveHkudHM6IDEuOG1zLCBhcHBsaWNhdGlvbi1jb2RlOiAxNW1zKQogUE9TVCAvYXBpL3N5bnRoZXRpYy9zZXNzaW9uIDMwMyBpbiAzbXMgKG5leHQuanM6IDAuOW1zLCBhcHBsaWNhdGlvbi1jb2RlOiAxLjdtcykKIEdFVCAvIDIwMCBpbiAxOG1zIChuZXh0LmpzOiAxLjFtcywgcHJveHkudHM6IDEuNG1zLCBhcHBsaWNhdGlvbi1jb2RlOiAxNW1zKQogUE9TVCAvYXBpL3N5bnRoZXRpYy9zZXNzaW9uIDMwMyBpbiAzbXMgKG5leHQuanM6IDEuMG1zLCBhcHBsaWNhdGlvbi1jb2RlOiAybXMpCiBHRVQgLyAyMDAgaW4gMTltcyAobmV4dC5qczogMS4ybXMsIHByb3h5LnRzOiAxLjZtcywgYXBwbGljYXRpb24tY29kZTogMTZtcykKIFBPU1QgL2FwaS9zeW50aGV0aWMvc2Vzc2lvbiAzMDMgaW4gM21zIChuZXh0LmpzOiAxLjFtcywgYXBwbGljYXRpb24tY29kZTogMS45bXMpCiBHRVQgLyAyMDAgaW4gMThtcyAobmV4dC5qczogMS40bXMsIHByb3h5LnRzOiAxLjZtcywgYXBwbGljYXRpb24tY29kZTogMTVtcykKG1s/MjVoCg=="
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "dae90d4949994d1e432b-1271f39b8339be188166",
+          "file": "profile-login-performance.spec.ts",
+          "line": 12,
+          "column": 5
+        },
+        {
+          "title": "development: first and switch to super-admin-local complete within 5000 ms",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3493,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-02T12:27:39.114Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "login-timings",
+                      "contentType": "application/json",
+                      "body": "ewogICJtb2RlIjogImRldmVsb3BtZW50IiwKICAicHJvZmlsZSI6ICJzdXBlci1hZG1pbi1sb2NhbCIsCiAgImZyb20iOiAicGFyZW50LWxvY2FsIiwKICAibWVhc3VyZW1lbnRzIjogWwogICAgewogICAgICAia2luZCI6ICJmaXJzdCIsCiAgICAgICJlbGFwc2VkIjogMzU2LjA5OTg1MzUxNTYyNQogICAgfSwKICAgIHsKICAgICAgImtpbmQiOiAic3dpdGNoIiwKICAgICAgImVsYXBzZWQiOiAxMzAuMTk5OTUxMTcxODc1CiAgICB9CiAgXSwKICAiY2FjaGUiOiAiLm5leHQvbG9naW4tcGVyZm9ybWFuY2UtOTA4NDItMTc5MDk0NDA1OTE1NSIsCiAgIm5vZGUiOiAidjI0LjIxLjAiLAogICJicm93c2VyIjogIjE1MS4wLjc5MjIuMzQiLAogICJtYWNoaW5lIjogewogICAgInBsYXRmb3JtIjogImRhcndpbiIsCiAgICAicmVsZWFzZSI6ICIyNy4wLjAiLAogICAgImNwdSI6ICJBcHBsZSBNNCBQcm8iCiAgfQp9"
+                    },
+                    {
+                      "name": "server-output",
+                      "contentType": "text/plain",
+                      "body": "Cj4gd2FsZG9yZi1jb21tdW5pdHktdGFzay1tYW5hZ2VyQDAuMi4wIHByZWRldgo+IG5wbSBydW4gY2hlY2s6dG9vbGNoYWluICYmIG5vZGUgLS1leHBlcmltZW50YWwtc3RyaXAtdHlwZXMgc2NyaXB0cy92YWxpZGF0ZS1ydW50aW1lLWNvbmZpZy50cyBkZXZlbG9wbWVudAoKCj4gd2FsZG9yZi1jb21tdW5pdHktdGFzay1tYW5hZ2VyQDAuMi4wIGNoZWNrOnRvb2xjaGFpbgo+IG5vZGUgc2NyaXB0cy92YWxpZGF0ZS10b29sY2hhaW4ubWpzCgpUT09MQ0hBSU5fVkFMSUQ6IE5vZGUgMjQueCAvIG5wbSAxMS54ClJVTlRJTUVfQ09ORklHX1ZBTElEOiBzeW50aGV0aWMKCj4gd2FsZG9yZi1jb21tdW5pdHktdGFzay1tYW5hZ2VyQDAuMi4wIGRldgo+IG5leHQgZGV2IC0taG9zdG5hbWUgMTI3LjAuMC4xIC0tcG9ydCAzODA0Cgoobm9kZTo5MTMzNCkgV2FybmluZzogVGhlICdOT19DT0xPUicgZW52IGlzIGlnbm9yZWQgZHVlIHRvIHRoZSAnRk9SQ0VfQ09MT1InIGVudiBiZWluZyBzZXQuCihVc2UgYG5vZGUgLS10cmFjZS13YXJuaW5ncyAuLi5gIHRvIHNob3cgd2hlcmUgdGhlIHdhcm5pbmcgd2FzIGNyZWF0ZWQpCihub2RlOjkxMzM1KSBXYXJuaW5nOiBUaGUgJ05PX0NPTE9SJyBlbnYgaXMgaWdub3JlZCBkdWUgdG8gdGhlICdGT1JDRV9DT0xPUicgZW52IGJlaW5nIHNldC4KKFVzZSBgbm9kZSAtLXRyYWNlLXdhcm5pbmdzIC4uLmAgdG8gc2hvdyB3aGVyZSB0aGUgd2FybmluZyB3YXMgY3JlYXRlZCkK4payIE5leHQuanMgMTYuMy42IChUdXJib3BhY2spCi0gTG9jYWw6ICAgICAgICAgaHR0cDovLzEyNy4wLjAuMTozODA0Ci0gTmV0d29yazogICAgICAgaHR0cDovLzEyNy4wLjAuMTozODA0Ci0gRW52aXJvbm1lbnRzOiAuZW52LmxvY2FsCuKckyBSZWFkeSBpbiAyNTBtcwrinJMgUnVubmluZyBuZXh0LmNvbmZpZy50cyB0b29rIDIybXMKCiAgV2UgZGV0ZWN0ZWQgVHlwZVNjcmlwdCBpbiB5b3VyIHByb2plY3QgYW5kIHJlY29uZmlndXJlZCB5b3VyIHRzY29uZmlnLmpzb24gZmlsZSBmb3IgeW91LgogIFRoZSBmb2xsb3dpbmcgc3VnZ2VzdGVkIHZhbHVlcyB3ZXJlIGFkZGVkIHRvIHlvdXIgdHNjb25maWcuanNvbi4gVGhlc2UgdmFsdWVzIGNhbiBiZSBjaGFuZ2VkIHRvIGZpdCB5b3VyIHByb2plY3QncyBuZWVkczoKCiAgCS0gaW5jbHVkZSB3YXMgdXBkYXRlZCB0byBhZGQgJy5uZXh0L2xvZ2luLXBlcmZvcm1hbmNlLTkwODQyLTE3OTA5NDQwNTkxNTUvdHlwZXMvKiovKi50cycKICAJLSBpbmNsdWRlIHdhcyB1cGRhdGVkIHRvIGFkZCAnLm5leHQvbG9naW4tcGVyZm9ybWFuY2UtOTA4NDItMTc5MDk0NDA1OTE1NS9kZXYvdHlwZXMvKiovKi50cycKCgogR0VUIC9hcGkvcmVhZGluZXNzIDIwMCBpbiA0MTBtcyAobmV4dC5qczogMzkxbXMsIGFwcGxpY2F0aW9uLWNvZGU6IDE5bXMpCiBHRVQgLyAyMDAgaW4gNzU1bXMgKG5leHQuanM6IDY1NG1zLCBwcm94eS50czogMjdtcywgYXBwbGljYXRpb24tY29kZTogNzRtcykKIFBPU1QgL2FwaS9zeW50aGV0aWMvc2Vzc2lvbiAzMDMgaW4gMTc1bXMgKG5leHQuanM6IDE2OG1zLCBhcHBsaWNhdGlvbi1jb2RlOiA3bXMpCiBHRVQgLyAyMDAgaW4gMjNtcyAobmV4dC5qczogMS4ybXMsIHByb3h5LnRzOiAybXMsIGFwcGxpY2F0aW9uLWNvZGU6IDE5bXMpCiBQT1NUIC9hcGkvc3ludGhldGljL3Nlc3Npb24gMzAzIGluIDNtcyAobmV4dC5qczogMS4wbXMsIGFwcGxpY2F0aW9uLWNvZGU6IDJtcykKIEdFVCAvIDIwMCBpbiAxOW1zIChuZXh0LmpzOiAxLjJtcywgcHJveHkudHM6IDEuN21zLCBhcHBsaWNhdGlvbi1jb2RlOiAxNm1zKQogUE9TVCAvYXBpL3N5bnRoZXRpYy9zZXNzaW9uIDMwMyBpbiAzbXMgKG5leHQuanM6IDEuMW1zLCBhcHBsaWNhdGlvbi1jb2RlOiAybXMpCiBHRVQgLyAyMDAgaW4gMTZtcyAobmV4dC5qczogMS4xbXMsIHByb3h5LnRzOiAxLjZtcywgYXBwbGljYXRpb24tY29kZTogMTNtcykKIFBPU1QgL2FwaS9zeW50aGV0aWMvc2Vzc2lvbiAzMDMgaW4gM21zIChuZXh0LmpzOiAxLjFtcywgYXBwbGljYXRpb24tY29kZTogMS43bXMpCiBHRVQgLyAyMDAgaW4gMjNtcyAobmV4dC5qczogMS40bXMsIHByb3h5LnRzOiAxLjdtcywgYXBwbGljYXRpb24tY29kZTogMjBtcykKIFBPU1QgL2FwaS9zeW50aGV0aWMvc2Vzc2lvbiAzMDMgaW4gM21zIChuZXh0LmpzOiAwLjltcywgYXBwbGljYXRpb24tY29kZTogMm1zKQogR0VUIC8gMjAwIGluIDE4bXMgKG5leHQuanM6IDEuMW1zLCBwcm94eS50czogMS42bXMsIGFwcGxpY2F0aW9uLWNvZGU6IDE2bXMpChtbPzI1aAo="
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "dae90d4949994d1e432b-2f0dff24bf4a77cc41c8",
+          "file": "profile-login-performance.spec.ts",
+          "line": 12,
+          "column": 5
+        },
+        {
+          "title": "production: first and switch to parent-local complete within 5000 ms",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 6479,
+                  "error": {
+                    "message": "Error: kill EPERM",
+                    "stack": "Error: kill EPERM\n    at Object.stop (/Users/dev/Development/waldorf-community-task-manager/tests/browser/support/profile-login-server.ts:86:19)\n    at /Users/dev/Development/waldorf-community-task-manager/tests/browser/profile-login-performance.spec.ts:44:9",
+                    "location": {
+                      "file": "/Users/dev/Development/waldorf-community-task-manager/tests/browser/support/profile-login-server.ts",
+                      "column": 19,
+                      "line": 86
+                    },
+                    "snippet": "\u001b[90m   at \u001b[39msupport/profile-login-server.ts:86\n\n  84 |       while (true) {\n  85 |         try {\n> 86 |           process.kill(-child.pid, 0);\n     |                   ^\n  87 |         } catch (error) {\n  88 |           if ((error as NodeJS.ErrnoException).code === \"ESRCH\") break;\n  89 |           throw error;"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/Users/dev/Development/waldorf-community-task-manager/tests/browser/support/profile-login-server.ts",
+                        "column": 19,
+                        "line": 86
+                      },
+                      "message": "Error: kill EPERM\n\n   at support/profile-login-server.ts:86\n\n  84 |       while (true) {\n  85 |         try {\n> 86 |           process.kill(-child.pid, 0);\n     |                   ^\n  87 |         } catch (error) {\n  88 |           if ((error as NodeJS.ErrnoException).code === \"ESRCH\") break;\n  89 |           throw error;\n    at Object.stop (/Users/dev/Development/waldorf-community-task-manager/tests/browser/support/profile-login-server.ts:86:19)\n    at /Users/dev/Development/waldorf-community-task-manager/tests/browser/profile-login-performance.spec.ts:44:9"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-02T12:27:42.611Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/Users/dev/Development/waldorf-community-task-manager/test-results/profile-login-performance--aabf3-cal-complete-within-5000-ms-chromium/test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/Users/dev/Development/waldorf-community-task-manager/test-results/profile-login-performance--aabf3-cal-complete-within-5000-ms-chromium/error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "/Users/dev/Development/waldorf-community-task-manager/test-results/profile-login-performance--aabf3-cal-complete-within-5000-ms-chromium/trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/Users/dev/Development/waldorf-community-task-manager/tests/browser/support/profile-login-server.ts",
+                    "column": 19,
+                    "line": 86
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "dae90d4949994d1e432b-73e3c42b2d3265078534",
+          "file": "profile-login-performance.spec.ts",
+          "line": 12,
+          "column": 5
+        },
+        {
+          "title": "production: first and switch to staff-local complete within 5000 ms",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 6506,
+                  "error": {
+                    "message": "Error: kill EPERM",
+                    "stack": "Error: kill EPERM\n    at Object.stop (/Users/dev/Development/waldorf-community-task-manager/tests/browser/support/profile-login-server.ts:86:19)\n    at /Users/dev/Development/waldorf-community-task-manager/tests/browser/profile-login-performance.spec.ts:44:9",
+                    "location": {
+                      "file": "/Users/dev/Development/waldorf-community-task-manager/tests/browser/support/profile-login-server.ts",
+                      "column": 19,
+                      "line": 86
+                    },
+                    "snippet": "\u001b[90m   at \u001b[39msupport/profile-login-server.ts:86\n\n  84 |       while (true) {\n  85 |         try {\n> 86 |           process.kill(-child.pid, 0);\n     |                   ^\n  87 |         } catch (error) {\n  88 |           if ((error as NodeJS.ErrnoException).code === \"ESRCH\") break;\n  89 |           throw error;"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/Users/dev/Development/waldorf-community-task-manager/tests/browser/support/profile-login-server.ts",
+                        "column": 19,
+                        "line": 86
+                      },
+                      "message": "Error: kill EPERM\n\n   at support/profile-login-server.ts:86\n\n  84 |       while (true) {\n  85 |         try {\n> 86 |           process.kill(-child.pid, 0);\n     |                   ^\n  87 |         } catch (error) {\n  88 |           if ((error as NodeJS.ErrnoException).code === \"ESRCH\") break;\n  89 |           throw error;\n    at Object.stop (/Users/dev/Development/waldorf-community-task-manager/tests/browser/support/profile-login-server.ts:86:19)\n    at /Users/dev/Development/waldorf-community-task-manager/tests/browser/profile-login-performance.spec.ts:44:9"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-02T12:27:49.434Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/Users/dev/Development/waldorf-community-task-manager/test-results/profile-login-performance--4059d-cal-complete-within-5000-ms-chromium/test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/Users/dev/Development/waldorf-community-task-manager/test-results/profile-login-performance--4059d-cal-complete-within-5000-ms-chromium/error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "/Users/dev/Development/waldorf-community-task-manager/test-results/profile-login-performance--4059d-cal-complete-within-5000-ms-chromium/trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/Users/dev/Development/waldorf-community-task-manager/tests/browser/support/profile-login-server.ts",
+                    "column": 19,
+                    "line": 86
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "dae90d4949994d1e432b-ff7f63810feab6fd273a",
+          "file": "profile-login-performance.spec.ts",
+          "line": 12,
+          "column": 5
+        },
+        {
+          "title": "production: first and switch to group-admin-local complete within 5000 ms",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1354,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-02T12:27:56.331Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "login-timings",
+                      "contentType": "application/json",
+                      "body": "ewogICJtb2RlIjogInByb2R1Y3Rpb24iLAogICJwcm9maWxlIjogImdyb3VwLWFkbWluLWxvY2FsIiwKICAiZnJvbSI6ICJraW5kZXJnYXJ0ZW4tYWRtaW4tbG9jYWwiLAogICJtZWFzdXJlbWVudHMiOiBbCiAgICB7CiAgICAgICJraW5kIjogImZpcnN0IiwKICAgICAgImVsYXBzZWQiOiA3MC44OTk5MDIzNDM3NQogICAgfSwKICAgIHsKICAgICAgImtpbmQiOiAic3dpdGNoIiwKICAgICAgImVsYXBzZWQiOiA1NC4xMDAwOTc2NTYyNQogICAgfQogIF0sCiAgImNhY2hlIjogInByZWJ1aWx0IGZyZXNoIHByb2Nlc3MiLAogICJub2RlIjogInYyNC4yMS4wIiwKICAiYnJvd3NlciI6ICIxNTEuMC43OTIyLjM0IiwKICAibWFjaGluZSI6IHsKICAgICJwbGF0Zm9ybSI6ICJkYXJ3aW4iLAogICAgInJlbGVhc2UiOiAiMjcuMC4wIiwKICAgICJjcHUiOiAiQXBwbGUgTTQgUHJvIgogIH0KfQ=="
+                    },
+                    {
+                      "name": "server-output",
+                      "contentType": "text/plain",
+                      "body": "Cj4gd2FsZG9yZi1jb21tdW5pdHktdGFzay1tYW5hZ2VyQDAuMi4wIHByZXN0YXJ0Cj4gbnBtIHJ1biBjaGVjazp0b29sY2hhaW4gJiYgbm9kZSAtLWV4cGVyaW1lbnRhbC1zdHJpcC10eXBlcyBzY3JpcHRzL3ZhbGlkYXRlLXJ1bnRpbWUtY29uZmlnLnRzIHByb2R1Y3Rpb24KCgo+IHdhbGRvcmYtY29tbXVuaXR5LXRhc2stbWFuYWdlckAwLjIuMCBjaGVjazp0b29sY2hhaW4KPiBub2RlIHNjcmlwdHMvdmFsaWRhdGUtdG9vbGNoYWluLm1qcwoKVE9PTENIQUlOX1ZBTElEOiBOb2RlIDI0LnggLyBucG0gMTEueApSVU5USU1FX0NPTkZJR19WQUxJRDogc3ludGhldGljCgo+IHdhbGRvcmYtY29tbXVuaXR5LXRhc2stbWFuYWdlckAwLjIuMCBzdGFydAo+IG5leHQgc3RhcnQgLS1ob3N0bmFtZSAke0FQUF9IT1NUOi0xMjcuMC4wLjF9IC0tcG9ydCAke0FQUF9QT1JUOi0zMDAwfQoKKG5vZGU6OTE2NjEpIFdhcm5pbmc6IFRoZSAnTk9fQ09MT1InIGVudiBpcyBpZ25vcmVkIGR1ZSB0byB0aGUgJ0ZPUkNFX0NPTE9SJyBlbnYgYmVpbmcgc2V0LgooVXNlIGBub2RlIC0tdHJhY2Utd2FybmluZ3MgLi4uYCB0byBzaG93IHdoZXJlIHRoZSB3YXJuaW5nIHdhcyBjcmVhdGVkKQrilrIgTmV4dC5qcyAxNi4zLjYKLSBMb2NhbDogICAgICAgICBodHRwOi8vMTI3LjAuMC4xOjM4MDIKLSBOZXR3b3JrOiAgICAgICBodHRwOi8vMTI3LjAuMC4xOjM4MDIK4pyTIFJlYWR5IGluIDEwNm1zCuKckyBSdW5uaW5nIG5leHQuY29uZmlnLnRzIHRvb2sgMThtcwo="
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "dae90d4949994d1e432b-3b79dabe3e759dfb5cc6",
+          "file": "profile-login-performance.spec.ts",
+          "line": 12,
+          "column": 5
+        },
+        {
+          "title": "production: first and switch to kindergarten-admin-local complete within 5000 ms",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1382,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-02T12:27:57.775Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "login-timings",
+                      "contentType": "application/json",
+                      "body": "ewogICJtb2RlIjogInByb2R1Y3Rpb24iLAogICJwcm9maWxlIjogImtpbmRlcmdhcnRlbi1hZG1pbi1sb2NhbCIsCiAgImZyb20iOiAic3VwZXItYWRtaW4tbG9jYWwiLAogICJtZWFzdXJlbWVudHMiOiBbCiAgICB7CiAgICAgICJraW5kIjogImZpcnN0IiwKICAgICAgImVsYXBzZWQiOiA4OC4wOTk4NTM1MTU2MjUKICAgIH0sCiAgICB7CiAgICAgICJraW5kIjogInN3aXRjaCIsCiAgICAgICJlbGFwc2VkIjogNzUuOTk5NzU1ODU5Mzc1CiAgICB9CiAgXSwKICAiY2FjaGUiOiAicHJlYnVpbHQgZnJlc2ggcHJvY2VzcyIsCiAgIm5vZGUiOiAidjI0LjIxLjAiLAogICJicm93c2VyIjogIjE1MS4wLjc5MjIuMzQiLAogICJtYWNoaW5lIjogewogICAgInBsYXRmb3JtIjogImRhcndpbiIsCiAgICAicmVsZWFzZSI6ICIyNy4wLjAiLAogICAgImNwdSI6ICJBcHBsZSBNNCBQcm8iCiAgfQp9"
+                    },
+                    {
+                      "name": "server-output",
+                      "contentType": "text/plain",
+                      "body": "Cj4gd2FsZG9yZi1jb21tdW5pdHktdGFzay1tYW5hZ2VyQDAuMi4wIHByZXN0YXJ0Cj4gbnBtIHJ1biBjaGVjazp0b29sY2hhaW4gJiYgbm9kZSAtLWV4cGVyaW1lbnRhbC1zdHJpcC10eXBlcyBzY3JpcHRzL3ZhbGlkYXRlLXJ1bnRpbWUtY29uZmlnLnRzIHByb2R1Y3Rpb24KCgo+IHdhbGRvcmYtY29tbXVuaXR5LXRhc2stbWFuYWdlckAwLjIuMCBjaGVjazp0b29sY2hhaW4KPiBub2RlIHNjcmlwdHMvdmFsaWRhdGUtdG9vbGNoYWluLm1qcwoKVE9PTENIQUlOX1ZBTElEOiBOb2RlIDI0LnggLyBucG0gMTEueApSVU5USU1FX0NPTkZJR19WQUxJRDogc3ludGhldGljCgo+IHdhbGRvcmYtY29tbXVuaXR5LXRhc2stbWFuYWdlckAwLjIuMCBzdGFydAo+IG5leHQgc3RhcnQgLS1ob3N0bmFtZSAke0FQUF9IT1NUOi0xMjcuMC4wLjF9IC0tcG9ydCAke0FQUF9QT1JUOi0zMDAwfQoKKG5vZGU6OTE3NDYpIFdhcm5pbmc6IFRoZSAnTk9fQ09MT1InIGVudiBpcyBpZ25vcmVkIGR1ZSB0byB0aGUgJ0ZPUkNFX0NPTE9SJyBlbnYgYmVpbmcgc2V0LgooVXNlIGBub2RlIC0tdHJhY2Utd2FybmluZ3MgLi4uYCB0byBzaG93IHdoZXJlIHRoZSB3YXJuaW5nIHdhcyBjcmVhdGVkKQrilrIgTmV4dC5qcyAxNi4zLjYKLSBMb2NhbDogICAgICAgICBodHRwOi8vMTI3LjAuMC4xOjM4MDMKLSBOZXR3b3JrOiAgICAgICBodHRwOi8vMTI3LjAuMC4xOjM4MDMK4pyTIFJlYWR5IGluIDk3bXMK4pyTIFJ1bm5pbmcgbmV4dC5jb25maWcudHMgdG9vayAxOW1zCg=="
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "dae90d4949994d1e432b-23517e52a5f81fcb3c68",
+          "file": "profile-login-performance.spec.ts",
+          "line": 12,
+          "column": 5
+        },
+        {
+          "title": "production: first and switch to super-admin-local complete within 5000 ms",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1432,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-02T12:27:59.161Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "login-timings",
+                      "contentType": "application/json",
+                      "body": "ewogICJtb2RlIjogInByb2R1Y3Rpb24iLAogICJwcm9maWxlIjogInN1cGVyLWFkbWluLWxvY2FsIiwKICAiZnJvbSI6ICJwYXJlbnQtbG9jYWwiLAogICJtZWFzdXJlbWVudHMiOiBbCiAgICB7CiAgICAgICJraW5kIjogImZpcnN0IiwKICAgICAgImVsYXBzZWQiOiAxMDIuNjk5NzA3MDMxMjUKICAgIH0sCiAgICB7CiAgICAgICJraW5kIjogInN3aXRjaCIsCiAgICAgICJlbGFwc2VkIjogNjcuMzAwMDQ4ODI4MTI1CiAgICB9CiAgXSwKICAiY2FjaGUiOiAicHJlYnVpbHQgZnJlc2ggcHJvY2VzcyIsCiAgIm5vZGUiOiAidjI0LjIxLjAiLAogICJicm93c2VyIjogIjE1MS4wLjc5MjIuMzQiLAogICJtYWNoaW5lIjogewogICAgInBsYXRmb3JtIjogImRhcndpbiIsCiAgICAicmVsZWFzZSI6ICIyNy4wLjAiLAogICAgImNwdSI6ICJBcHBsZSBNNCBQcm8iCiAgfQp9"
+                    },
+                    {
+                      "name": "server-output",
+                      "contentType": "text/plain",
+                      "body": "Cj4gd2FsZG9yZi1jb21tdW5pdHktdGFzay1tYW5hZ2VyQDAuMi4wIHByZXN0YXJ0Cj4gbnBtIHJ1biBjaGVjazp0b29sY2hhaW4gJiYgbm9kZSAtLWV4cGVyaW1lbnRhbC1zdHJpcC10eXBlcyBzY3JpcHRzL3ZhbGlkYXRlLXJ1bnRpbWUtY29uZmlnLnRzIHByb2R1Y3Rpb24KCgo+IHdhbGRvcmYtY29tbXVuaXR5LXRhc2stbWFuYWdlckAwLjIuMCBjaGVjazp0b29sY2hhaW4KPiBub2RlIHNjcmlwdHMvdmFsaWRhdGUtdG9vbGNoYWluLm1qcwoKVE9PTENIQUlOX1ZBTElEOiBOb2RlIDI0LnggLyBucG0gMTEueApSVU5USU1FX0NPTkZJR19WQUxJRDogc3ludGhldGljCgo+IHdhbGRvcmYtY29tbXVuaXR5LXRhc2stbWFuYWdlckAwLjIuMCBzdGFydAo+IG5leHQgc3RhcnQgLS1ob3N0bmFtZSAke0FQUF9IT1NUOi0xMjcuMC4wLjF9IC0tcG9ydCAke0FQUF9QT1JUOi0zMDAwfQoKKG5vZGU6OTE4MzEpIFdhcm5pbmc6IFRoZSAnTk9fQ09MT1InIGVudiBpcyBpZ25vcmVkIGR1ZSB0byB0aGUgJ0ZPUkNFX0NPTE9SJyBlbnYgYmVpbmcgc2V0LgooVXNlIGBub2RlIC0tdHJhY2Utd2FybmluZ3MgLi4uYCB0byBzaG93IHdoZXJlIHRoZSB3YXJuaW5nIHdhcyBjcmVhdGVkKQrilrIgTmV4dC5qcyAxNi4zLjYKLSBMb2NhbDogICAgICAgICBodHRwOi8vMTI3LjAuMC4xOjM4MDQKLSBOZXR3b3JrOiAgICAgICBodHRwOi8vMTI3LjAuMC4xOjM4MDQK4pyTIFJlYWR5IGluIDEwNm1zCuKckyBSdW5uaW5nIG5leHQuY29uZmlnLnRzIHRvb2sgMTltcwo="
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "dae90d4949994d1e432b-d4a2bdc9548e2d6f022f",
+          "file": "profile-login-performance.spec.ts",
+          "line": 12,
+          "column": 5
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-02T12:27:23.636Z",
+    "duration": 36997.526,
+    "expected": 8,
+    "skipped": 0,
+    "unexpected": 2,
+    "flaky": 0
+  }
+}

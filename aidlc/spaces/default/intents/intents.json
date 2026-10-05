@@ -19,5 +19,12 @@
     "dirName": "261001-local-startup-fix",
     "scope": "bugfix",
     "status": "complete"
+  },
+  {
+    "uuid": "01a0fc33-4fa3-74d3-89c6-8df4b7644dea",
+    "slug": "slow-profile-login",
+    "dirName": "261002-slow-profile-login",
+    "scope": "bugfix",
+    "status": "complete"
   }
 ]

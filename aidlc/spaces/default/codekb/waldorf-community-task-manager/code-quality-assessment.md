@@ -1,5 +1,8 @@
 # Code Quality Assessment
 
+> Focused merge, 2026-10-02 (`261002-slow-profile-login`): the earlier sections are preserved historical prose from an UNVERIFIED store, including the prior startup diagnosis and pending loader choices. They are not current defect claims. Fresh conclusions are in the profile-login update below; exact newly analyzed files appear in reverse-engineering-timestamp.md. No tests, latency measurements, browser sessions, or backend calls were performed.
+
+
 > Focused update, 2026-10-01: earlier repository-wide prose is preserved as historical static knowledge; its freshness was UNVERIFIED. Only the deep files listed in reverse-engineering-timestamp.md were analyzed for this update. No tests or runtime/external checks were executed.
 
 ## Verification Boundary
@@ -60,3 +63,17 @@ The archived CodeKB claim that there were no routes, browser/server entry, Next/
 Smoke (`scripts/start-smoke.mjs:7–13`) and the skimmed local verification runner (`scripts/verification/run-local-verification.ts:41–48`) explicitly inject synthetic mode. Their success alone would conceal the defect. Later authorized regression checks should use temporary fixture environments with no exported mode, exercise development versus production selection and shell precedence, and assert missing/invalid configuration still fails with secret-safe output. This is a recommendation, not an executed check or Testing Contract.
 
 Existing test filenames and CI presence were inventoried; their bodies and current results were not evaluated. Preserve all prior verification figures as historical. Keep Node/npm constraints, Next precedence, pure schema checks, safe errors, and loopback defaults. No `.env.local` contents were read; no secrets, tests, startup processes, or external targets were accessed by this investigation.
+
+## Profile Login Quality Update — 2026-10-02
+
+### Fresh Coverage and Evidence Limits
+
+Runtime boundary tests cover modes, all five fixed profiles, token rotation/tamper/expiry and origin checks. Route integration covers the parent cookie/303, origin rejection, unknown profile and disabled production controls, but lacks latency/cache-header assertions, all-profile route cases and empty-ID clearing. Runtime shell checks selector controls and role navigation. Browser runtime foundation covers selection and parent-to-staff isolation without elapsed-time assertions.
+
+Parent/staff/admin browser timing assertions start after selection; their sub-two-second budgets do not cover the five-second login target. Parent authentication coverage visits `/belepes` already signed in rather than exercising signed-out form submission. Fixture reset composes runtime before the user journey and cannot establish first-use session-route latency. Root test configuration and CI were not freshly read; prior file counts, coverage results, machine versions and startup defect statements above retain historical provenance.
+
+### Risks and Next Evidence
+
+No tests, benchmarks or browser measurements ran. There is no elapsed baseline, measured root cause or evidence of satisfying five seconds. Cache clearing is a strong source-level candidate; first-use compilation/module loading, native full navigation and repeated runtime composition remain unmeasured. The latter creates small local state and cannot be assumed to cost seconds.
+
+Requirements should define click-to-ready content, supported profiles/switches, first-use versus repeated selection and development versus built start. Later verification should time all five profiles and switching while proving prior-profile projections disappear and origin/mode/token constraints survive. Any cache adjustment requires explicit isolation checks; pending feedback alone does not meet the latency target. Do not weaken affirmed 80% production coverage, existing quality gates or a bugfix regression requirement. Read installed Next documentation before subsequent code edits.
