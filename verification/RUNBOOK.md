@@ -15,6 +15,16 @@ Run browser verification from a terminal with permission to launch native applic
 
 On macOS, the Firefox project writes `waldorf-application.ini` beside the bundled browser's resources in Playwright's browser cache and selects it with `XUL_APP_FILE`. This keeps Gecko's application-data directory separate from personal Firefox data and addresses the macOS 27 startup hang tracked in [Playwright issue #42768](https://github.com/microsoft/playwright/issues/42768). The bundled browser executable and its sandbox settings remain intact. Install the browser revision matching the locked Playwright package before running verification. A launch failure remains a failed check; do not report skipped browser tests as passed.
 
+## Next ESLint dependency override
+
+The scoped npm override replaces `fast-glob` inside `@next/eslint-plugin-next` with
+`tinyglobby@0.2.17`. This removes the unpatched `braces` dependency affected by
+[GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm).
+Next's plugin uses this dependency for synchronous directory glob matching;
+`tests/unit/eslint-glob-compatibility.test.ts` checks that matching and the internal
+link lint rule still work. Remove the override when the upstream plugin provides
+a dependency chain without this vulnerability, then repeat verification.
+
 ## Profile routes
 
 - Parent: `/szulo/feladatok`, `/szulo/ertesitesek`, invitation/authentication entry.
