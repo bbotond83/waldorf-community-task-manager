@@ -144,6 +144,19 @@ with `npx playwright install` if the local machine does not already have them. C
 desktop and mobile-Safari smoke evidence is not produced by this local scaffold and remains an
 explicit release blocker/outstanding item until recorded on a supported Apple environment.
 
+### CI build evidence
+
+After validation succeeds on a pull request or a push to `main`, CI rebuilds the synthetic
+application and uploads a private `build-evidence-<commit>-<attempt>` Actions artifact. It contains
+`next-build.tar.gz`, the CycloneDX `sbom.cdx.json`, `build-metadata.json` with the commit and workflow
+run details, and `SHA256SUMS`. Download it from the workflow run's **Artifacts** section and run
+`sha256sum -c SHA256SUMS` in the extracted directory to check the files. Evidence expires after
+14 days.
+
+These files are unsigned build records. They do not provide cryptographic provenance attestations.
+The workflow uses ordinary artifact storage because GitHub's attestation service does not support
+this user-owned private repository.
+
 ## Profile login timing regression
 
 The session form rotates the signed HttpOnly cookie and redirects through a full document
