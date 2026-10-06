@@ -20,8 +20,8 @@
 - **Review Override**: 
 - **Guard Policy**: relaxed (from scope bugfix)
 - **Sensors**: on (from scope bugfix)
-- **Learnings**: on (from scope bugfix)
-- **Summary Confirmation**: on (from scope bugfix)
+- **Learnings**: off (set by you)
+- **Summary Confirmation**: off (set by you)
 
 ## Workspace State
 - **Project Root**: .
@@ -98,7 +98,7 @@ Per unit: [TBD]
 - **Current Stage**: deployment-execution
 - **Next Stage**: none
 - **Status**: Completed
-- **Last Updated**: 2026-10-05T13:08:25Z
+- **Last Updated**: 2026-10-06T07:11:55Z
 
 ## Session Resume Point
 - **Last Completed Stage**: build-and-test

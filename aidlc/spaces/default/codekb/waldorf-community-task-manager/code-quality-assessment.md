@@ -1,79 +1,41 @@
 # Code Quality Assessment
 
-> Focused merge, 2026-10-02 (`261002-slow-profile-login`): the earlier sections are preserved historical prose from an UNVERIFIED store, including the prior startup diagnosis and pending loader choices. They are not current defect claims. Fresh conclusions are in the profile-login update below; exact newly analyzed files appear in reverse-engineering-timestamp.md. No tests, latency measurements, browser sessions, or backend calls were performed.
+## Test Coverage
 
+Source-configured tools: native Node tests for domain modules; Vitest/jsdom/Testing Library for delivery/components; Playwright Chromium/Firefox/mobile Chrome; axe for accessibility. Tests reside in colocated `src/**/*.test.ts` and `tests/{unit,integration,coverage,browser}/`. Node and Vitest configurations enforce 80% line/branch/function floors; aggregate production inventory includes app/src/scripts/proxy/Next config.
 
-> Focused update, 2026-10-01: earlier repository-wide prose is preserved as historical static knowledge; its freshness was UNVERIFIED. Only the deep files listed in reverse-engineering-timestamp.md were analyzed for this update. No tests or runtime/external checks were executed.
+**No tests, build or current coverage measurement were run in Reverse Engineering.** Historical counts and percentages are not current evidence.
 
-## Verification Boundary
+## Login Regression and Measurement Limits
 
-Static inspection only at commit d7995af0aacf59ff7aa75880c45cc5e0a50eda9e. No tests, builds, installs, audits, application sessions, external calls, database operations, or deployments were run. Existing recorded checks below are historical and retain their original SHA/date.
+`test:login-performance` defines ten Chromium cases: five profiles in development and production, each measuring first login and switching with zero retries and a 5000 ms assertion. Timing starts at form submit and ends at the correct greeting plus usable navigation. Readiness and initial `/` are loaded before timing. Development uses a unique empty output directory; production uses a prebuilt bundle/fresh server. This excludes full cold server startup/initial root compilation and later navigation to a profile's business landing page.
 
-## Test Organization and Coverage
+Route integration tests directly invoke handlers for all five profiles, cookie rotation/sign-out/redirect and denial. Component tests render selector/shell without a server. Browser foundation covers parent selection and parent-to-staff switching; business browser suites reset fixtures and measure subsequent navigation after login. These are useful behavioral surfaces, not reproduction of the reported actual-server delay.
 
-- 20 colocated src/**/*.test.ts files; tests/unit/ has 2 files, tests/integration/ 6, and tests/browser/ 5 Playwright specs.
-- Node node:test uses experimental TypeScript stripping; Vitest/jsdom runs integration/UI tests and V8 coverage; Playwright is configured for Chromium, Firefox, and mobile Chrome; Axe checks accessibility.
-- 80% line/branch/function thresholds are declared in the domain Node command and Vitest. Vitest explicit coverage includes only src/runtime/**/*.{ts,tsx}; most domain modules and App Router pages/actions are not explicitly included. Confirm whole-production-source enforcement before relying on the broader README claim.
-- The 2026-08-12 committed acceptance report records 33 PASS / 0 FAIL / 6 OUTSTANDING at SHA 69edd12c7aba1c0ae35138bbac67932d86b85e63. It predates this scan and is not a current baseline. Outstanding areas include desktop/mobile Safari, Supabase auth/RLS/persistence, scheduler/provider, and Vercel preview/staging.
-- Ignored .verification/evidence points to the same old SHA. Nothing was rerun.
+The prior login intent reports sub-second isolated first/switch samples but explicitly no reproduced delay or production login correction. Canonical `verify:local` and standard browser configuration exclude the timing suite. Acceptance must explicitly execute the timing check and capture the affected existing environment, with server/browser segment timing and all five profiles preserved.
 
-## Static Quality Controls
+## Linting, Formatting and CI/CD
 
-- tsconfig.json uses strict mode and includes app, all src, tests, scripts, and configuration.
-- ESLint and Prettier are blocking in the configured verification chain.
-- npm lint/format globs cover app, src/application, src/runtime, tests, and scripts but omit most domain folders such as access, directory, coordination, import-migration, notifications, and privacy-audit.
-- Several omitted domain modules compress methods into very long lines, reducing readability and automated style coverage.
+ESLint flat Next web-vitals/TypeScript config is blocking at zero warnings; Prettier is also blocking. Current lint/format commands use selective paths and omit portions of older domain/synthetic modules. GitHub Actions runs pinned checkout/setup-node, locked install/browser install and `verify:local` on PR/main. Main pushes additionally rebuild, generate SBOM and attest provenance. No executable deployment workflow or linked target was found.
 
-## CI and Supply Chain
+Local verification includes toolchain/manifests/format/lint/typecheck/test/coverage/security/build/smoke/standard browser/evidence. Security checks combine regex secret/SAST scanning with npm high/critical audit; configured checks do not prove runtime security. Team policy requires green checks, 80% coverage, no serious/critical accessibility violations and blocking high/critical dependency/SAST findings.
 
-- .github/workflows/ci.yml runs verify:local on pull requests targeting main and pushes to main, not feature-branch pushes alone.
-- CI selects Node 24 and runs verification. Main push validation is followed by a CycloneDX SBOM and build/SBOM attestations. Actions are pinned to immutable SHAs.
-- Workflow has no deployment job.
-- Verification scripts include privacy, secret, SAST, and no-deploy checks.
+## Documentation Quality
 
-## Risks and Technical Debt
+README records supported startup/environment precedence, loopback use, watcher polling workaround, checks and outstanding targets. Explicit port and result contracts support maintainability. Hungarian user guide/source references exist but were only inventoried; prior intent evidence is historical.
 
-1. **Unlinked production integration:** src/runtime/production/composition.ts validates configuration but makes no target call, labels Supabase unlinked, and has no active authorization-version source.
-2. **Incomplete persistence:** local UI uses synthetic in-memory profiles/stores. One SQL migration is a partial auth/RLS scaffold, not a complete production domain store.
-3. **Toolchain mismatch:** observed shell Node 26.10.0 is outside required Node 24.x. Validators reject the unsupported major.
-4. **Dependency drift:** package.json uses latest for selected direct dependencies although the lock currently pins versions.
-5. **Quality-scope gaps:** coverage and lint/format globs do not clearly enforce all production source.
-6. **Feature-branch CI gap:** pushes alone do not trigger CI until a PR targets main.
-7. **Stale documentation:** README AIDLC footer says 2.5.11; active intent description says 2.9.0; current project stamp is 2.10.0. Some inherited project rule wording refers to the earlier domain-library-only state.
-8. **Privacy limit:** the source workbook was inventoried by name/size only and not opened; no family or child records were inspected.
+## Technical Debt and Follow-up
 
-## Historical Archive Assessment
+| Finding | Evidence / implication |
+|---|---|
+| Reported delay unmeasured | Reproduce on the actual local server; isolated success does not close this defect |
+| Cache clearing hypothesis | Session route sends `Clear-Site-Data: "cache"`; measure browser cache/assets and preserve session isolation before changing it |
+| Compilation/environment hypothesis | Runtime composition/application-barrel imports, output contention, watcher/resource behavior and browser redirects need measured attribution |
+| Toolchain mismatch | Shell Node 26 versus required Node 24; record the running server's actual version; cause not established |
+| Nondurable synthetic state | Module/process stores; unlinked production boundary; no demonstrated real persistence |
+| Divergent authorization paths | Static root navigation versus dynamic business admin revocation; preserve protected role/scope behavior |
+| Migration/lifecycle debt | Partial synthetic rollback simulation and SQL security-definer/RLS contracts require later real-target validation |
 
-The archived CodeKB claim that there were no routes, browser/server entry, Next/React runtime, or dev/build/start commands is contradicted by current source. Its domain modules, synthetic in-memory adapters, and partial Supabase authorization edge are partly supported and extended. Its coverage/security/test metrics and intent boundary claims are historical, not current verification or backlog. Current integration/deployment targets remain unlinked.
+## Outstanding Evidence
 
-## Improvement Opportunities
-
-- Link and exercise production auth, durable persistence/RLS, scheduler/providers, and approved deployment target before production claims.
-- Align or narrow coverage and lint/format guarantees to actual source globs.
-- Decide whether feature-branch pushes should receive CI before PR creation.
-- Reconcile stale README/runtime wording and obsolete conditional rule text in a separate review.
-- Run the project verification chain with Node 24 when implementation work is authorized.
-
-## Confirmed Local Startup Defect
-
-`scripts/validate-runtime-config.ts:3` validates inherited `process.env` without loading configuration files. `package.json:13–18` invokes it in predev, prebuild, and prestart before Next initializes. README's env-copy recipe therefore cannot provide runtime mode to these validators without an extra shell export. README's nvm-only runtime selection also misses the reported existing Homebrew option.
-
-## Focused Verification Gap and Risk Controls
-
-Smoke (`scripts/start-smoke.mjs:7–13`) and the skimmed local verification runner (`scripts/verification/run-local-verification.ts:41–48`) explicitly inject synthetic mode. Their success alone would conceal the defect. Later authorized regression checks should use temporary fixture environments with no exported mode, exercise development versus production selection and shell precedence, and assert missing/invalid configuration still fails with secret-safe output. This is a recommendation, not an executed check or Testing Contract.
-
-Existing test filenames and CI presence were inventoried; their bodies and current results were not evaluated. Preserve all prior verification figures as historical. Keep Node/npm constraints, Next precedence, pure schema checks, safe errors, and loopback defaults. No `.env.local` contents were read; no secrets, tests, startup processes, or external targets were accessed by this investigation.
-
-## Profile Login Quality Update — 2026-10-02
-
-### Fresh Coverage and Evidence Limits
-
-Runtime boundary tests cover modes, all five fixed profiles, token rotation/tamper/expiry and origin checks. Route integration covers the parent cookie/303, origin rejection, unknown profile and disabled production controls, but lacks latency/cache-header assertions, all-profile route cases and empty-ID clearing. Runtime shell checks selector controls and role navigation. Browser runtime foundation covers selection and parent-to-staff isolation without elapsed-time assertions.
-
-Parent/staff/admin browser timing assertions start after selection; their sub-two-second budgets do not cover the five-second login target. Parent authentication coverage visits `/belepes` already signed in rather than exercising signed-out form submission. Fixture reset composes runtime before the user journey and cannot establish first-use session-route latency. Root test configuration and CI were not freshly read; prior file counts, coverage results, machine versions and startup defect statements above retain historical provenance.
-
-### Risks and Next Evidence
-
-No tests, benchmarks or browser measurements ran. There is no elapsed baseline, measured root cause or evidence of satisfying five seconds. Cache clearing is a strong source-level candidate; first-use compilation/module loading, native full navigation and repeated runtime composition remain unmeasured. The latter creates small local state and cannot be assumed to cost seconds.
-
-Requirements should define click-to-ready content, supported profiles/switches, first-use versus repeated selection and development versus built start. Later verification should time all five profiles and switching while proving prior-profile projections disappear and origin/mode/token constraints survive. Any cache adjustment requires explicit isolation checks; pending feedback alone does not meet the latency target. Do not weaken affirmed 80% production coverage, existing quality gates or a bugfix regression requirement. Read installed Next documentation before subsequent code edits.
+Committed local acceptance report references SHA `71a3b5f8d74be036b10571690e439d865fb5d664`, distinct from scan HEAD. Safari/mobile Safari, Supabase auth/RLS/persistence, provider/scheduler and Vercel checks remain outstanding. `.env.local` is synthetic, but effective settings of an already-running server were not checked. No login speed improvement or fix is claimed.
