@@ -41,17 +41,13 @@ jobs:
       - name: Run the complete local verification pipeline
         run: npm run verify:local
 
-  attest:
-    name: SBOM and build provenance
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+  build_evidence:
+    name: SBOM and build evidence
     needs: validate
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
       contents: read
-      id-token: write
-      attestations: write
-      artifact-metadata: write
     env:
       APP_RUNTIME_MODE: synthetic
       APP_SYNTHETIC_FIXTURE_VERSION: waldorf-local-v1
@@ -71,14 +67,41 @@ jobs:
         run: npm run build
       - name: Generate CycloneDX SBOM
         run: npm sbom --sbom-format=cyclonedx --sbom-type=application > sbom.cdx.json
-      - name: Archive the Next.js build for provenance
+      - name: Archive the Next.js build
         run: tar -czf next-build.tar.gz --exclude=.next/cache .next
-      - name: Attest build provenance
-        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+      - name: Record unsigned build metadata and checksums
+        run: |
+          node --input-type=module <<'NODE'
+          import { writeFileSync } from 'node:fs';
+          const env = process.env;
+          const metadata = {
+            signed: false,
+            repository: env.GITHUB_REPOSITORY,
+            commit: env.GITHUB_SHA,
+            ref: env.GITHUB_REF,
+            event: env.GITHUB_EVENT_NAME,
+            workflow: env.GITHUB_WORKFLOW,
+            runId: env.GITHUB_RUN_ID,
+            runAttempt: env.GITHUB_RUN_ATTEMPT,
+            runUrl: `${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}/actions/runs/${env.GITHUB_RUN_ID}`,
+            nodeVersion: process.version,
+            runtimeMode: env.APP_RUNTIME_MODE,
+            fixtureVersion: env.APP_SYNTHETIC_FIXTURE_VERSION,
+            createdAt: new Date().toISOString(),
+          };
+          writeFileSync('build-metadata.json', JSON.stringify(metadata, null, 2) + '\n');
+          NODE
+          sha256sum next-build.tar.gz sbom.cdx.json build-metadata.json > SHA256SUMS
+      # Ordinary private Actions artifacts do not require GitHub's attestation service.
+      - name: Upload unsigned build evidence
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          subject-path: next-build.tar.gz
-      - name: Attest the SBOM
-        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
-        with:
-          subject-path: next-build.tar.gz
-          sbom-path: sbom.cdx.json
+          name: build-evidence-${{ github.sha }}-${{ github.run_attempt }}
+          path: |
+            next-build.tar.gz
+            sbom.cdx.json
+            build-metadata.json
+            SHA256SUMS
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 0
