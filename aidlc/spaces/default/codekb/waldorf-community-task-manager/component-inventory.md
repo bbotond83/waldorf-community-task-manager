@@ -1,176 +1,75 @@
 # Component Inventory
 
-> Focused merge, 2026-10-02 (`261002-slow-profile-login`): the earlier sections are preserved historical prose from an UNVERIFIED store, including the prior startup diagnosis and pending loader choices. They are not current defect claims. Fresh conclusions are in the profile-login update below; exact newly analyzed files appear in reverse-engineering-timestamp.md. No tests, latency measurements, browser sessions, or backend calls were performed.
+These headings are the literal component identities used by the scope marker. Health ratings describe source boundaries and evidence gaps, not measured service health. Every listed component has deeply read implementation paths; complete directory coverage is not implied.
 
+## Access
 
-> Focused update, 2026-10-01: earlier repository-wide prose is preserved as historical static knowledge; its freshness was UNVERIFIED. Only the deep files listed in reverse-engineering-timestamp.md were analyzed for this update. No tests or runtime/external checks were executed.
+Authorization, role grants/revocation, authorization-version invalidation; owns access contracts. Depends on injected users/grants/audit/clock and optional Supabase RPC adapter. **At-risk:** real RPC/RLS behavior unverified.
 
-One Next.js package contains these in-process responsibility areas. They are not independently deployed services. Component headings are the canonical names used in the timestamp scope block.
+## Directory
 
-## App Router delivery
+Family/parent/child/group relationships, archive/restore and field projection. Depends on access/grants and directory repository/audit. **Healthy source boundary;** persistence is synthetic/injected.
 
-**Location:** app/  
-**Responsibility:** Hungarian parent (/szulo), staff (/munkatars), and administrator (/admin) experiences; login, synthetic invitation, access denied, shared role components/layouts, server actions, and three route handlers.  
-**Depends on:** runtime composition, role facades, application contracts.  
-**Assessment:** Active synthetic delivery layer; production data path is not established.
+## Coordination
 
-## Runtime and mode composition
+Signup, capacity/version checks, swap/cancellation requests and decisions. Depends on directory visibility, task/assignment repository and events/audit. **Healthy source boundary;** target durability unverified.
 
-**Location:** src/runtime/  
-**Responsibility:** Zod configuration validation, synthetic/production selection, profile shell, origin boundary, and synthetic session handling.  
-**Depends on:** application/access contracts and selected adapters.  
-**Assessment:** Synthetic mode is linked; production slot validates configuration but makes no target call.
+## Notifications
 
-## Application contract pipeline
+7-day/24-hour reminder creation, due-job dispatch and cancellation. Depends on store, queue, dispatcher/provider ports. **At-risk:** real provider/scheduler evidence outstanding.
 
-**Location:** src/application/  
-**Responsibility:** Shared result/contract types, authorization matrix and session-version invalidation, facade pipeline, validation, projection, idempotency, and evidence abstractions.  
-**Depends on:** domain services and injected ports.  
-**Assessment:** Central typed seam between delivery, domain, and adapters.
+## Parent Experience
 
-## Access authorization
+Family assignments, request views, contribution eligibility and own notification reads. Depends on directory, role repository and optional commands. **Healthy source boundary.**
 
-**Location:** src/access/  
-**Responsibility:** Role grants, scope authorization, audit/repository ports, in-memory adapters, and minimal Supabase RPC port adapter.  
-**Depends on:** application/runtime contracts and injected RPC client.  
-**Assessment:** Authorization logic is present; production auth and linked Supabase target are outstanding.
+## Staff Schedule
 
-## Directory domain
+Read-only bounded schedule projection; depends on authorizer and schedule repository. **Healthy source boundary.**
 
-**Location:** src/directory/  
-**Responsibility:** Family/parent/child data, group and school-year relationships, visibility, archive/restore.  
-**Depends on:** application contracts and injected repositories.  
-**Assessment:** Domain logic exists; production persistence is unlinked.
+## Admin Experience
 
-## Coordination domain
+Queue/school-year/generic operations and archive destinations for legacy sheets. Depends on access and import mapping. **Healthy source boundary.**
 
-**Location:** src/coordination/  
-**Responsibility:** Capacity-limited sign-up, optimistic versions, assignments, swaps, cancellation, contributions, allergen access checks, audit/event ports.  
-**Depends on:** application contracts and injected ports.  
-**Assessment:** Rich domain behavior exists; durable production storage/provider behavior is not established.
+## Import Migration
 
-## Import and migration domain
+17-sheet registry, consent/cell checks, immutable previews, conflicts and commit/rollback. Owns migration orchestration via repository transaction port. **At-risk:** synthetic rollback snapshot limitations and real transaction validation remain.
 
-**Location:** src/import-migration/  
-**Responsibility:** Workbook sheet registry, row validation, preview/fingerprint, conflict resolution, commit, rollback, recovery.  
-**Depends on:** application contracts and migration adapters.  
-**Assessment:** Contracts cover migration lifecycle; no production execution was verified.
+## Privacy Audit
 
-## Notifications and jobs
+Departure grace period, sibling/hold eligibility, delete/anonymize and one-year audit retention. Depends on lifecycle repository/clock. **At-risk:** real retention and deletion execution unverified.
 
-**Location:** src/notifications/  
-**Responsibility:** 7-day/24-hour schedules and durable dispatch/retry/cancellation jobs via provider/store/queue ports.  
-**Depends on:** application contracts and injected scheduler/provider/store ports.  
-**Assessment:** Domain/job contracts exist; providers and scheduler are unlinked.
+## Application
 
-## Parent experience
+Result/DTO contracts, session and role facades, authorization/projection/idempotency and event/evidence ports. Depends on domain/access types and injected adapters. **Healthy explicit boundary;** parallel legacy/direct-adapter implementations can diverge.
 
-**Location:** src/parent-experience/ and src/parent-web/  
-**Responsibility:** Parent services for duties, requests, notifications, contributions, with synthetic fixtures/adapters.  
-**Depends on:** application, directory, coordination, and notification contracts.  
-**Assessment:** Local synthetic interface exists; real user and persistence integration is outstanding.
+## Parent Web
 
-## Administrator experience
+Synthetic duties, requests, notifications, contribution and invitation gateway. Depends on application facades; owns module-local state/cache. **At-risk:** nondurable state.
 
-**Location:** src/admin-experience/, src/admin-core/, src/admin-advanced/  
-**Responsibility:** Records, tasks, assignments, approvals, import, reminders, governance, privacy, and settings with synthetic local adapters.  
-**Depends on:** application contracts and access/directory/coordination/migration/privacy services.  
-**Assessment:** Broad synthetic surface; production authorization and persistence are not established.
+## Staff Web
 
-## Staff schedule
+Synthetic schedule fixtures and failure scenarios; depends on staff facade/authorization. **Healthy fixture boundary;** not live persistence evidence.
 
-**Location:** src/staff-schedule/ and src/staff-web/  
-**Responsibility:** Schedule query contracts and synthetic staff experience.  
-**Depends on:** application contracts and synthetic profile state.  
-**Assessment:** Local role surface exists; live scheduling integration is unlinked.
+## Admin Core
 
-## Synthetic in-memory adapters
+Synthetic records/tasks/approvals, scope/version checks and idempotency; depends on admin facade and owns process-global store. **At-risk:** nondurable state.
 
-**Location:** src/parent-web/, src/admin-core/, src/admin-advanced/, src/staff-web/, and synthetic runtime profile wiring.  
-**Responsibility:** Deterministic in-memory profiles, fixtures, and local feature facades.  
-**Depends on:** role facades and application contracts.  
-**Assessment:** Supports local UI/tests, not production durability.
+## Admin Advanced
 
-## Privacy and audit
+Import recovery, reminders, governance/revocation, lifecycle/settings; composite admin port over process-global state. **At-risk:** persistence/provider and lifecycle evidence incomplete.
 
-**Location:** src/privacy-audit/  
-**Responsibility:** Family personal-data lifecycle, grace/hold deferral, anonymization, and audit retention behind repository ports.  
-**Depends on:** application/access contracts and injected repositories.  
-**Assessment:** Policies are represented; live durable execution remains unverified.
+## Runtime
 
-## Supabase RPC and SQL scaffold
+Config/mode composition, five profiles, signed session, selector/shell and origin guard. Depends on Zod, Node crypto and application authorization. **At-risk:** shared login delay not reproduced or attributed; production composition unlinked.
 
-**Location:** src/access/supabase-route-adapter.ts and supabase/migrations/20260806_access_rls.sql  
-**Responsibility:** Narrow auth RPC calls and role/version/RLS SQL definitions.  
-**Depends on:** Supabase/PostgreSQL target and runtime client injection.  
-**Assessment:** Partial authorization scaffold only; no linked target or complete domain store.
+## App Routes
 
-## Verification and CI
+Public authentication/invitation, three HTTP handlers and protected parent/staff/admin pages/actions. Depends on asynchronous Next cookies/params, runtime/role boundaries and facade helpers. **At-risk:** root and business-page latency require separate actual-environment measurement.
 
-**Location:** tests/, scripts/, .github/workflows/ci.yml  
-**Responsibility:** Domain/runtime/integration/browser/accessibility checks, verification evidence, privacy/secret/SAST/no-deploy scans, CI, SBOM, attestations.  
-**Depends on:** Node/npm toolchain and GitHub Actions.  
-**Assessment:** Extensive configured suite; no checks were run for this scan. CI has no deployment job.
+## Local Verification
 
-## AI-DLC governance
+Toolchain/environment checks, manifests, coverage/security, build/smoke/browser/evidence orchestration. Depends on Node APIs, Next environment loader and Playwright. **At-risk:** login timing suite is opt-in and current checks were not run.
 
-**Location:** aidlc/, .codex/, .agents/  
-**Responsibility:** Project scopes/rules, lifecycle records, agent/stage/hook/sensor/tool runtime and archived process artifacts.  
-**Depends on:** installed AIDLC 2.10.0 Codex distribution.  
-**Assessment:** Governance is versioned; historical claims must be reconciled against current app source.
+## Supabase Schema
 
-## Local startup lifecycle
-
-**Location:** package.json, scripts/validate-runtime-config.ts, scripts/validate-toolchain.mjs, README.md, .nvmrc, .npmrc, .env.example, next.config.ts.  
-**Responsibility:** Contributor setup, strict toolchain validation, runtime configuration validation before dev/build/start.  
-**Depends on:** npm lifecycle, pure runtime schema, Node and Next CLI.  
-**Assessment:** At risk: every prehook runs before framework env loading; README assumes nvm. Host/port shell expansion is an inherited-process boundary.
-
-## Runtime configuration validation
-
-**Location:** src/runtime/config.ts, src/runtime/composition.ts, src/runtime/production/composition.ts.  
-**Responsibility:** Pure schema validation, safe error formatting, and mode selection; this component names only the freshly analyzed subset of the broader historical runtime component.  
-**Depends on:** Zod and selected composition modules.  
-**Assessment:** Typed result boundary and invalid-config checks must be preserved; production composition is unlinked.
-
-## Local startup smoke harness
-
-**Location:** scripts/start-smoke.mjs.  
-**Responsibility:** Run loopback production output and request documented readiness route.  
-**Depends on:** npm start and loopback HTTP readiness.  
-**Assessment:** Explicit synthetic-mode injection bypasses the env-file startup symptom. Handler body and test assertions were not scanned.
-
-## Synthetic profile login boundary
-
-**Location:** `src/runtime/ProfileSelector.tsx`, `app/api/synthetic/session/route.ts`, `src/runtime/session/session.ts`, origin/profile/runtime wiring.  
-**Responsibility:** Submit fixed profile selection, validate mode/origin/profile, own the local signed-session token lifecycle and root redirect.  
-**Depends on:** Next response/cookie APIs, local crypto and Zod, runtime composition.  
-**Assessment:** At risk for an unmeasured latency regression; broad browser cache clearing is observed, with no proven causal effect.
-
-## Profile landing and role navigation
-
-**Location:** `app/page.tsx`, `src/runtime/AppShell.tsx`, `proxy.ts`, and freshly read parent/staff/admin layout/session/facade/landing files.  
-**Responsibility:** Resolve the selected profile, render greeting/navigation and separately load role projections; does not own session mutation.  
-**Depends on:** runtime composition and local role facades.  
-**Assessment:** Dynamic profile isolation is explicit; repeated resolution/composition exists, elapsed cost unknown. Coverage applies only to listed deep files.
-
-## Parent authentication entry
-
-**Location:** `app/belepes/page.tsx`, `actions.ts`, `AuthenticationEntry.tsx`, `src/application/session-facade.ts`.  
-**Responsibility:** Synthetic identifier validation and safe parent-destination continuation; delegates token ownership to the session boundary.  
-**Depends on:** local parent/session facade and cookie helper.  
-**Assessment:** Separate flow with pending state and manual continuation; signed-out action timing is uncovered.
-
-## Local synthetic session adapters
-
-**Location:** freshly read parent/staff/admin synthetic adapters and runtime composition.  
-**Responsibility:** Own local fixtures/projections and wire profile role experiences; advanced-admin internals remain shallow.  
-**Depends on:** application barrel, authorization/session contracts and domain seams.  
-**Assessment:** In-process Maps/global containers and fixed staff schedule; no durable or external auth integration on the inspected path.
-
-## Login regression surface
-
-**Location:** the focused runtime unit/integration/browser files listed in the timestamp.  
-**Responsibility:** Specify functional session/profile isolation and role navigation, with role-page performance coverage after selection.  
-**Depends on:** Node/Vitest/Playwright tooling and synthetic fixture reset.  
-**Assessment:** At risk: click-to-profile-ready timing and first-use conditions are absent. No suite ran.
+Six proposed application tables and three authorization RPCs using PostgreSQL/Supabase identity and RLS. **At-risk:** unlinked/unexercised target.
