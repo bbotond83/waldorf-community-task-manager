@@ -22,7 +22,7 @@ export type AdminSession = Readonly<{
 export type AdminSessionResult =
   | { state: "success"; data: AdminSession }
   | { state: "signed-out" }
-  | { state: "denied" }
+  | { state: "denied"; homePath?: string }
   | { state: "configuration-error"; message: string };
 
 const ROLE_BY_PROFILE: Readonly<Record<SyntheticProfile["role"], Role>> = {
@@ -42,16 +42,18 @@ export async function resolveAdminSession(): Promise<AdminSessionResult> {
   const cookieStore = await cookies();
   const session = resolveSyntheticSession(cookieStore.get(SESSION_COOKIE_NAME)?.value);
   if (!session) return { state: "signed-out" };
-  if (isSyntheticAdvancedSubjectRevoked(session.profile.id)) return { state: "denied" };
+  if (isSyntheticAdvancedSubjectRevoked(session.profile.id)) {
+    return { state: "denied", homePath: session.profile.homePath };
+  }
 
   const role = ROLE_BY_PROFILE[session.profile.role];
-  if (!isAdministrator(role)) return { state: "denied" };
+  if (!isAdministrator(role)) return { state: "denied", homePath: session.profile.homePath };
 
   const scope = scopeForProfile(session.profile);
   return {
     state: "success",
     data: {
-      profile: withCoreNavigation(session.profile),
+      profile: session.profile,
       scope,
       applicationSession: session.actor,
     },
@@ -71,18 +73,4 @@ function scopeForProfile(profile: SyntheticProfile): Scope {
     type: "organization",
     organizationId: SYNTHETIC_ORGANIZATION_ID,
   };
-}
-
-function withCoreNavigation(profile: SyntheticProfile): SyntheticProfile {
-  const coreItems = [
-    { id: "admin-dashboard", label: "Áttekintés", href: "/admin" },
-    { id: "admin-records", label: "Nyilvántartások", href: "/admin/nyilvantartasok" },
-    { id: "admin-tasks", label: "Feladatok és események", href: "/admin/feladatok" },
-    { id: "admin-approvals", label: "Jóváhagyások", href: "/admin/jovahagyasok" },
-    { id: "admin-archive", label: "Archívum", href: "/admin/archivum" },
-  ] as const;
-  const advancedItems = profile.navigation.filter(
-    (item) => !coreItems.some((coreItem) => coreItem.id === item.id),
-  );
-  return { ...profile, navigation: [...coreItems, ...advancedItems] };
 }

@@ -50,5 +50,8 @@ export async function authenticateParentAction(
 }
 
 function safeDestination(value: FormDataEntryValue | null): string {
-  return typeof value === "string" && /^\/szulo(?:\/|$)/.test(value) ? value : "/szulo/feladatok";
+  // A destination the person was sent here from still wins; otherwise the parent's default page.
+  return typeof value === "string" && /^\/szulo(?:\/|$)/.test(value)
+    ? value
+    : getSyntheticProfile("parent-local")!.homePath;
 }

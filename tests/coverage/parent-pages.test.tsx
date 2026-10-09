@@ -186,6 +186,33 @@ it("renders permitted notifications with real projections", async () => {
   expect(output.toLocaleLowerCase("hu")).toContain("értesít");
   expect(output).not.toContain("protectedReason");
 });
+it("renders each notification as one whole-card link plus one read checkbox beside it", async () => {
+  signIn("parent-local");
+  const page = (await import("../../app/szulo/ertesitesek/page.tsx")).default as (
+    input: ReturnType<typeof props>,
+  ) => ReactNode | Promise<ReactNode>;
+  const output = html(await page(props("")));
+  const document = new DOMParser().parseFromString(output, "text/html");
+  const cards = [...document.querySelectorAll('li[data-testid^="notification-card-"]')];
+  expect(cards.length).toBeGreaterThan(0);
+  for (const card of cards) {
+    const links = card.querySelectorAll("a");
+    expect(links).toHaveLength(1);
+    expect(links[0]!.getAttribute("href")).toMatch(/^\/szulo\//);
+    expect(links[0]!.querySelector("h2")?.textContent).toBeTruthy();
+    // The checkbox sits beside the link, never inside it.
+    const checkboxes = card.querySelectorAll('input[type="checkbox"]');
+    expect(checkboxes).toHaveLength(1);
+    expect(links[0]!.contains(checkboxes[0]!)).toBe(false);
+    // The only button is the no-JavaScript fallback inside <noscript>.
+    expect([...card.querySelectorAll("button")].filter((b) => !b.closest("noscript"))).toHaveLength(
+      0,
+    );
+  }
+  expect(output).not.toContain("Megnyitás");
+  expect(output).not.toContain("Részletek");
+  expect(output).toContain("Olvasottnak jelölöm");
+});
 it("withholds notifications content without session", async () => {
   const page = (await import("../../app/szulo/ertesitesek/page.tsx")).default as (
     input: ReturnType<typeof props>,

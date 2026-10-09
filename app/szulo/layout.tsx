@@ -7,6 +7,13 @@ export const dynamic = "force-dynamic";
 
 export default async function ParentLayout({ children }: Readonly<{ children: ReactNode }>) {
   const session = await resolveParentSession();
-  if (session.state !== "success") return <ParentAccessState kind={session.state} />;
+  if (session.state !== "success") {
+    return (
+      <ParentAccessState
+        kind={session.state}
+        homePath={session.state === "denied" ? session.homePath : undefined}
+      />
+    );
+  }
   return <AppShell profile={session.data.profile}>{children}</AppShell>;
 }

@@ -24,16 +24,22 @@ export function ScheduleCollection({
               <th scope="col">Felelős</th>
               <th scope="col">Beosztottak</th>
               <th scope="col">Állapot</th>
-              <th scope="col">
-                <span className="visually-hidden">Részletek</span>
-              </th>
             </tr>
           </thead>
           <tbody>
             {entries.map((entry) => (
               <tr key={entry.id} data-testid={`teacher-schedule-row-${entry.id}`}>
                 <td>{formatScheduleRange(entry)}</td>
-                <td>{entry.title}</td>
+                <td>
+                  {/* One link per row: the link is stretched over the whole row with CSS. */}
+                  <Link
+                    className="teacher-row-link"
+                    href={`/teacher/schedule/${encodeURIComponent(entry.id)}?${query}`}
+                    data-testid={`teacher-schedule-open-${entry.id}`}
+                  >
+                    {entry.title}
+                  </Link>
+                </td>
                 <td>{groupLabel}</td>
                 <td>{entry.location}</td>
                 <td>{entry.coordinationDisplayName ?? "Nem szükséges"}</td>
@@ -44,14 +50,6 @@ export function ScheduleCollection({
                     : "Nincs beosztott"}
                 </td>
                 <td>{entry.currentStatusLabel ?? "Nincs elérhető állapot"}</td>
-                <td>
-                  <Link
-                    href={`/teacher/schedule/${encodeURIComponent(entry.id)}?${query}`}
-                    data-testid={`teacher-schedule-open-${entry.id}`}
-                  >
-                    Részletek
-                  </Link>
-                </td>
               </tr>
             ))}
           </tbody>
@@ -64,7 +62,16 @@ export function ScheduleCollection({
             key={entry.id}
             data-testid={`teacher-schedule-card-${entry.id}`}
           >
-            <h2>{entry.title}</h2>
+            <h2>
+              {/* One link per card: the link is stretched over the whole card with CSS. */}
+              <Link
+                className="teacher-card-link"
+                href={`/teacher/schedule/${encodeURIComponent(entry.id)}?${query}`}
+                data-testid={`teacher-schedule-card-open-${entry.id}`}
+              >
+                {entry.title}
+              </Link>
+            </h2>
             <dl>
               <div>
                 <dt>Dátum és idő</dt>
@@ -84,12 +91,6 @@ export function ScheduleCollection({
               </div>
               <TrackingFields entry={entry} />
             </dl>
-            <Link
-              href={`/teacher/schedule/${encodeURIComponent(entry.id)}?${query}`}
-              data-testid={`teacher-schedule-card-open-${entry.id}`}
-            >
-              Részletek
-            </Link>
           </li>
         ))}
       </ul>

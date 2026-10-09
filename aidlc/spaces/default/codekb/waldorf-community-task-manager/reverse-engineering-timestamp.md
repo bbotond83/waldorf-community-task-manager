@@ -3,39 +3,59 @@
 ## Run Record
 
 - Date: 2026-10-09
-- Commit: 4c9938347f536e306a6b76f274af6d600b97e418
+- Commit: a031222a95546b83bad291eb061527774d3e068f
 
 ## Scope of Analysis
 
 ```yaml
 scope_version: 1
-kind: full
-intent: 261009-visual-overhaul
-fingerprint: afd78c70ec3ba6de45190e8437ffc75b2b147faf
+kind: partial
+intent: 261009-navigation-polish
+fingerprint: ebd1e98a41a8838509704631c5ce908d9b998c9b
 analyzed:
   paths:
-    - ./
+    - app/
+    - src/runtime/
+    - src/application/
+    - tests/
+    - package.json
+    - vitest.config.ts
+    - playwright.config.ts
+    - next.config.ts
+    - proxy.ts
+    - .github/workflows/ci.yml
+    - .env.example
   components:
-    - RootLayout
-    - GlobalStyles
-    - ProfileSelector
     - AppShell
-    - SyntheticProfiles
-    - RuntimeConfigurationError
-    - HomePage
-    - LoginPage
+    - BrandMark
+    - ProfileSelector
+    - Synthetic profiles
+    - Admin session
+    - AuthorizationContract
+    - ResponsiveCollection
+    - AdminFilterBar
+    - Admin dashboard
     - ParentDutiesPage
-    - ParentDutyDetailPage
-    - ParentSupportComponents
-    - AdminDashboardPage
-    - AdminListPages
-    - AdminSupportComponents
-    - TeacherArea
-    - SessionRoutes
-    - CspProxy
-    - ApplicationFacades
-    - DomainServices
-    - RuntimeComposition
+    - ParentNotificationsPage
+    - NotificationReadForm
+    - ScheduleCollection
+    - Global stylesheet
 shallow:
-  paths: []
+  paths:
+    - src/access/
+    - src/admin-core/
+    - src/admin-advanced/
+    - src/admin-experience/
+    - src/coordination/
+    - src/directory/
+    - src/import-migration/
+    - src/notifications/
+    - src/parent-experience/
+    - src/parent-web/
+    - src/privacy-audit/
+    - src/teacher-tracking/
+    - src/teacher-web/
+    - scripts/
+    - verification/
+    - supabase/
 ```

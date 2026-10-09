@@ -126,4 +126,13 @@ describe("ParentAccessState", () => {
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Nincs jogosultság");
     expect(document.body).not.toHaveTextContent("family-unrelated");
   });
+
+  it("leads a teacher who opened a parent page back to Beosztás", () => {
+    render(<ParentAccessState kind="denied" homePath="/teacher/schedule" />);
+    expect(screen.getByTestId("parent-access-home-link")).toHaveTextContent("Vissza a beosztáshoz");
+    expect(screen.getByTestId("parent-access-home-link")).toHaveAttribute(
+      "href",
+      "/teacher/schedule",
+    );
+  });
 });

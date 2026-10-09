@@ -49,6 +49,26 @@ describe("Teacher schedule components", () => {
     expect(screen.getByTestId("teacher-schedule-filter-clear-link")).toBeVisible();
   });
 
+  it("opens an entry from one whole-row link and one whole-card link with the same name", () => {
+    render(<ScheduleCollection entries={model.entries} filters={filters} />);
+    const table = screen.getByTestId("teacher-schedule-table");
+    const cards = screen.getByTestId("teacher-schedule-card-list");
+    const rowLink = screen.getByTestId("teacher-schedule-open-schedule-test");
+    const cardLink = screen.getByTestId("teacher-schedule-card-open-schedule-test");
+    expect(within(table).getAllByRole("link")).toHaveLength(1);
+    expect(within(cards).getAllByRole("link")).toHaveLength(1);
+    expect(rowLink).toHaveAccessibleName("Kitalált felügyelet");
+    expect(cardLink).toHaveAccessibleName("Kitalált felügyelet");
+    expect(rowLink.getAttribute("href")).toBe(cardLink.getAttribute("href"));
+    expect(rowLink.getAttribute("href")).toMatch(/^\/teacher\/schedule\/schedule-test\?/);
+    // The table keeps its row and cell semantics; the link sits in the title cell of its row.
+    const row = within(table).getByRole("row", { name: /Kitalált felügyelet/ });
+    expect(within(row).getAllByRole("cell")).toHaveLength(8);
+    expect(within(row).getByRole("link")).toBe(rowLink);
+    expect(within(table).getAllByRole("columnheader")).toHaveLength(8);
+    expect(document.body).not.toHaveTextContent("Részletek");
+  });
+
   it("renders desktop table and mobile cards from one authorized model", () => {
     render(<ScheduleCollection entries={model.entries} filters={filters} />);
     const table = screen.getByTestId("teacher-schedule-table");

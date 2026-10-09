@@ -1,6 +1,9 @@
+import { BackToHomeLink } from "../../../src/runtime/BackToHomeLink.tsx";
+
 export function ParentAccessState({
   kind,
-}: Readonly<{ kind: "signed-out" | "denied" | "configuration-error" }>) {
+  homePath,
+}: Readonly<{ kind: "signed-out" | "denied" | "configuration-error"; homePath?: string }>) {
   if (kind === "signed-out") {
     return (
       <section className="centered-panel" data-testid="parent-signed-out">
@@ -25,8 +28,11 @@ export function ParentAccessState({
           ? "A helyi futtatási beállítás nem érhető el."
           : "A kért tartalom nem érhető el ezzel a profillal."}
       </p>
-      <Link href="/">Vissza a biztonságos kezdőoldalra</Link>
+      <BackToHomeLink
+        homePath={homePath}
+        label="Vissza a biztonságos kezdőoldalra"
+        testId="parent-access-home-link"
+      />
     </section>
   );
 }
-import Link from "next/link";

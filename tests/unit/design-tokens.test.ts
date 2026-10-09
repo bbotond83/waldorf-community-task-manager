@@ -55,6 +55,31 @@ describe("design tokens", () => {
     }
   });
 
+  it("keeps the menu button states readable (text 4.5:1, borders 3:1)", () => {
+    // default: dark text and strong border on the surface; hover: info background;
+    // pressed: danger background; current page: white text on the primary colour.
+    for (const background of ["color-surface", "color-info-bg", "color-danger-bg"]) {
+      expect(
+        contrast(token("color-primary-dark"), token(background)),
+        `menu text on ${background}`,
+      ).toBeGreaterThanOrEqual(4.5);
+    }
+    expect(contrast(token("color-border-strong"), token("color-surface"))).toBeGreaterThanOrEqual(
+      3,
+    );
+    expect(contrast(token("color-primary"), token("color-info-bg"))).toBeGreaterThanOrEqual(3);
+    expect(contrast(token("color-primary-dark"), token("color-background"))).toBeGreaterThanOrEqual(
+      3,
+    );
+    expect(contrast("#ffffff", token("color-primary"))).toBeGreaterThanOrEqual(4.5);
+    expect(contrast("#ffffff", token("color-primary-dark"))).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it("removes the heading focus box but keeps the ring on controls", () => {
+    expect(css).toMatch(/\[tabindex="-1"\]:focus-visible\s*{\s*outline:\s*none/);
+    expect(css).toMatch(/:focus-visible\s*{\s*outline:\s*3px solid var\(--color-focus\)/);
+  });
+
   it("defines every hex colour only as a token in :root", () => {
     const outsideRoot = css.replace(/:root\s*{[^}]*}/, "");
     expect(outsideRoot.match(/#[0-9a-fA-F]{3,8}\b/g) ?? []).toEqual([]);

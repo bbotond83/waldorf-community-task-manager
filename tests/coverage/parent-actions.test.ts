@@ -161,7 +161,18 @@ it("returns validation and denied authentication then safe destination/cookie", 
         form({ identifier: "parent-local", intendedPath: "https://invented.invalid" }),
       )
     ).destination,
-  ).toBe("/szulo/feladatok");
+  ).toBe("/szulo/ertesitesek");
+  expect(
+    (await authenticateParentAction(initial, form({ identifier: "parent-local" }))).destination,
+  ).toBe("/szulo/ertesitesek");
+  expect(
+    (
+      await authenticateParentAction(
+        initial,
+        form({ identifier: "parent-local", intendedPath: "/szulo/feladatok/duty-garden" }),
+      )
+    ).destination,
+  ).toBe("/szulo/feladatok/duty-garden");
   expect(boundary.set).toHaveBeenCalledWith(
     "waldorf_local_session",
     expect.any(String),

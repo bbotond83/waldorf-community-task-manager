@@ -5,6 +5,7 @@ import { restoreRecordAction } from "../../actions.ts";
 import { resolveAdminFacade } from "../../_lib/facade.ts";
 import { resolveAdminSession } from "../../_lib/session.ts";
 import { terminalFailure } from "../../../../src/application/results.ts";
+import { statusLabel } from "../../../../src/application/status-labels.ts";
 
 export default async function ArchiveDetailPage({
   params,
@@ -35,7 +36,7 @@ export default async function ArchiveDetailPage({
         {(record) => (
           <>
             <h2>{record.title}</h2>
-            <p>Állapot: {record.state}</p>
+            <p>Állapot: {statusLabel(record.state)}</p>
             <AdminMutationForm
               action={restoreRecordAction}
               submitLabel="Visszaállítás"

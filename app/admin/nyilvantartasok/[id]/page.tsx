@@ -5,6 +5,7 @@ import { archiveRecordAction, saveRecordAction } from "../../actions.ts";
 import { resolveAdminFacade } from "../../_lib/facade.ts";
 import { resolveAdminSession } from "../../_lib/session.ts";
 import { terminalFailure } from "../../../../src/application/results.ts";
+import { statusLabel } from "../../../../src/application/status-labels.ts";
 
 export default async function RecordDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -29,7 +30,7 @@ export default async function RecordDetailPage({ params }: { params: Promise<{ i
           <div className="admin-detail-grid">
             <section>
               <h2>{record.title}</h2>
-              <p>Állapot: {record.state}</p>
+              <p>Állapot: {statusLabel(record.state)}</p>
               <p>Verzió: {record.version}</p>
             </section>
             <AdminMutationForm

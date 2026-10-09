@@ -29,7 +29,9 @@ export default async function ParentNotificationsPage() {
     <section className="parent-page" data-testid="parent-notifications-page">
       <header>
         <p className="eyebrow">Szülői felület</p>
-        <h1 tabIndex={-1}>Értesítések</h1>
+        <h1 tabIndex={-1} autoFocus>
+          Értesítések
+        </h1>
         <p>A szolgáltatói állapotok helyben szimuláltak; valós kézbesítést nem igazolnak.</p>
       </header>
       <ParentStatePanel result={result} emptyMessage="Nincs értesítés." testId="notifications">
@@ -41,18 +43,21 @@ export default async function ParentNotificationsPage() {
                 key={notification.id}
                 data-testid={`notification-card-${notification.id}`}
               >
-                <div>
+                <a
+                  className="parent-card-link"
+                  href={notification.link}
+                  data-testid={`notification-link-${notification.id}`}
+                >
                   <h2>{notification.title}</h2>
                   <p>{TIMING_LABEL[notification.timing]}</p>
                   <p className="synthetic-label">{PROVIDER_LABEL[notification.providerStatus]}</p>
                   <strong>{notification.isRead ? "Olvasott" : "Olvasatlan"}</strong>
-                </div>
-                <div>
-                  <a href={notification.link} data-testid={`notification-link-${notification.id}`}>
-                    Megnyitás
-                  </a>
-                  {!notification.isRead && <NotificationReadForm id={notification.id} />}
-                </div>
+                </a>
+                <NotificationReadForm
+                  id={notification.id}
+                  title={notification.title}
+                  isRead={notification.isRead}
+                />
               </li>
             ))}
           </ul>

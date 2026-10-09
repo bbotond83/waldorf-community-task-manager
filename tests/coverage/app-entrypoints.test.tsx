@@ -22,13 +22,38 @@ beforeEach(() => {
   boundary.token = undefined;
 });
 afterEach(() => vi.unstubAllEnvs());
-it("renders profile selection and authenticated home navigation", async () => {
+async function redirectTarget(): Promise<string | undefined> {
+  try {
+    await Home();
+  } catch (error) {
+    return (error as { digest?: string }).digest?.split(";")[2];
+  }
+  return undefined;
+}
+it("renders profile selection when there is no session", async () => {
   expect(renderToStaticMarkup(await Home())).toContain("profileId");
+  boundary.token = "expired.session";
+  expect(renderToStaticMarkup(await Home())).toContain("profileId");
+});
+it.each([
+  ["parent-local", "/szulo/ertesitesek"],
+  ["kindergarten-teacher-local", "/teacher/schedule"],
+  ["group-admin-local", "/admin"],
+  ["super-admin-local", "/admin"],
+])("redirects an active %s session to its default page", async (profileId, path) => {
+  boundary.token = createSyntheticSessionToken(getSyntheticProfile(profileId)!);
+  await expect(Home()).rejects.toMatchObject({ digest: expect.stringContaining("NEXT_REDIRECT") });
+  expect(await redirectTarget()).toBe(path);
+});
+it("never renders the removed welcome heading", async () => {
   boundary.token = createSyntheticSessionToken(getSyntheticProfile("parent-local")!);
-  const output = renderToStaticMarkup(await Home());
-  expect(output).toContain("Üdvözlünk");
-  expect(output).toContain("/szulo/feladatok");
-  expect(output).not.toContain("/admin");
+  let markup = "";
+  try {
+    markup = renderToStaticMarkup(await Home());
+  } catch {
+    markup = "";
+  }
+  expect(markup).not.toContain("Üdvözlünk");
 });
 it("renders safe configuration and production boundaries", async () => {
   vi.stubEnv("APP_RUNTIME_MODE", "invalid");
@@ -68,18 +93,12 @@ it("shows the logo linking to the start page on the public pages", async () => {
     expect(output).toContain("Cinkotai Waldorf Óvoda");
   }
 });
-it("renders the greeting of a long role name as plain text", async () => {
-  boundary.token = createSyntheticSessionToken(getSyntheticProfile("super-admin-local")!);
-  const markup = renderToStaticMarkup(await Home());
-  expect(markup).toContain("Üdvözlünk, Szuperadminisztrátor!");
-  expect(markup).not.toContain("­");
-});
 it("sanitizes login targets and renders authenticated notice", async () => {
   expect(
     renderToStaticMarkup(
       await Login({ searchParams: Promise.resolve({ tovabb: "https://invented.invalid" }) }),
     ),
-  ).toContain("/szulo/feladatok");
+  ).toContain("/szulo/ertesitesek");
   boundary.token = createSyntheticSessionToken(getSyntheticProfile("parent-local")!);
   expect(
     renderToStaticMarkup(

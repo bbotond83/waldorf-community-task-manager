@@ -78,7 +78,9 @@ test("reminder retry preserves correlation identity and blocks non-retryable job
   await page.goto("/admin/emlekeztetok");
   await expect(page.getByTestId("admin-reminder-job-lampas")).toContainText("corr-lampas-01");
   await page.getByTestId("admin-reminder-retry-job-lampas-submit-button").click();
-  await expect(page.getByTestId("admin-reminder-job-lampas")).toContainText("retrying");
+  await expect(page.getByTestId("admin-reminder-job-lampas")).toContainText(
+    "Újrapróbálás folyamatban",
+  );
   await expect(
     page.getByTestId("admin-reminder-job-kert").getByRole("button", { name: "Újrapróbálás" }),
   ).toHaveCount(0);
