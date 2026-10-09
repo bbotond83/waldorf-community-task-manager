@@ -48,6 +48,25 @@ it("renders permitted duties with real projections", async () => {
   expect(output.toLocaleLowerCase("hu")).toContain("feladat");
   expect(output).not.toContain("protectedReason");
 });
+it("renders each duty as one whole-card link without a separate details link", async () => {
+  signIn("parent-local");
+  const page = (await import("../../app/szulo/feladatok/page.tsx")).default as (
+    input: ReturnType<typeof props>,
+  ) => ReactNode | Promise<ReactNode>;
+  const output = html(await page({ ...props(""), searchParams: Promise.resolve({ allapot: "available" }) }));
+  const document = new DOMParser().parseFromString(output, "text/html");
+  const cards = [...document.querySelectorAll('li[data-testid^="duty-card-"]')];
+  expect(cards.length).toBeGreaterThan(0);
+  for (const card of cards) {
+    const links = card.querySelectorAll("a");
+    expect(links).toHaveLength(1);
+    const link = links[0]!;
+    expect(link.getAttribute("href")).toMatch(/^\/szulo\/feladatok\/[^?]+\?allapot=available$/);
+    expect(link.querySelector("h2")?.textContent).toBeTruthy();
+    expect(card.querySelectorAll("button, a a")).toHaveLength(0);
+  }
+  expect(output).not.toContain("Részletek");
+});
 it("withholds duties content without session", async () => {
   const page = (await import("../../app/szulo/feladatok/page.tsx")).default as (
     input: ReturnType<typeof props>,

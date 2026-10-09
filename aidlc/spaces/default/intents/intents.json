@@ -40,5 +40,13 @@
     "dirName": "261006-simplify-user-roles",
     "scope": "classic",
     "status": "complete"
+  },
+  {
+    "uuid": "01a12023-7df0-7dfc-af62-4ae119f7d959",
+    "slug": "visual-overhaul",
+    "dirName": "261009-visual-overhaul",
+    "scope": "bugfix",
+    "status": "complete",
+    "request": "f7966cbd"
   }
 ]

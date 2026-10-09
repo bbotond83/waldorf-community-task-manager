@@ -9,8 +9,29 @@ describe("runtime shell", () => {
   it("renders every privacy-safe test profile with stable controls", () => {
     render(<ProfileSelector profiles={SYNTHETIC_PROFILES} />);
     expect(screen.getByRole("heading", { name: "Helyi tesztprofil kiválasztása" })).toBeVisible();
-    expect(screen.getAllByRole("button", { name: "Profil használata" })).toHaveLength(4);
+    expect(screen.getAllByRole("button")).toHaveLength(4);
+    expect(screen.queryByText("Profil használata")).not.toBeInTheDocument();
     expect(screen.getByTestId("profile-selector-parent-local-button")).toBeVisible();
+  });
+
+  it("shows the logo with its name and a decorative cover photo on the chooser", () => {
+    render(<ProfileSelector profiles={SYNTHETIC_PROFILES} />);
+    const logo = screen.getByRole("img", { name: "Cinkotai Waldorf Óvoda" });
+    expect(logo).toBeVisible();
+    expect(logo.closest("a")).toBeNull();
+    const cover = within(screen.getByTestId("selector-hero")).getAllByRole("presentation");
+    expect(cover[0]).toHaveAttribute("alt", "");
+  });
+
+  it("links the logo in the app header to the start page", () => {
+    render(
+      <AppShell profile={SYNTHETIC_PROFILES[2]}>
+        <h1>Kezdőlap</h1>
+      </AppShell>,
+    );
+    expect(screen.getByTestId("brand-link")).toHaveAttribute("href", "/");
+    expect(screen.getByRole("img", { name: "Cinkotai Waldorf Óvoda" })).toBeVisible();
+    expect(screen.getByRole("status")).toHaveTextContent("Csoportadminisztrátor profil aktív.");
   });
 
   it("renders the semantic shell and role announcement", () => {
@@ -57,7 +78,7 @@ describe("runtime shell", () => {
 
 it("shows four role controls and no removed profile selection", () => {
   render(<ProfileSelector profiles={SYNTHETIC_PROFILES} />);
-  expect(screen.getByRole("heading", { name: "Óvónő" })).toBeVisible();
+  expect(screen.getByRole("button", { name: /^Óvónő\./ })).toBeVisible();
   expect(screen.getByTestId("profile-selector-kindergarten-teacher-local-button")).toHaveAttribute(
     "type",
     "submit",
@@ -88,6 +109,21 @@ it("selector uses native keyboard-operable forms and stable accessible submit na
     const form = screen.getByTestId(`profile-selector-${profile.id}-form`);
     expect(form).toHaveAttribute("method", "post");
     expect(form).toHaveAttribute("action", "/api/synthetic/session");
-    expect(within(form).getByRole("button", { name: "Profil használata" })).toBeEnabled();
+    const card = within(form).getByRole("button", {
+      name: `${profile.label}. ${profile.scopeSummary}`,
+    });
+    expect(card).toBeEnabled();
+    expect(card).toHaveAttribute("type", "submit");
+    expect(within(form).getByTestId(`profile-selector-${profile.id}-input`)).toHaveAttribute(
+      "value",
+      profile.id,
+    );
   }
+});
+
+it("breaks long role names at syllables in the card but keeps the plain accessible name", () => {
+  render(<ProfileSelector profiles={SYNTHETIC_PROFILES} />);
+  const card = screen.getByTestId("profile-selector-super-admin-local-button");
+  expect(card.textContent).toContain("Szu­per­ad­mi­niszt­rá­tor");
+  expect(card).toHaveAccessibleName(/^Szuperadminisztrátor\./);
 });

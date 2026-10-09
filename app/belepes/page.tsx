@@ -1,3 +1,4 @@
+import { BrandMark } from "../../src/runtime/BrandMark.tsx";
 import { resolveParentSession } from "../szulo/_lib/session.ts";
 import { AuthenticationEntry } from "./AuthenticationEntry.tsx";
 
@@ -16,6 +17,7 @@ export default async function LoginPage({
       <a className="skip-link" href="#fo-tartalom" data-testid="login-skip-link">
         Ugrás a fő tartalomra
       </a>
+      <BrandMark />
       <p className="eyebrow">Szülői belépés</p>
       <h1 tabIndex={-1}>Bejelentkezés</h1>
       {session.state === "success" ? (

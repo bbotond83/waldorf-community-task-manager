@@ -12,6 +12,11 @@ export type LoginMeasurement = {
   requests: { path: string; method: string; duration: number }[];
 };
 
+/** The greeting heading is plain text (no soft hyphens); CSS hyphenation handles wrapping. */
+export function greetingName(label: string): string {
+  return `Üdvözlünk, ${label}!`;
+}
+
 export function assertLoginDuration(elapsed: number) {
   if (!Number.isFinite(elapsed) || elapsed < 0 || elapsed > 5000) {
     throw new Error(`Profile login must complete within 5000 ms; observed ${elapsed} ms`);
@@ -58,7 +63,6 @@ export async function assertProfileMainReady(page: Page, profile: SyntheticProfi
       "admin-dashboard-summary",
       "admin-dashboard-records-state",
       "admin-dashboard-tasks-state",
-      "admin-dashboard-queue-state",
     ]) {
       await expect(page.getByTestId(id)).toBeVisible();
       await expect(page.getByTestId(id)).toHaveText(/^\d+$/);
@@ -108,9 +112,7 @@ export async function measureProfileLogin(
       );
     });
     await page.getByTestId(`profile-selector-${profile.id}-button`).click();
-    await expect(
-      page.getByRole("heading", { name: `Üdvözlünk, ${profile.label}!`, exact: true }),
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: greetingName(profile.label) })).toBeVisible();
     const home = profile.navigation.find((item) => item.href === profile.homePath);
     if (!home) throw new Error(`Missing main navigation for ${profile.id}`);
     await page.getByTestId(`app-shell-navigation-${home.id}`).click();

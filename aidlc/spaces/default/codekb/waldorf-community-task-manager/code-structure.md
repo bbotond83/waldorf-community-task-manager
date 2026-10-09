@@ -1,41 +1,37 @@
 # Code Structure
 
-Static synthesis of the revalidated 2026-10-06 developer scan for `261006-simplify-user-roles`, Standard depth, branch `feature/simplify-user-roles`, observed HEAD `0dce0567f18dc72e46aa88d87e5626708b08bc7d`. Full repository breadth with partial deep coverage. No application changes, tests, builds, browser sessions, migrations or target calls were performed.
-
-## Package and Module Organization
-
-One private ESM package `waldorf-community-task-manager` version `0.2.0`; no workspace packages or separate deployable services. Breadth inventory: 80 tracked `src` files, 71 `app` files, nine scripts, one SQL migration and one GitHub workflow. These are source counts, not execution counts.
+## Layout (single package)
 
 | Path | Purpose |
-| --- | --- |
-| `app/` | Hungarian pages/layouts, actions, HTTP routes and UI components |
-| `src/application/` | Facades, authorization contracts, results, projection, idempotency and evidence |
-| `src/runtime/` | Config, profiles/signed sessions, shell and production composition |
-| `src/access/`, `src/directory/`, `src/coordination/` | Grants/authorization, family/group directory and duty coordination |
-| `src/notifications/`, `src/privacy-audit/`, `src/import-migration/` | Jobs/provider ports, retention, import/archive registry |
-| `src/parent-experience/`, `src/staff-schedule/`, `src/admin-experience/` | Persona-oriented domains |
-| `src/parent-web/`, `src/staff-web/`, `src/admin-core/`, `src/admin-advanced/` | Process-local adapters and fixtures |
-| `scripts/`, `tests/`, `verification/` | Toolchain/delivery runners, suites, manifests and fixtures |
-| `supabase/migrations/`, `.github/workflows/ci.yml` | Intended RLS/database surface and locked CI/private evidence |
-| `source-materials/`, `qa-results/` | Workbook inventory and historical evidence |
-| `aidlc/`, `.aidlc-archive/`, `.codex/`, `.agents/` | Workflow knowledge/history and framework tooling |
+|---|---|
+| `app/layout.tsx`, `app/globals.css` | Root layout (`lang="hu"`, metadata) and the only stylesheet |
+| `app/page.tsx` | Entry: runtime composition, production boundary, `ProfileSelector` or `AppShell` home |
+| `app/belepes/` | Parent login page and `AuthenticationEntry` client form, server action |
+| `app/szulo/` | Parent area: layout, `feladatok/` (list, `[id]`, `csere`, `lemondas`), `ertesitesek/`, `_components`, `_lib`, `actions.ts` |
+| `app/admin/` | Admin area: dashboard `page.tsx`, `feladatok/`, `jovahagyasok/`, `nyilvantartasok/`, `archivum/`, `import/`, `emlekeztetok/`, `adatvedelem/`, `beallitasok/`, `_components`, `_lib`, actions |
+| `app/teacher/` | Teacher area: `schedule/` list and detail, `_lib` filters/compatibility |
+| `app/munkatars/beosztas/` | Legacy route handlers redirecting (307) to `/teacher/schedule`; no pages |
+| `app/api/` | `readiness`, `synthetic/session`, `synthetic/reset` |
+| `app/meghivas/[token]/`, `app/hozzaferes-megtagadva/` | Invitation and access-denied pages |
+| `src/runtime/` | `AppShell.tsx`, `ProfileSelector.tsx`, `RuntimeConfigurationError.tsx`, `composition.ts`, `config.ts`, `session/`, `synthetic/`, `production/`, `security/` |
+| `src/application/` | Facades, contracts, results, authorization, idempotency, validation, projection |
+| `src/<domain>/` | access, admin-advanced, admin-core, admin-experience, coordination, directory, import-migration, notifications, parent-experience, parent-web, privacy-audit, teacher-tracking, teacher-web |
+| `proxy.ts` | CSP nonce middleware |
+| `public/brand/` | `logo.png`, `cover.jpg` (untracked at scan time) |
+| `tests/` | `unit`, `integration`, `coverage`, `browser`, `database` |
+| `scripts/`, `verification/`, `supabase/migrations/`, `.github/workflows/ci.yml` | Tooling, evidence manifests, RLS/role SQL, CI |
 
 ## File Classification
 
-TS/TSX production source, colocated domain `*.test.ts`, JSON manifests/fixtures/lockfile, SQL migration and Markdown usage/history. Existing generated `next-env.d.ts` local edit remains unchanged.
+- Pages/layouts: `app/**/page.tsx|layout.tsx|loading.tsx|error.tsx`
+- Server actions: `app/**/actions.ts`, `advanced-actions.ts`
+- Shared UI: `src/runtime/*.tsx`, `app/*/_components/*.tsx`
+- Domain/services: `src/<domain>/*-service.ts`, in-memory repositories
+- Tests: colocated `src/**/*.test.ts` (node:test), `tests/**` (Vitest, Playwright)
 
-## Code Patterns
+## Patterns
 
-App Router → runtime/session and facades → authorization/ports → synthetic adapters or domain services → repository/provider interfaces. Explicit ports, barrel exports, result states and field projection concentrate public boundaries. Older domains often compress methods into long lines and lie outside explicit app/application/runtime lint/format command paths. Navigation cannot replace layout/action authorization.
-
-## Build and Configuration
-
-- npm lockfile with Node **24.x** / npm **11.x**, `.npmrc` engine strictness, `.nvmrc` 24, and toolchain prehooks. `next dev`, `next build`, `next start`; development/start default to loopback.
-- Strict TypeScript, ES2024, bundler resolution, no emit, `.ts` import extensions. Next.js uses App Router, promise-based params/searchParams, async cookies and a root `proxy.ts` CSP boundary.
-- Config: `package.json`, `package-lock.json`, `tsconfig.json`, `next.config.ts`, `eslint.config.mjs`, `.prettierrc.json`, `vitest.config.ts`, three Playwright configs.
-- Dependency direction: App Router → runtime/session + application facades → authorization/ports → synthetic adapters or domain services → repository/provider interfaces. Access types are shared across domains. Barrel exports concentrate public surfaces. Production composition currently initializes an authorization port returning no current version and makes no backend call (`src/runtime/production/composition.ts:8`).
-- No code changes were made; Next.js API documentation must be consulted before future implementation, per `AGENTS.md`.
-
-## Role Change Surface
-
-[Dependencies](dependencies.md) maps role types, profiles, session gates, contracts, RLS and verification. Historical records retain the meaning of old roles. Before future Next.js implementation read the installed guides required by `AGENTS.md`.
+- Server components by default; client components only for forms with `useActionState` (`AuthenticationEntry`, mutation forms).
+- Relative imports with explicit `.ts`/`.tsx` extensions (`allowImportingTsExtensions`).
+- `data-testid` on nearly every element; Hungarian route slugs (`szulo`, `belepes`, `jovahagyasok`, `nyilvantartasok`).
+- Class-name families in the global CSS: `selector-*`, `profile-*`, `admin-*`, `parent-*`, `teacher-*`, `advanced-*`.

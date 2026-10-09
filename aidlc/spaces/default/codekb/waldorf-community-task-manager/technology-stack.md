@@ -1,33 +1,25 @@
 # Technology Stack
 
-Static synthesis of the revalidated 2026-10-06 developer scan for `261006-simplify-user-roles`, Standard depth, branch `feature/simplify-user-roles`, observed HEAD `0dce0567f18dc72e46aa88d87e5626708b08bc7d`. Full repository breadth with partial deep coverage. No application changes, tests, builds, browser sessions, migrations or target calls were performed.
+| Area | Technology | Version (installed) | Notes |
+|---|---|---|---|
+| Language | TypeScript | 5.9.3 | strict, ES2024 target, bundler resolution, `.ts` import extensions |
+| Runtime | Node.js | 24.x (`.nvmrc` 24, `engines` 24.x, npm 11.x) | enforced by `scripts/validate-toolchain.mjs` |
+| Framework | Next.js | 16.4.0 | App Router, `proxy.ts`, `next dev --hostname 127.0.0.1` |
+| UI | React / React DOM | 19.2.8 | declared `latest` |
+| Validation | zod | 4.4.3 | declared `latest` |
+| Styling | Plain global CSS | n/a | `app/globals.css`; system font stack; no Tailwind/CSS modules/font loader |
+| Unit/domain tests | node:test | Node 24 | `--experimental-strip-types`, 80% coverage flags |
+| Delivery tests | Vitest + jsdom + Testing Library | 4.1.11 | istanbul and v8 coverage providers |
+| Browser tests | Playwright + axe-core | 1.62.1 / 4.13.0 | chromium, firefox, Pixel 7 |
+| Lint / format | ESLint 9.39.5 (eslint-config-next), Prettier 3.9.6 | | print width 100, double quotes |
+| Backend data | Supabase/PostgreSQL migrations | n/a | `supabase/migrations/*.sql`; runtime uses synthetic in-memory adapters |
+| CI | GitHub Actions | | actions pinned to commit SHAs |
+| Hosting plan | Vercel (immutable promotion, rollback) | n/a | no executable deploy workflow yet (team rule) |
 
-## Languages and Build Tools
+## Security Headers
 
-TypeScript/TSX, SQL, JSON and Markdown. One ESM npm package; Node 24.x/npm 11.x, strict ES2024/bundler/no-emit configuration and engine/toolchain checks. Domain ports and synthetic adapters run within one Next.js app.
+`next.config.ts`: nosniff, Referrer-Policy, X-Frame-Options DENY, Permissions-Policy. `proxy.ts`: CSP with nonce, `img-src 'self' blob: data:`, `font-src 'self'`, `style-src 'self' 'unsafe-inline'`.
 
-## Frameworks and Libraries
+## Fonts and Assets
 
-Versions below are read from the lockfile, not inferred from `latest` ranges or newly installed:
-
-| Dependency | Resolved version | Purpose |
-| --- | --- | --- |
-| Next.js / `@next/env` | 16.3.6 | Web server, App Router, environment loading |
-| React / React DOM | 19.2.8 | Components and action state |
-| Zod | 4.4.3 | Runtime environment/profile validation |
-| TypeScript | 5.9.3 | Strict static contracts |
-| Node types | 24.13.3 | Node API typing |
-| Vitest / coverage packages | 4.1.11 | Delivery and combined production coverage |
-| Playwright | 1.62.1 | Chromium/Firefox/mobile Chrome; opt-in installed Chrome timing |
-| Axe Playwright | 4.13.0 | Serious/critical accessibility gate |
-| ESLint | 9.39.5 | Blocking lint |
-| eslint-config-next | 16.3.0 | Framework lint rules |
-| Prettier | 3.9.6 | Formatting |
-| jsdom | 30.0.1 | Integration rendering environment |
-| source-map-js | 1.2.2 | Transitive source maps; recently patched lockfile |
-
-Most direct runtime/dev dependencies use `latest`; reproducibility relies on `npm ci` and lockfile. No live vulnerability audit was run during this scan.
-
-## Runtime, Integration and Verification Tools
-
-Node crypto signed local sessions, nonce CSP, App Router server rendering/actions. Intended Supabase SQL/RPC port with no installed SDK or linked target; process-local synthetic provider/persistence. Node tests, Vitest/Istanbul, Testing Library/jsdom, Playwright browsers/Axe and opt-in installed Chrome timing. Immutable CI action revisions. CycloneDX SBOM plus unsigned private build evidence retained 14 days. Vercel immutable promotion/rollback is affirmed policy; executable deployment is disabled until linked.
+No web font is loaded. Self-hosted fonts (`next/font/local` or `next/font/google`, which downloads at build) satisfy `font-src 'self'`; a `<link>` to fonts.googleapis.com would be blocked. Static images are served from `public/` (`public/brand/logo.png`, `cover.jpg`).
