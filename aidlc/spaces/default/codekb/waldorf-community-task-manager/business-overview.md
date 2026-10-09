@@ -1,31 +1,28 @@
 # Business Overview
 
-Static synthesis of the revalidated 2026-10-06 developer scan for `261006-simplify-user-roles`, Standard depth, branch `feature/simplify-user-roles`, observed HEAD `0dce0567f18dc72e46aa88d87e5626708b08bc7d`. Full repository breadth with partial deep coverage. No application changes, tests, builds, browser sessions, migrations or target calls were performed.
+## Purpose
 
-## Business Domain and Purpose
+"Waldorf közösségi feladatkezelő" is a Hungarian-language community task manager for a Waldorf kindergarten. Families sign up for community duties (garden work, festival preparation), teachers see their group's schedule, and administrators manage tasks, records and approvals. The repository currently runs in a synthetic (fictitious data) local mode; production authentication is a placeholder (`app/page.tsx` renders "Biztonságos bejelentkezés" in production mode).
 
-The application coordinates community participation, duties and administrative records for a Waldorf kindergarten. Hungarian browser copy serves local synthetic personas; production backend composition is not linked.
+## Roles and Key Functionality
 
-## Key Functionality
+| Role (profile id) | Hungarian label | Home | Capabilities |
+|---|---|---|---|
+| `parent-local` | Szülő | `/szulo/feladatok` | List own family's duties, sign up, request swap or cancellation, edit own contribution note, notifications |
+| `kindergarten-teacher-local` | Óvónő | `/teacher/schedule` | Read-only schedule of one group |
+| `group-admin-local` | Csoportadminisztrátor | `/admin` | Dashboard, tasks/events, approvals for the assigned group |
+| `super-admin-local` | Szuperadminisztrátor | `/admin` | All of the above plus records, import, reminders, privacy, settings |
 
-Families, parents, children, school years and kindergarten groups; capacity-aware duty signup, swaps and cancellation approvals; own-family contributions/allergen access and notifications; date-filtered staff schedules; administrative records/tasks/assignments/queues/archives; seventeen-sheet legacy import with conflict resolution and rollback; reminders, grant revocation, privacy lifecycle and settings.
+Source: `src/runtime/synthetic/profiles.ts`.
 
-## Current Users and Roles
+## Domain Modules
 
-| Concept | Domain role | Current responsibility |
-| --- | --- | --- |
-| Parent | `parent` | Own-family participation, requests and notifications |
-| Group Administrator | `group_admin` | Granted-group core administration; application import denied |
-| Kindergarten Administrator | `kindergarten_admin` | Organization administration/advanced operations; application governance denied |
-| Read-only Staff | `read_only_staff` | Granted-group schedule viewing; sensitive fields and mutations denied |
-| Super Administrator | `super_admin` | Organization administration and governance |
+Access/roles, directory (families, children, groups), coordination (duties and assignments), notifications, import/migration, privacy/audit, teacher tracking and the admin/parent experience services live under `src/` (see component-inventory.md).
 
-The requested future catalog contains Parent, Group admin, Kindergarten teacher and Super administrator. No teacher role exists now. Teacher permissions/home/scope and legacy-role migration or rejection require approval in requirements. [Dependencies](dependencies.md) records the current role representations.
+## Locale and Copy
 
-## Groups and Business Ownership
+All user-facing copy is Hungarian; code identifiers are English (team rule). `<html lang="hu">` is set in `app/layout.tsx`. Long Hungarian compound words (role names such as "Csoportadminisztrátor") appear in cards, headers and status text.
 
-Kindergarten groups are business entities and authorization scopes. Staff fixtures include Tölgyfa/Napraforgó groups; workgroup/finance/library/water-test labels are process owners. These are distinct from role categories. Five import archive owners currently say `kindergarten-admin`; a future owner must be chosen without losing legacy sheet coverage. “Unnecessary groups” must be clarified before deleting business entities.
+## Intent Relevance (261009-visual-overhaul)
 
-## Operational and Privacy Boundaries
-
-Family and granted-group constraints, field allowlists, immediate revocation/version checks, last-admin protection and redacted audit are existing safeguards. Domain, application and SQL policy differ. Synthetic transactions/provider behavior do not prove production durability, Supabase/RLS, scheduler/email or deployment behavior.
+The visual overhaul touches the entry/profile chooser, parent duty list, admin dashboard summary cards, shared shell/header and the global stylesheet. Business rules, access boundaries and data flows must not change.

@@ -15,14 +15,11 @@ export default async function AdminDashboardPage() {
     );
   }
   const { applicationSession, scope } = session.data;
-  const [dashboard, records, tasks, approvals] = await Promise.all([
+  const [dashboard, records, tasks] = await Promise.all([
     facade.getDashboard(applicationSession, scope),
     facade.listRecords(applicationSession, scope),
     facade.listTasks(applicationSession, scope),
-    facade.listApprovals(applicationSession, scope),
-  ]).catch(
-    () => [terminalFailure(), terminalFailure(), terminalFailure(), terminalFailure()] as const,
-  );
+  ]).catch(() => [terminalFailure(), terminalFailure(), terminalFailure()] as const);
 
   return (
     <section className="admin-page" data-testid="admin-dashboard-page">
@@ -34,7 +31,11 @@ export default async function AdminDashboardPage() {
         <p>A kijelölt működési kör összefoglalója.</p>
       </header>
       <div className="admin-dashboard-grid">
-        <DashboardPanel title="Nyitott jóváhagyások" testId="admin-dashboard-approvals">
+        <DashboardPanel
+          title="Nyitott jóváhagyások"
+          testId="admin-dashboard-approvals"
+          href="/admin/jovahagyasok?state=pending"
+        >
           <AsyncStatePanel
             result={dashboard}
             testId="admin-dashboard-summary"
@@ -43,7 +44,11 @@ export default async function AdminDashboardPage() {
             {(data) => <strong>{data.openApprovals}</strong>}
           </AsyncStatePanel>
         </DashboardPanel>
-        <DashboardPanel title="Nyilvántartások" testId="admin-dashboard-records">
+        <DashboardPanel
+          title="Nyilvántartások"
+          testId="admin-dashboard-records"
+          href="/admin/nyilvantartasok"
+        >
           <AsyncStatePanel
             result={records}
             testId="admin-dashboard-records-state"
@@ -52,24 +57,17 @@ export default async function AdminDashboardPage() {
             {(data) => <strong>{data.items.length}</strong>}
           </AsyncStatePanel>
         </DashboardPanel>
-        <DashboardPanel title="Feladatok és események" testId="admin-dashboard-tasks">
+        <DashboardPanel
+          title="Feladatok és események"
+          testId="admin-dashboard-tasks"
+          href="/admin/feladatok"
+        >
           <AsyncStatePanel
             result={tasks}
             testId="admin-dashboard-tasks-state"
             emptyMessage="Nincs feladat vagy esemény."
           >
             {(data) => <strong>{data.items.length}</strong>}
-          </AsyncStatePanel>
-        </DashboardPanel>
-        <DashboardPanel title="Függőben lévő kérelmek" testId="admin-dashboard-queue">
-          <AsyncStatePanel
-            result={approvals}
-            testId="admin-dashboard-queue-state"
-            emptyMessage="Nincs függőben lévő kérelem."
-          >
-            {(data) => (
-              <strong>{data.items.filter((item) => item.state === "pending").length}</strong>
-            )}
           </AsyncStatePanel>
         </DashboardPanel>
       </div>
@@ -80,12 +78,13 @@ export default async function AdminDashboardPage() {
 function DashboardPanel({
   title,
   testId,
+  href,
   children,
-}: Readonly<{ title: string; testId: string; children: React.ReactNode }>) {
+}: Readonly<{ title: string; testId: string; href: string; children: React.ReactNode }>) {
   return (
-    <section className="admin-dashboard-panel" data-testid={testId}>
+    <a className="admin-dashboard-panel dashboard-link" href={href} data-testid={testId}>
       <h2>{title}</h2>
       {children}
-    </section>
+    </a>
   );
 }

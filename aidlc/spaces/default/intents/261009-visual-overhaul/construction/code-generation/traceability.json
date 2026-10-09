@@ -1,0 +1,40 @@
+{
+  "stage": "code-generation",
+  "upstream_ids": [
+    "FR1.1", "FR1.2", "FR1.3",
+    "FR2.1", "FR2.2", "FR2.3",
+    "FR3.1", "FR3.2", "FR3.3",
+    "FR4.1", "FR4.2", "FR4.3", "FR4.4",
+    "FR5.1", "FR5.2", "FR5.3",
+    "FR6.1", "FR6.2", "FR6.3", "FR6.4",
+    "NFR1", "NFR2", "NFR3", "NFR4", "NFR5", "NFR6"
+  ],
+  "coverage": [
+    { "id": "FR1.1", "status": "OK", "target": "app/globals.css" },
+    { "id": "FR1.2", "status": "OK", "target": "src/runtime/hyphenation.ts" },
+    { "id": "FR1.3", "status": "OK", "target": "tests/unit/design-tokens.test.ts" },
+    { "id": "FR2.1", "status": "OK", "target": "src/runtime/BrandMark.tsx" },
+    { "id": "FR2.2", "status": "OK", "target": "src/runtime/ProfileSelector.tsx" },
+    { "id": "FR2.3", "status": "OK", "target": "tests/browser/visual-overhaul.spec.ts" },
+    { "id": "FR3.1", "status": "OK", "target": "app/szulo/feladatok/page.tsx" },
+    { "id": "FR3.2", "status": "OK", "target": "tests/coverage/parent-pages.test.tsx" },
+    { "id": "FR3.3", "status": "OK", "target": "tests/browser/visual-overhaul.spec.ts" },
+    { "id": "FR4.1", "status": "OK", "target": "app/admin/page.tsx" },
+    { "id": "FR4.2", "status": "OK", "target": "tests/coverage/admin-dashboard.test.tsx" },
+    { "id": "FR4.3", "status": "OK", "target": "tests/coverage/admin-dashboard.test.tsx" },
+    { "id": "FR4.4", "status": "OK", "target": "tests/browser/visual-overhaul.spec.ts" },
+    { "id": "FR5.1", "status": "OK", "target": "src/runtime/AppShell.tsx" },
+    { "id": "FR5.2", "status": "OK", "target": "tests/integration/runtime-shell.test.tsx" },
+    { "id": "FR5.3", "status": "OK", "target": "HASZNALATI_UTMUTATO_HU.md" },
+    { "id": "FR6.1", "status": "OK", "target": "app/globals.css" },
+    { "id": "FR6.2", "status": "OK", "target": "app/globals.css" },
+    { "id": "FR6.3", "status": "OK", "target": "tests/unit/design-tokens.test.ts" },
+    { "id": "FR6.4", "status": "OK", "target": "tests/browser/visual-overhaul.spec.ts" },
+    { "id": "NFR1", "status": "OK", "target": "tests/unit/design-tokens.test.ts" },
+    { "id": "NFR2", "status": "OK", "target": "app/globals.css" },
+    { "id": "NFR3", "status": "OK", "target": "tests/unit/design-tokens.test.ts" },
+    { "id": "NFR4", "status": "OK", "target": "next.config.ts" },
+    { "id": "NFR5", "status": "OK", "target": "tests/coverage/production-inventory.test.ts" },
+    { "id": "NFR6", "status": "OK", "target": "tests/integration/runtime-shell.test.tsx" }
+  ]
+}

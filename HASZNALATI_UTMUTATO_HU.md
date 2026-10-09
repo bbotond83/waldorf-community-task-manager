@@ -23,8 +23,8 @@ a helyi, memóriában tárolt tesztadatokra hatnak.
 
 ## 2. Tesztprofil kiválasztása és váltása
 
-Válassz egy profilt a kezdőképernyőn, majd kattints a **Profil használata**
-gombra. A profil határozza meg, mely oldalakat látod és milyen műveleteket
+Válassz egy profilt a kezdőképernyőn: kattints a profil kártyájára (bárhol a
+kártyán). A profil határozza meg, mely oldalakat látod és milyen műveleteket
 végezhetsz.
 
 | Profil | Mit ellenőrizhetsz? |
@@ -94,7 +94,7 @@ Válaszd a **Munkatárs (csak olvasás)** profilt. A navigációból nyisd meg a
 2. Állítsd a kezdő és záró dátumot egyaránt **2026-08-14** értékre, majd
    kattints a **Szűrés** gombra. A találatok között meg kell jelennie a
    **Kézműves előkészítés** tevékenységnek.
-3. Nyisd meg a **Részletek** oldalt, majd térj vissza. A dátumszűrők
+3. Kattints egy feladat kártyájára a részletek megnyitásához, majd térj vissza. A dátumszűrők
    maradjanak meg.
 4. Próbálj olyan dátumtartományt megadni, amelyre nincs találat; ellenőrizd
    az üres állapotot és a **Szűrők törlése** linket.

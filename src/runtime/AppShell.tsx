@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { BrandMark } from "./BrandMark.tsx";
 import type { SyntheticProfile } from "./synthetic/profiles.ts";
 
 type AppShellProps = {
@@ -14,12 +15,15 @@ export function AppShell({ profile, children, statusMessage }: AppShellProps) {
         Ugrás a fő tartalomra
       </a>
       <header className="site-header">
-        <div>
-          <p className="eyebrow">Waldorf közösségi feladatkezelő</p>
-          <p className="profile-summary" data-testid="app-shell-profile-summary">
-            <strong>{profile.label}</strong>
-            <span>{profile.scopeSummary}</span>
-          </p>
+        <div className="site-header-brand">
+          <BrandMark size={48} />
+          <div>
+            <p className="eyebrow">Waldorf közösségi feladatkezelő</p>
+            <p className="profile-summary" data-testid="app-shell-profile-summary">
+              <strong>{profile.label}</strong>
+              <span>{profile.scopeSummary}</span>
+            </p>
+          </div>
         </div>
         <form
           action="/api/synthetic/session"

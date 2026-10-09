@@ -3,6 +3,7 @@ import { expect, test } from "@playwright/test";
 import { SYNTHETIC_PROFILES } from "../../src/runtime/synthetic/profiles.ts";
 import { measureProfileLogin, startLoginServer } from "./support/profile-login-server.ts";
 import {
+  greetingName,
   permittedNavigationIds,
   type LoginMeasurement,
 } from "./support/profile-login-measurement.ts";
@@ -39,9 +40,9 @@ for (const mode of ["development", "production"] as const) {
         );
         for (const id of forbidden)
           await expect(page.getByTestId(`app-shell-navigation-${id}`)).toHaveCount(0);
-        await expect(
-          page.getByRole("heading", { name: `Üdvözlünk, ${previous.label}!`, exact: true }),
-        ).toHaveCount(0);
+        await expect(page.getByRole("heading", { name: greetingName(previous.label) })).toHaveCount(
+          0,
+        );
         if (profile.role === "parent" || profile.role === "kindergarten-teacher") {
           await page.goto(`${server.origin}/admin/import`);
           await expect(

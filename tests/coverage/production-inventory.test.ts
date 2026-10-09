@@ -81,7 +81,7 @@ describe("honest executable denominator", () => {
     expect(
       inventory.some((entry) => entry.path.includes(".test.") || entry.path.endsWith(".d.ts")),
     ).toBe(false);
-    expect(inventory.length).toBe(151);
+    expect(inventory.length).toBe(153);
     expect(inventory.some((entry) => entry.path === "scripts/verification/current-role-database.ts")).toBe(true);
     for (const path of ["src/teacher-tracking/tracking-model.ts", "src/teacher-web/synthetic-teacher-repository.ts", "app/teacher/_lib/compatibility.ts", "app/munkatars/beosztas/route.ts", "app/munkatars/beosztas/[id]/route.ts"]) expect(inventory.some(entry => entry.path === path)).toBe(true);
     expect(inventory.some(entry => entry.path.startsWith("src/staff-") || entry.path === "src/application/staff-facade.ts")).toBe(false);

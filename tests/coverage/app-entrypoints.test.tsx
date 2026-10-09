@@ -55,6 +55,25 @@ it("renders Hungarian root and safe denied navigation", () => {
   expect(renderToStaticMarkup(<Root>Owned child</Root>)).toContain('lang="hu"');
   expect(renderToStaticMarkup(<Denied />)).toContain('href="/"');
 });
+it("shows the logo linking to the start page on the public pages", async () => {
+  const outputs = [
+    renderToStaticMarkup(<Denied />),
+    renderToStaticMarkup(await Login({ searchParams: Promise.resolve({}) })),
+    renderToStaticMarkup(
+      await Invitation({ params: Promise.resolve({ token: "parent-valid-invitation" }) }),
+    ),
+  ];
+  for (const output of outputs) {
+    expect(output).toContain('data-testid="brand-link"');
+    expect(output).toContain("Cinkotai Waldorf Óvoda");
+  }
+});
+it("renders the greeting of a long role name as plain text", async () => {
+  boundary.token = createSyntheticSessionToken(getSyntheticProfile("super-admin-local")!);
+  const markup = renderToStaticMarkup(await Home());
+  expect(markup).toContain("Üdvözlünk, Szuperadminisztrátor!");
+  expect(markup).not.toContain("­");
+});
 it("sanitizes login targets and renders authenticated notice", async () => {
   expect(
     renderToStaticMarkup(

@@ -21,6 +21,8 @@ const nextConfig: NextConfig = {
   ...(loginTestDistDir ? { distDir: loginTestDistDir } : {}),
   poweredByHeader: false,
   reactStrictMode: true,
+  // Local brand images only, served at the default quality.
+  images: { qualities: [75] },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },

@@ -1,3 +1,4 @@
+import { BrandMark } from "../../../src/runtime/BrandMark.tsx";
 import { inspectSyntheticInvitation } from "../../../src/parent-web/index.ts";
 import { InvitationAcceptForm, InvitationResendForm } from "./InvitationActions.tsx";
 import { acceptInvitationAction } from "./actions.ts";
@@ -34,6 +35,7 @@ export default async function InvitationPage({ params }: { params: Promise<{ tok
       <a className="skip-link" href="#fo-tartalom" data-testid="invitation-skip-link">
         Ugrás a fő tartalomra
       </a>
+      <BrandMark />
       <p className="eyebrow">Szülői meghívás</p>
       <h1 tabIndex={-1}>{COPY[state].heading}</h1>
       <p>{COPY[state].message}</p>

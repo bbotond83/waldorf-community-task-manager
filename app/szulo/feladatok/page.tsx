@@ -56,16 +56,14 @@ export default async function ParentDutiesPage({
             <ul className="parent-collection" data-testid="duty-list">
               {duties.map((duty) => (
                 <li className="parent-card" key={duty.id} data-testid={`duty-card-${duty.id}`}>
-                  <div>
-                    <h2>{duty.title}</h2>
-                    <p>{formatBudapestDate(duty.dueAt)}</p>
-                    <strong className="parent-state-badge">{STATE_LABELS[duty.state]}</strong>
-                  </div>
                   <a
+                    className="parent-card-link"
                     href={`/szulo/feladatok/${duty.id}${allapot ? `?allapot=${encodeURIComponent(allapot)}` : ""}`}
                     data-testid={`duty-open-${duty.id}`}
                   >
-                    Részletek
+                    <h2>{duty.title}</h2>
+                    <p>{formatBudapestDate(duty.dueAt)}</p>
+                    <strong className="parent-state-badge">{STATE_LABELS[duty.state]}</strong>
                   </a>
                 </li>
               ))}

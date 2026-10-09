@@ -1,39 +1,34 @@
 # Code Quality Assessment
 
-Static synthesis of the revalidated 2026-10-06 developer scan for `261006-simplify-user-roles`, Standard depth, branch `feature/simplify-user-roles`, observed HEAD `0dce0567f18dc72e46aa88d87e5626708b08bc7d`. Full repository breadth with partial deep coverage. No application changes, tests, builds, browser sessions, migrations or target calls were performed.
+## Testing
 
-## Test Coverage
+- Layers: colocated domain tests (`src/**/*.test.ts`, node:test), Vitest `tests/unit|integration|coverage`, Playwright `tests/browser` on three projects, DB migration tests.
+- Coverage: 80% lines/branches/functions enforced across production sources (`vitest.config.ts`; `tests/coverage/support/production-inventory.ts` enumerates files, so new production files need tests).
+- Accessibility: `@a11y`-tagged axe checks in `runtime-foundation`, `admin-core`, `admin-advanced`, `teacher-web` specs (serious/critical must be zero).
+- Tests that assert on the UI affected by the intent:
+  - `tests/integration/runtime-shell.test.tsx` lines 12, 13, 61, 91: button role named "Profil használata" (four), `profile-selector-<id>-button`, `type="submit"`, form `method=post` / `action=/api/synthetic/session`.
+  - `tests/browser/{runtime-foundation,teacher-web,admin-core,admin-advanced,parent-web}.spec.ts` and `support/profile-login-measurement.ts:110`: click `profile-selector-<id>-button`.
+  - `tests/browser/parent-web.spec.ts:62-63`: `duty-card-<id>` visible then click `duty-open-<id>`.
+  - `tests/browser/admin-core.spec.ts:32`, `admin-advanced.spec.ts:97,114`, `profile-login-measurement.ts:28,58-61`: dashboard test IDs `admin-dashboard-page`, `-summary`, `-records-state`, `-tasks-state`, `-queue-state`.
+  - No test asserts the literal "Részletek" text; `tests/coverage/parent-pages.test.tsx` covers the detail pages only.
 
-- `src/**/*.test.ts`: colocated Node test-runner tests cover access/domain services, facades, isolation/contracts, synthetic workflows, schedules, import and lifecycle. Static declaration counts are not execution counts because tests use loops and grouped cases; no current pass count is claimed.
-- `tests/unit`, `tests/integration`, `tests/coverage`: Vitest/jsdom plus Testing Library, Node-test adapter for coverage, framework entrypoint/action/session/page tests, CLI and verification tests.
-- `tests/browser`: runtime foundation, parent, staff, admin core/advanced; profile login timing suites and helpers. Standard Playwright runs Chromium, Firefox, Pixel 7 mobile-Chrome with independent synthetic production servers at ports 3100–3102 and deterministic reset. Timing suites are opt-in and excluded from standard browser inventory.
-- `vitest.config.ts` Istanbul coverage includes all production `app`, `src`, scripts, proxy and Next config; excludes tests/declarations; 80% line/branch/function thresholds. `tests/coverage/support/production-inventory.ts` independently inventories runtime/type-only/linkage-only source and refuses omitted runtime coverage. Domain runner also has 80% thresholds.
-- Role-sensitive tests include `src/access/access-service.test.ts`, `src/application/authorization.test.ts`, `facades.test.ts`, directory/core/advanced/staff/parent tests; browser runtime/staff/admin tests; `tests/unit/runtime-boundaries.test.ts:200` asserts exactly five roles; `tests/coverage/app-session-boundaries.test.ts` and staff/admin page coverage have explicit old profiles. Login suites iterate profiles but helpers branch on `staff` and require appropriate main content/control IDs (`tests/browser/support/profile-login-measurement.ts:21`).
-- Verification manifest has **39 scenarios: 33 local and six linked-target/outstanding**. Outstanding IDs: `SAFARI-DESKTOP-SMOKE`, `SAFARI-MOBILE-SMOKE`, `TARGET-SUPABASE-AUTH-RLS`, `TARGET-SUPABASE-PERSISTENCE`, `TARGET-SCHEDULER-PROVIDER`, `TARGET-VERCEL-PREVIEW-STAGING`. This is inventory, not new evidence of pass/fail.
+## Linting and Formatting
 
-## Linting, CI/CD and Documentation
+ESLint (zero warnings) and Prettier are blocking, but scripts cover only `app src/application src/runtime tests scripts *.config.* proxy.ts` (verification and other `src/*` folders are excluded).
 
-- Lint and format are blocking scripts; their path scope covers App Router, application/runtime, tests/scripts and config. Older domain modules are often compressed onto very long lines and are outside the explicit lint/format command paths. Naming and explicit ports are generally clear; exception handling and state unions exist at facade boundaries.
-- CI `.github/workflows/ci.yml`: PRs/main pushes, immutable action revisions, read-only contents permissions, concurrency cancellation. Validate installs locked dependencies and browsers then runs `verify:local`: toolchain, manifests, format, lint, types, tests, coverage, security, build, smoke, full browser suite and evidence aggregation.
-- A dependent build-evidence job rebuilds synthetic output, creates CycloneDX SBOM, archives `.next` without cache, writes unsigned commit/run metadata and SHA256SUMS, uploads private artifact for 14 days. It does not use GitHub attestation API. Current team/project steering still requests an artifact attestation, whereas this intentional private-repository implementation is unsigned; practices discovery should reconcile descriptive evidence honestly through its authorized process.
-- Security: nonce CSP, production eval blocked, same-origin mutation endpoints, signed HttpOnly Lax local cookie, non-enumerating denial contracts, scope/version checks, field allowlists. The synthetic signing constant and nonsecure local cookie are synthetic behavior, not a production auth implementation.
-- `scan-artifacts.ts` implements privacy/secret regex scans, limited app/src dangerous-code SAST patterns, and no-deploy command scans; these are bounded scanners, not complete security analysis. `npm audit --audit-level=high` blocks high/critical dependency findings when verification runs.
-- `README.md`, Hungarian usage guide and verification runbook document local startup, five current roles and linked-target limitations. Historical aidlc/qa reports are prior evidence and may contain old role names or outdated counts; preserve their historical meaning.
+## CI/CD
+
+`.github/workflows/ci.yml`: `verify:local` (typecheck, lint, format, tests, coverage, build, start smoke, browser, a11y, security scans) then SBOM/build-evidence artifacts. Actions pinned by SHA.
+
+## Documentation
+
+`README.md`, Hungarian guide `HASZNALATI_UTMUTATO_HU.md` (mentions "Profil használata" at line 26 and "Részletek" at line 97), `verification/RUNBOOK.md`.
 
 ## Technical Debt
 
-1. Role vocabularies are duplicated across five domain IDs, five hyphenated profile roles, profile IDs, UI resolvers, matrices, grants and SQL. Centralization or exhaustive type checks may help implementation, but changing identifiers requires all consumers and runtime rejection checks.
-2. Domain `AccessService` grant semantics, application matrix semantics and SQL policies differ (group import, kindergarten role governance and sensitive fields). The verification JSON additionally allows sensitive administrator fields absent from the current application display-name allowlist. Treat this as a policy-alignment risk, not permission to silently broaden access.
-3. `AccessService` unknown-role fallback grants staff-like read behavior for matching scope. SQL role text has no constraint. Removing roles from TypeScript is insufficient to prevent legacy/unknown runtime grants from retaining access.
-4. Process-local synthetic stores simulate transactions, durable jobs, import recovery and grant revocation; their success cannot prove persistence or production restart behavior. Production adapter is a validated, unlinked slot.
-5. Archive ownership strings use the obsolete kindergarten administrator label. Workgroup/process owners are distinct from application authorization roles, and kindergarten groups are business entities used for scope enforcement. Cleanup requires a precise interpretation of “unnecessary groups.”
-6. Large files include application admin facade (~500 lines), synthetic advanced (~500), synthetic core (~430), parent synthetic (~415); older domains often use one-line methods. No circular-dependency proof or unused-code compiler analysis was performed. No TODO/FIXME/HACK or suppression matches were found in the bounded app/src/scripts/tests/.github search, which does not prove absence of broader debt.
-7. Manifest/reference validation does not establish semantic parity across the three executable authorization layers. Historical reports and static scope dictionaries are not current runtime evidence.
-
-## Role Change Risk Assessment
-
-High cross-cutting authorization impact across grants, matrices, profiles/cookies, UI gates, sensitive directory fields, RLS, ownership metadata and tests/manifests. Teacher behavior and legacy disposition remain unresolved. Explicit runtime rejection and semantic policy alignment need implementation evidence; preserve family/group privacy, immediate revocation and last-admin protection.
-
-## Assessment Limits
-
-Full repository breadth with partial deep coverage; no fresh passing counts, measured coverage, performance or security certification. Historical summaries are prior evidence. Static manifest reference checks do not prove executable policy parity or real integrations. The production inventory helper `tests/coverage/support/production-inventory.ts` was read deeply, but verified coverage is demoted to shallow because the current `coverage/` ignore rule prevents its inclusion in the mint utility's empty temporary index. The other 53 analyzed paths have fingerprint `30b17c6daf49b37eea5f622f21905a0df9b26923`, minted using the refreshed snapshot's approved Git access. This limitation affects the coverage claim, not the retained static finding that the helper inventories runtime/type-only/linkage-only source and refuses omitted runtime coverage.
+- `latest` ranges for react, react-dom, zod and dev tools.
+- Monolithic 857-line `app/globals.css`; literal colours (`#eef6fb`, `#fff1ed` at lines 329, 334, 461, 467, 600, 787 and `rgb()` in `body` and `--shadow`); `overflow-wrap: anywhere` on headings and paragraphs causes mid-word breaks of long Hungarian words; no typography tokens.
+- Duplicate "Részletek" link implementations (parent page, admin `ResponsiveCollection`).
+- Dashboard cards are not navigable although target list routes exist.
+- Contrast of `--color-primary #8c3f2f`, `--color-muted #655d53` on surfaces passes today; any new palette must be rechecked against axe.
+- `public/` untracked in git at scan time; `next-env.d.ts` shows as modified.
