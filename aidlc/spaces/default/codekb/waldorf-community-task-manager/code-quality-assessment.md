@@ -1,25 +1,28 @@
 # Code Quality Assessment
 
 ## Ratings (good/fair/poor)
-Naming clarity good; function size good; error handling good (explicit result states); test presence good; duplication fair (CSS selectors, three nav lists); dead code fair.
+Naming clarity good; function size good; error handling good (explicit result states); test presence good; duplication fair (two status-label maps, CSS selectors); dead code fair.
 
 ## Testing
-71 test files: node:test domain tests in src/, Vitest (tests/unit, integration, coverage), Playwright specs (admin-core, admin-advanced, parent-web, teacher-web, runtime-foundation, visual-overhaul, two login specs), database test. 80 percent line/branch/function thresholds. Tests heavily use stable `data-testid` values.
+71+ test files: node:test domain tests in src/, Vitest (tests/unit, integration, coverage), Playwright specs (admin-core, admin-advanced, parent-web, teacher-web, runtime-foundation, visual-overhaul, navigation-polish, two login specs), database test. 80 percent line/branch/function thresholds. Tests heavily use stable `data-testid` values. Playwright runs chromium, firefox and mobile-chrome against one shared in-memory server state.
 
-## Tests touching intent areas (will need updates)
-- Nav labels/counts: tests/integration/runtime-shell.test.tsx:49-100; tests/unit/runtime-boundaries.test.ts:209-213; tests/browser/admin-core.spec.ts:33-34; admin-advanced.spec.ts:28-33,114; profile-login-existing/performance specs and support/profile-login-measurement.ts:36-43,116-118,159-161 (`permittedNavigationIds` adds admin-records, admin-archive).
-- Landing "Üdvözlünk": tests/browser/runtime-foundation.spec.ts:15,23,27; visual-overhaul.spec.ts:48,54,63,112; profile-login-measurement.ts:17,116; tests/coverage/app-entrypoints.test.tsx:25-33,70-76; focus assertions `toBeFocused` runtime-foundation.spec.ts:15,23 and admin-core.spec.ts:30.
-- "Részletek"/open links: tests/integration/admin-components.test.tsx:82-90; tests/browser/teacher-web.spec.ts:48-49,150; tests/coverage/parent-pages.test.tsx:56-68 (asserts absence on duties).
-- Raw state text: admin-components.test.tsx:88 ("active"), admin-core.spec.ts:85 ("Állapot: archived"), tests/coverage/admin-dashboard.test.tsx:75 (`state: "pending"` query).
-- Notifications: tests/browser/parent-web.spec.ts:112-117; tests/coverage/parent-pages.test.tsx:182-190.
+## Tests touching this intent's areas (will need updates)
+- Parent notifications: tests/browser/parent-web.spec.ts:104-140 (link href `/szulo/feladatok/<duty>` with `projectSuffix`, checkbox read flow), tests/browser/navigation-polish.spec.ts:175-210 (card link count, checkbox size, read state, focus; uses notice-24-hour because state is shared), tests/integration/notification-read-form.test.tsx, tests/coverage/parent-pages.test.tsx:182-190, tests/coverage/parent-actions.test.ts.
+- Menu order and current item: tests/unit/runtime-boundaries.test.ts:34-35 (ids in order), tests/integration/runtime-shell.test.tsx:49-100, tests/integration/app-nav.test.tsx (currentNavigationId, BackToHomeLink), tests/unit/navigation-access.test.ts, tests/browser/support/profile-login-measurement.ts:25,45,155.
+- Admin lists/filters/forms: tests/browser/navigation-polish.spec.ts:160-171 (exact filter options), tests/browser/admin-core.spec.ts, admin-advanced.spec.ts:79 ("corr-lampas-01"), tests/integration/admin-components.test.tsx, admin-advanced-components.test.tsx, tests/coverage/admin-pages.test.tsx, admin-actions.test.ts, admin-dashboard.test.tsx, src/application/status-labels.test.ts.
+- Per-browser demo data: parent-web.spec.ts `projectSuffix` (:4-8, :57, :83, :94, :109-111) depends on the "-firefox" / "-mobile" fixtures.
 
 ## Tooling and CI
-ESLint max-warnings 0 over app, src/application, src/runtime, tests, scripts; Prettier check; typecheck; CI runs `verify:local` (type check, tests, build, start smoke, browser, a11y, scans). Accessibility: axe test `@a11y` on root flow.
+ESLint max-warnings 0 over app, src/application, src/runtime, tests, scripts; Prettier check; typecheck; CI runs `verify:local` (type check, tests, build, start smoke, browser, a11y, scans). Accessibility: axe tests (`@a11y`).
 
 ## Technical debt
-- Duplicated/inconsistent navigation (see architecture.md); duplicated home path constant.
-- Unlocalized state values in admin lists and detail pages, reminders, privacy lifecycle; no shared label map.
-- `autoFocus` headings with `tabIndex=-1` on ten pages and a global `:focus-visible` outline using `--color-focus` produce a visible box on every programmatic focus.
-- Notification cards: padding reset (globals.css:681-686) shared with link cards leaves content flush with the border.
-- `latest` dependency ranges; single large stylesheet with repeated selectors; ESLint scope excludes most of src/.
+- Parent duty state labels duplicated page-locally (app/szulo/feladatok/page.tsx:5-12) and differing from `STATUS_LABELS`.
+- Admin filter options are one fixed list for all pages regardless of the list's real state values.
+- Notification read state has no revalidation after the action; page text is server-rendered.
+- Notification and duty back/current-menu context is path-only; the duty detail back link always targets the duties list.
+- Duty detail shows request links regardless of pending state and shows no state.
+- Test scenario controls and technical values (scenario selects, "Verzió", "Korreláció", "OUTSTANDING") are rendered as normal user UI.
+- Demo fixtures carry test-runner wording ("– Firefox próba", "– mobil próba") visible to users.
+- Admin pages repeat their header markup; no back-navigation affordance in admin.
+- `autoFocus` headings on several pages; `latest` dependency ranges; large single stylesheet; ESLint scope excludes most of src/.
 - No TODO/FIXME or eslint-disable inventory was performed beyond files read.

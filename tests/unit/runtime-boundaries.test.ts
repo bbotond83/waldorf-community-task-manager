@@ -31,8 +31,8 @@ describe("profile login measurement boundary", () => {
     expect(permittedNavigationIds(SYNTHETIC_PROFILES[2]).has("admin-records")).toBe(true);
     expect(permittedNavigationIds(SYNTHETIC_PROFILES[2]).has("admin-import")).toBe(false);
     expect([...permittedNavigationIds(SYNTHETIC_PROFILES[0])]).toEqual([
-      "parent-duties",
       "parent-notifications",
+      "parent-duties",
     ]);
     expect([...permittedNavigationIds(SYNTHETIC_PROFILES[1])]).toEqual([]);
   });

@@ -3,21 +3,40 @@
 ## Run Record
 
 - Date: 2026-10-09
-- Commit: a031222a95546b83bad291eb061527774d3e068f
+- Commit: f51c84477aacb9810ac4bda810a1e4952d259712
 
 ## Scope of Analysis
 
 ```yaml
 scope_version: 1
 kind: partial
-intent: 261009-navigation-polish
-fingerprint: ebd1e98a41a8838509704631c5ce908d9b998c9b
+intent: 261009-functional-test-fixes
+fingerprint: 1cc16c4e947810a8fb4cbcaedd590b584e6ab1a7
 analyzed:
   paths:
     - app/
     - src/runtime/
     - src/application/
     - tests/
+    - verification/
+  components:
+    - AppShell
+    - AppNav
+    - BackToHomeLink
+    - Synthetic profiles
+    - Admin session
+    - ResponsiveCollection
+    - AdminFilterBar
+    - AdminMutationForm
+    - Admin pages with raw demo-facing text
+    - ParentDutiesPage
+    - ParentDutyDetailPage
+    - ParentRequestPages
+    - ParentNotificationsPage
+    - NotificationReadForm
+    - Status labels
+shallow:
+  paths:
     - package.json
     - vitest.config.ts
     - playwright.config.ts
@@ -25,23 +44,6 @@ analyzed:
     - proxy.ts
     - .github/workflows/ci.yml
     - .env.example
-  components:
-    - AppShell
-    - BrandMark
-    - ProfileSelector
-    - Synthetic profiles
-    - Admin session
-    - AuthorizationContract
-    - ResponsiveCollection
-    - AdminFilterBar
-    - Admin dashboard
-    - ParentDutiesPage
-    - ParentNotificationsPage
-    - NotificationReadForm
-    - ScheduleCollection
-    - Global stylesheet
-shallow:
-  paths:
     - src/access/
     - src/admin-core/
     - src/admin-advanced/
@@ -56,6 +58,5 @@ shallow:
     - src/teacher-tracking/
     - src/teacher-web/
     - scripts/
-    - verification/
     - supabase/
 ```

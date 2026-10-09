@@ -1,11 +1,13 @@
 import { randomUUID } from "node:crypto";
-import { AdminMutationForm } from "../../_components/AdminMutationForm.tsx";
+import { AdminBackLink, ADMIN_LIST_LINKS } from "../../_components/AdminBackLink.tsx";
+import { AdminMutationForm, AdminTextField } from "../../_components/AdminMutationForm.tsx";
 import { saveTaskAction } from "../../actions.ts";
 
 export default function NewTaskPage() {
   return (
     <section className="admin-page" data-testid="admin-task-create-page">
       <header>
+        <AdminBackLink list="tasks" />
         <p className="eyebrow">Feladatok és események</p>
         <h1 tabIndex={-1}>Új feladat vagy esemény</h1>
       </header>
@@ -13,6 +15,7 @@ export default function NewTaskPage() {
         action={saveTaskAction}
         submitLabel="Létrehozás"
         testId="admin-task-create-form"
+        successLink={ADMIN_LIST_LINKS.tasks}
       >
         <input type="hidden" name="id" value="new" />
         <input type="hidden" name="expectedVersion" value="1" />
@@ -22,13 +25,13 @@ export default function NewTaskPage() {
           <option value="task">Feladat</option>
           <option value="event">Esemény</option>
         </select>
-        <label htmlFor="title">Megnevezés</label>
-        <input
+        <AdminTextField
           id="title"
           name="title"
+          label="Megnevezés"
           required
           maxLength={120}
-          data-testid="admin-task-title-input"
+          testId="admin-task-title-input"
         />
       </AdminMutationForm>
     </section>

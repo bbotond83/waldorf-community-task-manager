@@ -101,6 +101,32 @@ for (const [name, values] of cases) {
     expect(JSON.stringify(result)).not.toContain("Invented reason");
   });
 }
+it("marks a notification read twice without a change or an error and refreshes the list", async () => {
+  signIn("parent-local");
+  const first = await actions.markNotificationReadAction(
+    initial,
+    form({ id: "notice-7-day", idempotencyKey: "notice:notice-7-day:open:aaaa1111" }),
+  );
+  const second = await actions.markNotificationReadAction(
+    initial,
+    form({ id: "notice-7-day", idempotencyKey: "notice:notice-7-day:read" }),
+  );
+  expect(first.state).toBe("success");
+  expect(second.state).toBe("success");
+  expect(second.link).toBe("/szulo/feladatok/duty-assigned");
+  expect(boundary.revalidate).toHaveBeenCalledWith("/szulo/ertesitesek");
+  expect(boundary.revalidate).toHaveBeenCalledTimes(2);
+});
+it("does not refresh the list when marking read is denied or invalid", async () => {
+  expect(
+    (await actions.markNotificationReadAction(initial, form({ id: "notice-7-day" }))).state,
+  ).toBe("denied");
+  expect(
+    (await actions.markNotificationReadAction(initial, form({ id: "!", idempotencyKey: "x" })))
+      .state,
+  ).toBe("validation");
+  expect(boundary.revalidate).not.toHaveBeenCalled();
+});
 it("preserves signup idempotency and reports full/ineligible conflicts", async () => {
   signIn("parent-local");
   const input = form({ id: "duty-garden" });

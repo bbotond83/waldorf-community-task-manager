@@ -63,6 +63,7 @@ test("interrupted import recovers without partial outcome", async ({ page }) => 
   await page.getByTestId("admin-import-preview-form-submit-button").click();
   await page.getByLabel("Meglévő adat megtartása").check();
   await page.getByTestId("admin-import-conflict-form-submit-button").click();
+  await page.getByTestId("developer-details-toggle").click();
   await page.getByLabel("Mentési forgatókönyv").selectOption("interrupted");
   await page.getByTestId("admin-import-confirm-checkbox").check();
   await page.getByTestId("admin-import-commit-form-submit-button").click();
@@ -76,7 +77,13 @@ test("reminder retry preserves correlation identity and blocks non-retryable job
 }) => {
   await selectProfile(page, "super-admin-local");
   await page.goto("/admin/emlekeztetok");
-  await expect(page.getByTestId("admin-reminder-job-lampas")).toContainText("corr-lampas-01");
+  // The correlation id is technical text: it sits in the closed "Fejlesztői részletek" section.
+  await expect(page.getByTestId("admin-reminder-job-lampas")).not.toContainText("corr-lampas-01");
+  await expect(page.getByTestId("developer-details")).not.toHaveAttribute("open", "");
+  await page.getByTestId("developer-details-toggle").click();
+  await expect(page.getByTestId("admin-reminder-correlation-job-lampas")).toContainText(
+    "corr-lampas-01",
+  );
   await page.getByTestId("admin-reminder-retry-job-lampas-submit-button").click();
   await expect(page.getByTestId("admin-reminder-job-lampas")).toContainText(
     "Újrapróbálás folyamatban",

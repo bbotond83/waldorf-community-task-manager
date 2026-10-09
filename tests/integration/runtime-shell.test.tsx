@@ -62,6 +62,10 @@ describe("runtime shell", () => {
       "/szulo/ertesitesek",
     );
     expect(navigation.getAllByRole("link")).toHaveLength(2);
+    expect(navigation.getAllByRole("link").map((link) => link.textContent)).toEqual([
+      "Értesítések",
+      "Feladatok",
+    ]);
     expect(navigation.queryByRole("link", { name: "Importálás" })).not.toBeInTheDocument();
   });
 

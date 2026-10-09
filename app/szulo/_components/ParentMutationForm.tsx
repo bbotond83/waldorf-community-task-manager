@@ -8,19 +8,31 @@ export type ParentAction = (
   formData: FormData,
 ) => Promise<ParentActionState>;
 
+/**
+ * A form that posts to a parent action and shows the outcome. With `afterSuccess` the fields and
+ * the submit button are replaced by that content once the action succeeded, so the same request
+ * cannot be sent twice (the swap and cancellation request pages use it for their pending notice).
+ * `alreadyDone` shows that content from the start, for a request that was sent earlier; keeping
+ * the same form mounted lets the confirmation survive the refresh that follows a success.
+ */
 export function ParentMutationForm({
   action,
   submitLabel,
   testId,
   children,
+  afterSuccess,
+  alreadyDone = false,
 }: Readonly<{
   action: ParentAction;
   submitLabel: string;
   testId: string;
   children?: ReactNode;
+  afterSuccess?: ReactNode;
+  alreadyDone?: boolean;
 }>) {
   const [state, formAction, isPending] = useActionState(action, { state: "initial" });
   const stateRef = useRef<HTMLDivElement>(null);
+  const replaced = (state.state === "success" || alreadyDone) && afterSuccess !== undefined;
 
   useEffect(() => {
     if (["validation", "denied", "conflict", "invalidated", "terminal"].includes(state.state)) {
@@ -52,10 +64,16 @@ export function ParentMutationForm({
           )}
         </div>
       )}
-      {children}
-      <button type="submit" disabled={isPending} data-testid={`${testId}-submit-button`}>
-        {isPending ? "Feldolgozás folyamatban" : submitLabel}
-      </button>
+      {replaced ? (
+        afterSuccess
+      ) : (
+        <>
+          {children}
+          <button type="submit" disabled={isPending} data-testid={`${testId}-submit-button`}>
+            {isPending ? "Feldolgozás folyamatban" : submitLabel}
+          </button>
+        </>
+      )}
     </form>
   );
 }

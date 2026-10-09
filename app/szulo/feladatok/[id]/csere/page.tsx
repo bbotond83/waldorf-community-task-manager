@@ -1,4 +1,6 @@
 import { ParentMutationForm } from "../../../_components/ParentMutationForm.tsx";
+import { pendingRequests } from "../../../../../src/parent-web/notification-context.ts";
+import { PendingRequestPanel } from "../../../_components/PendingRequestNotice.tsx";
 import { ParentStatePanel } from "../../../_components/ParentStatePanel.tsx";
 import { resolveParentFacade } from "../../../_lib/facade.ts";
 import { resolveParentSession } from "../../../_lib/session.ts";
@@ -34,6 +36,18 @@ export default async function SwapRequestPage({
               action={requestSwapAction}
               submitLabel="Cserekérelem elküldése"
               testId="swap-request-form"
+              alreadyDone={pendingRequests(duty).any}
+              afterSuccess={
+                <PendingRequestPanel
+                  pending={
+                    pendingRequests(duty).any
+                      ? pendingRequests(duty)
+                      : { swap: true, cancellation: false }
+                  }
+                  dutyId={duty.id}
+                  testId="swap-pending-panel"
+                />
+              }
             >
               <input type="hidden" name="id" value={duty.id} />
               <input type="hidden" name="assignmentId" value={duty.assignmentId} />

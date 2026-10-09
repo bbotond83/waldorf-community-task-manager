@@ -3,7 +3,12 @@ import { describe, expect, it } from "vitest";
 import { AdminAccessState } from "../../app/admin/_components/AdminAccessState.tsx";
 import { AdminFilterBar } from "../../app/admin/_components/AdminFilterBar.tsx";
 import { AdminPagination } from "../../app/admin/_components/AdminPagination.tsx";
-import { AdminMutationForm } from "../../app/admin/_components/AdminMutationForm.tsx";
+import { AdminBackLink, listReturnQuery } from "../../app/admin/_components/AdminBackLink.tsx";
+import { DeveloperDetails } from "../../app/admin/_components/DeveloperDetails.tsx";
+import {
+  AdminMutationForm,
+  AdminTextField,
+} from "../../app/admin/_components/AdminMutationForm.tsx";
 import { AsyncStatePanel } from "../../app/admin/_components/AsyncStatePanel.tsx";
 import { ResponsiveCollection } from "../../app/admin/_components/ResponsiveCollection.tsx";
 import {
@@ -165,32 +170,66 @@ describe("administrator shared presentation", () => {
   });
 
   it("renders labelled filter controls and stable test ids", () => {
-    render(<AdminFilterBar action="/admin/feladatok" query="kert" state="open" />);
+    render(<AdminFilterBar action="/admin/feladatok" list="tasks" query="kert" state="open" />);
     expect(screen.getByLabelText("Keresés")).toHaveValue("kert");
     expect(screen.getByLabelText("Állapot")).toHaveValue("open");
     expect(screen.getByTestId("admin-filter-submit-button")).toBeInTheDocument();
   });
 
-  it("shows Hungarian state words while the option values stay unchanged", () => {
-    render(<AdminFilterBar action="/admin/feladatok" />);
-    const options = within(screen.getByLabelText("Állapot")).getAllByRole("option");
-    expect(options.map((option) => [option.getAttribute("value"), option.textContent])).toEqual([
-      ["", "Minden állapot"],
-      ["active", "Aktív"],
-      ["archived", "Archivált"],
-      ["open", "Nyitott"],
-      ["pending", "Függőben"],
-    ]);
+  it.each([
+    [
+      "records",
+      [
+        ["active", "Aktív"],
+        ["archived", "Archivált"],
+      ],
+    ],
+    [
+      "tasks",
+      [
+        ["open", "Nyitott"],
+        ["scheduled", "Ütemezve"],
+      ],
+    ],
+    [
+      "approvals",
+      [
+        ["pending", "Függőben"],
+        ["approved", "Jóváhagyva"],
+        ["rejected", "Elutasítva"],
+      ],
+    ],
+  ] as const)(
+    "offers only the %s statuses, in Hungarian words with unchanged option values",
+    (list, expected) => {
+      render(<AdminFilterBar action="/admin/x" list={list} />);
+      const options = within(screen.getByLabelText("Állapot")).getAllByRole("option");
+      expect(options.map((option) => [option.getAttribute("value"), option.textContent])).toEqual([
+        ["", "Minden állapot"],
+        ...expected,
+      ]);
+    },
+  );
+
+  it("shows a short note, not an error, for a status the list does not offer", () => {
+    const { rerender } = render(<AdminFilterBar action="/admin/x" list="tasks" />);
+    expect(screen.queryByTestId("admin-filter-unknown-note")).not.toBeInTheDocument();
+    rerender(<AdminFilterBar action="/admin/x" list="tasks" unknownState />);
+    expect(screen.getByTestId("admin-filter-unknown-note")).toHaveTextContent(
+      "minden elem látható",
+    );
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    expect(screen.getByLabelText("Állapot")).toHaveValue("");
   });
 
   it("renders empty filter defaults", () => {
-    render(<AdminFilterBar action="/admin/feladatok" />);
+    render(<AdminFilterBar action="/admin/feladatok" list="tasks" />);
     expect(screen.getByLabelText("Keresés")).toHaveValue("");
     expect(screen.getByLabelText("Állapot")).toHaveValue("");
   });
 
   it("preserves Hungarian search input", () => {
-    render(<AdminFilterBar action="/admin/feladatok" query="Lámpás ünnep" />);
+    render(<AdminFilterBar action="/admin/feladatok" list="tasks" query="Lámpás ünnep" />);
     expect(screen.getByLabelText("Keresés")).toHaveValue("Lámpás ünnep");
   });
 
@@ -266,5 +305,132 @@ describe("AdminMutationForm", () => {
     await waitFor(() =>
       expect(screen.getByTestId("terminal-mutation-state-terminal")).toHaveFocus(),
     );
+  });
+
+  it("lets an empty required field reach the action instead of the browser's own check", () => {
+    render(
+      <AdminMutationForm
+        action={async () => ({ state: "success", message: "Mentve." })}
+        submitLabel="Mentés"
+        testId="mutation"
+      >
+        <AdminTextField id="title" name="title" label="Megnevezés" required testId="title-input" />
+      </AdminMutationForm>,
+    );
+    expect(screen.getByTestId("mutation")).toHaveAttribute("novalidate");
+    expect(screen.getByLabelText("Megnevezés")).toBeRequired();
+  });
+
+  it("shows the field message next to the field, in the summary, and focuses the summary", async () => {
+    const message = "A megnevezés megadása kötelező.";
+    render(
+      <AdminMutationForm
+        action={async () => ({
+          state: "validation",
+          message: "Ellenőrizze a megadott adatokat.",
+          fieldErrors: { title: message },
+        })}
+        submitLabel="Mentés"
+        testId="mutation"
+      >
+        <AdminTextField id="title" name="title" label="Megnevezés" required testId="title-input" />
+      </AdminMutationForm>,
+    );
+    expect(screen.queryByTestId("title-input-error")).not.toBeInTheDocument();
+    fireEvent.submit(screen.getByTestId("mutation"));
+    await waitFor(() => expect(screen.getByTestId("mutation-state-validation")).toHaveFocus());
+    expect(screen.getByTestId("title-input-error")).toHaveTextContent(message);
+    expect(screen.getByLabelText("Megnevezés")).toBeInvalid();
+    expect(screen.getByLabelText("Megnevezés")).toHaveAccessibleDescription(message);
+    expect(screen.getByRole("link", { name: message })).toHaveAttribute("href", "#title");
+  });
+
+  it("shows the link back to the list beside a success message, and only then", async () => {
+    render(
+      <AdminMutationForm
+        action={async () => ({ state: "success", message: "Mentve." })}
+        submitLabel="Mentés"
+        testId="mutation"
+        successLink={{ href: "/admin/feladatok", label: "Vissza a feladatokhoz és eseményekhez" }}
+      >
+        <input name="title" defaultValue="Fenyő" />
+      </AdminMutationForm>,
+    );
+    expect(screen.queryByTestId("mutation-success-link")).not.toBeInTheDocument();
+    fireEvent.submit(screen.getByTestId("mutation"));
+    await waitFor(() => expect(screen.getByTestId("mutation-success-link")).toBeInTheDocument());
+    expect(screen.getByTestId("mutation-success-link")).toHaveAttribute("href", "/admin/feladatok");
+    // The form stays on the page.
+    expect(screen.getByRole("button", { name: "Mentés" })).toBeInTheDocument();
+  });
+});
+
+describe("AdminBackLink", () => {
+  it.each([
+    ["records", "/admin/nyilvantartasok", "Vissza a nyilvántartásokhoz"],
+    ["tasks", "/admin/feladatok", "Vissza a feladatokhoz és eseményekhez"],
+    ["approvals", "/admin/jovahagyasok", "Vissza a jóváhagyásokhoz"],
+    ["archive", "/admin/archivum", "Vissza az archívumhoz"],
+  ] as const)("leads %s details back to their list in the list's words", (list, href, label) => {
+    render(<AdminBackLink list={list} />);
+    expect(screen.getByTestId("admin-back-link")).toHaveAttribute("href", href);
+    expect(screen.getByTestId("admin-back-link")).toHaveTextContent(label);
+  });
+
+  it("restores the list's search and status filter, and nothing else", () => {
+    render(<AdminBackLink list="tasks" returnQuery="q=kert&state=open&x=evil&state2=1" />);
+    expect(screen.getByTestId("admin-back-link")).toHaveAttribute(
+      "href",
+      "/admin/feladatok?q=kert&state=open",
+    );
+  });
+
+  it("builds the query a list hands to its detail pages from its filter", () => {
+    expect(listReturnQuery({ q: "", state: "" })).toBe("");
+    expect(listReturnQuery({ q: "kert" })).toBe("q=kert");
+    expect(listReturnQuery({ q: "Lámpás ünnep", state: "open" })).toBe(
+      "q=L%C3%A1mp%C3%A1s+%C3%BCnnep&state=open",
+    );
+  });
+
+  it("links each list card to its detail page, carrying the filter only when there is one", () => {
+    const items = [{ id: "task-kert", title: "Kert", state: "open", version: 1 }] as never;
+    const { rerender } = render(
+      <ResponsiveCollection items={items} basePath="/admin/feladatok" testId="list" />,
+    );
+    expect(screen.getByTestId("list-open-task-kert")).toHaveAttribute(
+      "href",
+      "/admin/feladatok/task-kert",
+    );
+    rerender(
+      <ResponsiveCollection
+        items={items}
+        basePath="/admin/feladatok"
+        testId="list"
+        returnQuery="q=kert&state=open"
+      />,
+    );
+    expect(screen.getByTestId("list-open-task-kert")).toHaveAttribute(
+      "href",
+      "/admin/feladatok/task-kert?vissza=q%3Dkert%26state%3Dopen",
+    );
+  });
+});
+
+describe("DeveloperDetails", () => {
+  it("keeps technical text in one section that is closed by default", () => {
+    render(
+      <>
+        <p>Állapot: Nyitott</p>
+        <DeveloperDetails>
+          <p>Verzió: 3</p>
+        </DeveloperDetails>
+      </>,
+    );
+    const section = screen.getByTestId("developer-details");
+    expect(section).not.toHaveAttribute("open");
+    expect(within(section).getByText("Fejlesztői részletek")).toBeInTheDocument();
+    expect(within(section).getByText("Verzió: 3")).toBeInTheDocument();
+    expect(screen.getByText("Állapot: Nyitott").closest("details")).toBeNull();
   });
 });

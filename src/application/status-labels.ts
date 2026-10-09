@@ -51,6 +51,55 @@ export const STATUS_LABELS = Object.freeze({
   "cancellation-pending": "Lemondás függőben",
 } as const);
 
+/**
+ * Parent-facing words for the duty states. The parent task list and the task detail page both
+ * read this one map, so they never disagree. The request words match the pending notices.
+ */
+export const DUTY_STATE_LABELS = Object.freeze({
+  available: "Jelentkezésre nyitott",
+  full: "Betelt",
+  ineligible: "Nem jogosult",
+  assigned: "Vállalt feladat",
+  "swap-pending": "Cserekérelem folyamatban",
+  "cancellation-pending": "Lemondási kérelem folyamatban",
+} as const);
+
+export type DutyState = keyof typeof DUTY_STATE_LABELS;
+
+/** Returns the parent-facing Hungarian label for a duty state. */
+export function dutyStateLabel(value: string): string {
+  return Object.hasOwn(DUTY_STATE_LABELS, value)
+    ? DUTY_STATE_LABELS[value as DutyState]
+    : UNKNOWN_STATUS_LABEL;
+}
+
+/**
+ * The statuses each admin list can contain (the filter offers exactly these). Records are active
+ * or archived; tasks and events are open or scheduled; approvals are pending, approved or, once
+ * a request is rejected, rejected.
+ */
+export const ADMIN_LIST_STATUS_OPTIONS = Object.freeze({
+  records: ["active", "archived"],
+  tasks: ["open", "scheduled"],
+  approvals: ["pending", "approved", "rejected"],
+} as const);
+
+export type AdminListKind = keyof typeof ADMIN_LIST_STATUS_OPTIONS;
+
+/**
+ * Reads the status value of a list address. A value the list offers is used as is; an empty value
+ * means no filter; any other value (for example an old link) shows the unfiltered list and is
+ * reported as `unknown` so the page can say so instead of failing.
+ */
+export function resolveListStatus(
+  kind: AdminListKind,
+  raw: string,
+): Readonly<{ state: string; unknown: boolean }> {
+  if (raw === "") return { state: "", unknown: false };
+  const offered: readonly string[] = ADMIN_LIST_STATUS_OPTIONS[kind];
+  return offered.includes(raw) ? { state: raw, unknown: false } : { state: "", unknown: true };
+}
+
 export type KnownStatus = keyof typeof STATUS_LABELS;
 
 export const UNKNOWN_STATUS_LABEL = "Ismeretlen állapot";

@@ -81,11 +81,16 @@ describe("honest executable denominator", () => {
     expect(
       inventory.some((entry) => entry.path.includes(".test.") || entry.path.endsWith(".d.ts")),
     ).toBe(false);
-    expect(inventory.length).toBe(156);
+    expect(inventory.length).toBe(161);
     for (const path of [
       "src/runtime/AppNav.tsx",
       "src/runtime/BackToHomeLink.tsx",
       "src/application/status-labels.ts",
+      "src/parent-web/notification-context.ts",
+      "app/szulo/_components/MarkNotificationRead.tsx",
+      "app/szulo/_components/PendingRequestNotice.tsx",
+      "app/admin/_components/AdminBackLink.tsx",
+      "app/admin/_components/DeveloperDetails.tsx",
     ]) {
       expect(inventory.some((entry) => entry.path === path)).toBe(true);
     }

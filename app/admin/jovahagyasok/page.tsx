@@ -1,4 +1,6 @@
 import { AdminFilterBar } from "../_components/AdminFilterBar.tsx";
+import { listReturnQuery } from "../_components/AdminBackLink.tsx";
+import { resolveListStatus } from "../../../src/application/status-labels.ts";
 import { AdminPagination } from "../_components/AdminPagination.tsx";
 import { AsyncStatePanel } from "../_components/AsyncStatePanel.tsx";
 import { ResponsiveCollection } from "../_components/ResponsiveCollection.tsx";
@@ -13,7 +15,10 @@ export default async function ApprovalsPage({
 }) {
   const query = await searchParams;
   const q = typeof query.q === "string" ? query.q : "";
-  const state = typeof query.state === "string" ? query.state : "";
+  const { state, unknown } = resolveListStatus(
+    "approvals",
+    typeof query.state === "string" ? query.state : "",
+  );
   const session = await resolveAdminSession();
   const facade = await resolveAdminFacade();
   const result =
@@ -33,7 +38,13 @@ export default async function ApprovalsPage({
           meg.
         </p>
       </header>
-      <AdminFilterBar action="/admin/jovahagyasok" query={q} state={state} />
+      <AdminFilterBar
+        action="/admin/jovahagyasok"
+        list="approvals"
+        query={q}
+        state={state}
+        unknownState={unknown}
+      />
       <AsyncStatePanel
         result={result}
         testId="admin-approvals-state"
@@ -45,6 +56,7 @@ export default async function ApprovalsPage({
               items={data.items}
               basePath="/admin/jovahagyasok"
               testId="admin-approvals-list"
+              returnQuery={listReturnQuery({ q, state })}
             />
             <AdminPagination />
           </>

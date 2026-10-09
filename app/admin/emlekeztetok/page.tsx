@@ -1,5 +1,6 @@
 import { AdminAccessState } from "../_components/AdminAccessState.tsx";
 import { AdminMutationForm } from "../_components/AdminMutationForm.tsx";
+import { DeveloperDetails } from "../_components/DeveloperDetails.tsx";
 import { retryReminderAction } from "../advanced-actions.ts";
 import { resolveAdminFacade } from "../_lib/facade.ts";
 import { resolveAdminSession } from "../_lib/session.ts";
@@ -60,10 +61,6 @@ export default async function ReminderMonitorPage({
                   <dd>{job.attempt}</dd>
                 </div>
                 <div>
-                  <dt>Korreláció</dt>
-                  <dd>{job.correlationId}</dd>
-                </div>
-                <div>
                   <dt>Címzettek</dt>
                   <dd>{job.recipientSummary}</dd>
                 </div>
@@ -87,6 +84,18 @@ export default async function ReminderMonitorPage({
         </ul>
       ) : (
         <p role="alert">Hiba történt.</p>
+      )}
+      {result.state === "success" && (
+        <DeveloperDetails>
+          <dl className="advanced-details" data-testid="admin-reminder-correlations">
+            {result.data.jobs.map((job) => (
+              <div key={job.id} data-testid={`admin-reminder-correlation-${job.id}`}>
+                <dt>Korreláció – {job.title}</dt>
+                <dd>{job.correlationId}</dd>
+              </div>
+            ))}
+          </dl>
+        </DeveloperDetails>
       )}
     </section>
   );

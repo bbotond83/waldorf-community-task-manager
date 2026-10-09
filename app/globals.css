@@ -11,6 +11,8 @@
   --color-success-bg: #e8f3e6;
   --color-info-bg: #f5ecd9;
   --color-danger-bg: #fbe9e3;
+  --color-read-bg: #ebe6de;
+  --color-read-text: #5a5044;
   --color-focus: #1f4e79;
   --color-border: #d9c4a9;
   --color-border-strong: #8a7762;
@@ -524,6 +526,46 @@ nav a:hover {
   display: grid;
   gap: 1rem;
 }
+.admin-back-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding-inline: 0.35rem;
+}
+.admin-form-success-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: 0.5rem;
+}
+.admin-field-error {
+  margin: 0.25rem 0 0;
+  color: var(--color-primary-dark);
+  font-weight: 700;
+}
+.admin-form input[aria-invalid="true"] {
+  border-color: var(--color-primary);
+  border-width: 2px;
+}
+.developer-details {
+  margin-block: 1.5rem 1rem;
+  padding: 0.5rem 1rem;
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius);
+  color: var(--color-muted);
+}
+.developer-details summary {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  cursor: pointer;
+  font-weight: 700;
+}
+.developer-details-body {
+  display: grid;
+  gap: 0.75rem;
+  padding-bottom: 0.75rem;
+}
 .admin-pagination {
   display: flex;
   flex-wrap: wrap;
@@ -847,6 +889,27 @@ nav a:hover {
 
 .notification-card .parent-card-link p {
   margin-block: 0.15rem;
+}
+
+/* A read notification is greyed as a whole: muted text on a greyer card (contrast >= 4.5:1). */
+.parent-card.notification-card-read {
+  border-color: var(--color-border);
+  background: var(--color-read-bg);
+  box-shadow: none;
+  color: var(--color-read-text);
+}
+
+.parent-card.notification-card-read:hover {
+  border-color: var(--color-primary);
+  background: var(--color-read-bg);
+}
+
+.notification-card-read .parent-card-link h2,
+.notification-card-read .parent-state-badge,
+.notification-card-read .synthetic-label,
+.notification-card-read .notification-read-label,
+.notification-card-read .notification-read-state {
+  color: var(--color-read-text);
 }
 
 .notification-read-form {

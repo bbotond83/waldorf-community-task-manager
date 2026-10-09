@@ -7,7 +7,10 @@ import {
   type SessionContext,
 } from "../application/index.ts";
 import {
+  buildDutyFixtures,
+  buildNotificationFixtures,
   createSyntheticParentFacade,
+  TEST_COPIES_VARIABLE,
   inspectSyntheticInvitation,
   PARENT_FAMILY_ID,
   PARENT_FAMILY_SCOPE,
@@ -225,5 +228,53 @@ describe("synthetic invitation states", () => {
     assert.equal(inspectSyntheticInvitation("parent-expired-invitation"), "expired");
     assert.equal(inspectSyntheticInvitation("parent-used-invitation"), "used");
     assert.equal(inspectSyntheticInvitation("anything-else"), "invalid");
+  });
+});
+
+describe("per-browser fixture copies (test mode only)", () => {
+  it("keeps the demo free of per-browser copies when the test mode is off", () => {
+    const duties = buildDutyFixtures(false);
+    const notices = buildNotificationFixtures(false);
+    assert.ok(duties.length > 0 && notices.length > 0);
+    assert.ok(![...duties, ...notices].some((item) => /próba/.test(item.title)));
+    assert.ok(!duties.some((duty) => /-(firefox|mobile)$/.test(duty.id)));
+  });
+
+  it("adds the copies on top of the same base entries when the test mode is on", () => {
+    const base = buildDutyFixtures(false);
+    const withCopies = buildDutyFixtures(true);
+    assert.deepEqual(withCopies.slice(0, base.length), base);
+    assert.equal(withCopies.length - base.length, 4);
+    assert.equal(
+      buildNotificationFixtures(true).length - buildNotificationFixtures(false).length,
+      2,
+    );
+  });
+
+  it("reads the switch from the environment when the state is created", async () => {
+    const previous = process.env[TEST_COPIES_VARIABLE];
+    try {
+      process.env[TEST_COPIES_VARIABLE] = "1";
+      resetSyntheticParentState();
+      const on = await facade().listDuties(session, {
+        familyScope: PARENT_FAMILY_SCOPE,
+        familyId: PARENT_FAMILY_ID,
+      });
+      delete process.env[TEST_COPIES_VARIABLE];
+      resetSyntheticParentState();
+      const off = await facade().listDuties(session, {
+        familyScope: PARENT_FAMILY_SCOPE,
+        familyId: PARENT_FAMILY_ID,
+      });
+      assert.ok(on.state === "success" && off.state === "success");
+      if (on.state === "success" && off.state === "success") {
+        assert.ok(on.data.duties.some((duty) => duty.id === "duty-assigned-firefox"));
+        assert.ok(!off.data.duties.some((duty) => duty.id === "duty-assigned-firefox"));
+      }
+    } finally {
+      if (previous === undefined) delete process.env[TEST_COPIES_VARIABLE];
+      else process.env[TEST_COPIES_VARIABLE] = previous;
+      resetSyntheticParentState();
+    }
   });
 });
