@@ -244,9 +244,9 @@ test.describe("admin: the way back", () => {
 
 test.describe("admin: filters offer only matching statuses", () => {
   const lists = [
-    ["/admin/nyilvantartasok", ["Minden állapot", "Aktív", "Archivált"]],
-    ["/admin/feladatok", ["Minden állapot", "Nyitott", "Ütemezve"]],
-    ["/admin/jovahagyasok", ["Minden állapot", "Függőben", "Jóváhagyva", "Elutasítva"]],
+    ["/admin/nyilvantartasok", ["Minden állapot", "● Aktív", "○ Archivált"]],
+    ["/admin/feladatok", ["Minden állapot", "◐ Nyitott", "▦ Ütemezve"]],
+    ["/admin/jovahagyasok", ["Minden állapot", "◔ Függőben", "✓ Jóváhagyva", "✕ Elutasítva"]],
   ] as const;
 
   for (const [path, labels] of lists) {
@@ -264,7 +264,7 @@ test.describe("admin: filters offer only matching statuses", () => {
         const items = page.locator(".admin-collection li");
         const empty = page.getByText(/nincs találata|Nincs a szűrésnek megfelelő/);
         await expect(items.first().or(empty.first())).toBeVisible();
-        if (label !== "Elutasítva") await expect(items.first()).toBeVisible();
+        if (label !== "✕ Elutasítva") await expect(items.first()).toBeVisible();
       }
     });
   }
@@ -272,7 +272,7 @@ test.describe("admin: filters offer only matching statuses", () => {
   test("approved requests can be found with Jóváhagyva", async ({ page }) => {
     await resetAndSelect(page, "group-admin-local");
     await page.goto("/admin/jovahagyasok");
-    await page.getByTestId("admin-filter-state-select").selectOption({ label: "Jóváhagyva" });
+    await page.getByTestId("admin-filter-state-select").selectOption({ label: "✓ Jóváhagyva" });
     await page.getByTestId("admin-filter-submit-button").click();
     await expect(page.locator(".admin-collection li").first()).toContainText("Jóváhagyva");
   });

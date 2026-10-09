@@ -7,7 +7,8 @@ import { archiveRecordAction, saveRecordAction } from "../../actions.ts";
 import { resolveAdminFacade } from "../../_lib/facade.ts";
 import { resolveAdminSession } from "../../_lib/session.ts";
 import { terminalFailure } from "../../../../src/application/results.ts";
-import { statusLabel } from "../../../../src/application/status-labels.ts";
+import { statusDisplay } from "../../../../src/application/status-labels.ts";
+import { StatusBadge } from "../../../../src/runtime/StatusBadge.tsx";
 
 export default async function RecordDetailPage({
   params,
@@ -32,18 +33,20 @@ export default async function RecordDetailPage({
           returnQuery={typeof query.vissza === "string" ? query.vissza : undefined}
         />
         <p className="eyebrow">Nyilvántartások</p>
-        <h1 tabIndex={-1}>Rekord részletei</h1>
+        <h1 tabIndex={-1}>Elem részletei</h1>
       </header>
       <AsyncStatePanel
         result={result}
         testId="admin-record-detail-state"
-        emptyMessage="A rekord nem található."
+        emptyMessage="Az elem nem található."
       >
         {(record) => (
           <div className="admin-detail-grid">
             <section>
               <h2>{record.title}</h2>
-              <p>Állapot: {statusLabel(record.state)}</p>
+              <p>
+                Állapot: <StatusBadge {...statusDisplay(record.state)} />
+              </p>
             </section>
             <AdminMutationForm
               action={saveRecordAction}

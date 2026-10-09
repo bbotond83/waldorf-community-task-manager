@@ -21,6 +21,23 @@ it("Teacher repository returns bounded inclusive start dates", async () => {
     [],
   );
 });
+it("Teacher repository leaves a side open when its date is missing", async () => {
+  const { repository } = createSyntheticTeacherRepository();
+  const group = { groupScope: TEACHER_GROUPS[0]!.scope };
+  assert.deepEqual(
+    (await repository.readCurrent(group)).map((row) => row.id),
+    ["schedule-garden", "schedule-crafts"],
+  );
+  assert.deepEqual(
+    (await repository.readCurrent({ ...group, from: "2026-08-14" })).map((row) => row.id),
+    ["schedule-crafts"],
+  );
+  assert.deepEqual(
+    (await repository.readCurrent({ ...group, to: "2026-08-13" })).map((row) => row.id),
+    ["schedule-garden"],
+  );
+  assert.throws(() => repository.readCurrent({ ...group, from: "nope" }), /Invalid tracking range/);
+});
 it("Teacher repository isolates organization and group", async () => {
   const { repository } = createSyntheticTeacherRepository();
   assert.deepEqual(

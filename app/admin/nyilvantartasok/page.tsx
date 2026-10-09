@@ -34,8 +34,12 @@ export default async function RecordsPage({
         <p>Családok, gyermekek, csoportok és nevelési évek a jogosult működési körben.</p>
       </header>
       <div className="admin-page-actions">
-        <Link href="/admin/nyilvantartasok/uj" data-testid="admin-records-create-link">
-          Új rekord
+        <Link
+          href="/admin/nyilvantartasok/uj"
+          className="button-link"
+          data-testid="admin-records-create-link"
+        >
+          Új elem
         </Link>
       </div>
       <AdminFilterBar

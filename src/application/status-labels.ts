@@ -110,3 +110,168 @@ export function statusLabel(value: string): string {
     ? STATUS_LABELS[value as KnownStatus]
     : UNKNOWN_STATUS_LABEL;
 }
+
+/**
+ * Status symbols. A symbol is shown before a status word wherever the status stands as its own
+ * item (list badge, "Állapot" line, status column, status dropdown option), never inside a
+ * sentence. Each symbol has two forms: an icon key (drawn as an inline vector icon next to lists
+ * and detail pages, see `StatusBadge`) and a plain character for native dropdown options, which
+ * cannot hold markup. The characters are text-presentation geometric symbols that system fonts
+ * render without an emoji font.
+ *
+ * Approval states use the three symbols the person asked for: check (approved), cross (rejected)
+ * and clock (pending).
+ */
+export const STATUS_ICON_CHARACTERS = Object.freeze({
+  check: "✓",
+  cross: "✕",
+  clock: "◔",
+  dot: "●",
+  ring: "○",
+  half: "◐",
+  square: "■",
+  diamond: "◆",
+  calendar: "▦",
+  pencil: "✎",
+  arrow: "→",
+  retry: "↻",
+  undo: "↺",
+  warning: "△",
+  block: "⊘",
+  pause: "‖",
+  unknown: "?",
+} as const);
+
+export type StatusIconKey = keyof typeof STATUS_ICON_CHARACTERS;
+
+export type StatusSymbol = Readonly<{ icon: StatusIconKey; character: string }>;
+
+function symbolFor(icon: StatusIconKey): StatusSymbol {
+  return Object.freeze({ icon, character: STATUS_ICON_CHARACTERS[icon] });
+}
+
+const STATUS_ICONS = {
+  pending: "clock",
+  approved: "check",
+  rejected: "cross",
+  active: "dot",
+  archived: "ring",
+  open: "half",
+  scheduled: "calendar",
+  assigned: "diamond",
+  "notes-saved": "pencil",
+  queued: "clock",
+  sent: "arrow",
+  retryable: "retry",
+  retrying: "retry",
+  "retry-scheduled": "clock",
+  stale: "warning",
+  cancelled: "block",
+  terminal: "cross",
+  "eligible-delete": "check",
+  "eligible-anonymize": "check",
+  blocked: "block",
+  selected: "square",
+  validated: "check",
+  preview: "ring",
+  conflicts: "warning",
+  confirmed: "check",
+  committed: "check",
+  "rolled-back": "undo",
+  interrupted: "pause",
+  recovered: "retry",
+  available: "dot",
+  full: "square",
+  ineligible: "block",
+  "swap-pending": "clock",
+  "cancellation-pending": "clock",
+} as const satisfies Record<keyof typeof STATUS_LABELS, StatusIconKey>;
+
+const DUTY_STATE_ICONS = {
+  available: "dot",
+  full: "square",
+  ineligible: "block",
+  assigned: "check",
+  "swap-pending": "clock",
+  "cancellation-pending": "clock",
+} as const satisfies Record<keyof typeof DUTY_STATE_LABELS, StatusIconKey>;
+
+/** The symbol of every key of `STATUS_LABELS`. */
+export const STATUS_SYMBOLS: Readonly<Record<KnownStatus, StatusSymbol>> = Object.freeze(
+  Object.fromEntries(
+    Object.entries(STATUS_ICONS).map(([key, icon]) => [key, symbolFor(icon)]),
+  ) as Record<KnownStatus, StatusSymbol>,
+);
+
+/** The symbol of every key of `DUTY_STATE_LABELS`. */
+export const DUTY_STATE_SYMBOLS: Readonly<Record<DutyState, StatusSymbol>> = Object.freeze(
+  Object.fromEntries(
+    Object.entries(DUTY_STATE_ICONS).map(([key, icon]) => [key, symbolFor(icon)]),
+  ) as Record<DutyState, StatusSymbol>,
+);
+
+/** The neutral symbol of an unknown status or of text that has no mapping. */
+export const UNKNOWN_STATUS_SYMBOL: StatusSymbol = symbolFor("unknown");
+
+/** Returns the symbol for a status value; an unknown value gets the neutral symbol. */
+export function statusSymbol(value: string): StatusSymbol {
+  return Object.hasOwn(STATUS_SYMBOLS, value)
+    ? STATUS_SYMBOLS[value as KnownStatus]
+    : UNKNOWN_STATUS_SYMBOL;
+}
+
+/** Returns the symbol for a parent duty state; an unknown value gets the neutral symbol. */
+export function dutyStateSymbol(value: string): StatusSymbol {
+  return Object.hasOwn(DUTY_STATE_SYMBOLS, value)
+    ? DUTY_STATE_SYMBOLS[value as DutyState]
+    : UNKNOWN_STATUS_SYMBOL;
+}
+
+/** A status as its own item: the word and the symbol that goes before it. */
+export type StatusDisplay = Readonly<{ label: string; symbol: StatusSymbol | null }>;
+
+export function statusDisplay(value: string): StatusDisplay {
+  return { label: statusLabel(value), symbol: statusSymbol(value) };
+}
+
+export function dutyStateDisplay(value: string): StatusDisplay {
+  return { label: dutyStateLabel(value), symbol: dutyStateSymbol(value) };
+}
+
+/** Option text for a native dropdown: the plain symbol character, a space, then the word. */
+export function statusOptionText(value: string): string {
+  return `${statusSymbol(value).character} ${statusLabel(value)}`;
+}
+
+/** Option text for the parent duty filter. */
+export function dutyStateOptionText(value: string): string {
+  return `${dutyStateSymbol(value).character} ${dutyStateLabel(value)}`;
+}
+
+/** Shown in the teacher status column when the source gives no status. */
+export const NO_TEACHER_STATUS_LABEL = "Nincs elérhető állapot";
+
+/**
+ * The teacher schedule carries its status as free Hungarian text from the data source. Words the
+ * source is known to use that differ from the shared label map are mapped here to a shared state.
+ */
+const TEACHER_STATUS_ALIASES: Readonly<Record<string, KnownStatus>> = Object.freeze({
+  Ütemezett: "scheduled",
+});
+
+/**
+ * Maps the teacher's free-text status to the shared word and symbol: a known word (or a source
+ * word with an alias) shows the shared label and its symbol; any other text is shown unchanged
+ * with the neutral symbol; no status shows the fixed notice and no symbol.
+ */
+export function teacherStatusDisplay(text: string | null): StatusDisplay {
+  if (text === null) return { label: NO_TEACHER_STATUS_LABEL, symbol: null };
+  const alias = Object.hasOwn(TEACHER_STATUS_ALIASES, text)
+    ? TEACHER_STATUS_ALIASES[text]
+    : undefined;
+  if (alias) return statusDisplay(alias);
+  const known = (Object.keys(STATUS_LABELS) as KnownStatus[]).find(
+    (key) => STATUS_LABELS[key] === text,
+  );
+  return known ? statusDisplay(known) : { label: text, symbol: UNKNOWN_STATUS_SYMBOL };
+}

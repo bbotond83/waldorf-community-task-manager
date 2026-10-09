@@ -211,7 +211,7 @@ function PreviewDetails({
         >
           <h2 tabIndex={-1}>Importálás lezárva</h2>
           <p>
-            3 rekord módosult, 1 sor változatlan maradt. Szimulált adatbázishatás;
+            3 elem módosult, 1 sor változatlan maradt. Szimulált adatbázishatás;
             Supabase-tranzakció: OUTSTANDING.
           </p>
         </section>

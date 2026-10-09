@@ -4,7 +4,8 @@ import { DeveloperDetails } from "../_components/DeveloperDetails.tsx";
 import { retryReminderAction } from "../advanced-actions.ts";
 import { resolveAdminFacade } from "../_lib/facade.ts";
 import { resolveAdminSession } from "../_lib/session.ts";
-import { statusLabel } from "../../../src/application/status-labels.ts";
+import { statusDisplay, statusOptionText } from "../../../src/application/status-labels.ts";
+import { StatusBadge } from "../../../src/runtime/StatusBadge.tsx";
 
 export default async function ReminderMonitorPage({
   searchParams,
@@ -33,16 +34,20 @@ export default async function ReminderMonitorPage({
         </p>
       </header>
       <form className="advanced-filter" method="get" data-testid="admin-reminder-filter">
-        <label htmlFor="status">Állapot</label>
-        <select id="status" name="status" defaultValue={query.status ?? ""}>
-          <option value="">Mind</option>
-          <option value="retryable">{statusLabel("retryable")}</option>
-          <option value="sent">{statusLabel("sent")}</option>
-          <option value="stale">{statusLabel("stale")}</option>
-        </select>
-        <button type="submit" data-testid="admin-reminder-filter-submit">
-          Szűrés
-        </button>
+        <div className="filter-field">
+          <label htmlFor="status">Állapot</label>
+          <select id="status" name="status" defaultValue={query.status ?? ""}>
+            <option value="">Mind</option>
+            <option value="retryable">{statusOptionText("retryable")}</option>
+            <option value="sent">{statusOptionText("sent")}</option>
+            <option value="stale">{statusOptionText("stale")}</option>
+          </select>
+        </div>
+        <div className="filter-actions">
+          <button type="submit" data-testid="admin-reminder-filter-submit">
+            Szűrés
+          </button>
+        </div>
       </form>
       {result.state === "empty" ? (
         <p>Nincs a szűrésnek megfelelő feladat.</p>
@@ -54,7 +59,9 @@ export default async function ReminderMonitorPage({
               <dl className="advanced-details">
                 <div>
                   <dt>Állapot</dt>
-                  <dd>{statusLabel(job.status)}</dd>
+                  <dd>
+                    <StatusBadge {...statusDisplay(job.status)} />
+                  </dd>
                 </div>
                 <div>
                   <dt>Kísérlet</dt>

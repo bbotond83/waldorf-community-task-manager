@@ -1,12 +1,14 @@
 import { sessionGrantBindings } from "../../src/access/session-grants.ts";
 import { TEACHER_GROUPS } from "../../src/teacher-web/index.ts";
-import { render, screen, within } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { fireEvent, render, screen, within } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
 import type { ApplicationResult, TrackingModel } from "../../src/application/index.ts";
 import { ScheduleCollection } from "../../app/teacher/schedule/_components/ScheduleCollection.tsx";
 import { ScheduleFilter } from "../../app/teacher/schedule/_components/ScheduleFilter.tsx";
 import { TeacherStatePanel } from "../../app/teacher/_components/TeacherStatePanel.tsx";
-import { DEFAULT_TEACHER_FILTERS, parseTeacherFilters } from "../../app/teacher/_lib/filters.ts";
+import { parseTeacherFilters } from "../../app/teacher/_lib/filters.ts";
+
+vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn() }) }));
 
 const session = {
   subjectId: "teacher",
@@ -42,11 +44,61 @@ const model: TrackingModel = {
 describe("Teacher schedule components", () => {
   it("renders labelled bounded filters with stable interactive test IDs", () => {
     render(<ScheduleFilter filters={filters} />);
-    expect(screen.getByLabelText("Csoport")).toHaveValue(filters.groupId);
-    expect(screen.getByLabelText("Kezdő dátum")).toHaveValue(DEFAULT_TEACHER_FILTERS.from);
-    expect(screen.getByLabelText("Záró dátum")).toHaveValue(DEFAULT_TEACHER_FILTERS.to);
+    expect(screen.getByLabelText("Csoport")).toHaveValue("");
+    expect(screen.getByLabelText("Kezdő dátum")).toHaveValue("");
+    expect(screen.getByLabelText("Záró dátum")).toHaveValue("");
     expect(screen.getByTestId("teacher-schedule-filter-submit-button")).toBeVisible();
     expect(screen.getByTestId("teacher-schedule-filter-clear-link")).toBeVisible();
+  });
+
+  it("offers every granted group after an empty first choice and does not require dates", () => {
+    render(<ScheduleFilter filters={filters} />);
+    const options = within(screen.getByLabelText("Csoport")).getAllByRole("option");
+    expect(options.map((option) => [option.getAttribute("value"), option.textContent])).toEqual([
+      ["", "Minden csoport"],
+      ["group-oak", "Tölgyfa csoport"],
+      ["group-sunflower", "Napraforgó csoport"],
+    ]);
+    expect(screen.getByLabelText("Kezdő dátum")).not.toBeRequired();
+    expect(screen.getByLabelText("Záró dátum")).not.toBeRequired();
+  });
+
+  it("shows the values of the address and clears every field with the clear link", () => {
+    const filled = parseTeacherFilters(
+      { groupId: "group-sunflower", from: "2026-08-13", to: "2026-08-15" },
+      session,
+    );
+    render(<ScheduleFilter filters={filled} />);
+    expect(screen.getByLabelText("Csoport")).toHaveValue("group-sunflower");
+    expect(screen.getByLabelText("Kezdő dátum")).toHaveValue("2026-08-13");
+    const clear = screen.getByTestId("teacher-schedule-filter-clear-link");
+    expect(clear).toHaveAttribute("href", "/teacher/schedule");
+    fireEvent.click(clear);
+    expect(screen.getByLabelText("Csoport")).toHaveValue("");
+    expect(screen.getByLabelText("Kezdő dátum")).toHaveValue("");
+    expect(screen.getByLabelText("Záró dátum")).toHaveValue("");
+  });
+
+  it("opens each entry with its own group and remembers an all-groups list", () => {
+    render(<ScheduleCollection entries={model.entries} filters={filters} />);
+    const href = screen.getByTestId("teacher-schedule-open-schedule-test").getAttribute("href");
+    expect(href).toBe("/teacher/schedule/schedule-test?groupId=group-oak&allGroups=1");
+  });
+
+  it("shows the status with its symbol and the shared word", () => {
+    render(
+      <ScheduleCollection
+        entries={[{ ...model.entries[0]!, currentStatusLabel: "Ütemezett" }]}
+        filters={filters}
+      />,
+    );
+    const row = screen.getByTestId("teacher-schedule-row-schedule-test");
+    expect(row).toHaveTextContent("Ütemezve");
+    expect(row).not.toHaveTextContent("Ütemezett");
+    expect(row.querySelector("svg[data-status-icon='calendar']")).toHaveAttribute(
+      "aria-hidden",
+      "true",
+    );
   });
 
   it("opens an entry from one whole-row link and one whole-card link with the same name", () => {

@@ -216,12 +216,12 @@ class AdvancedWorkflowStore implements AdminApplicationPort {
     this.preview = {
       id: "preview-waldorf-v1",
       fingerprint: FIXTURE_FINGERPRINT,
-      changedRows: ["Boróka csoport: 2 módosítás", "Napraforgó csoport: 1 új rekord"],
+      changedRows: ["Boróka csoport: 2 módosítás", "Napraforgó csoport: 1 új elem"],
       conflicts: [
         {
           id: "conflict-family-1",
           rowLabel: "Családok · 12. sor",
-          message: "A rekord már létezik.",
+          message: "Az elem már létezik.",
         },
       ],
       step: 4,

@@ -121,15 +121,29 @@ Menü nincs, mert ez az egyetlen oldal; a részletek oldalon és a tiltott
 oldalak üzenetén a **Vissza a beosztáshoz** hivatkozás, valamint a fejléc
 logója visszavisz ide.
 
-1. Ellenőrizd a Tölgyfa csoport beosztását.
-2. Állítsd a kezdő és záró dátumot egyaránt **2026-08-14** értékre, majd
-   kattints a **Szűrés** gombra. A találatok között meg kell jelennie a
-   **Kézműves előkészítés** tevékenységnek.
+1. Az oldal első megnyitásakor a szűrők üresek: a **Csoport** mezőben
+   **Minden csoport** áll, a dátumok üresek, és a lista az összes, neked
+   engedélyezett csoport összes beosztási tételét mutatja. A mezők feliratai
+   a mezők fölött állnak.
+2. Válaszd a **Tölgyfa csoport** értéket, állítsd a kezdő és záró dátumot
+   egyaránt **2026-08-14** értékre, majd kattints a **Szűrés** gombra. A
+   találatok között meg kell jelennie a **Kézműves előkészítés**
+   tevékenységnek. Csak az egyik dátum megadása is működik (egyoldali
+   korlát); ha a kezdő dátum későbbi a záró dátumnál, magyar hibaüzenetet
+   kapsz.
 3. Kattints egy beosztási tétel sorára vagy kártyájára (bárhová rajta) a
-   részletek megnyitásához, majd térj vissza. A dátumszűrők maradjanak meg.
+   részletek megnyitásához. A **Vissza a beosztáshoz** hivatkozás a teljes,
+   szűretlen listára visz vissza. Az állapotszó előtt jelzőszimbólum áll
+   (például ▦ az **Ütemezve** előtt); a szimbólum csak díszítés, a szó
+   mindig ott van.
 4. Próbálj olyan dátumtartományt megadni, amelyre nincs találat; ellenőrizd
    az üres állapotot és a **Szűrők törlése** linket.
-5. Ellenőrizd, hogy az oldalon nincs feladatmódosító vagy jóváhagyó művelet,
+5. Kattints a **Szűrők törlése** gombra: minden mező kiürül (az olyan, még el
+   nem küldött beírt érték is, mint a félig kitöltött dátum), a csoport
+   **Minden csoport** lesz, és a teljes lista látszik. Ezután nyiss meg egy
+   részletet, és a **Vissza** gombbal (böngészőgomb is) térj vissza: a
+   mezők üresek maradnak. A törlés után a fókusz az oldal címére kerül.
+6. Ellenőrizd, hogy az oldalon nincs feladatmódosító vagy jóváhagyó művelet,
    és a profilváltón kívül nem jelenik meg szerkesztési lehetőség.
 
 Opcionális jogosultsági próba: nyisd meg közvetlenül ezt a címet:
@@ -151,10 +165,16 @@ hivatkozás), az állapotok magyarul jelennek meg (Függőben, Jóváhagyva,
 Aktív, Archivált, Nyitott, Ütemezve). Minden listának a saját állapotait
 kínáló szűrője van (jóváhagyásoknál Függőben, Jóváhagyva, Elutasítva;
 nyilvántartásoknál Aktív, Archivált; feladatoknál Nyitott, Ütemezve). Minden
-részletes oldalon és az **Új rekord**, valamint az **Új feladat vagy
-esemény** űrlapon **Vissza a …** hivatkozás visz a megfelelő listához, a
-szűrő megtartásával. Az üres kötelező mező beküldésekor magyar hibaüzenet
-jelenik meg a mező mellett.
+állapotszó előtt kis szimbólum áll (✓ Jóváhagyva, ✕ Elutasítva, ◔ Függőben,
+● Aktív, ○ Archivált, ◐ Nyitott, ▦ Ütemezve), a szűrő legördülő listájában
+is; a szimbólum csak díszítés, a szó mindig ott van. A **Keresés** és az
+**Állapot** felirata a mezője fölött áll, a **Szűrők törlése** gomb pedig
+minden mezőt kiürít és a szűretlen listát mutatja (az Archívum listán nincs
+szűrő). Az **Új elem** és az **Új feladat vagy esemény** a lista tetején
+gombként jelenik meg. Minden részletes oldalon és az **Új elem**, valamint
+az **Új feladat vagy esemény** űrlapon **Vissza a …** hivatkozás visz a
+megfelelő listához, a szűrő megtartásával. Az üres kötelező mező
+beküldésekor magyar hibaüzenet jelenik meg a mező mellett.
 
 A technikai részletek (a kapacitási és egyéb forgatókönyv-választók, a
 „Verzió” és a „Korreláció” sor) az oldalak alján az alapból összecsukott
@@ -183,9 +203,10 @@ menüpontokon felül a következők jelennek meg: **Importálás**,
 ### 6.1 Nyilvántartás és feladat
 
 - A **Nyilvántartások** oldalon keress rá a **Fenyő család** vagy a
-  **Boróka csoport** rekordra. Nyiss meg egy rekordot, módosítsd a
-  megnevezését, majd mentsd el. Rekordot archiválni, illetve az archívumból
-  visszaállítani is lehet.
+  **Boróka csoport** elemre. Nyiss meg egy elemet, módosítsd a
+  megnevezését, majd mentsd el. Elemet archiválni, illetve az archívumból
+  visszaállítani is lehet. Új elemet az **Új elem** gombbal hozhatsz létre
+  (az űrlapon az **Elem típusa** mező és az **Elem létrehozása** gomb áll).
 - A **Feladatok** oldalon nyiss meg egy feladatot. Módosítsd a
   megnevezését, próbáld ki a hozzárendelést, majd teszteld a betelt vagy
   nem jogosult állapotot.
@@ -204,7 +225,7 @@ menüpontokon felül a következők jelennek meg: **Importálás**,
    **Ütközés feloldása** gombra.
 5. Jelöld be a következmények megerősítését, hagyd a mentési forgatókönyvet
    **Sikeres** értéken, és kattints az **Import véglegesítése** gombra.
-6. Elvárt eredmény: **3 rekord módosult, 1 sor változatlan maradt**.
+6. Elvárt eredmény: **3 elem módosult, 1 sor változatlan maradt**.
 
 Ez a próba nem tölt fel valódi munkafüzetet és nem ír éles adatbázisba.
 Külön próbához választható a hibás fájl, túl nagy fájl, hiányzó munkalap,
@@ -218,7 +239,7 @@ használd a **Helyreállítás folytatása** gombot.
   ellenőrizd az állapotot. Az elküldött vagy elavult emlékeztető nem
   újrapróbálható.
 - Az **Adat-életciklus** oldalon ellenőrizd a távozott családok
-  jelöltjeit. A megőrzési kötelezettséggel blokkolt rekordnál ne legyen
+  jelöltjeit. A megőrzési kötelezettséggel blokkolt elemnél ne legyen
   végrehajtható törlési művelet. A többi művelet csak helyi próbaadatot érint.
 - A **Beállítások és jogosultságok** oldalon válassz másik engedélyezett
   címzetti kört, majd mentsd el az emlékeztető-beállítást. A képernyőn
@@ -278,7 +299,10 @@ kiszolgálót a terminálban **Ctrl+C** billentyűkombinációval állíthatod l
 | Technikai szövegek | Verzió, Korreláció és forgatókönyv-választók csak a Fejlesztői részletek szakaszban látszanak | |
 | Szülői jelentkezés | Nyitott feladat vállalható; betelt/nem jogosult feladat nem | |
 | Csere és lemondás | Kérelem elküldése sikeres, az indoklás nem jelenik meg más nézetben | |
-| Munkatársi beosztás | Szűrés és részletek működnek; nincs módosító művelet | |
+| Munkatársi beosztás | Szűrés és részletek működnek; nincs módosító művelet; az első megnyitás szűretlen (Minden csoport, üres dátumok); az állapot „Ütemezve” szóval és szimbólummal látszik | |
+| Szűrők törlése | A teljes beosztáson és mindhárom admin listán minden mezőt kiürít (a be nem küldött beírt értéket is), a szűretlen lista látszik, a fókusz a címre kerül | |
+| Mezők elrendezése | A feliratok minden szűrőn és űrlapon a mezőjük fölött állnak 320 px-en és asztali nézetben is, vízszintes görgetés nélkül | |
+| Gombok és szimbólumok | Az Új elem és az Új feladat vagy esemény gomb; minden állapotszó előtt szimbólum áll, a legördülő listában is | |
 | Adminisztrátori jogosultságok | Korlátozott profilnál a tiltott oldal megtagadott | |
 | Import és helyreállítás | Előnézet, ütközésfeloldás és eredmény vagy helyreállítás látható | |
 | Emlékeztető és beállítás | Újrapróbálás és címzetti beállítás szimulált állapotot mutat | |

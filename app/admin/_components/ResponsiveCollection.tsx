@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { AdminItemModel } from "../../../src/application/index.ts";
-import { statusLabel } from "../../../src/application/status-labels.ts";
+import { statusDisplay } from "../../../src/application/status-labels.ts";
+import { StatusBadge } from "../../../src/runtime/StatusBadge.tsx";
 import { LIST_RETURN_PARAMETER } from "./AdminBackLink.tsx";
 
 /**
@@ -31,7 +32,7 @@ export function ResponsiveCollection({
             data-testid={`${testId}-open-${item.id}`}
           >
             <strong>{item.title}</strong>{" "}
-            <span className="admin-state-badge">{statusLabel(item.state)}</span>
+            <StatusBadge className="admin-state-badge" {...statusDisplay(item.state)} />
           </Link>
         </li>
       ))}

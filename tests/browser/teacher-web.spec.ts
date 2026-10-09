@@ -165,10 +165,11 @@ test("Teacher current responsibility assignment status and absence match list/de
       ? "teacher-schedule-card-schedule-garden"
       : "teacher-schedule-row-schedule-garden",
   );
-  for (const text of ["Kitalált Dóra", "Kitalált Eszter", "Ütemezett"])
+  // The source word "Ütemezett" is shown as the shared status word "Ütemezve".
+  for (const text of ["Kitalált Dóra", "Kitalált Eszter", "Ütemezve"])
     await expect(row).toContainText(text);
   await page.goto("/teacher/schedule/schedule-garden");
-  for (const text of ["Kitalált Dóra", "Kitalált Eszter", "Ütemezett"])
+  for (const text of ["Kitalált Dóra", "Kitalált Eszter", "Ütemezve"])
     await expect(page.getByTestId("teacher-schedule-detail-fields")).toContainText(text);
   await page.goto("/teacher/schedule?groupId=group-sunflower");
   const missing = page.getByTestId(
@@ -218,7 +219,8 @@ test("Teacher opens an entry with a click on any part of its row or card and by 
   await expect(page).toHaveURL(/\/teacher\/schedule\/schedule-garden/);
   await expect(page.getByTestId("teacher-schedule-detail-fields")).toBeVisible();
   await page.getByTestId("teacher-schedule-detail-back-link").click();
-  await expect(page).toHaveURL(/\/teacher\/schedule\?/);
+  // The list was unfiltered, so the way back is the bare schedule address.
+  await expect(page).toHaveURL(/\/teacher\/schedule$/);
 
   // Keyboard: the one link of the row or card is reachable and opens the entry with Enter.
   const link = page.getByTestId(

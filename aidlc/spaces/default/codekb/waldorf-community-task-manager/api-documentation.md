@@ -3,13 +3,13 @@
 ## Route handlers
 | Method path | Purpose | Notes |
 |---|---|---|
-| POST /api/synthetic/session | Select or clear a synthetic profile | Same-origin check; empty `profileId` clears cookie; valid id sets signed cookie; 303 to `/`; 400 `SYNTHETIC_PROFILE_INVALID`, 403 `REQUEST_ORIGIN_DENIED`, 503 outside synthetic mode |
+| POST /api/synthetic/session | Select or clear a synthetic profile (the shell's "Tesztprofil váltása" form posts an empty `profileId`; the browser must send a same-origin request, a bare curl gets 403) | Same-origin check; empty `profileId` clears cookie; valid id sets signed cookie; 303 to `/`; 400 `SYNTHETIC_PROFILE_INVALID`, 403 `REQUEST_ORIGIN_DENIED`, 503 outside synthetic mode |
 | POST /api/synthetic/reset | Reset synthetic fixture state | Used by browser tests (`resetSyntheticParentState` and peers) |
 | GET /api/readiness | Readiness probe | `{status:"ready",mode}` or 503 with config error code |
 | GET munkatars/beosztas, /[id] | Schedule route handlers for colleagues | Teacher compatibility routes |
 
 ## Server actions
-- app/szulo/actions.ts: `signUpAction`, `requestSwapAction`, `requestCancellationAction` (both call `revalidateParentDuty` on success), `markNotificationReadAction` (input `id`, `idempotencyKey`; validates identifier and key; returns `ParentActionState` with `link`; no `revalidatePath`), `updateContributionAction`.
+- app/szulo/actions.ts: `signUpAction`, `requestSwapAction`, `requestCancellationAction` (both call `revalidateParentDuty` on success), `markNotificationReadAction` (input `id`, `idempotencyKey`; validates identifier and key; returns `ParentActionState` with `link`; calls `revalidatePath("/szulo/ertesitesek")` on success; also called from `MarkNotificationRead` with an `open` key when a task page is opened from a notification), `updateContributionAction`.
 - app/admin/actions.ts: `saveRecordAction` (title via `normalizeRequiredText` max 120, payload `{title, kind}`, revalidates /admin/nyilvantartasok), `archiveRecordAction`, `restoreRecordAction`, `saveTaskAction` (payload `{title, kind task|event, scenario}`, revalidates /admin/feladatok), `assignTaskAction` (scenario), `decideApprovalAction`, `saveEventNotesAction`; app/admin/advanced-actions.ts: import, reminders (`retryReminderAction`), lifecycle, settings. All return `AdminActionState` (`initial|validation|success|denied|conflict|invalidated|retryable|terminal`).
 - app/belepes/actions.ts: parent synthetic login, returns `destination` (parent home).
 - app/meghivas/[token]/actions.ts: accept and resend invitation.
@@ -21,4 +21,4 @@ Public: /, /belepes, /meghivas/[token], /hozzaferes-megtagadva. Parent: /szulo/f
 `NavigationItem {id,label,href}`, `AdminItemModel {id,title,state:string,version?}`, `NotificationModel {id,title,link,isRead,timing,providerStatus}` (src/application/contracts.ts:147-148), `DutyListItemModel.state` / `DutyDetailModel` (state available|full|ineligible|assigned|swap-pending|cancellation-pending, `assignmentId?`, `version`), `RequestModel {id,state:"pending"}`. Authorization: `AUTHORIZATION_MATRIX` version `four-role-v1`.
 
 ## Query parameters
-`state`, `q` (admin lists; values active|archived|open|pending offered by the filter), `status` (reminders: retryable|sent|stale), `allapot` (parent duty filter and back link), `scenario` (parent csere/lemondas, admin feladatok/[id] and jovahagyasok/[id], test-only outcome selector), teacher filter params via app/teacher/_lib/filters.ts.
+`state`, `q` (admin lists; the filter offers per list: records active|archived, tasks open|scheduled, approvals pending|approved|rejected; an unknown `state` is ignored with a note), `vissza` (detail/new pages: the list's `q`/`state` for the back link), `groupId`, `from`, `to` (teacher schedule; missing values fall back to the first granted group and 2026-08-12..2026-08-20), `status` (reminders: retryable|sent|stale), `allapot` (parent duty filter and back link), `scenario` (parent csere/lemondas, admin feladatok/[id] and jovahagyasok/[id], test-only outcome selector), teacher filter params via app/teacher/_lib/filters.ts.

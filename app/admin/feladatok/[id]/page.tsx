@@ -8,7 +8,8 @@ import { resolveAdminFacade } from "../../_lib/facade.ts";
 import { resolveAdminSession } from "../../_lib/session.ts";
 import type { AdminItemModel, ApplicationResult } from "../../../../src/application/index.ts";
 import { denied, terminalFailure } from "../../../../src/application/results.ts";
-import { statusLabel } from "../../../../src/application/status-labels.ts";
+import { statusDisplay } from "../../../../src/application/status-labels.ts";
+import { StatusBadge } from "../../../../src/runtime/StatusBadge.tsx";
 
 export default async function TaskDetailPage({
   params,
@@ -50,7 +51,9 @@ export default async function TaskDetailPage({
           <div className="admin-detail-grid">
             <section>
               <h2>{task.title}</h2>
-              <p>Állapot: {statusLabel(task.state)}</p>
+              <p>
+                Állapot: <StatusBadge {...statusDisplay(task.state)} />
+              </p>
             </section>
             <AdminMutationForm
               action={saveTaskAction}

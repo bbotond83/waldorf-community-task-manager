@@ -67,6 +67,31 @@ it("renders each duty as one whole-card link without a separate details link", a
   }
   expect(output).not.toContain("Részletek");
 });
+it("shows a symbol before each duty state word, in the list, the filter and the detail", async () => {
+  signIn("parent-local");
+  const list = (await import("../../app/szulo/feladatok/page.tsx")).default as (
+    input: ReturnType<typeof props>,
+  ) => ReactNode | Promise<ReactNode>;
+  const output = html(await list(props("")));
+  const document = new DOMParser().parseFromString(output, "text/html");
+  for (const badge of document.querySelectorAll(".parent-state-badge")) {
+    expect(badge.classList.contains("status-badge")).toBe(true);
+    expect(badge.querySelector("svg[aria-hidden='true']")).not.toBeNull();
+  }
+  const options = [...document.querySelectorAll("#allapot option")].map((o) => o.textContent);
+  expect(options[0]).toBe("Minden állapot");
+  expect(options).toContain("● Jelentkezésre nyitott");
+  expect(options).toContain("■ Betelt");
+  expect(options).toContain("⊘ Nem jogosult");
+  expect(options).toContain("✓ Vállalt feladat");
+  expect(options).toContain("◔ Cserekérelem folyamatban");
+  expect(options).toContain("◔ Lemondási kérelem folyamatban");
+  const detail = (await import("../../app/szulo/feladatok/[id]/page.tsx")).default as (
+    input: ReturnType<typeof props>,
+  ) => ReactNode | Promise<ReactNode>;
+  const detailOutput = html(await detail(props("duty-garden")));
+  expect(detailOutput).toMatch(/duty-detail-state"><span class="status-badge"><svg /);
+});
 it("withholds duties content without session", async () => {
   const page = (await import("../../app/szulo/feladatok/page.tsx")).default as (
     input: ReturnType<typeof props>,

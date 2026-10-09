@@ -1,0 +1,40 @@
+{
+  "stage": "code-generation",
+  "upstream_ids": [
+    "FR1.1", "FR1.2", "FR1.3", "FR1.4", "FR1.5", "FR1.6", "FR1.7",
+    "FR2.1", "FR2.2", "FR2.3",
+    "FR3.1", "FR3.2", "FR3.3", "FR3.4", "FR3.5",
+    "FR4.1", "FR4.2", "FR4.3", "FR4.4", "FR4.5", "FR4.6",
+    "NFR1", "NFR2", "NFR3", "NFR4", "NFR5", "NFR6", "NFR7"
+  ],
+  "coverage": [
+    { "id": "FR1.1", "status": "OK", "target": "app/teacher/_lib/filters.ts" },
+    { "id": "FR1.2", "status": "OK", "target": "src/teacher-web/synthetic-teacher-repository.ts" },
+    { "id": "FR1.3", "status": "OK", "target": "src/runtime/FilterClearLink.tsx" },
+    { "id": "FR1.4", "status": "OK", "target": "app/teacher/_components/TeacherStatePanel.tsx" },
+    { "id": "FR1.5", "status": "OK", "target": "app/admin/_components/AdminFilterBar.tsx" },
+    { "id": "FR1.6", "status": "OK", "target": "tests/integration/filter-clear-link.test.tsx" },
+    { "id": "FR1.7", "status": "OK", "target": "tests/unit/teacher-filters.test.ts" },
+    { "id": "FR2.1", "status": "OK", "target": "app/globals.css" },
+    { "id": "FR2.2", "status": "OK", "target": "tests/browser/list-polish.spec.ts" },
+    { "id": "FR2.3", "status": "OK", "target": "app/teacher/schedule/_components/ScheduleFilter.tsx" },
+    { "id": "FR3.1", "status": "OK", "target": "app/admin/nyilvantartasok/page.tsx" },
+    { "id": "FR3.2", "status": "OK", "target": "app/admin/feladatok/page.tsx" },
+    { "id": "FR3.3", "status": "OK", "target": "tests/browser/list-polish.spec.ts" },
+    { "id": "FR3.4", "status": "OK", "target": "app/admin/nyilvantartasok/uj/page.tsx" },
+    { "id": "FR3.5", "status": "OK", "target": "tests/coverage/admin-pages.test.tsx" },
+    { "id": "FR4.1", "status": "OK", "target": "src/runtime/StatusBadge.tsx" },
+    { "id": "FR4.2", "status": "OK", "target": "src/application/status-labels.ts" },
+    { "id": "FR4.3", "status": "OK", "target": "tests/integration/status-badge.test.tsx" },
+    { "id": "FR4.4", "status": "OK", "target": "tests/integration/admin-components.test.tsx" },
+    { "id": "FR4.5", "status": "OK", "target": "src/application/status-symbols.test.ts" },
+    { "id": "FR4.6", "status": "OK", "target": "app/teacher/schedule/_components/ScheduleCollection.tsx" },
+    { "id": "NFR1", "status": "OK", "target": "tests/unit/design-tokens.test.ts" },
+    { "id": "NFR2", "status": "OK", "target": "tests/integration/status-badge.test.tsx" },
+    { "id": "NFR3", "status": "OK", "target": "tests/browser/list-polish.spec.ts" },
+    { "id": "NFR4", "status": "OK", "target": "tests/coverage/production-inventory.test.ts" },
+    { "id": "NFR5", "status": "OK", "target": "tests/browser/list-polish.spec.ts" },
+    { "id": "NFR6", "status": "OK", "target": "tests/browser/teacher-web.spec.ts" },
+    { "id": "NFR7", "status": "OK", "target": "HASZNALATI_UTMUTATO_HU.md" }
+  ]
+}

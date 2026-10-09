@@ -89,6 +89,42 @@ describe("design tokens", () => {
     expect(contrast("#ffffff", token("color-primary-dark"))).toBeGreaterThanOrEqual(4.5);
   });
 
+  it("keeps the status symbols visible next to their words (3:1) on every card surface", () => {
+    // The symbol colours (done, failed, waiting) come from existing tokens, no new hex colour.
+    const tones = css.match(
+      /\.status-badge-icon-(positive|negative|pending)\s*{\s*color:\s*var\(--([a-z-]+)\)/g,
+    );
+    expect(tones).toHaveLength(3);
+    for (const name of ["color-success", "color-primary", "color-accent-ochre"]) {
+      for (const surface of ["color-background", "color-surface", "color-info-bg"]) {
+        expect(
+          contrast(token(name), token(surface)),
+          `${name} on ${surface}`,
+        ).toBeGreaterThanOrEqual(3);
+      }
+    }
+  });
+
+  it("keeps the link-button states readable: white on primary, dark text on its hover tint", () => {
+    expect(css).toMatch(/\.button-link\s*{[^}]*background:\s*var\(--color-primary\)/);
+    expect(css).toMatch(
+      /\.button-link:hover,\s*\.button-link:active\s*{[^}]*var\(--color-primary-dark\)/,
+    );
+    expect(contrast("#ffffff", token("color-primary"))).toBeGreaterThanOrEqual(4.5);
+    expect(contrast("#ffffff", token("color-primary-dark"))).toBeGreaterThanOrEqual(4.5);
+    expect(contrast(token("color-primary-dark"), token("color-info-bg"))).toBeGreaterThanOrEqual(
+      4.5,
+    );
+    expect(contrast(token("color-primary"), token("color-surface"))).toBeGreaterThanOrEqual(3);
+  });
+
+  it("stacks every filter label above its control", () => {
+    expect(css).toMatch(/\.filter-field\s*{[^}]*flex-direction:\s*column/);
+    expect(css).toMatch(
+      /\.admin-filter,\s*\.teacher-filter fieldset,\s*\.parent-filter,\s*\.advanced-filter\s*{[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*12rem\)/,
+    );
+  });
+
   it("removes the heading focus box but keeps the ring on controls", () => {
     expect(css).toMatch(/\[tabindex="-1"\]:focus-visible\s*{\s*outline:\s*none/);
     expect(css).toMatch(/:focus-visible\s*{\s*outline:\s*3px solid var\(--color-focus\)/);

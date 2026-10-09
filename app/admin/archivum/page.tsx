@@ -22,7 +22,7 @@ export default async function ArchivePage() {
       <AsyncStatePanel
         result={result}
         testId="admin-archive-state"
-        emptyMessage="Nincs archivált rekord."
+        emptyMessage="Nincs archivált elem."
       >
         {(data) => (
           <ResponsiveCollection

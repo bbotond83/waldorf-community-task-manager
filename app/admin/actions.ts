@@ -200,7 +200,7 @@ async function runRecordStateAction(
   }
   return mapApplicationResult(
     result,
-    operation === "archive" ? "A rekord archiválva." : "A rekord visszaállítva.",
+    operation === "archive" ? "Az elem archiválva." : "Az elem visszaállítva.",
   );
 }
 

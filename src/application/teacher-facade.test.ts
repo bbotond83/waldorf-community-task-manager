@@ -47,6 +47,21 @@ it("Teacher facade projects explicit allowlist and exact list/detail envelopes",
   const detail = await facade.getScheduleEntry(session, { ...query, entryId: "schedule-garden" });
   assert.equal(detail.code, "SCHEDULE_ENTRY_READY");
 });
+it("Teacher facade accepts missing dates and validates only what is filled", async () => {
+  const { facade } = setup();
+  for (const range of [{}, { from: "2026-08-14" }, { to: "2026-08-20" }]) {
+    const result = await facade.getSchedule(session, { groupScope: scope, ...range });
+    assert.equal(result.state, "success");
+  }
+  const swapped = await facade.getSchedule(session, {
+    groupScope: scope,
+    from: "2026-08-20",
+    to: "2026-08-12",
+  });
+  assert.equal(swapped.state, "validation");
+  const impossible = await facade.getSchedule(session, { groupScope: scope, from: "2026-02-30" });
+  assert.equal(impossible.state, "validation");
+});
 it("Teacher facade authorizes before validation and source", async () => {
   let reads = 0;
   const { facade, versions } = setup({

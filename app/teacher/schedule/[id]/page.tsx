@@ -4,9 +4,12 @@ import { TeacherStatePanel } from "../../_components/TeacherStatePanel.tsx";
 import { resolveTeacherFacade } from "../../_lib/facade.ts";
 import {
   parseTeacherFilters,
+  teacherDetailQuery,
   teacherFilterQuery,
+  teacherScheduleHref,
   type TeacherSearchParams,
 } from "../../_lib/filters.ts";
+import { teacherRange } from "../../_lib/schedule.ts";
 import { resolveTeacherSession } from "../../_lib/session.ts";
 import { formatScheduleRange, TrackingFields } from "../_components/ScheduleCollection.tsx";
 
@@ -27,15 +30,15 @@ export default async function TeacherScheduleDetailPage({
   const result = await facade.getScheduleEntry(session.data.applicationSession, {
     groupScope: filters.groupScope,
     entryId: id,
-    from: filters.from,
-    to: filters.to,
+    ...teacherRange(filters),
   });
   const canKeepContext =
     result.state === "success" || result.state === "dependency-failure-retryable";
   const returnHref = canKeepContext
-    ? `/teacher/schedule?${teacherFilterQuery(filters)}`
+    ? teacherScheduleHref(teacherFilterQuery(filters))
     : "/teacher/schedule";
-  const retryHref = `/teacher/schedule/${encodeURIComponent(id)}?${teacherFilterQuery({ ...filters, scenario: "ready" })}`;
+  // The retry keeps the address as it is, including the group this entry belongs to.
+  const retryHref = `/teacher/schedule/${encodeURIComponent(id)}?${teacherDetailQuery(filters, filters.groupScope.id)}`;
   const groupLabel = filters.groups.find(({ scope }) => scope.id === filters.groupId)?.label ?? "";
 
   return (

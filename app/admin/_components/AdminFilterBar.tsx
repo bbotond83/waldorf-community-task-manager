@@ -1,8 +1,9 @@
 import {
   ADMIN_LIST_STATUS_OPTIONS,
-  statusLabel,
+  statusOptionText,
   type AdminListKind,
 } from "../../../src/application/status-labels.ts";
+import { FilterClearLink } from "../../../src/runtime/FilterClearLink.tsx";
 
 type AdminFilterBarProps = Readonly<{
   action: string;
@@ -23,31 +24,51 @@ export function AdminFilterBar({
 }: AdminFilterBarProps) {
   return (
     <>
-      <form action={action} method="get" className="admin-filter" data-testid="admin-filter-form">
-        <label htmlFor="admin-filter-query">Keresés</label>
-        <input
-          id="admin-filter-query"
-          name="q"
-          defaultValue={query}
-          data-testid="admin-filter-query-input"
-        />
-        <label htmlFor="admin-filter-state">Állapot</label>
-        <select
-          id="admin-filter-state"
-          name="state"
-          defaultValue={state}
-          data-testid="admin-filter-state-select"
-        >
-          <option value="">Minden állapot</option>
-          {ADMIN_LIST_STATUS_OPTIONS[list].map((value) => (
-            <option key={value} value={value}>
-              {statusLabel(value)}
-            </option>
-          ))}
-        </select>
-        <button type="submit" data-testid="admin-filter-submit-button">
-          Szűrés
-        </button>
+      {/* Keyed by the values the address carries, so a new address never keeps a stale typed value. */}
+      <form
+        key={`${query}\u0000${state}`}
+        action={action}
+        method="get"
+        className="admin-filter"
+        data-testid="admin-filter-form"
+      >
+        <div className="filter-field">
+          <label htmlFor="admin-filter-query">Keresés</label>
+          <input
+            id="admin-filter-query"
+            name="q"
+            defaultValue={query}
+            data-testid="admin-filter-query-input"
+          />
+        </div>
+        <div className="filter-field">
+          <label htmlFor="admin-filter-state">Állapot</label>
+          <select
+            id="admin-filter-state"
+            name="state"
+            defaultValue={state}
+            data-testid="admin-filter-state-select"
+          >
+            <option value="">Minden állapot</option>
+            {ADMIN_LIST_STATUS_OPTIONS[list].map((value) => (
+              <option key={value} value={value}>
+                {statusOptionText(value)}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="filter-actions">
+          <button type="submit" data-testid="admin-filter-submit-button">
+            Szűrés
+          </button>
+          <FilterClearLink
+            href={action}
+            className="button-link button-link-secondary"
+            testId="admin-filter-clear-link"
+          >
+            Szűrők törlése
+          </FilterClearLink>
+        </div>
       </form>
       {unknownState && (
         <p role="status" className="form-hint" data-testid="admin-filter-unknown-note">

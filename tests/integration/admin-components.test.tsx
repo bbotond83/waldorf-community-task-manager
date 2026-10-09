@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { AdminAccessState } from "../../app/admin/_components/AdminAccessState.tsx";
 import { AdminFilterBar } from "../../app/admin/_components/AdminFilterBar.tsx";
 import { AdminPagination } from "../../app/admin/_components/AdminPagination.tsx";
@@ -20,6 +20,9 @@ import {
   terminalFailure,
   validation,
 } from "../../src/application/index.ts";
+
+const router = vi.hoisted(() => ({ push: vi.fn() }));
+vi.mock("next/navigation", () => ({ useRouter: () => router }));
 
 describe("AsyncStatePanel", () => {
   it("renders authorized success data", () => {
@@ -92,6 +95,14 @@ describe("administrator shared presentation", () => {
     );
     expect(screen.getByTestId("records-item-family-feny")).toHaveTextContent("Aktív");
     expect(screen.getByTestId("records-item-family-feny")).not.toHaveTextContent("active");
+    // The symbol is a decorative icon: hidden from assistive technology, the word stays.
+    const icon = screen
+      .getByTestId("records-item-family-feny")
+      .querySelector("svg[data-status-icon='dot']");
+    expect(icon).toHaveAttribute("aria-hidden", "true");
+    expect(screen.getByTestId("records-open-family-feny")).toHaveAccessibleName(
+      "Fenyő család Aktív",
+    );
     expect(screen.getByTestId("records-open-family-feny")).toHaveAttribute(
       "href",
       "/admin/nyilvantartasok/family-feny",
@@ -176,31 +187,82 @@ describe("administrator shared presentation", () => {
     expect(screen.getByTestId("admin-filter-submit-button")).toBeInTheDocument();
   });
 
+  it("puts every filter field in its own label-above-control group", () => {
+    render(<AdminFilterBar action="/admin/feladatok" list="tasks" />);
+    const form = screen.getByTestId("admin-filter-form");
+    const fields = form.querySelectorAll(".filter-field");
+    expect(fields).toHaveLength(2);
+    for (const field of Array.from(fields)) {
+      expect(field.firstElementChild?.tagName).toBe("LABEL");
+      expect(field.children).toHaveLength(2);
+    }
+  });
+
+  it("offers a clear link to the list without filter values", () => {
+    render(<AdminFilterBar action="/admin/feladatok" list="tasks" query="kert" state="open" />);
+    const clear = screen.getByTestId("admin-filter-clear-link");
+    expect(clear).toHaveTextContent("Szűrők törlése");
+    expect(clear).toHaveAttribute("href", "/admin/feladatok");
+    expect(clear).toHaveClass("button-link");
+  });
+
+  it("clears a typed, unsubmitted value and goes to the bare list", () => {
+    router.push.mockClear();
+    render(<AdminFilterBar action="/admin/feladatok" list="tasks" />);
+    fireEvent.change(screen.getByLabelText("Keresés"), { target: { value: "kert" } });
+    fireEvent.change(screen.getByLabelText("Állapot"), { target: { value: "scheduled" } });
+    fireEvent.click(screen.getByTestId("admin-filter-clear-link"));
+    expect(screen.getByLabelText("Keresés")).toHaveValue("");
+    expect(screen.getByLabelText("Állapot")).toHaveValue("");
+    expect(router.push).toHaveBeenCalledWith("/admin/feladatok");
+  });
+
+  it("moves focus to the page heading after a clear", () => {
+    render(
+      <main>
+        <h1>Feladatok és események</h1>
+        <AdminFilterBar action="/admin/feladatok" list="tasks" query="kert" />
+      </main>,
+    );
+    fireEvent.click(screen.getByTestId("admin-filter-clear-link"));
+    expect(screen.getByRole("heading", { level: 1 })).toHaveFocus();
+  });
+
+  it("starts from the values of a new address, never from a stale typed value", () => {
+    const { rerender } = render(
+      <AdminFilterBar action="/admin/feladatok" list="tasks" query="kert" state="open" />,
+    );
+    fireEvent.change(screen.getByLabelText("Keresés"), { target: { value: "gépelt" } });
+    rerender(<AdminFilterBar action="/admin/feladatok" list="tasks" />);
+    expect(screen.getByLabelText("Keresés")).toHaveValue("");
+    expect(screen.getByLabelText("Állapot")).toHaveValue("");
+  });
+
   it.each([
     [
       "records",
       [
-        ["active", "Aktív"],
-        ["archived", "Archivált"],
+        ["active", "● Aktív"],
+        ["archived", "○ Archivált"],
       ],
     ],
     [
       "tasks",
       [
-        ["open", "Nyitott"],
-        ["scheduled", "Ütemezve"],
+        ["open", "◐ Nyitott"],
+        ["scheduled", "▦ Ütemezve"],
       ],
     ],
     [
       "approvals",
       [
-        ["pending", "Függőben"],
-        ["approved", "Jóváhagyva"],
-        ["rejected", "Elutasítva"],
+        ["pending", "◔ Függőben"],
+        ["approved", "✓ Jóváhagyva"],
+        ["rejected", "✕ Elutasítva"],
       ],
     ],
   ] as const)(
-    "offers only the %s statuses, in Hungarian words with unchanged option values",
+    "offers only the %s statuses, with a symbol and the Hungarian word, and unchanged option values",
     (list, expected) => {
       render(<AdminFilterBar action="/admin/x" list={list} />);
       const options = within(screen.getByLabelText("Állapot")).getAllByRole("option");

@@ -8,7 +8,7 @@ import type {
 import type { DomainOutcome, FacadePipeline } from "./facade-pipeline.ts";
 import { denied, terminalFailure, validation } from "./results.ts";
 import {
-  isTrackingRange,
+  isOptionalTrackingRange,
   isTrackingSource,
   matchesTrackingScope,
   projectTrackingEntry,
@@ -18,8 +18,8 @@ export interface TeacherApplicationPort {
   getSchedule(input: {
     actorId: string;
     groupScope: Scope;
-    from: string;
-    to: string;
+    from?: string;
+    to?: string;
   }): Promise<DomainOutcome<{ entries: readonly TrackingSourceRecord[] }>>;
 }
 export class TeacherApplicationFacade {
@@ -31,7 +31,7 @@ export class TeacherApplicationFacade {
   }
   async getSchedule(
     session: SessionContext,
-    input: { groupScope: Scope; from: string; to: string },
+    input: { groupScope: Scope; from?: string; to?: string },
   ): Promise<ApplicationResult<TrackingModel>> {
     return this.pipeline.invoke<TrackingModel>({
       session,
@@ -41,7 +41,9 @@ export class TeacherApplicationFacade {
       scope: input.groupScope,
       fields: ["SF-PARTICIPANT-NAME"],
       validate: () =>
-        isTrackingRange(input.from, input.to) ? undefined : validation({ range: "VAL-DATE-RANGE" }),
+        isOptionalTrackingRange(input.from, input.to)
+          ? undefined
+          : validation({ range: "VAL-DATE-RANGE" }),
       invoke: async () => {
         const outcome = await this.domain.getSchedule({ actorId: session.subjectId, ...input });
         if (!outcome || typeof outcome !== "object") throw new Error("Invalid tracking outcome");
@@ -73,7 +75,7 @@ export class TeacherApplicationFacade {
   }
   async getScheduleEntry(
     session: SessionContext,
-    input: { groupScope: Scope; entryId: string; from: string; to: string },
+    input: { groupScope: Scope; entryId: string; from?: string; to?: string },
   ): Promise<ApplicationResult<TrackingEntry>> {
     const schedule = await this.getSchedule(session, input);
     if (schedule.state === "recovery") return terminalFailure("SCHEDULE_RECOVERY_UNAVAILABLE");
