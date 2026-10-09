@@ -14,7 +14,7 @@ export function mapApplicationResult<T>(
         state: "validation",
         message: "Ellenőrizze a megadott adatokat.",
         code: result.code,
-        fieldErrors: result.fieldErrors,
+        fieldErrors: translateFieldErrors(result.fieldErrors),
       };
     case "denied":
       return { state: "denied", message: "Nincs jogosultság", code: result.code };
@@ -41,6 +41,27 @@ export function mapApplicationResult<T>(
     case "pending":
       return { state: "terminal", message: "A művelet nem fejeződött be.", code: result.code };
   }
+}
+
+const VALIDATION_CODE_MESSAGES: Readonly<Record<string, string>> = Object.freeze({
+  "VAL-REQUIRED": "A mező kitöltése kötelező.",
+  "VAL-TOO-LONG": "A megadott érték túl hosszú.",
+  "VAL-IDEMPOTENCY-KEY": "Érvénytelen műveleti kulcs.",
+  "VAL-EXPECTED-VERSION": "Érvénytelen verzió.",
+  "VAL-DATE-RANGE": "Érvénytelen időszak.",
+});
+
+/** A validation code never reaches the screen as such; readable messages pass through. */
+function translateFieldErrors(
+  fieldErrors: Readonly<Record<string, string>> | undefined,
+): Readonly<Record<string, string>> | undefined {
+  if (!fieldErrors) return undefined;
+  return Object.fromEntries(
+    Object.entries(fieldErrors).map(([field, message]) => [
+      field,
+      VALIDATION_CODE_MESSAGES[message] ?? message,
+    ]),
+  );
 }
 
 function conflictMessage(code: string): string {

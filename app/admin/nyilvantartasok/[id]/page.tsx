@@ -1,14 +1,23 @@
 import { randomUUID } from "node:crypto";
-import { AdminMutationForm } from "../../_components/AdminMutationForm.tsx";
+import { AdminBackLink } from "../../_components/AdminBackLink.tsx";
+import { AdminMutationForm, AdminTextField } from "../../_components/AdminMutationForm.tsx";
 import { AsyncStatePanel } from "../../_components/AsyncStatePanel.tsx";
+import { DeveloperDetails } from "../../_components/DeveloperDetails.tsx";
 import { archiveRecordAction, saveRecordAction } from "../../actions.ts";
 import { resolveAdminFacade } from "../../_lib/facade.ts";
 import { resolveAdminSession } from "../../_lib/session.ts";
 import { terminalFailure } from "../../../../src/application/results.ts";
 import { statusLabel } from "../../../../src/application/status-labels.ts";
 
-export default async function RecordDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function RecordDetailPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const { id } = await params;
+  const query = await searchParams;
   const session = await resolveAdminSession();
   const facade = await resolveAdminFacade();
   const result =
@@ -18,6 +27,10 @@ export default async function RecordDetailPage({ params }: { params: Promise<{ i
   return (
     <section className="admin-page" data-testid="admin-record-detail-page">
       <header>
+        <AdminBackLink
+          list="records"
+          returnQuery={typeof query.vissza === "string" ? query.vissza : undefined}
+        />
         <p className="eyebrow">Nyilvántartások</p>
         <h1 tabIndex={-1}>Rekord részletei</h1>
       </header>
@@ -31,7 +44,6 @@ export default async function RecordDetailPage({ params }: { params: Promise<{ i
             <section>
               <h2>{record.title}</h2>
               <p>Állapot: {statusLabel(record.state)}</p>
-              <p>Verzió: {record.version}</p>
             </section>
             <AdminMutationForm
               action={saveRecordAction}
@@ -46,13 +58,13 @@ export default async function RecordDetailPage({ params }: { params: Promise<{ i
                 value={`record:save:${record.id}:${randomUUID()}`}
               />
               <input type="hidden" name="kind" value="record" />
-              <label htmlFor="title">Megnevezés</label>
-              <input
+              <AdminTextField
                 id="title"
                 name="title"
+                label="Megnevezés"
                 defaultValue={record.title}
                 required
-                data-testid="admin-record-title-input"
+                testId="admin-record-title-input"
               />
             </AdminMutationForm>
             <AdminMutationForm
@@ -68,6 +80,9 @@ export default async function RecordDetailPage({ params }: { params: Promise<{ i
                 value={`record:archive:${record.id}:${randomUUID()}`}
               />
             </AdminMutationForm>
+            <DeveloperDetails>
+              <p>Verzió: {record.version}</p>
+            </DeveloperDetails>
           </div>
         )}
       </AsyncStatePanel>

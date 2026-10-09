@@ -1,11 +1,13 @@
 import { randomUUID } from "node:crypto";
-import { AdminMutationForm } from "../../_components/AdminMutationForm.tsx";
+import { AdminBackLink, ADMIN_LIST_LINKS } from "../../_components/AdminBackLink.tsx";
+import { AdminMutationForm, AdminTextField } from "../../_components/AdminMutationForm.tsx";
 import { saveRecordAction } from "../../actions.ts";
 
 export default function NewRecordPage() {
   return (
     <section className="admin-page" data-testid="admin-record-create-page">
       <header>
+        <AdminBackLink list="records" />
         <p className="eyebrow">Nyilvántartások</p>
         <h1 tabIndex={-1}>Új rekord</h1>
       </header>
@@ -13,6 +15,7 @@ export default function NewRecordPage() {
         action={saveRecordAction}
         submitLabel="Rekord létrehozása"
         testId="admin-record-create-form"
+        successLink={ADMIN_LIST_LINKS.records}
       >
         <input type="hidden" name="id" value="new" />
         <input type="hidden" name="expectedVersion" value="1" />
@@ -24,13 +27,13 @@ export default function NewRecordPage() {
           <option value="group">Csoport</option>
           <option value="school-year">Nevelési év</option>
         </select>
-        <label htmlFor="title">Megnevezés</label>
-        <input
+        <AdminTextField
           id="title"
           name="title"
+          label="Megnevezés"
           maxLength={120}
           required
-          data-testid="admin-record-title-input"
+          testId="admin-record-title-input"
         />
       </AdminMutationForm>
     </section>

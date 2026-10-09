@@ -93,6 +93,60 @@ describe("ParentMutationForm", () => {
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 
+  it("replaces its fields and button by the after-success content once sent", async () => {
+    render(
+      <ParentMutationForm
+        action={async () => ({ state: "success", message: "Elküldve." })}
+        submitLabel="Küldés"
+        testId="parent-mutation"
+        afterSuccess={<p data-testid="after">Cserekérelem folyamatban</p>}
+      >
+        <input name="reason" aria-label="Indoklás" />
+      </ParentMutationForm>,
+    );
+    expect(screen.getByLabelText("Indoklás")).toBeInTheDocument();
+    expect(screen.queryByTestId("after")).not.toBeInTheDocument();
+    fireEvent.submit(screen.getByTestId("parent-mutation"));
+    await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent("Elküldve"));
+    expect(screen.getByTestId("after")).toBeInTheDocument();
+    expect(screen.queryByLabelText("Indoklás")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Küldés" })).not.toBeInTheDocument();
+  });
+
+  it("shows the after-success content from the start for a request sent earlier", () => {
+    render(
+      <ParentMutationForm
+        action={async () => ({ state: "success", message: "Elküldve." })}
+        submitLabel="Küldés"
+        testId="parent-mutation"
+        alreadyDone
+        afterSuccess={<p data-testid="after">Cserekérelem folyamatban</p>}
+      >
+        <input name="reason" aria-label="Indoklás" />
+      </ParentMutationForm>,
+    );
+    expect(screen.getByTestId("after")).toBeInTheDocument();
+    expect(screen.queryByLabelText("Indoklás")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button")).not.toBeInTheDocument();
+  });
+
+  it("keeps its fields after a failed send even with after-success content", async () => {
+    render(
+      <ParentMutationForm
+        action={async () => ({ state: "conflict", message: "Már van kérelem." })}
+        submitLabel="Küldés"
+        testId="parent-mutation"
+        afterSuccess={<p data-testid="after">Cserekérelem folyamatban</p>}
+      >
+        <input name="reason" aria-label="Indoklás" />
+      </ParentMutationForm>,
+    );
+    fireEvent.submit(screen.getByTestId("parent-mutation"));
+    await waitFor(() => expect(screen.getByRole("alert")).toHaveTextContent("Már van kérelem"));
+    expect(screen.getByLabelText("Indoklás")).toBeInTheDocument();
+    expect(screen.queryByTestId("after")).not.toBeInTheDocument();
+  });
+
   it("focuses a validation summary and links its field", async () => {
     render(
       <ParentMutationForm

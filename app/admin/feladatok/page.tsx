@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { AdminFilterBar } from "../_components/AdminFilterBar.tsx";
+import { listReturnQuery } from "../_components/AdminBackLink.tsx";
+import { resolveListStatus } from "../../../src/application/status-labels.ts";
 import { AdminPagination } from "../_components/AdminPagination.tsx";
 import { AsyncStatePanel } from "../_components/AsyncStatePanel.tsx";
 import { ResponsiveCollection } from "../_components/ResponsiveCollection.tsx";
@@ -14,7 +16,10 @@ export default async function TasksEventsPage({
 }) {
   const query = await searchParams;
   const q = typeof query.q === "string" ? query.q : "";
-  const state = typeof query.state === "string" ? query.state : "";
+  const { state, unknown } = resolveListStatus(
+    "tasks",
+    typeof query.state === "string" ? query.state : "",
+  );
   const session = await resolveAdminSession();
   const facade = await resolveAdminFacade();
   const result =
@@ -33,7 +38,13 @@ export default async function TasksEventsPage({
           Új feladat vagy esemény
         </Link>
       </div>
-      <AdminFilterBar action="/admin/feladatok" query={q} state={state} />
+      <AdminFilterBar
+        action="/admin/feladatok"
+        list="tasks"
+        query={q}
+        state={state}
+        unknownState={unknown}
+      />
       <AsyncStatePanel
         result={result}
         testId="admin-tasks-state"
@@ -45,6 +56,7 @@ export default async function TasksEventsPage({
               items={data.items}
               basePath="/admin/feladatok"
               testId="admin-tasks-list"
+              returnQuery={listReturnQuery({ q, state })}
             />
             <AdminPagination />
           </>

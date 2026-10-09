@@ -1,3 +1,4 @@
+import { notificationHref } from "../../../src/parent-web/notification-context.ts";
 import { NotificationReadForm } from "../_components/NotificationReadForm.tsx";
 import { ParentStatePanel } from "../_components/ParentStatePanel.tsx";
 import { resolveParentFacade } from "../_lib/facade.ts";
@@ -39,13 +40,13 @@ export default async function ParentNotificationsPage() {
           <ul className="parent-collection" data-testid="notification-list">
             {model.notifications.map((notification) => (
               <li
-                className="parent-card notification-card"
+                className={`parent-card notification-card${notification.isRead ? " notification-card-read" : ""}`}
                 key={notification.id}
                 data-testid={`notification-card-${notification.id}`}
               >
                 <a
                   className="parent-card-link"
-                  href={notification.link}
+                  href={notificationHref(notification)}
                   data-testid={`notification-link-${notification.id}`}
                 >
                   <h2>{notification.title}</h2>

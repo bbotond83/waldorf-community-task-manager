@@ -1,6 +1,7 @@
 import type { ImportPreviewModel } from "../../../src/application/index.ts";
 import type { AdminAction } from "../actions.ts";
 import { AdminMutationForm } from "./AdminMutationForm.tsx";
+import { DeveloperDetails } from "./DeveloperDetails.tsx";
 
 const STEPS = [
   "Kiválasztás",
@@ -57,19 +58,6 @@ export function ImportWorkflow({
           >
             <option value="workbook-waldorf-v1">Waldorf 30 család — v1</option>
           </select>
-          <label htmlFor="scenario">Ellenőrzési forgatókönyv</label>
-          <select
-            id="scenario"
-            name="scenario"
-            defaultValue="valid"
-            data-testid="admin-import-scenario-select"
-          >
-            <option value="valid">Érvényes</option>
-            <option value="malformed">Sérült fájl</option>
-            <option value="oversized">Túl nagy fájl</option>
-            <option value="missing-sheet">Hiányzó munkalap</option>
-            <option value="missing-header">Hiányzó oszlop</option>
-          </select>
           <input type="hidden" name="idempotencyKey" value="import-preview-waldorf-v1" />
           <p className="form-hint">
             A fájl legfeljebb 5 MB lehet; a kötelező lapokat és fejléceket a szerver ellenőrzi.
@@ -77,6 +65,48 @@ export function ImportWorkflow({
         </AdminMutationForm>
       )}
       {preview && <PreviewDetails preview={preview} actions={actions} />}
+      <DeveloperDetails>
+        {!preview && (
+          <div>
+            <label htmlFor="scenario">Ellenőrzési forgatókönyv</label>
+            <select
+              id="scenario"
+              name="scenario"
+              form="admin-import-preview-form"
+              defaultValue="valid"
+              data-testid="admin-import-scenario-select"
+            >
+              <option value="valid">Érvényes</option>
+              <option value="malformed">Sérült fájl</option>
+              <option value="oversized">Túl nagy fájl</option>
+              <option value="missing-sheet">Hiányzó munkalap</option>
+              <option value="missing-header">Hiányzó oszlop</option>
+            </select>
+          </div>
+        )}
+        {preview &&
+          preview.conflicts.every((conflict) => conflict.resolution) &&
+          preview.state !== "committed" && (
+            <div>
+              <label htmlFor="commitScenario">Mentési forgatókönyv</label>
+              <select
+                id="commitScenario"
+                name="scenario"
+                form="admin-import-commit-form"
+                defaultValue="success"
+              >
+                <option value="success">Sikeres</option>
+                <option value="interrupted">Megszakított</option>
+                <option value="retryable">Átmeneti hiba</option>
+                <option value="terminal">Végleges hiba</option>
+              </select>
+            </div>
+          )}
+        {preview &&
+          !(preview.conflicts.every((c) => c.resolution) && preview.state !== "committed") && (
+            <p>Nincs módosítható beállítás ebben a lépésben.</p>
+          )}
+      </DeveloperDetails>
     </div>
   );
 }
@@ -156,13 +186,6 @@ function PreviewDetails({
             />{" "}
             Megerősítem a következményeket
           </label>
-          <label htmlFor="commitScenario">Mentési forgatókönyv</label>
-          <select id="commitScenario" name="scenario" defaultValue="success">
-            <option value="success">Sikeres</option>
-            <option value="interrupted">Megszakított</option>
-            <option value="retryable">Átmeneti hiba</option>
-            <option value="terminal">Végleges hiba</option>
-          </select>
           <input type="hidden" name="previewId" value={preview.id} />
           <input type="hidden" name="fingerprint" value={preview.fingerprint} />
           <input type="hidden" name="expectedVersion" value="1" />

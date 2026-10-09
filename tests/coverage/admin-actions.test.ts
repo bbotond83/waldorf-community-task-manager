@@ -89,6 +89,29 @@ it("normalizes title validation, notes bounds and idempotent repeat", async () =
   const first = await core.assignTaskAction(initial, input);
   expect(await core.assignTaskAction(initial, input)).toEqual(first);
 });
+it.each(["saveRecordAction", "saveTaskAction"] as const)(
+  "%s names an empty or too long title in Hungarian and creates nothing",
+  async (name) => {
+    signIn("super-admin-local");
+    const empty = await core[name](initial, form({ id: "new", title: "   " }));
+    expect(empty.state).toBe("validation");
+    expect(empty.fieldErrors).toEqual({ title: "A megnevezés megadása kötelező." });
+    const long = await core[name](initial, form({ id: "new", title: "x".repeat(121) }));
+    expect(long.state).toBe("validation");
+    expect(long.fieldErrors).toEqual({
+      title: "A megnevezés legfeljebb 120 karakter hosszú lehet.",
+    });
+    for (const result of [empty, long]) {
+      expect(JSON.stringify(result)).not.toMatch(/VAL-/);
+    }
+    expect(boundary.revalidate).not.toHaveBeenCalled();
+    const exact = await core[name](
+      initial,
+      form({ id: "new", title: "x".repeat(120), idempotencyKey: "coverage:title:max:0001" }),
+    );
+    expect(exact.state).toBe("success");
+  },
+);
 it.each([
   ["full", "conflict"],
   ["ineligible", "conflict"],

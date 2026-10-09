@@ -1,4 +1,6 @@
 import { ParentMutationForm } from "../../../_components/ParentMutationForm.tsx";
+import { pendingRequests } from "../../../../../src/parent-web/notification-context.ts";
+import { PendingRequestPanel } from "../../../_components/PendingRequestNotice.tsx";
 import { ParentStatePanel } from "../../../_components/ParentStatePanel.tsx";
 import { resolveParentFacade } from "../../../_lib/facade.ts";
 import { resolveParentSession } from "../../../_lib/session.ts";
@@ -38,6 +40,18 @@ export default async function CancellationRequestPage({
               action={requestCancellationAction}
               submitLabel="Lemondási kérelem elküldése"
               testId="cancellation-request-form"
+              alreadyDone={pendingRequests(duty).any}
+              afterSuccess={
+                <PendingRequestPanel
+                  pending={
+                    pendingRequests(duty).any
+                      ? pendingRequests(duty)
+                      : { swap: false, cancellation: true }
+                  }
+                  dutyId={duty.id}
+                  testId="cancellation-pending-panel"
+                />
+              }
             >
               <input type="hidden" name="id" value={duty.id} />
               <input

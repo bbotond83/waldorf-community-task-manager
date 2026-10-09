@@ -39,7 +39,7 @@ adott profil alapértelmezett oldalát nyitja meg.
 
 | Profil | Alapértelmezett oldal | Menü (minden oldalon ugyanaz) |
 |---|---|---|
-| **Szülő** | Értesítések | Feladatok, Értesítések |
+| **Szülő** | Értesítések | Értesítések, Feladatok |
 | **Óvónő** | Beosztás | nincs menü, mert a Beosztás az egyetlen oldal |
 | **Csoportadminisztrátor** | Áttekintés | Áttekintés, Nyilvántartások, Feladatok és események, Jóváhagyások, Archívum |
 | **Szuperadminisztrátor** | Áttekintés | az előbbi öt, majd Importálás, Emlékeztetők, Adatvédelem, Beállítások |
@@ -56,7 +56,7 @@ váltja; a módosított szintetikus adatokat külön kell alaphelyzetbe állíta
 ## 3. Szülői felület
 
 Válaszd a **Szülő** profilt. A program az **Értesítések** oldalt nyitja meg;
-a menüben a **Feladatok** és az **Értesítések** gomb jelenik meg.
+a menüben az **Értesítések** és a **Feladatok** gomb jelenik meg (ebben a sorrendben).
 
 ### 3.1 Feladatok böngészése és jelentkezés
 
@@ -82,14 +82,24 @@ a menüben a **Feladatok** és az **Értesítések** gomb jelenik meg.
    küldd el a kérelmet.
 4. Ellenőrizd a sikeres, függő állapotú visszajelzést. Az indoklás a
    visszaigazolásban és a többi család számára nem jelenik meg.
-5. Próbáld ki a **Lemondási kérelem** oldalt is. Az indoklás legyen
-   tesztszöveg, ne valódi személyes adat.
+5. Térj vissza a feladathoz: a feladat oldalán megjelenik a **Cserekérelem
+   folyamatban** jelzés, a **Cserekérelem** és a **Lemondási kérelem**
+   hivatkozás pedig eltűnik, amíg a kérelem függőben van. Ugyanazt a kérelmet
+   nem lehet újra elküldeni; a kérelem oldala a jelzést és a feladathoz
+   visszavivő hivatkozást mutatja az űrlap helyett.
+6. Egy másik, még nem kérelmezett feladaton próbáld ki a **Lemondási
+   kérelem** oldalt is. Az indoklás legyen tesztszöveg, ne valódi személyes
+   adat.
 
 ### 3.3 Értesítések és meghívóállapotok
 
 1. Nyisd meg az **Értesítések** oldalt (ez a szülő alapértelmezett oldala).
 2. Kattints egy értesítés kártyájára, bárhová a kártyán: megnyílik a
-   hozzá tartozó feladat. Külön „Megnyitás” hivatkozás nincs.
+   hozzá tartozó feladat, és az értesítés olvasottnak jelölődik. Külön
+   „Megnyitás” hivatkozás nincs. A menüben az **Értesítések** marad kiemelt,
+   a visszalépő hivatkozás pedig **Vissza az értesítésekhez** feliratú, és az
+   értesítések listájára visz. A listán az olvasott értesítés kártyája
+   szürkített (halványabb szöveg és háttér), az „Olvasott” felirattal.
 3. A kártya jobb oldalán lévő **Olvasottnak jelölöm** jelölőnégyzet
    bejelölése azonnal olvasottnak jelöli az értesítést. Az olvasott
    értesítés négyzete bejelölt és nem módosítható. Hiba esetén a négyzet
@@ -138,14 +148,25 @@ oldalt nyitja meg; a menüben az **Áttekintés**, **Nyilvántartások**,
 **Feladatok és események**, **Jóváhagyások** és **Archívum** gomb látszik.
 A listák elemei egyetlen kattintható kártyák (nincs külön „Részletek”
 hivatkozás), az állapotok magyarul jelennek meg (Függőben, Jóváhagyva,
-Aktív, Archivált, Nyitott, Ütemezve).
+Aktív, Archivált, Nyitott, Ütemezve). Minden listának a saját állapotait
+kínáló szűrője van (jóváhagyásoknál Függőben, Jóváhagyva, Elutasítva;
+nyilvántartásoknál Aktív, Archivált; feladatoknál Nyitott, Ütemezve). Minden
+részletes oldalon és az **Új rekord**, valamint az **Új feladat vagy
+esemény** űrlapon **Vissza a …** hivatkozás visz a megfelelő listához, a
+szűrő megtartásával. Az üres kötelező mező beküldésekor magyar hibaüzenet
+jelenik meg a mező mellett.
+
+A technikai részletek (a kapacitási és egyéb forgatókönyv-választók, a
+„Verzió” és a „Korreláció” sor) az oldalak alján az alapból összecsukott
+**Fejlesztői részletek** szakaszban találhatók; a próbákhoz nyisd ki.
 
 1. Az áttekintő oldalon jegyezd fel a függő jóváhagyások számát.
 2. Nyisd meg a feladatokat, szűrj vagy keress rá a
    **Kerti előkészületek** feladatra.
-3. A részleteknél próbáld ki a hozzárendelést. A **Betelt kapacitás**
-   forgatókönyvvel ellenőrizd az ütközési visszajelzést; ezután próbáld ki
-   a jogosult, szabad kapacitású forgatókönyvet.
+3. A részleteknél próbáld ki a hozzárendelést. A **Fejlesztői részletek**
+   alatt a **Betelt kapacitás** forgatókönyvvel ellenőrizd az ütközési
+   visszajelzést; ezután próbáld ki a jogosult, szabad kapacitású
+   forgatókönyvet.
 4. Nyisd meg a **Jóváhagyások** listát. Válassz egy függő feladatcsere- vagy
    lemondási kérelmet, jelöld meg a döntést, majd rögzítsd.
 5. Opcionális: közvetlenül próbáld megnyitni az `/admin/import`,
@@ -173,7 +194,9 @@ menüpontokon felül a következők jelennek meg: **Importálás**,
 
 1. Nyisd meg az **Importálás** oldalt.
 2. Hagyd kiválasztva a **Waldorf 30 család — v1** szintetikus munkafüzetet
-   és az **Érvényes** forgatókönyvet.
+   és az **Érvényes** forgatókönyvet (a forgatókönyv-választók az oldal alján,
+   a **Fejlesztői részletek** szakaszban vannak; a mentési forgatókönyv
+   ugyanott módosítható).
 3. Kattints az **Ellenőrzés és előnézet** gombra. Ellenőrizd a sorok számát,
    az ujjlenyomatot és a változásösszesítőt.
 4. Az ütközésnél válaszd a **Meglévő adat megtartása** vagy az
@@ -248,7 +271,11 @@ kiszolgálót a terminálban **Ctrl+C** billentyűkombinációval állíthatod l
 |---|---|---|
 | Profilok és navigáció | Minden profil az alapértelmezett oldalát nyitja; a menü minden oldalon ugyanaz, az aktuális oldal kiemelt; az óvónőnek nincs menüje | |
 | Listaelemek és állapotok | Minden listaelem egyetlen kattintható kártya; az állapotok magyarul látszanak | |
-| Értesítés olvasottnak jelölése | A négyzet bejelölése azonnal olvasottá teszi; az olvasott négyzet bejelölt és nem módosítható | |
+| Értesítés olvasottnak jelölése | A négyzet bejelölése azonnal olvasottá teszi; az olvasott négyzet bejelölt és nem módosítható; az olvasott kártya szürkített | |
+| Értesítés megnyitása | A kártya megnyitja a feladatot, a menüben az Értesítések marad kiemelt, a „Vissza az értesítésekhez” hivatkozás a listára visz, és az értesítés olvasott lesz | |
+| Függő kérelem | Elküldés után megjelenik a függő jelzés; a kérelem hivatkozásai eltűnnek, ugyanaz nem küldhető újra | |
+| Admin visszalépés és szűrők | Minden részletes oldalon és űrlapon van Vissza hivatkozás; a szűrők csak az adott listára érvényes állapotokat kínálják | |
+| Technikai szövegek | Verzió, Korreláció és forgatókönyv-választók csak a Fejlesztői részletek szakaszban látszanak | |
 | Szülői jelentkezés | Nyitott feladat vállalható; betelt/nem jogosult feladat nem | |
 | Csere és lemondás | Kérelem elküldése sikeres, az indoklás nem jelenik meg más nézetben | |
 | Munkatársi beosztás | Szűrés és részletek működnek; nincs módosító művelet | |

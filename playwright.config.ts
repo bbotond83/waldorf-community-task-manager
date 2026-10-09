@@ -8,6 +8,8 @@ const serverEnvironment = (port: number) => ({
   APP_SYNTHETIC_FIXTURE_VERSION: "waldorf-local-v1",
   APP_HOST: "127.0.0.1",
   APP_PORT: String(port),
+  // Test mode: adds the per-browser copies of the parent fixtures so each project mutates its own.
+  SYNTHETIC_TEST_COPIES: "1",
 });
 
 export default defineConfig({

@@ -1,15 +1,7 @@
+import { DUTY_STATE_LABELS, dutyStateLabel } from "../../../src/application/status-labels.ts";
 import { ParentStatePanel } from "../_components/ParentStatePanel.tsx";
 import { resolveParentFacade } from "../_lib/facade.ts";
 import { resolveParentSession } from "../_lib/session.ts";
-
-const STATE_LABELS = {
-  available: "Jelentkezésre nyitott",
-  full: "Betelt",
-  ineligible: "Nem jogosult",
-  assigned: "Vállalt feladat",
-  "swap-pending": "Cserekérelem folyamatban",
-  "cancellation-pending": "Lemondási kérelem folyamatban",
-} as const;
 
 export default async function ParentDutiesPage({
   searchParams,
@@ -38,7 +30,7 @@ export default async function ParentDutiesPage({
         <label htmlFor="allapot">Állapot</label>
         <select id="allapot" name="allapot" defaultValue={allapot} data-testid="duty-filter-select">
           <option value="">Minden állapot</option>
-          {Object.entries(STATE_LABELS).map(([value, label]) => (
+          {Object.entries(DUTY_STATE_LABELS).map(([value, label]) => (
             <option key={value} value={value}>
               {label}
             </option>
@@ -63,7 +55,7 @@ export default async function ParentDutiesPage({
                   >
                     <h2>{duty.title}</h2>
                     <p>{formatBudapestDate(duty.dueAt)}</p>
-                    <strong className="parent-state-badge">{STATE_LABELS[duty.state]}</strong>
+                    <strong className="parent-state-badge">{dutyStateLabel(duty.state)}</strong>
                   </a>
                 </li>
               ))}

@@ -3,6 +3,10 @@ import { describe, it } from "node:test";
 import type { Scope } from "../access/index.ts";
 import { SyntheticAdminPort } from "../admin-core/synthetic-admin.ts";
 import {
+  ADMIN_LIST_STATUS_OPTIONS,
+  DUTY_STATE_LABELS,
+  dutyStateLabel,
+  type AdminListKind,
   STATUS_LABELS,
   statusLabel,
   UNKNOWN_STATUS_LABEL,
@@ -124,5 +128,76 @@ describe("statusLabel", () => {
     assert.equal(statusLabel(""), "Ismeretlen állapot");
     assert.equal(statusLabel("toString"), "Ismeretlen állapot");
     assert.equal(statusLabel("__proto__"), "Ismeretlen állapot");
+  });
+});
+
+describe("dutyStateLabel", () => {
+  it("labels every parent duty state with the request words of the pending notices", () => {
+    for (const state of [
+      "available",
+      "full",
+      "ineligible",
+      "assigned",
+      "swap-pending",
+      "cancellation-pending",
+    ]) {
+      assert.ok(Object.hasOwn(DUTY_STATE_LABELS, state), `no duty label for ${state}`);
+      assert.notEqual(dutyStateLabel(state), UNKNOWN_STATUS_LABEL);
+    }
+    assert.equal(dutyStateLabel("swap-pending"), "Cserekérelem folyamatban");
+    assert.equal(dutyStateLabel("cancellation-pending"), "Lemondási kérelem folyamatban");
+  });
+
+  it("falls back to the unknown label for unlisted and inherited keys", () => {
+    assert.equal(dutyStateLabel("something-new"), UNKNOWN_STATUS_LABEL);
+    assert.equal(dutyStateLabel("toString"), UNKNOWN_STATUS_LABEL);
+  });
+});
+
+describe("ADMIN_LIST_STATUS_OPTIONS", () => {
+  const operations = {
+    records: "records.list",
+    tasks: "tasks.list",
+    approvals: "approvals.list",
+  } as const;
+
+  it("offers only labelled statuses, each once, and every status the demo data holds", async () => {
+    const port = new SyntheticAdminPort();
+    for (const kind of Object.keys(ADMIN_LIST_STATUS_OPTIONS) as AdminListKind[]) {
+      const offered: readonly string[] = ADMIN_LIST_STATUS_OPTIONS[kind];
+      assert.equal(new Set(offered).size, offered.length, `${kind} repeats a status`);
+      for (const value of offered) {
+        assert.ok(Object.hasOwn(STATUS_LABELS, value), `${kind} offers unknown status ${value}`);
+      }
+      const outcome = await port.execute({
+        actorId: "label-test",
+        operation: operations[kind],
+        scope: organizationScope,
+        payload: {},
+      });
+      assert.equal(outcome.state, "success");
+      if (outcome.state === "success") {
+        const items = (outcome.data as { items: readonly { state: string }[] }).items;
+        assert.ok(items.length > 0, `${kind} demo list is empty`);
+        for (const item of items) {
+          assert.ok(offered.includes(item.state), `${kind} demo status ${item.state} not offered`);
+        }
+      }
+    }
+  });
+
+  it("returns a result for every offered value that the demo data holds", async () => {
+    const port = new SyntheticAdminPort();
+    for (const kind of ["records", "tasks"] as const) {
+      for (const value of ADMIN_LIST_STATUS_OPTIONS[kind]) {
+        const outcome = await port.execute({
+          actorId: "label-test",
+          operation: operations[kind],
+          scope: organizationScope,
+          payload: { state: value },
+        });
+        assert.equal(outcome.state, "success", `${kind} ${value} filter has no result`);
+      }
+    }
   });
 });

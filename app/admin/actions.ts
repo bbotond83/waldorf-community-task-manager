@@ -28,12 +28,26 @@ export type AdminAction = (
   formData: FormData,
 ) => Promise<AdminActionState>;
 
+const TITLE_MAX_LENGTH = 120;
+
+/** Hungarian field message for an empty or too long title, naming the limit. */
+function titleValidationState(code: string | undefined): AdminActionState {
+  return mapApplicationResult(
+    validation({
+      title:
+        code === "VAL-TOO-LONG"
+          ? `A megnevezés legfeljebb ${TITLE_MAX_LENGTH} karakter hosszú lehet.`
+          : "A megnevezés megadása kötelező.",
+    }),
+  );
+}
+
 export async function saveRecordAction(
   _state: AdminActionState,
   formData: FormData,
 ): Promise<AdminActionState> {
-  const title = normalizeRequiredText(formData.get("title"), "title", 120);
-  if (title.state === "validation") return mapApplicationResult(title);
+  const title = normalizeRequiredText(formData.get("title"), "title", TITLE_MAX_LENGTH);
+  if (title.state === "validation") return titleValidationState(title.fieldErrors?.title);
   const context = parseMutationContext(formData);
   if (!context.ok) return context.state;
   const boundary = await resolveBoundary();
@@ -65,8 +79,8 @@ export async function saveTaskAction(
   _state: AdminActionState,
   formData: FormData,
 ): Promise<AdminActionState> {
-  const title = normalizeRequiredText(formData.get("title"), "title", 120);
-  if (title.state === "validation") return mapApplicationResult(title);
+  const title = normalizeRequiredText(formData.get("title"), "title", TITLE_MAX_LENGTH);
+  if (title.state === "validation") return titleValidationState(title.fieldErrors?.title);
   const context = parseMutationContext(formData);
   if (!context.ok) return context.state;
   const boundary = await resolveBoundary();

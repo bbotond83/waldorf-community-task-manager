@@ -1,7 +1,16 @@
+import { redirect } from "next/navigation";
+import { dutyStateLabel } from "../../../../src/application/status-labels.ts";
+import {
+  NOTIFICATION_LIST_PATH,
+  pendingRequests,
+  resolveNotificationContext,
+} from "../../../../src/parent-web/notification-context.ts";
+import { MarkNotificationRead } from "../../_components/MarkNotificationRead.tsx";
 import { ParentMutationForm } from "../../_components/ParentMutationForm.tsx";
+import { PendingRequestNotice } from "../../_components/PendingRequestNotice.tsx";
 import { ParentStatePanel } from "../../_components/ParentStatePanel.tsx";
 import { resolveParentFacade } from "../../_lib/facade.ts";
-import { resolveParentSession } from "../../_lib/session.ts";
+import { resolveParentSession, type ParentSession } from "../../_lib/session.ts";
 import { signUpAction, updateContributionAction } from "../../actions.ts";
 import { formatBudapestDate } from "../page.tsx";
 
@@ -10,10 +19,10 @@ export default async function DutyDetailPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ allapot?: string }>;
+  searchParams: Promise<{ allapot?: string; ertesites?: string }>;
 }) {
   const { id } = await params;
-  const { allapot = "" } = await searchParams;
+  const { allapot = "", ertesites } = await searchParams;
   const session = await resolveParentSession();
   const facade = await resolveParentFacade();
   if (session.state !== "success" || !facade) return null;
@@ -22,12 +31,16 @@ export default async function DutyDetailPage({
     familyId: session.data.familyId,
     dutyId: id,
   });
-  const backHref = `/szulo/feladatok${allapot ? `?allapot=${encodeURIComponent(allapot)}` : ""}`;
+  const notification = await openedFromNotification(facade, session.data, ertesites, id, allapot);
+  const backHref = notification
+    ? NOTIFICATION_LIST_PATH
+    : `/szulo/feladatok${allapot ? `?allapot=${encodeURIComponent(allapot)}` : ""}`;
 
   return (
     <section className="parent-page" data-testid="duty-detail-page">
+      {notification && <MarkNotificationRead notificationId={notification.id} />}
       <a href={backHref} data-testid="duty-detail-back-link">
-        Vissza a feladatokhoz
+        {notification ? "Vissza az értesítésekhez" : "Vissza a feladatokhoz"}
       </a>
       <ParentStatePanel
         result={result}
@@ -49,7 +62,12 @@ export default async function DutyDetailPage({
                 <dt>Helyszín</dt>
                 <dd>{duty.location}</dd>
               </div>
+              <div>
+                <dt>Állapot</dt>
+                <dd data-testid="duty-detail-state">{dutyStateLabel(duty.state)}</dd>
+              </div>
             </dl>
+            <PendingRequestNotice pending={pendingRequests(duty)} />
             {duty.state === "available" && (
               <ParentMutationForm
                 action={signUpAction}
@@ -69,7 +87,7 @@ export default async function DutyDetailPage({
                 A család ehhez a feladathoz most nem jogosult.
               </p>
             )}
-            {duty.assignmentId && (
+            {duty.assignmentId && !pendingRequests(duty).any && (
               <nav aria-label="Feladatműveletek" className="parent-page-actions">
                 <a href={`/szulo/feladatok/${duty.id}/csere`} data-testid="swap-request-link">
                   Cserekérelem
@@ -117,6 +135,33 @@ export default async function DutyDetailPage({
       </ParentStatePanel>
     </section>
   );
+}
+
+/**
+ * The notification this task page was opened from. The address parameter counts only when it is
+ * one of the signed-in parent's own notifications and it points at this task; any other value
+ * sends the parent to the clean task address, so the page behaves exactly as if the parameter
+ * were absent (no marking, "Feladatok" current, back link to the task list).
+ */
+async function openedFromNotification(
+  facade: NonNullable<Awaited<ReturnType<typeof resolveParentFacade>>>,
+  session: ParentSession,
+  notificationId: string | undefined,
+  dutyId: string,
+  allapot: string,
+) {
+  if (notificationId === undefined) return undefined;
+  const list = await facade.listNotifications(session.applicationSession, session.familyScope);
+  const notification =
+    list.state === "success"
+      ? resolveNotificationContext(list.data.notifications, notificationId, dutyId)
+      : undefined;
+  if (!notification) {
+    redirect(
+      `/szulo/feladatok/${dutyId}${allapot ? `?allapot=${encodeURIComponent(allapot)}` : ""}`,
+    );
+  }
+  return notification;
 }
 
 function MutationContext({

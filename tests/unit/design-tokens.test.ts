@@ -41,6 +41,20 @@ describe("design tokens", () => {
     }
   });
 
+  it("keeps the greyed read-notification card readable (4.5:1) and its card edge visible", () => {
+    for (const text of ["color-read-text", "color-primary-dark", "color-text"]) {
+      expect(
+        contrast(token(text), token("color-read-bg")),
+        `${text} on color-read-bg`,
+      ).toBeGreaterThanOrEqual(4.5);
+    }
+    expect(contrast(token("color-focus"), token("color-read-bg"))).toBeGreaterThanOrEqual(3);
+    expect(contrast(token("color-border-strong"), token("color-read-bg"))).toBeGreaterThanOrEqual(
+      3,
+    );
+    expect(token("color-read-bg")).not.toBe(token("color-surface"));
+  });
+
   it("keeps button text readable on the primary colours", () => {
     expect(contrast("#ffffff", token("color-primary"))).toBeGreaterThanOrEqual(4.5);
     expect(contrast("#ffffff", token("color-primary-dark"))).toBeGreaterThanOrEqual(4.5);

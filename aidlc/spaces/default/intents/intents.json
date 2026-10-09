@@ -56,5 +56,13 @@
     "scope": "bugfix",
     "status": "complete",
     "request": "e67c9b2b"
+  },
+  {
+    "uuid": "01a12115-8bb9-7a98-914c-ba7b938f403c",
+    "slug": "functional-test-fixes",
+    "dirName": "261009-functional-test-fixes",
+    "scope": "bugfix",
+    "status": "complete",
+    "request": "7db047ce"
   }
 ]

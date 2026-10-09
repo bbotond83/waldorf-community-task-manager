@@ -84,6 +84,8 @@ export async function markNotificationReadAction(
     idempotencyKey,
   });
   if (result.state === "success") {
+    // Marking read is idempotent; the list is refreshed so returning to it shows the read state.
+    revalidatePath("/szulo/ertesitesek");
     return {
       ...mapParentResult(result, "Az értesítés olvasottként megjelölve."),
       link: result.data.link,

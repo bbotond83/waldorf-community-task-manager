@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { AdminBackLink } from "../../_components/AdminBackLink.tsx";
 import { AdminMutationForm } from "../../_components/AdminMutationForm.tsx";
 import { AsyncStatePanel } from "../../_components/AsyncStatePanel.tsx";
 import { restoreRecordAction } from "../../actions.ts";
@@ -25,6 +26,7 @@ export default async function ArchiveDetailPage({
   return (
     <section className="admin-page" data-testid="admin-archive-detail-page">
       <header>
+        <AdminBackLink list="archive" />
         <p className="eyebrow">Archívum</p>
         <h1 tabIndex={-1}>Archivált rekord</h1>
       </header>

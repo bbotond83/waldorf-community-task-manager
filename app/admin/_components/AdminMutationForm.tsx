@@ -1,14 +1,37 @@
 "use client";
 
-import { useActionState, useEffect, useRef, type ReactNode } from "react";
+import Link from "next/link";
+import {
+  createContext,
+  useActionState,
+  useContext,
+  useEffect,
+  useRef,
+  type ReactNode,
+} from "react";
 import type { AdminAction, AdminActionState } from "../actions.ts";
 
+const FieldErrorsContext = createContext<Readonly<Record<string, string>>>({});
+
+/**
+ * A form that posts to an admin action and shows the outcome. The browser's own required-field
+ * check is switched off (`noValidate`) so an empty required field reaches the action and gets
+ * the same Hungarian message next to the field and in the summary. With `successLink` the
+ * confirmation carries a link (for example back to the list); the form itself stays on the page.
+ */
 export function AdminMutationForm({
   action,
   submitLabel,
   testId,
   children,
-}: Readonly<{ action: AdminAction; submitLabel: string; testId: string; children: ReactNode }>) {
+  successLink,
+}: Readonly<{
+  action: AdminAction;
+  submitLabel: string;
+  testId: string;
+  children: ReactNode;
+  successLink?: Readonly<{ href: string; label: string }>;
+}>) {
   const [state, formAction, isPending] = useActionState(action, { state: "initial" });
   const summaryRef = useRef<HTMLDivElement>(null);
 
@@ -19,7 +42,7 @@ export function AdminMutationForm({
   }, [state.state]);
 
   return (
-    <form action={formAction} className="admin-form" data-testid={testId}>
+    <form action={formAction} className="admin-form" id={testId} noValidate data-testid={testId}>
       {state.state !== "initial" && (
         <div
           ref={summaryRef}
@@ -40,13 +63,64 @@ export function AdminMutationForm({
               ))}
             </ul>
           )}
+          {state.state === "success" && successLink && (
+            <p>
+              <Link
+                className="admin-form-success-link"
+                href={successLink.href}
+                data-testid={`${testId}-success-link`}
+              >
+                {successLink.label}
+              </Link>
+            </p>
+          )}
         </div>
       )}
-      {children}
+      <FieldErrorsContext value={state.state === "validation" ? (state.fieldErrors ?? {}) : {}}>
+        {children}
+      </FieldErrorsContext>
       <button type="submit" disabled={isPending} data-testid={`${testId}-submit-button`}>
         {isPending ? "Feldolgozás folyamatban" : submitLabel}
       </button>
     </form>
+  );
+}
+
+/**
+ * A labelled text input of an admin form. When the last submit reported an error for this field
+ * the message is shown right below the input and tied to it for assistive technology.
+ */
+export function AdminTextField({
+  id,
+  label,
+  testId,
+  ...input
+}: Readonly<{
+  id: string;
+  label: string;
+  testId: string;
+  name: string;
+  defaultValue?: string;
+  required?: boolean;
+  maxLength?: number;
+}>) {
+  const message = useContext(FieldErrorsContext)[input.name];
+  return (
+    <>
+      <label htmlFor={id}>{label}</label>
+      <input
+        id={id}
+        {...input}
+        aria-invalid={message ? true : undefined}
+        aria-describedby={message ? `${id}-error` : undefined}
+        data-testid={testId}
+      />
+      {message && (
+        <p id={`${id}-error`} className="admin-field-error" data-testid={`${testId}-error`}>
+          {message}
+        </p>
+      )}
+    </>
   );
 }
 

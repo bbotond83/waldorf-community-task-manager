@@ -23,8 +23,8 @@ export type SyntheticProfile = {
 };
 
 const parentNavigation: readonly NavigationItem[] = [
-  { id: "parent-duties", label: "Feladatok", href: "/szulo/feladatok" },
   { id: "parent-notifications", label: "Értesítések", href: "/szulo/ertesitesek" },
+  { id: "parent-duties", label: "Feladatok", href: "/szulo/feladatok" },
 ];
 
 // The teacher's only page is Beosztás, so the shell shows no menu for this profile.

@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { AdminItemModel, ApplicationResult } from "../../../../src/application/index.ts";
+import { AdminBackLink } from "../../_components/AdminBackLink.tsx";
 import { AdminMutationForm } from "../../_components/AdminMutationForm.tsx";
 import { AsyncStatePanel } from "../../_components/AsyncStatePanel.tsx";
 import { decideApprovalAction } from "../../actions.ts";
@@ -33,6 +34,10 @@ export default async function ApprovalDetailPage({
   return (
     <section className="admin-page" data-testid="admin-approval-detail-page">
       <header>
+        <AdminBackLink
+          list="approvals"
+          returnQuery={typeof query.vissza === "string" ? query.vissza : undefined}
+        />
         <p className="eyebrow">Jóváhagyások</p>
         <h1 tabIndex={-1}>Kérelem elbírálása</h1>
       </header>

@@ -3,6 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { resetSyntheticAdminFixtures } from "../../../../src/admin-core/synthetic-admin.ts";
 import { resetSyntheticAdvancedFixtures } from "../../../../src/admin-advanced/index.ts";
 import { resetSyntheticParentState } from "../../../../src/parent-web/index.ts";
+import { resetParentFacadeCache } from "../../../szulo/_lib/facade.ts";
 import { composeRuntime } from "../../../../src/runtime/composition";
 import { isSameOrigin } from "../../../../src/runtime/security/origin";
 
@@ -21,6 +22,7 @@ export async function POST(request: NextRequest) {
   resetSyntheticAdminFixtures();
   resetSyntheticAdvancedFixtures();
   resetSyntheticParentState();
+  resetParentFacadeCache();
 
   return NextResponse.json({
     state: "success",

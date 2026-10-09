@@ -1,5 +1,6 @@
 import { AdminAccessState } from "../_components/AdminAccessState.tsx";
 import { AdminMutationForm } from "../_components/AdminMutationForm.tsx";
+import { DeveloperDetails } from "../_components/DeveloperDetails.tsx";
 import { saveAdvancedSettingsAction, updateGrantAction } from "../advanced-actions.ts";
 import { resolveAdminFacade } from "../_lib/facade.ts";
 import { resolveAdminSession } from "../_lib/session.ts";
@@ -86,16 +87,6 @@ export default async function AdvancedSettingsPage() {
                   submitLabel="Jogosultság visszavonása"
                   testId={`admin-grant-revoke-${grant.id}`}
                 >
-                  <label htmlFor={`grant-scenario-${grant.id}`}>Ellenőrzési forgatókönyv</label>
-                  <select
-                    id={`grant-scenario-${grant.id}`}
-                    name="scenario"
-                    defaultValue={grant.isSelf ? "self-lockout" : "success"}
-                  >
-                    <option value="success">Szabályos visszavonás</option>
-                    <option value="self-lockout">Saját hozzáférés védelme</option>
-                    <option value="retryable">Átmeneti hiba</option>
-                  </select>
                   <input type="hidden" name="grantId" value={grant.id} />
                   <input type="hidden" name="expectedVersion" value={grant.version} />
                   <input
@@ -108,6 +99,27 @@ export default async function AdvancedSettingsPage() {
             ))}
           </ul>
         </section>
+      )}
+      {governance.state === "success" && (
+        <DeveloperDetails>
+          {governance.data.grants.map((grant) => (
+            <div key={grant.id}>
+              <label htmlFor={`grant-scenario-${grant.id}`}>
+                Ellenőrzési forgatókönyv – {grant.subjectLabel}
+              </label>
+              <select
+                id={`grant-scenario-${grant.id}`}
+                name="scenario"
+                form={`admin-grant-revoke-${grant.id}`}
+                defaultValue={grant.isSelf ? "self-lockout" : "success"}
+              >
+                <option value="success">Szabályos visszavonás</option>
+                <option value="self-lockout">Saját hozzáférés védelme</option>
+                <option value="retryable">Átmeneti hiba</option>
+              </select>
+            </div>
+          ))}
+        </DeveloperDetails>
       )}
     </section>
   );

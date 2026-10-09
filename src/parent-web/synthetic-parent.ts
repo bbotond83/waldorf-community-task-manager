@@ -30,22 +30,6 @@ export const PARENT_FAMILY_SCOPE: Scope = Object.freeze({
 
 const DUTY_FIXTURES: readonly DutyDetailModel[] = Object.freeze([
   Object.freeze({
-    id: "duty-garden-firefox",
-    title: "Kerti előkészítés – Firefox próba",
-    dueAt: "2026-09-06T08:00:00+02:00",
-    location: "Napsugár Waldorf Óvoda kertje",
-    state: "available",
-    version: 1,
-  }),
-  Object.freeze({
-    id: "duty-garden-mobile",
-    title: "Kerti előkészítés – mobil próba",
-    dueAt: "2026-09-07T08:00:00+02:00",
-    location: "Napsugár Waldorf Óvoda kertje",
-    state: "available",
-    version: 1,
-  }),
-  Object.freeze({
     id: "duty-garden",
     title: "Kerti előkészítés",
     dueAt: "2026-09-05T08:00:00+02:00",
@@ -82,6 +66,57 @@ const DUTY_FIXTURES: readonly DutyDetailModel[] = Object.freeze([
     allergenNote: "A sütemények összetevőit külön jelöljük.",
     ownContributionNote: "Almalevet viszünk.",
   }),
+]);
+
+const NOTIFICATION_FIXTURES = Object.freeze([
+  Object.freeze({
+    id: "notice-7-day",
+    title: "Egy hét múlva: Lámpás ünnep előkészítése",
+    link: "/szulo/feladatok/duty-assigned",
+    isRead: false,
+    timing: "7-day" as const,
+    providerStatus: "simulated-sent" as const,
+  }),
+  Object.freeze({
+    id: "notice-24-hour",
+    title: "Holnap: Kerti előkészítés",
+    link: "/szulo/feladatok/duty-garden",
+    isRead: false,
+    timing: "24-hour" as const,
+    providerStatus: "simulated-retry" as const,
+  }),
+  Object.freeze({
+    id: "notice-stale",
+    title: "Korábbi, már nem aktuális emlékeztető",
+    link: "/szulo/ertesitesek",
+    isRead: true,
+    timing: "stale" as const,
+    providerStatus: "simulated-cancelled" as const,
+  }),
+]);
+
+/**
+ * Per-browser copies of a few fixtures. The browser tests run three projects against separate
+ * servers, but each project keeps its own copy so a mutation in one never affects another. They
+ * exist only when the test-mode switch `SYNTHETIC_TEST_COPIES=1` is set, never in the demo.
+ */
+const TEST_DUTY_FIXTURES: readonly DutyDetailModel[] = Object.freeze([
+  Object.freeze({
+    id: "duty-garden-firefox",
+    title: "Kerti előkészítés – Firefox próba",
+    dueAt: "2026-09-06T08:00:00+02:00",
+    location: "Napsugár Waldorf Óvoda kertje",
+    state: "available",
+    version: 1,
+  }),
+  Object.freeze({
+    id: "duty-garden-mobile",
+    title: "Kerti előkészítés – mobil próba",
+    dueAt: "2026-09-07T08:00:00+02:00",
+    location: "Napsugár Waldorf Óvoda kertje",
+    state: "available",
+    version: 1,
+  }),
   Object.freeze({
     id: "duty-assigned-firefox",
     title: "Lámpás ünnep előkészítése – Firefox próba",
@@ -106,15 +141,7 @@ const DUTY_FIXTURES: readonly DutyDetailModel[] = Object.freeze([
   }),
 ]);
 
-const NOTIFICATION_FIXTURES = Object.freeze([
-  Object.freeze({
-    id: "notice-7-day",
-    title: "Egy hét múlva: Lámpás ünnep előkészítése",
-    link: "/szulo/feladatok/duty-assigned",
-    isRead: false,
-    timing: "7-day" as const,
-    providerStatus: "simulated-sent" as const,
-  }),
+const TEST_NOTIFICATION_FIXTURES: readonly NotificationModel[] = Object.freeze([
   Object.freeze({
     id: "notice-7-day-firefox",
     title: "Egy hét múlva: Lámpás ünnep – Firefox próba",
@@ -131,23 +158,24 @@ const NOTIFICATION_FIXTURES = Object.freeze([
     timing: "7-day" as const,
     providerStatus: "simulated-sent" as const,
   }),
-  Object.freeze({
-    id: "notice-24-hour",
-    title: "Holnap: Kerti előkészítés",
-    link: "/szulo/feladatok/duty-garden",
-    isRead: false,
-    timing: "24-hour" as const,
-    providerStatus: "simulated-retry" as const,
-  }),
-  Object.freeze({
-    id: "notice-stale",
-    title: "Korábbi, már nem aktuális emlékeztető",
-    link: "/szulo/ertesitesek",
-    isRead: true,
-    timing: "stale" as const,
-    providerStatus: "simulated-cancelled" as const,
-  }),
 ]);
+
+/** The test-mode switch that adds the per-browser copies to the fixtures. */
+export const TEST_COPIES_VARIABLE = "SYNTHETIC_TEST_COPIES";
+
+export function buildDutyFixtures(testCopies: boolean): readonly DutyDetailModel[] {
+  return testCopies ? [...DUTY_FIXTURES, ...TEST_DUTY_FIXTURES] : DUTY_FIXTURES;
+}
+
+export function buildNotificationFixtures(testCopies: boolean): readonly NotificationModel[] {
+  return testCopies
+    ? [...NOTIFICATION_FIXTURES, ...TEST_NOTIFICATION_FIXTURES]
+    : NOTIFICATION_FIXTURES;
+}
+
+function testCopiesEnabled(): boolean {
+  return process.env[TEST_COPIES_VARIABLE] === "1";
+}
 
 type MutableParentState = {
   duties: Map<string, DutyDetailModel>;
@@ -156,14 +184,29 @@ type MutableParentState = {
   requests: Map<string, RequestModel>;
 };
 
-let state = createState();
+/**
+ * The state lives on the global object, not in a module variable: the production build can load
+ * this file once for the pages and actions and once for the reset route, and a module variable
+ * would then be reset in the wrong copy.
+ */
+const STATE_KEY = Symbol.for("waldorf.syntheticParentState");
+type StateHolder = { [STATE_KEY]?: MutableParentState };
+
+function currentState(): MutableParentState {
+  const holder = globalThis as StateHolder;
+  holder[STATE_KEY] ??= createState();
+  return holder[STATE_KEY];
+}
 
 function createState(): MutableParentState {
+  const dutyFixtures = buildDutyFixtures(testCopiesEnabled());
   return {
-    duties: new Map(DUTY_FIXTURES.map((duty) => [duty.id, duty])),
-    notifications: new Map(NOTIFICATION_FIXTURES.map((notice) => [notice.id, notice])),
+    duties: new Map(dutyFixtures.map((duty) => [duty.id, duty])),
+    notifications: new Map(
+      buildNotificationFixtures(testCopiesEnabled()).map((notice) => [notice.id, notice]),
+    ),
     contributionNotes: new Map(
-      DUTY_FIXTURES.flatMap((duty) =>
+      dutyFixtures.flatMap((duty) =>
         duty.ownContributionNote ? [[duty.id, duty.ownContributionNote] as const] : [],
       ),
     ),
@@ -172,7 +215,7 @@ function createState(): MutableParentState {
 }
 
 export function resetSyntheticParentState(): void {
-  state = createState();
+  (globalThis as StateHolder)[STATE_KEY] = createState();
 }
 
 class RetryableSyntheticFailure extends Error {}
@@ -195,7 +238,7 @@ class SyntheticParentPort implements ParentApplicationPort {
     familyId: string;
   }): Promise<DomainOutcome<DutyListModel>> {
     if (!ownsFamily(input)) return { state: "denied" };
-    const duties = [...state.duties.values()].map(toListItem);
+    const duties = [...currentState().duties.values()].map(toListItem);
     return duties.length ? { state: "success", data: { duties } } : { state: "empty" };
   }
 
@@ -205,13 +248,13 @@ class SyntheticParentPort implements ParentApplicationPort {
     dutyId: string;
   }): Promise<DomainOutcome<DutyDetailModel>> {
     if (!ownsFamily(input)) return { state: "denied" };
-    const duty = state.duties.get(input.dutyId);
+    const duty = currentState().duties.get(input.dutyId);
     if (!duty) return { state: "denied" };
     return {
       state: "success",
       data: Object.freeze({
         ...duty,
-        ownContributionNote: state.contributionNotes.get(duty.id),
+        ownContributionNote: currentState().contributionNotes.get(duty.id),
       }),
     };
   }
@@ -225,7 +268,7 @@ class SyntheticParentPort implements ParentApplicationPort {
     if (!ownsFamily(input)) return { state: "denied" };
     if (input.dutyId === "duty-retry") throw new RetryableSyntheticFailure();
     if (input.dutyId === "duty-terminal") throw new TerminalSyntheticFailure();
-    const duty = state.duties.get(input.dutyId);
+    const duty = currentState().duties.get(input.dutyId);
     if (!duty) return { state: "denied" };
     if (duty.version !== input.expectedVersion) {
       return { state: "invalidated", code: "DUTY_VERSION_STALE" };
@@ -238,7 +281,7 @@ class SyntheticParentPort implements ParentApplicationPort {
       state: "assigned",
       version: duty.version + 1,
     });
-    state.duties.set(
+    currentState().duties.set(
       duty.id,
       Object.freeze({
         ...duty,
@@ -285,7 +328,10 @@ class SyntheticParentPort implements ParentApplicationPort {
     actorId: string;
   }): Promise<DomainOutcome<NotificationListModel>> {
     if (input.actorId !== "parent-local") return { state: "denied" };
-    return { state: "success", data: { notifications: [...state.notifications.values()] } };
+    return {
+      state: "success",
+      data: { notifications: [...currentState().notifications.values()] },
+    };
   }
 
   async markNotificationRead(input: {
@@ -293,9 +339,12 @@ class SyntheticParentPort implements ParentApplicationPort {
     notificationId: string;
   }): Promise<DomainOutcome<Readonly<{ link: string }>>> {
     if (input.actorId !== "parent-local") return { state: "denied" };
-    const notification = state.notifications.get(input.notificationId);
+    const notification = currentState().notifications.get(input.notificationId);
     if (!notification) return { state: "denied" };
-    state.notifications.set(input.notificationId, Object.freeze({ ...notification, isRead: true }));
+    currentState().notifications.set(
+      input.notificationId,
+      Object.freeze({ ...notification, isRead: true }),
+    );
     return { state: "success", data: Object.freeze({ link: notification.link }) };
   }
 
@@ -305,9 +354,9 @@ class SyntheticParentPort implements ParentApplicationPort {
     note: string;
   }): Promise<DomainOutcome<EventNoteModel>> {
     if (input.actorId !== "parent-local") return { state: "denied" };
-    const duty = state.duties.get(input.eventId);
+    const duty = currentState().duties.get(input.eventId);
     if (!duty?.assignmentId) return { state: "denied" };
-    state.contributionNotes.set(input.eventId, input.note);
+    currentState().contributionNotes.set(input.eventId, input.note);
     return {
       state: "success",
       data: Object.freeze({ eventId: input.eventId, note: input.note }),
@@ -327,7 +376,7 @@ class SyntheticParentPort implements ParentApplicationPort {
       return { state: "invalidated", code: "REQUEST_INVALIDATED" };
     }
     const normalizedAssignmentId = assignmentId.split("--scenario-")[0]!;
-    const assignedDuty = [...state.duties.values()].find(
+    const assignedDuty = [...currentState().duties.values()].find(
       (duty) => duty.assignmentId === normalizedAssignmentId,
     );
     if (!assignedDuty) return { state: "denied" };
@@ -335,12 +384,12 @@ class SyntheticParentPort implements ParentApplicationPort {
       return { state: "invalidated", code: "REQUEST_VERSION_STALE" };
     }
     const requestId = `${kind}-request-${assignedDuty.id}`;
-    const existing = state.requests.get(requestId);
+    const existing = currentState().requests.get(requestId);
     if (existing) return { state: "conflict", code: "REQUEST_DUPLICATE" };
     const request = Object.freeze({ id: requestId, state: "pending" as const });
-    state.requests.set(requestId, request);
+    currentState().requests.set(requestId, request);
     const duty = assignedDuty;
-    state.duties.set(
+    currentState().duties.set(
       duty.id,
       Object.freeze({
         ...duty,

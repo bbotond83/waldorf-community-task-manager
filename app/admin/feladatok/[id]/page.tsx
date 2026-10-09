@@ -1,6 +1,8 @@
 import { randomUUID } from "node:crypto";
-import { AdminMutationForm } from "../../_components/AdminMutationForm.tsx";
+import { AdminBackLink } from "../../_components/AdminBackLink.tsx";
+import { AdminMutationForm, AdminTextField } from "../../_components/AdminMutationForm.tsx";
 import { AsyncStatePanel } from "../../_components/AsyncStatePanel.tsx";
+import { DeveloperDetails } from "../../_components/DeveloperDetails.tsx";
 import { assignTaskAction, saveEventNotesAction, saveTaskAction } from "../../actions.ts";
 import { resolveAdminFacade } from "../../_lib/facade.ts";
 import { resolveAdminSession } from "../../_lib/session.ts";
@@ -32,6 +34,10 @@ export default async function TaskDetailPage({
   return (
     <section className="admin-page" data-testid="admin-task-detail-page">
       <header>
+        <AdminBackLink
+          list="tasks"
+          returnQuery={typeof query.vissza === "string" ? query.vissza : undefined}
+        />
         <p className="eyebrow">Feladatok és események</p>
         <h1 tabIndex={-1}>Részletek és kapacitás</h1>
       </header>
@@ -45,7 +51,6 @@ export default async function TaskDetailPage({
             <section>
               <h2>{task.title}</h2>
               <p>Állapot: {statusLabel(task.state)}</p>
-              <p>Verzió: {task.version}</p>
             </section>
             <AdminMutationForm
               action={saveTaskAction}
@@ -64,13 +69,13 @@ export default async function TaskDetailPage({
                 name="kind"
                 value={task.state === "scheduled" ? "event" : "task"}
               />
-              <label htmlFor="title">Megnevezés</label>
-              <input
+              <AdminTextField
                 id="title"
                 name="title"
+                label="Megnevezés"
                 defaultValue={task.title}
                 required
-                data-testid="admin-task-title-input"
+                testId="admin-task-title-input"
               />
             </AdminMutationForm>
             <AdminMutationForm
@@ -85,19 +90,6 @@ export default async function TaskDetailPage({
                 name="idempotencyKey"
                 value={`assignment:${task.id}:${randomUUID()}`}
               />
-              <label htmlFor="scenario">Kapacitási helyzet</label>
-              <select
-                id="scenario"
-                name="scenario"
-                defaultValue={typeof query.scenario === "string" ? query.scenario : "eligible"}
-                data-testid="admin-assignment-scenario-select"
-              >
-                <option value="eligible">Jogosult, van hely</option>
-                <option value="ineligible">Nem jogosult</option>
-                <option value="full">Betelt kapacitás</option>
-                <option value="retryable">Átmeneti szolgáltatáshiba</option>
-                <option value="terminal">Végleges szolgáltatáshiba</option>
-              </select>
             </AdminMutationForm>
             {task.state === "scheduled" && (
               <AdminMutationForm
@@ -140,6 +132,23 @@ export default async function TaskDetailPage({
                 </fieldset>
               </AdminMutationForm>
             )}
+            <DeveloperDetails>
+              <p>Verzió: {task.version}</p>
+              <label htmlFor="scenario">Kapacitási helyzet</label>
+              <select
+                id="scenario"
+                name="scenario"
+                form="admin-assignment-form"
+                defaultValue={typeof query.scenario === "string" ? query.scenario : "eligible"}
+                data-testid="admin-assignment-scenario-select"
+              >
+                <option value="eligible">Jogosult, van hely</option>
+                <option value="ineligible">Nem jogosult</option>
+                <option value="full">Betelt kapacitás</option>
+                <option value="retryable">Átmeneti szolgáltatáshiba</option>
+                <option value="terminal">Végleges szolgáltatáshiba</option>
+              </select>
+            </DeveloperDetails>
           </div>
         )}
       </AsyncStatePanel>

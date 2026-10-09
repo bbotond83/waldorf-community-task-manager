@@ -4,13 +4,20 @@ import { AppNav, currentNavigationId } from "../../src/runtime/AppNav";
 import { BackToHomeLink } from "../../src/runtime/BackToHomeLink";
 import { getSyntheticProfile } from "../../src/runtime/synthetic/profiles";
 
-const navigation = vi.hoisted(() => ({ pathname: null as string | null }));
-vi.mock("next/navigation", () => ({ usePathname: () => navigation.pathname }));
+const navigation = vi.hoisted(() => ({
+  pathname: null as string | null,
+  search: "" as string,
+}));
+vi.mock("next/navigation", () => ({
+  usePathname: () => navigation.pathname,
+  useSearchParams: () => new URLSearchParams(navigation.search),
+}));
 
 const adminItems = getSyntheticProfile("super-admin-local")!.navigation;
 
 beforeEach(() => {
   navigation.pathname = null;
+  navigation.search = "";
 });
 
 describe("AppNav", () => {
@@ -55,7 +62,60 @@ describe("AppNav", () => {
   });
 });
 
+describe("AppNav for a parent", () => {
+  const parentItems = getSyntheticProfile("parent-local")!.navigation;
+
+  it("lists Értesítések before Feladatok", () => {
+    render(<AppNav items={parentItems} />);
+    const links = screen.getAllByRole("link");
+    expect(links.map((link) => link.textContent)).toEqual(["Értesítések", "Feladatok"]);
+  });
+
+  it("keeps Feladatok current on a task page opened from the task list", () => {
+    navigation.pathname = "/szulo/feladatok/duty-assigned";
+    render(<AppNav items={parentItems} />);
+    expect(screen.getByTestId("app-shell-navigation-parent-duties")).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    expect(screen.getByTestId("app-shell-navigation-parent-notifications")).not.toHaveAttribute(
+      "aria-current",
+    );
+  });
+
+  it("marks Értesítések current on a task page opened from a notification", () => {
+    navigation.pathname = "/szulo/feladatok/duty-assigned";
+    navigation.search = "ertesites=notice-7-day";
+    render(<AppNav items={parentItems} />);
+    expect(document.querySelectorAll("[aria-current]")).toHaveLength(1);
+    expect(screen.getByTestId("app-shell-navigation-parent-notifications")).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+  });
+
+  it("ignores the notification parameter outside a task page", () => {
+    navigation.pathname = "/szulo/feladatok";
+    navigation.search = "ertesites=notice-7-day";
+    render(<AppNav items={parentItems} />);
+    expect(screen.getByTestId("app-shell-navigation-parent-duties")).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+  });
+});
+
 describe("currentNavigationId", () => {
+  it("lets a task page opened from a notification stand for the notification list", () => {
+    const items = getSyntheticProfile("parent-local")!.navigation;
+    expect(currentNavigationId(items, "/szulo/feladatok/duty-1", true)).toBe(
+      "parent-notifications",
+    );
+    expect(currentNavigationId(items, "/szulo/feladatok/duty-1", false)).toBe("parent-duties");
+    expect(currentNavigationId(items, "/szulo/feladatok/duty-1/csere", true)).toBe("parent-duties");
+    expect(currentNavigationId(adminItems, "/szulo/feladatok/duty-1", true)).toBeUndefined();
+  });
+
   it("matches the dashboard only exactly", () => {
     expect(currentNavigationId(adminItems, "/admin")).toBe("admin-dashboard");
     expect(currentNavigationId(adminItems, "/admin/")).toBe("admin-dashboard");

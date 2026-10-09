@@ -83,7 +83,7 @@ describe("navigation and default pages follow the access rules", () => {
   });
 
   it("lists the agreed items in the agreed order", () => {
-    expect(labels("parent-local")).toEqual(["Feladatok", "Értesítések"]);
+    expect(labels("parent-local")).toEqual(["Értesítések", "Feladatok"]);
     expect(labels("kindergarten-teacher-local")).toEqual([]);
     expect(labels("group-admin-local")).toEqual([
       "Áttekintés",
