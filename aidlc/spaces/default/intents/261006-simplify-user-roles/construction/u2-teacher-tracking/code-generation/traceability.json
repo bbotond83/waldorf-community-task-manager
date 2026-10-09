@@ -1,0 +1,273 @@
+{
+  "stage": "code-generation",
+  "unit": "u2-teacher-tracking",
+  "upstream_ids": [
+    "FR6",
+    "FR7",
+    "FR8",
+    "FR9",
+    "AC1.1.2",
+    "AC2.1.1",
+    "AC2.1.2",
+    "AC2.1.3",
+    "AC2.1.4",
+    "AC2.1.5",
+    "AC2.1.6",
+    "AC2.2.1",
+    "BR2.1",
+    "BR2.2",
+    "BR2.3",
+    "BR2.4",
+    "BR2.5",
+    "BR2.6",
+    "BR2.7",
+    "BR2.8",
+    "BR2.9",
+    "BR2.10",
+    "BR2.11",
+    "BR2.12",
+    "NFR1.21",
+    "NFR1.22",
+    "NFR1.23",
+    "NFR1.24",
+    "NFR1.25",
+    "NFR1.26",
+    "NFR1.27",
+    "NFR1.28",
+    "NFR1.29",
+    "NFR1.30",
+    "NFR2.21",
+    "NFR2.22",
+    "NFR2.24",
+    "NFR2.25",
+    "NFR2.26",
+    "NFR2.27",
+    "NFR3.21",
+    "NFR3.22",
+    "NFR3.23",
+    "NFR2.23"
+  ],
+  "coverage": [
+    {
+      "id": "FR6",
+      "status": "OK",
+      "target": "src/application/teacher-facade.test.ts"
+    },
+    {
+      "id": "FR7",
+      "status": "OK",
+      "target": "src/teacher-web/synthetic-teacher-repository.test.ts"
+    },
+    {
+      "id": "FR8",
+      "status": "OK",
+      "target": "tests/integration/teacher-boundaries.test.ts"
+    },
+    {
+      "id": "FR9",
+      "status": "OK",
+      "target": "src/teacher-tracking/tracking-model.test.ts"
+    },
+    {
+      "id": "AC1.1.2",
+      "status": "OK",
+      "target": "tests/coverage/teacher-pages.test.tsx"
+    },
+    {
+      "id": "AC2.1.1",
+      "status": "OK",
+      "target": "tests/browser/teacher-web.spec.ts"
+    },
+    {
+      "id": "AC2.1.2",
+      "status": "OK",
+      "target": "tests/integration/teacher-components.test.tsx"
+    },
+    {
+      "id": "AC2.1.3",
+      "status": "OK",
+      "target": "src/application/teacher-facade.test.ts"
+    },
+    {
+      "id": "AC2.1.4",
+      "status": "OK",
+      "target": "src/teacher-tracking/tracking-model.test.ts"
+    },
+    {
+      "id": "AC2.1.5",
+      "status": "OK",
+      "target": "src/teacher-web/synthetic-teacher-repository.test.ts"
+    },
+    {
+      "id": "AC2.1.6",
+      "status": "OK",
+      "target": "tests/browser/teacher-web.spec.ts"
+    },
+    {
+      "id": "AC2.2.1",
+      "status": "OK",
+      "target": "tests/integration/teacher-boundaries.test.ts"
+    },
+    {
+      "id": "BR2.1",
+      "status": "OK",
+      "target": "src/application/teacher-facade.test.ts"
+    },
+    {
+      "id": "BR2.2",
+      "status": "OK",
+      "target": "src/teacher-tracking/tracking-model.test.ts"
+    },
+    {
+      "id": "BR2.3",
+      "status": "OK",
+      "target": "src/teacher-web/synthetic-teacher.test.ts"
+    },
+    {
+      "id": "BR2.4",
+      "status": "OK",
+      "target": "src/teacher-tracking/tracking-model.test.ts"
+    },
+    {
+      "id": "BR2.5",
+      "status": "OK",
+      "target": "tests/integration/teacher-components.test.tsx"
+    },
+    {
+      "id": "BR2.6",
+      "status": "OK",
+      "target": "src/application/teacher-facade.test.ts"
+    },
+    {
+      "id": "BR2.7",
+      "status": "OK",
+      "target": "tests/coverage/teacher-pages.test.tsx"
+    },
+    {
+      "id": "BR2.8",
+      "status": "OK",
+      "target": "tests/integration/teacher-boundaries.test.ts"
+    },
+    {
+      "id": "BR2.9",
+      "status": "OK",
+      "target": "tests/coverage/teacher-pages.test.tsx"
+    },
+    {
+      "id": "BR2.10",
+      "status": "OK",
+      "target": "tests/browser/teacher-web.spec.ts"
+    },
+    {
+      "id": "BR2.11",
+      "status": "OK",
+      "target": "tests/integration/teacher-routes.test.ts"
+    },
+    {
+      "id": "BR2.12",
+      "status": "OK",
+      "target": "src/teacher-web/synthetic-teacher-repository.test.ts"
+    },
+    {
+      "id": "NFR1.21",
+      "status": "OK",
+      "target": "src/application/teacher-facade.test.ts"
+    },
+    {
+      "id": "NFR1.22",
+      "status": "OK",
+      "target": "tests/integration/teacher-boundaries.test.ts"
+    },
+    {
+      "id": "NFR1.23",
+      "status": "OK",
+      "target": "tests/integration/teacher-boundaries.test.ts"
+    },
+    {
+      "id": "NFR1.24",
+      "status": "OK",
+      "target": "src/teacher-tracking/tracking-model.test.ts"
+    },
+    {
+      "id": "NFR1.25",
+      "status": "OK",
+      "target": "tests/integration/teacher-routes.test.ts"
+    },
+    {
+      "id": "NFR1.26",
+      "status": "OK",
+      "target": "tests/integration/teacher-components.test.tsx"
+    },
+    {
+      "id": "NFR1.27",
+      "status": "OK",
+      "target": "src/teacher-web/synthetic-teacher-repository.test.ts"
+    },
+    {
+      "id": "NFR1.28",
+      "status": "OK",
+      "target": "tests/integration/teacher-boundaries.test.ts"
+    },
+    {
+      "id": "NFR1.29",
+      "status": "OK",
+      "target": "src/application/teacher-facade.test.ts"
+    },
+    {
+      "id": "NFR1.30",
+      "status": "OK",
+      "target": "src/teacher-web/synthetic-teacher-repository.test.ts"
+    },
+    {
+      "id": "NFR2.21",
+      "status": "OK",
+      "target": "tests/browser/teacher-web.spec.ts"
+    },
+    {
+      "id": "NFR2.22",
+      "status": "OK",
+      "target": "src/teacher-tracking/tracking-model.test.ts"
+    },
+    {
+      "id": "NFR2.24",
+      "status": "OK",
+      "target": "src/teacher-web/synthetic-teacher.ts"
+    },
+    {
+      "id": "NFR2.25",
+      "status": "OK",
+      "target": "src/application/teacher-facade.test.ts"
+    },
+    {
+      "id": "NFR2.26",
+      "status": "OK",
+      "target": "scripts/verification/aggregate-evidence.ts"
+    },
+    {
+      "id": "NFR2.27",
+      "status": "OK",
+      "target": "tests/coverage/production-inventory.test.ts"
+    },
+    {
+      "id": "NFR3.21",
+      "status": "OK",
+      "target": "src/application/teacher-facade.ts"
+    },
+    {
+      "id": "NFR3.22",
+      "status": "OK",
+      "target": "tests/integration/teacher-components.test.tsx"
+    },
+    {
+      "id": "NFR3.23",
+      "status": "OK",
+      "target": "tests/browser/teacher-web.spec.ts"
+    },
+    {
+      "id": "NFR2.23",
+      "status": "Deferred",
+      "target": "Prior unit tests, browser/accessibility B1/B2/B3, production build and strict typecheck passed; these are historical evidence, not current redo execution. Current conductor review/checkpoint and whole-production80% line/branch/function coverage, lint/format, deterministic smoke and integrated secret/SAST/dependency gates remain outstanding under conductor/Build and Test. No linked DB/RLS execution claimed."
+    }
+  ],
+  "reverse": []
+}

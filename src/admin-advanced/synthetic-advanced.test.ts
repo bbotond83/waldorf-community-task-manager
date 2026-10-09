@@ -1,3 +1,4 @@
+import { sessionGrantBindings } from "../access/session-grants.ts";
 import assert from "node:assert/strict";
 import { beforeEach, describe, it } from "node:test";
 import type { Scope } from "../access/index.ts";
@@ -18,7 +19,6 @@ import {
 const scope: Scope = { id: "org-napsugar", type: "organization", organizationId: "org-napsugar" };
 const versions = new InMemoryAuthorizationVersions({
   "group-admin-local": 1,
-  "kindergarten-admin-local": 1,
   "super-admin-local": 1,
 });
 const authorization = new AuthorizationContract(versions);
@@ -34,17 +34,18 @@ const deniedCore: AdminApplicationPort = {
   },
 };
 
-function session(role: "group_admin" | "kindergarten_admin" | "super_admin"): SessionContext {
+function session(role: "group_admin" | "super_admin"): SessionContext {
+  const subjectId = role === "group_admin" ? "group-admin-local" : "super-admin-local";
+  const grantScope: Scope =
+    role === "group_admin"
+      ? { id: "group-boroka", type: "group", organizationId: scope.organizationId }
+      : scope;
   return {
-    subjectId:
-      role === "group_admin"
-        ? "group-admin-local"
-        : role === "kindergarten_admin"
-          ? "kindergarten-admin-local"
-          : "super-admin-local",
+    subjectId,
     authorizationVersion: 1,
+    ...sessionGrantBindings(subjectId, role, [grantScope]),
     roles: [role],
-    scopes: [scope],
+    scopes: [grantScope],
     runtimeMode: "synthetic",
     isSynthetic: true,
   };
@@ -64,13 +65,13 @@ describe("synthetic advanced administrator workflows", () => {
       command("workbook-waldorf-v1", "import:denied:01"),
     );
     assert.equal(denied.state, "denied");
-    const status = await facade.import.status(session("kindergarten_admin"), scope);
+    const status = await facade.import.status(session("super_admin"), scope);
     assert.equal(status.state, "empty");
   });
 
   it("validates, resolves, commits, and deduplicates one immutable import", async () => {
     const facade = createSyntheticAdvancedAdminFacade(authorization, deniedCore);
-    const actor = session("kindergarten_admin");
+    const actor = session("super_admin");
     const preview = await facade.import.createPreview(
       actor,
       command("workbook-waldorf-v1", "import:preview:01"),
@@ -113,7 +114,7 @@ describe("synthetic advanced administrator workflows", () => {
 
   it("rejects changed fingerprint and stale preview without partial commit", async () => {
     const facade = createSyntheticAdvancedAdminFacade(authorization, deniedCore);
-    const actor = session("kindergarten_admin");
+    const actor = session("super_admin");
     await facade.import.createPreview(actor, command("workbook-waldorf-v1", "import:preview:02"));
     const stale = await facade.import.resolveConflict(actor, {
       ...command("preview-waldorf-v1", "import:resolve:stale", {
@@ -135,7 +136,7 @@ describe("synthetic advanced administrator workflows", () => {
 
   it("rejects malformed, oversized, missing-sheet, and missing-header workbooks", async () => {
     const facade = createSyntheticAdvancedAdminFacade(authorization, deniedCore);
-    const actor = session("kindergarten_admin");
+    const actor = session("super_admin");
     for (const scenario of ["malformed", "oversized", "missing-sheet", "missing-header"]) {
       const result = await facade.import.createPreview(
         actor,
@@ -148,7 +149,7 @@ describe("synthetic advanced administrator workflows", () => {
 
   it("recovers an interrupted import using the original run identity", async () => {
     const facade = createSyntheticAdvancedAdminFacade(authorization, deniedCore);
-    const actor = session("kindergarten_admin");
+    const actor = session("super_admin");
     const preview = await facade.import.createPreview(
       actor,
       command("workbook-waldorf-v1", "import:preview:03"),
@@ -179,7 +180,7 @@ describe("synthetic advanced administrator workflows", () => {
 
   it("retries only classified reminder failures with the same correlation identity", async () => {
     const facade = createSyntheticAdvancedAdminFacade(authorization, deniedCore);
-    const actor = session("kindergarten_admin");
+    const actor = session("super_admin");
     const retry = await facade.reminders.retry(actor, command("job-lampas", "corr-lampas-01"));
     assert.equal(retry.state === "success" ? retry.data.status : "failure", "retry-scheduled");
     const duplicate = await facade.reminders.retry(actor, command("job-lampas", "corr-lampas-01"));
@@ -190,10 +191,7 @@ describe("synthetic advanced administrator workflows", () => {
 
   it("enforces governance role, self-lockout, stale version, and next-request revocation", async () => {
     const facade = createSyntheticAdvancedAdminFacade(authorization, deniedCore);
-    assert.equal(
-      (await facade.governance.list(session("kindergarten_admin"), scope)).state,
-      "denied",
-    );
+    assert.equal((await facade.governance.list(session("group_admin"), scope)).state, "denied");
     const self = await facade.governance.updateGrant(
       session("super_admin"),
       command("grant-super-current", "grant:self:01", { scenario: "self-lockout" }),
@@ -219,7 +217,7 @@ describe("synthetic advanced administrator workflows", () => {
 
   it("rechecks lifecycle blocker/version and performs one redacted atomic outcome", async () => {
     const facade = createSyntheticAdvancedAdminFacade(authorization, deniedCore);
-    const actor = session("kindergarten_admin");
+    const actor = session("super_admin");
     const blocked = await facade.lifecycle.run(actor, {
       ...command("family-retained", "lifecycle:blocked:01", { confirmed: "yes" }),
       expectedVersion: 2,
@@ -248,7 +246,7 @@ describe("synthetic advanced administrator workflows", () => {
 
   it("allowlists recipients and rejects stale or invented settings", async () => {
     const facade = createSyntheticAdvancedAdminFacade(authorization, deniedCore);
-    const actor = session("kindergarten_admin");
+    const actor = session("super_admin");
     const invalid = await facade.settings.save(
       actor,
       command("advanced-settings", "settings:invalid:01", {
@@ -274,7 +272,7 @@ describe("synthetic advanced administrator workflows", () => {
 
   it("maps retryable and terminal adapter failures without raw provider text", async () => {
     const facade = createSyntheticAdvancedAdminFacade(authorization, deniedCore);
-    const actor = session("kindergarten_admin");
+    const actor = session("super_admin");
     const retryable = await facade.lifecycle.run(
       actor,
       command("family-delete", "lifecycle:retry:01", { confirmed: "yes", scenario: "retryable" }),

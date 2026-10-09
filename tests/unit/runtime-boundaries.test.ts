@@ -34,7 +34,7 @@ describe("profile login measurement boundary", () => {
       "parent-duties",
       "parent-notifications",
     ]);
-    expect([...permittedNavigationIds(SYNTHETIC_PROFILES[1])]).toEqual(["staff-schedule"]);
+    expect([...permittedNavigationIds(SYNTHETIC_PROFILES[1])]).toEqual(["teacher-tracking"]);
   });
   it("rejects a successful but over-budget login", () => {
     expect(() => assertLoginDuration(5001)).toThrow("within 5000 ms");
@@ -197,12 +197,11 @@ describe("runtime configuration", () => {
 describe("synthetic profile and session boundary", () => {
   const parent = SYNTHETIC_PROFILES[0];
 
-  it("provides exactly the five approved invented roles", () => {
+  it("provides exactly the four approved invented roles", () => {
     expect(SYNTHETIC_PROFILES.map((profile) => profile.role)).toEqual([
       "parent",
-      "staff",
+      "kindergarten-teacher",
       "group-admin",
-      "kindergarten-admin",
       "super-admin",
     ]);
   });
@@ -226,7 +225,7 @@ describe("synthetic profile and session boundary", () => {
     const firstToken = createSyntheticSessionToken(parent);
     const nextToken = createSyntheticSessionToken(SYNTHETIC_PROFILES[1]);
     expect(firstToken).not.toBe(nextToken);
-    expect(resolveSyntheticSession(nextToken)?.profile.id).toBe("staff-local");
+    expect(resolveSyntheticSession(nextToken)?.profile.id).toBe("kindergarten-teacher-local");
   });
 
   it("rejects missing, malformed, and tampered tokens", () => {

@@ -28,9 +28,8 @@ a dependency chain without this vulnerability, then repeat verification.
 ## Profile routes
 
 - Parent: `/szulo/feladatok`, `/szulo/ertesitesek`, invitation/authentication entry.
-- Read-only Staff: `/munkatars/beosztas` with scoped filters and generic denials.
+- Kindergarten teacher (Óvónő): `/teacher/schedule` with scoped filters and generic denials.
 - Group Administrator: `/admin`, records/tasks/approvals/archive; direct import is denied.
-- Kindergarten Administrator: core plus import/reminders/privacy/settings, excluding super-admin governance.
 - Super Administrator: organization-wide administration and governance/revocation.
 
 Use `Tesztprofil váltása` between profiles. Browser automation uses a synthetic reset endpoint through the public same-origin HTTP boundary; it does not import private repositories or bypass authorization.
@@ -45,4 +44,4 @@ Reports are `verification/reports/local-acceptance.json`, `local-acceptance.md`,
 
 ## Safari and linked targets
 
-On supported Apple hardware, record Safari desktop and mobile Safari entry/navigation, Parent signup, Staff read/denial, Administrator approval, validation, keyboard/focus, and accessibility outcomes with browser/version/device metadata. Real Supabase auth/RLS/object/revocation/transactions, durable scheduler/provider delivery, and Vercel preview/staging remain a future approved repeat set. Do not run deployment commands as part of this runbook.
+On supported Apple hardware, record Safari desktop and mobile Safari entry/navigation, Parent signup, Teacher tracking read/denial, Administrator approval, validation, keyboard/focus, and accessibility outcomes with browser/version/device metadata. Real Supabase auth/RLS/object/revocation/transactions, durable scheduler/provider delivery, and Vercel preview/staging remain a future approved repeat set. Do not run deployment commands as part of this runbook.

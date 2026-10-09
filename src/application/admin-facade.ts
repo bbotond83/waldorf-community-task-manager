@@ -1,3 +1,4 @@
+import { isRoleScope, scopeContains } from "../access/role-policy.ts";
 import type { Scope } from "../access/index.ts";
 import type {
   AdminItemModel,
@@ -437,7 +438,7 @@ function invokeAdmin<T>(
 ): Promise<ApplicationResult<T>> {
   return pipeline.invoke({
     session,
-    matrixRowId: input.matrixRowId ?? matrixRowFor(session, input.resource),
+    matrixRowId: input.matrixRowId ?? matrixRowFor(session, input.resource, input.scope),
     action: input.action,
     resource: input.resource,
     scope: input.scope,
@@ -483,13 +484,19 @@ function invokeAdminCommand<T>(
 function matrixRowFor(
   session: SessionContext,
   resource: string,
-):
-  | "AUTH-GROUP-ADMIN-CORE"
-  | "AUTH-GRP-IMPORT-DENY"
-  | "AUTH-KINDERGARTEN-ADMIN"
-  | "AUTH-SUPER-ADMIN" {
-  if (session.roles.includes("super_admin")) return "AUTH-SUPER-ADMIN";
-  if (session.roles.includes("kindergarten_admin")) return "AUTH-KINDERGARTEN-ADMIN";
+  scope: Scope,
+): "AUTH-GROUP-ADMIN-CORE" | "AUTH-GRP-IMPORT-DENY" | "AUTH-SUPER-ADMIN" {
+  if (
+    session.grants.some(
+      (grant) =>
+        grant.subjectId === session.subjectId &&
+        grant.role === "super_admin" &&
+        grant.revokedAt === undefined &&
+        isRoleScope(grant.role, grant.scope) &&
+        scopeContains(grant.scope, scope),
+    )
+  )
+    return "AUTH-SUPER-ADMIN";
   return resource === "import" ? "AUTH-GRP-IMPORT-DENY" : "AUTH-GROUP-ADMIN-CORE";
 }
 

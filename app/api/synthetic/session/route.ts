@@ -1,3 +1,4 @@
+import { currentSyntheticActor } from "../../../../src/runtime/synthetic/access-state";
 import { NextResponse, type NextRequest } from "next/server";
 import { composeRuntime } from "../../../../src/runtime/composition";
 import { isSameOrigin } from "../../../../src/runtime/security/origin";
@@ -16,7 +17,7 @@ export const dynamic = "force-dynamic";
 export async function POST(request: NextRequest) {
   const composition = await composeRuntime();
   if (!composition.ok || composition.value.mode !== "synthetic") {
-    return new NextResponse(null, { status: 404 });
+    return new NextResponse(null, { status: 503 });
   }
   if (!isSameOrigin(request)) {
     return NextResponse.json({ error: { code: "REQUEST_ORIGIN_DENIED" } }, { status: 403 });
@@ -38,7 +39,7 @@ export async function POST(request: NextRequest) {
 
   const profileId = syntheticProfileIdSchema.safeParse(rawProfileId);
   const profile = profileId.success ? getSyntheticProfile(profileId.data) : undefined;
-  if (!profile) {
+  if (!profile || !currentSyntheticActor(profile.id)) {
     return NextResponse.json({ error: { code: "SYNTHETIC_PROFILE_INVALID" } }, { status: 400 });
   }
 

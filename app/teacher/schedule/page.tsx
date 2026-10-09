@@ -1,0 +1,50 @@
+import { redirect } from "next/navigation";
+import { ScheduleCollection } from "./_components/ScheduleCollection.tsx";
+import { ScheduleFilter } from "./_components/ScheduleFilter.tsx";
+import { TeacherStatePanel } from "../_components/TeacherStatePanel.tsx";
+import {
+  parseTeacherFilters,
+  teacherFilterQuery,
+  type TeacherSearchParams,
+} from "../_lib/filters.ts";
+import { resolveTeacherFacade } from "../_lib/facade.ts";
+import { resolveTeacherSession } from "../_lib/session.ts";
+
+export default async function TeacherSchedulePage({
+  searchParams,
+}: Readonly<{ searchParams: Promise<TeacherSearchParams> }>) {
+  const session = await resolveTeacherSession();
+  if (session.state === "signed-out") redirect("/");
+  if (session.state !== "success") return null;
+  const filters = parseTeacherFilters(await searchParams, session.data.applicationSession);
+  const facade = await resolveTeacherFacade(filters.scenario);
+  if (session.state !== "success" || !facade) return null;
+  const result = await facade.getSchedule(session.data.applicationSession, {
+    groupScope: filters.groupScope,
+    from: filters.from,
+    to: filters.to,
+  });
+  const retryFilters = { ...filters, scenario: "ready" as const };
+
+  return (
+    <section className="teacher-page" data-testid="teacher-schedule-page">
+      <header>
+        <p className="eyebrow">Óvónő felület · csak olvasás</p>
+        <h1 tabIndex={-1} autoFocus>
+          Beosztás
+        </h1>
+        <p>Csak az engedélyezett csoportok és a szükséges koordinációs adatok láthatók.</p>
+      </header>
+      {(result.state === "success" ||
+        result.state === "empty" ||
+        result.state === "validation") && <ScheduleFilter filters={filters} />}
+      <TeacherStatePanel
+        result={result}
+        retryHref={`/teacher/schedule?${teacherFilterQuery(retryFilters)}`}
+        testId="teacher-schedule"
+      >
+        {(model) => <ScheduleCollection entries={model.entries} filters={filters} />}
+      </TeacherStatePanel>
+    </section>
+  );
+}

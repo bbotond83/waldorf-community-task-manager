@@ -1,3 +1,7 @@
+import {
+  resetSyntheticAccessState,
+  revokeSyntheticSubjectAccess,
+} from "../runtime/synthetic/access-state.ts";
 import type { Scope } from "../access/index.ts";
 import {
   AdminApplicationFacade,
@@ -334,13 +338,18 @@ class AdvancedWorkflowStore implements AdminApplicationPort {
     const superCount = this.grants.filter((candidate) => candidate.role === "super_admin").length;
     if (grant.role === "super_admin" && superCount <= 1)
       return { state: "conflict", code: "GRANT_LAST_SUPER_ADMIN" };
-    this.grants = this.grants.filter((candidate) => candidate.id !== grant.id);
     const subjectId =
       grant.id === "grant-group-target" ? "group-admin-local" : "super-admin-backup-local";
+    const authorizationVersion =
+      subjectId === "group-admin-local"
+        ? revokeSyntheticSubjectAccess(subjectId)
+        : grant.version + 1;
+    if (authorizationVersion === undefined) return { state: "invalidated", code: "GRANT_STALE" };
+    this.grants = this.grants.filter((candidate) => candidate.id !== grant.id);
     if (subjectId !== actorId) this.revokedSubjects.add(subjectId);
     this.lastGrantOutcome = {
       grantId: grant.id,
-      authorizationVersion: grant.version + 1,
+      authorizationVersion,
       invalidatedSubjectId: subjectId,
     };
     return { state: "success", data: this.lastGrantOutcome };
@@ -453,6 +462,7 @@ function container(): Container {
 }
 
 export function resetSyntheticAdvancedFixtures(): void {
+  resetSyntheticAccessState();
   (globalThis as AdvancedGlobal)[GLOBAL_KEY] = {
     store: new AdvancedWorkflowStore(),
     idempotency: new InMemoryIdempotencyStore(),

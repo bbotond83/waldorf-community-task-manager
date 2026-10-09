@@ -1,20 +1,28 @@
 {
   "version": "waldorf-local-v1",
   "dataClassification": "invented-only",
-  "familyProfile": { "count": 30, "locale": "hu-HU", "timezone": "Europe/Budapest" },
+  "familyProfile": {
+    "count": 30,
+    "locale": "hu-HU",
+    "timezone": "Europe/Budapest"
+  },
   "profiles": [
-    { "id": "parent-local", "role": "parent", "scope": "family-fenyo", "home": "/szulo/feladatok" },
     {
-      "id": "staff-local",
-      "role": "read_only_staff",
-      "scope": "group-oak",
-      "home": "/munkatars/beosztas"
+      "id": "parent-local",
+      "role": "parent",
+      "scope": "family-fenyo",
+      "home": "/szulo/feladatok"
     },
-    { "id": "group-admin-local", "role": "group_admin", "scope": "group-oak", "home": "/admin" },
     {
-      "id": "kindergarten-admin-local",
-      "role": "kindergarten_admin",
-      "scope": "organization-local",
+      "id": "kindergarten-teacher-local",
+      "role": "kindergarten_teacher",
+      "scope": "group-oak",
+      "home": "/teacher/schedule"
+    },
+    {
+      "id": "group-admin-local",
+      "role": "group_admin",
+      "scope": "group-oak",
       "home": "/admin"
     },
     {

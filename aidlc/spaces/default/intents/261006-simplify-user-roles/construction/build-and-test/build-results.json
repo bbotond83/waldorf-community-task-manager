@@ -1,0 +1,10 @@
+[
+  {
+    "name": "build",
+    "command": "PATH=/opt/homebrew/opt/node@24/bin:$PATH APP_RUNTIME_MODE=synthetic APP_SYNTHETIC_FIXTURE_VERSION=waldorf-local-v1 npm run build",
+    "started": "2026-10-08T14:46:51.286634+00:00",
+    "seconds": 12.89,
+    "exit": 0,
+    "log": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/build-and-test/logs/attempt-2/build.log"
+  }
+]

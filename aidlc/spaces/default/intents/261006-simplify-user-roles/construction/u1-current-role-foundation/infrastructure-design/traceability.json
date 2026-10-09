@@ -1,0 +1,18 @@
+{
+  "stage": "infrastructure-design",
+  "unit": "u1-current-role-foundation",
+  "upstream_ids": ["NFR1.1", "NFR1.2", "NFR1.3", "NFR1.4", "NFR1.5", "NFR1.6", "NFR2.1", "NFR2.2", "NFR2.3", "NFR3.1", "NFR3.2"],
+  "coverage": [
+    {"id": "NFR1.1", "status": "OK", "target": "cicd-pipeline.md#id1-unit-verification"},
+    {"id": "NFR1.2", "status": "OK", "target": "cicd-pipeline.md#id1-unit-verification"},
+    {"id": "NFR1.3", "status": "OK", "target": "cicd-pipeline.md#id4-deployment-strategy-and-migration-ordering"},
+    {"id": "NFR1.4", "status": "OK", "target": "cicd-pipeline.md#id5-rollback-and-secrets"},
+    {"id": "NFR1.5", "status": "OK", "target": "cicd-pipeline.md#id5-rollback-and-secrets"},
+    {"id": "NFR1.6", "status": "OK", "target": "cicd-pipeline.md#id1-unit-verification"},
+    {"id": "NFR2.1", "status": "OK", "target": "cicd-pipeline.md#id1-unit-verification"},
+    {"id": "NFR2.2", "status": "OK", "target": "cicd-pipeline.md#id2-integrated-validation-and-promotion-gate"},
+    {"id": "NFR2.3", "status": "OK", "target": "cicd-pipeline.md#id3-private-build-evidence"},
+    {"id": "NFR3.1", "status": "OK", "target": "cicd-pipeline.md#id2-integrated-validation-and-promotion-gate"},
+    {"id": "NFR3.2", "status": "OK", "target": "cicd-pipeline.md#id2-integrated-validation-and-promotion-gate"}
+  ]
+}

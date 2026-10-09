@@ -1,0 +1,172 @@
+{
+  "stage": "code-generation",
+  "unit": "u1-current-role-foundation",
+  "version": 1,
+  "writes": [
+    {
+      "path": "app/admin/_lib/session.ts"
+    },
+    {
+      "path": "app/api/synthetic/reset/route.ts"
+    },
+    {
+      "path": "app/api/synthetic/session/route.ts"
+    },
+    {
+      "path": "app/szulo/_lib/session.ts"
+    },
+    {
+      "path": "src/access/access-service.test.ts"
+    },
+    {
+      "path": "src/access/access-service.ts"
+    },
+    {
+      "path": "src/access/current-role-migration.test.ts"
+    },
+    {
+      "path": "src/access/in-memory-adapters.ts"
+    },
+    {
+      "path": "src/access/index.ts"
+    },
+    {
+      "path": "src/access/legacy-role-conversion.test.ts"
+    },
+    {
+      "path": "src/access/legacy-role-conversion.ts"
+    },
+    {
+      "path": "src/access/role-policy.test.ts"
+    },
+    {
+      "path": "src/access/role-policy.ts"
+    },
+    {
+      "path": "src/access/session-grants.ts"
+    },
+    {
+      "path": "src/access/supabase-route-adapter.ts"
+    },
+    {
+      "path": "src/access/transaction.test.ts"
+    },
+    {
+      "path": "src/access/types.ts"
+    },
+    {
+      "path": "src/admin-advanced/synthetic-advanced.test.ts"
+    },
+    {
+      "path": "src/admin-advanced/synthetic-advanced.ts"
+    },
+    {
+      "path": "src/admin-core/synthetic-admin.test.ts"
+    },
+    {
+      "path": "src/application/admin-facade.ts"
+    },
+    {
+      "path": "src/application/authorization.test.ts"
+    },
+    {
+      "path": "src/application/authorization.ts"
+    },
+    {
+      "path": "src/application/contracts.test.ts"
+    },
+    {
+      "path": "src/application/contracts.ts"
+    },
+    {
+      "path": "src/application/facades.test.ts"
+    },
+    {
+      "path": "src/application/session-facade.ts"
+    },
+    {
+      "path": "src/directory/directory-service.test.ts"
+    },
+    {
+      "path": "src/directory/directory-service.ts"
+    },
+    {
+      "path": "src/parent-web/synthetic-parent.test.ts"
+    },
+    {
+      "path": "src/parent-web/synthetic-parent.ts"
+    },
+    {
+      "path": "src/runtime/session/session.ts"
+    },
+    {
+      "path": "src/runtime/synthetic/access-state.ts"
+    },
+    {
+      "path": "src/runtime/synthetic/composition.ts"
+    },
+    {
+      "path": "src/runtime/synthetic/profiles.ts"
+    },
+    {
+      "path": "supabase/migrations/20261006_current_roles.sql"
+    },
+    {
+      "path": "tests/browser/profile-login-performance.spec.ts"
+    },
+    {
+      "path": "tests/browser/support/profile-login-measurement.ts"
+    },
+    {
+      "path": "tests/coverage/app-session-boundaries.test.ts"
+    },
+    {
+      "path": "tests/coverage/parent-pages.test.tsx"
+    },
+    {
+      "path": "tests/integration/runtime-shell.test.tsx"
+    },
+    {
+      "path": "tests/integration/synthetic-route.test.ts"
+    },
+    {
+      "path": "tests/unit/current-role-session.test.ts"
+    },
+    {
+      "path": "tests/unit/runtime-boundaries.test.ts"
+    },
+    {
+      "path": "tests/coverage/app-entrypoints.test.tsx"
+    },
+    {
+      "path": "tests/coverage/production-inventory.test.ts"
+    },
+    {
+      "path": "package.json"
+    },
+    {
+      "path": ".github/workflows/ci.yml"
+    },
+    {
+      "path": "README.md"
+    },
+    {
+      "path": "package-lock.json"
+    },
+    {
+      "path": "scripts/verification/current-role-database.ts"
+    },
+    {
+      "path": "scripts/verification/run-local-verification.ts"
+    },
+    {
+      "path": "tests/database/current-role-migration.test.ts"
+    },
+    {
+      "path": "tests/database/fixtures/current-role-baseline.sql"
+    },
+    {
+      "path": "tests/unit/current-role-database.test.ts"
+    }
+  ]
+}

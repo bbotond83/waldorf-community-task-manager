@@ -1,3 +1,4 @@
+import { sessionGrantBindings } from "../access/session-grants.ts";
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import type { Scope } from "../access/index.ts";
@@ -10,7 +11,7 @@ import {
   InMemoryIdempotencyStore,
   ParentApplicationFacade,
   SessionApplicationFacade,
-  StaffApplicationFacade,
+  TeacherApplicationFacade,
 } from "./index.ts";
 import type {
   AdminApplicationPort,
@@ -19,7 +20,7 @@ import type {
   ParentApplicationPort,
   SessionContext,
   SessionGateway,
-  StaffApplicationPort,
+  TeacherApplicationPort,
 } from "./index.ts";
 
 const organizationScope: Scope = { id: "org-1", type: "organization", organizationId: "org-1" };
@@ -27,9 +28,9 @@ const groupScope: Scope = { id: "group-1", type: "group", organizationId: "org-1
 const familyScope: Scope = { id: "family-1", type: "family", organizationId: "org-1" };
 
 const parentSession = makeSession("parent", familyScope);
-const staffSession = makeSession("read_only_staff", groupScope);
+const teacherSession = makeSession("kindergarten_teacher", groupScope);
 const groupAdminSession = makeSession("group_admin", groupScope);
-const kindergartenSession = makeSession("kindergarten_admin", organizationScope);
+const kindergartenSession = makeSession("super_admin", organizationScope);
 
 describe("role application facades", () => {
   it("returns an immutable parent duty list", async () => {
@@ -98,14 +99,20 @@ describe("role application facades", () => {
     assert.equal(JSON.stringify(result).includes("database response"), false);
   });
 
-  it("returns a Staff schedule without mutation or contact fields", async () => {
-    const port: StaffApplicationPort = {
+  it("returns a Teacher schedule without mutation or contact fields", async () => {
+    const port: TeacherApplicationPort = {
       getSchedule: async () => ({
         state: "success",
         data: {
           entries: [
             {
               id: "entry-1",
+              sourceRecordId: "entry-1",
+              groupId: groupScope.id,
+              organizationId: groupScope.organizationId,
+              ownerDisplayName: null,
+              assigneeDisplayNames: [],
+              currentStatusLabel: null,
               startsAt: "2026-08-12T08:00:00.000Z",
               endsAt: "2026-08-12T09:00:00.000Z",
               title: "Udvari felügyelet",
@@ -116,8 +123,8 @@ describe("role application facades", () => {
         },
       }),
     };
-    const facade = new StaffApplicationFacade(pipelineFor(staffSession), port);
-    const result = await facade.getSchedule(staffSession, {
+    const facade = new TeacherApplicationFacade(pipelineFor(teacherSession), port);
+    const result = await facade.getSchedule(teacherSession, {
       groupScope,
       from: "2026-08-01",
       to: "2026-08-31",
@@ -127,30 +134,36 @@ describe("role application facades", () => {
     assert.equal("save" in facade, false);
   });
 
-  it("validates a Staff date range before invoking its port", async () => {
+  it("validates a Teacher date range before invoking its port", async () => {
     let calls = 0;
-    const port: StaffApplicationPort = {
+    const port: TeacherApplicationPort = {
       getSchedule: async () => {
         calls += 1;
         return { state: "empty" };
       },
     };
-    const result = await new StaffApplicationFacade(pipelineFor(staffSession), port).getSchedule(
-      staffSession,
-      { groupScope, from: "invalid", to: "2026-08-31" },
-    );
+    const result = await new TeacherApplicationFacade(
+      pipelineFor(teacherSession),
+      port,
+    ).getSchedule(teacherSession, { groupScope, from: "invalid", to: "2026-08-31" });
     assert.equal(result.state, "validation");
     assert.equal(calls, 0);
   });
 
-  it("returns one authorized Staff schedule entry and hides missing entries", async () => {
-    const port: StaffApplicationPort = {
+  it("returns one authorized Teacher schedule entry and hides missing entries", async () => {
+    const port: TeacherApplicationPort = {
       getSchedule: async () => ({
         state: "success",
         data: {
           entries: [
             {
               id: "entry-1",
+              sourceRecordId: "entry-1",
+              groupId: groupScope.id,
+              organizationId: groupScope.organizationId,
+              ownerDisplayName: null,
+              assigneeDisplayNames: [],
+              currentStatusLabel: null,
               startsAt: "2026-08-12T08:00:00.000Z",
               endsAt: "2026-08-12T09:00:00.000Z",
               title: "Udvari felügyelet",
@@ -160,14 +173,14 @@ describe("role application facades", () => {
         },
       }),
     };
-    const facade = new StaffApplicationFacade(pipelineFor(staffSession), port);
+    const facade = new TeacherApplicationFacade(pipelineFor(teacherSession), port);
     const common = { groupScope, from: "2026-08-01", to: "2026-08-31" };
     assert.equal(
-      (await facade.getScheduleEntry(staffSession, { ...common, entryId: "entry-1" })).state,
+      (await facade.getScheduleEntry(teacherSession, { ...common, entryId: "entry-1" })).state,
       "success",
     );
     assert.equal(
-      (await facade.getScheduleEntry(staffSession, { ...common, entryId: "missing" })).state,
+      (await facade.getScheduleEntry(teacherSession, { ...common, entryId: "missing" })).state,
       "denied",
     );
   });
@@ -187,7 +200,7 @@ describe("role application facades", () => {
     assert.equal(port.calls, 0);
   });
 
-  it("allows Kindergarten Administrator import through the public port", async () => {
+  it("allows Super Administrator import through the public port", async () => {
     const port = new FakeAdminPort();
     const result = await new AdminApplicationFacade(
       pipelineFor(kindergartenSession),
@@ -352,6 +365,7 @@ function makeSession(role: SessionContext["roles"][number], scope: Scope): Sessi
   return {
     subjectId: `${role}-synthetic`,
     authorizationVersion: 1,
+    ...sessionGrantBindings(`${role}-synthetic`, role, [scope]),
     roles: [role],
     scopes: [scope],
     runtimeMode: "synthetic",

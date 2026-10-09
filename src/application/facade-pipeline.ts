@@ -43,6 +43,7 @@ export class FacadePipeline {
     fields?: readonly SensitiveFieldId[];
     idempotencyKey?: string;
     idempotency?: Readonly<{ operation: string; fingerprint: string }>;
+    validate?: () => Extract<ApplicationResult<never>, { state: "validation" }> | undefined;
     invoke: () => DomainOutcome<T> | Promise<DomainOutcome<T>>;
     project: (value: T) => Readonly<T>;
   }): Promise<ApplicationResult<T>> {
@@ -63,6 +64,9 @@ export class FacadePipeline {
       });
     }
 
+    // Optional filter validation runs only after current authority succeeds.
+    const validationResult = input.validate?.();
+    if (validationResult) return validationResult;
     const execute = () => this.invokeDomain(input);
     if (input.idempotency && input.idempotencyKey && this.idempotency) {
       return this.idempotency.execute({

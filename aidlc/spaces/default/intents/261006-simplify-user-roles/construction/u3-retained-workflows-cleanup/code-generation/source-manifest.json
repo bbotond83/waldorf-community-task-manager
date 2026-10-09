@@ -1,0 +1,64 @@
+{
+  "stage": "code-generation",
+  "unit": "u3-retained-workflows-cleanup",
+  "version": 1,
+  "writes": [
+    {
+      "path": "scripts/verification/core.ts"
+    },
+    {
+      "path": "src/admin-experience/admin-service.test.ts"
+    },
+    {
+      "path": "src/admin-experience/admin-service.ts"
+    },
+    {
+      "path": "src/application/admin-facade.test.ts"
+    },
+    {
+      "path": "src/application/admin-facade.ts"
+    },
+    {
+      "path": "src/import-migration/import-service.test.ts"
+    },
+    {
+      "path": "src/import-migration/import-service.ts"
+    },
+    {
+      "path": "tests/browser/admin-advanced.spec.ts"
+    },
+    {
+      "path": "tests/browser/admin-core.spec.ts"
+    },
+    {
+      "path": "tests/coverage/verification-entrypoints.test.ts"
+    },
+    {
+      "path": "tests/integration/retained-workflows.test.ts"
+    },
+    {
+      "path": "tests/unit/current-role-references.test.ts"
+    },
+    {
+      "path": "tests/unit/verification-core.test.ts"
+    },
+    {
+      "path": "verification/AUTHORIZATION.md"
+    },
+    {
+      "path": "verification/RUNBOOK.md"
+    },
+    {
+      "path": "verification/authorization-matrix.json"
+    },
+    {
+      "path": "verification/fixtures.json"
+    },
+    {
+      "path": "verification/scenarios.json"
+    },
+    {
+      "path": "verification/sensitive-fields.json"
+    }
+  ]
+}

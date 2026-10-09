@@ -56,30 +56,30 @@
       "effect": "deny"
     },
     {
-      "id": "AUTH-STAFF-SCHEDULE-ALLOW",
-      "role": "read_only_staff",
+      "id": "AUTH-TEACHER-TRACKING-ALLOW",
+      "role": "kindergarten_teacher",
       "scope": "granted-group",
-      "route": "/munkatars/beosztas/**",
+      "route": "/teacher/schedule/**",
       "actions": ["read"],
       "resources": ["schedule", "coordination"],
       "fields": ["SF-DISPLAY-NAME", "SF-PARTICIPANT-NAME"],
       "effect": "allow"
     },
     {
-      "id": "AUTH-STAFF-MUTATION-DENY",
-      "role": "read_only_staff",
+      "id": "AUTH-TEACHER-MUTATION-DENY",
+      "role": "kindergarten_teacher",
       "scope": "granted-group",
-      "route": "/munkatars/**",
+      "route": "/teacher/**",
       "actions": ["create", "update", "delete", "manage"],
       "resources": ["schedule", "assignment", "record"],
       "fields": [],
       "effect": "deny"
     },
     {
-      "id": "AUTH-STAFF-SENSITIVE-FIELDS-DENY",
-      "role": "read_only_staff",
+      "id": "AUTH-TEACHER-SENSITIVE-FIELDS-DENY",
+      "role": "kindergarten_teacher",
       "scope": "granted-group",
-      "route": "/munkatars/**",
+      "route": "/teacher/**",
       "actions": ["read"],
       "resources": ["schedule", "family", "profile", "request"],
       "fields": [
@@ -92,10 +92,10 @@
       "effect": "deny"
     },
     {
-      "id": "AUTH-STAFF-OUT-OF-SCOPE-DENY",
-      "role": "read_only_staff",
+      "id": "AUTH-TEACHER-OUT-OF-SCOPE-DENY",
+      "role": "kindergarten_teacher",
       "scope": "ungranted-group",
-      "route": "/munkatars/beosztas/**",
+      "route": "/teacher/schedule/**",
       "actions": ["read"],
       "resources": ["schedule", "coordination"],
       "fields": [],
@@ -128,45 +128,6 @@
       "route": "/admin/import/**",
       "actions": ["read", "create", "update", "manage"],
       "resources": ["import"],
-      "fields": [],
-      "effect": "deny"
-    },
-    {
-      "id": "AUTH-KINDERGARTEN-ADMIN-ALLOW",
-      "role": "kindergarten_admin",
-      "scope": "organization",
-      "route": "/admin/**",
-      "actions": ["read", "create", "update", "delete", "manage"],
-      "resources": [
-        "dashboard",
-        "record",
-        "task",
-        "assignment",
-        "approval",
-        "archive",
-        "import",
-        "reminder",
-        "lifecycle",
-        "settings"
-      ],
-      "fields": [
-        "SF-DISPLAY-NAME",
-        "SF-PARTICIPANT-NAME",
-        "SF-EMAIL",
-        "SF-PHONE",
-        "SF-LOCALITY",
-        "SF-OPTIONAL-PROFILE",
-        "SF-PROTECTED-REASON"
-      ],
-      "effect": "allow"
-    },
-    {
-      "id": "AUTH-KINDERGARTEN-GOVERNANCE-DENY",
-      "role": "kindergarten_admin",
-      "scope": "organization",
-      "route": "/admin/beallitasok",
-      "actions": ["read", "create", "update", "delete", "manage"],
-      "resources": ["super_admin_grant", "governance"],
       "fields": [],
       "effect": "deny"
     },
@@ -205,7 +166,7 @@
       "id": "AUTH-UNKNOWN-ROLE-DENY",
       "role": "anonymous_or_unknown",
       "scope": "none",
-      "route": "/szulo/**|/munkatars/**|/admin/**",
+      "route": "/szulo/**|/teacher/**|/admin/**",
       "actions": ["read", "create", "update", "delete", "manage"],
       "resources": ["protected"],
       "fields": [],
@@ -215,12 +176,32 @@
       "id": "AUTH-IMMEDIATE-REVOCATION-DENY",
       "role": "any_authenticated",
       "scope": "revoked-or-stale-version",
-      "route": "/szulo/**|/munkatars/**|/admin/**",
+      "route": "/szulo/**|/teacher/**|/admin/**",
       "actions": ["read", "create", "update", "delete", "manage"],
       "resources": ["protected"],
       "fields": [],
       "effect": "deny",
       "nextRequest": "deny-and-clear-protected-cache"
+    },
+    {
+      "id": "AUTH-SUPER-GOVERNANCE-ALLOW",
+      "role": "super_admin",
+      "scope": "organization",
+      "route": "/admin/beallitasok",
+      "actions": ["read", "manage"],
+      "resources": ["role_grant", "governance"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-NON-SUPER-ADVANCED-DENY",
+      "role": "any_authenticated",
+      "scope": "non-super-role",
+      "route": "/admin/**",
+      "actions": ["read", "create", "update", "delete", "manage"],
+      "resources": ["import", "reminder", "lifecycle", "settings", "role_grant", "governance"],
+      "fields": [],
+      "effect": "deny"
     }
   ]
 }

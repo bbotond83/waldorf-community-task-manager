@@ -1,0 +1,10 @@
+[
+  {
+    "name": "unit-07",
+    "command": "PATH=/opt/homebrew/opt/node@24/bin:$PATH node --experimental-strip-types --test tests/database/current-role-migration.test.ts",
+    "started": "2026-10-08T14:59:56.975051+00:00",
+    "seconds": 16.21,
+    "exit": 0,
+    "log": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/build-and-test/logs/attempt-2/unit-07.log"
+  }
+]

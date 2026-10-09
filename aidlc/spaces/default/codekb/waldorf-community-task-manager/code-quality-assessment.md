@@ -1,41 +1,39 @@
 # Code Quality Assessment
 
+Static synthesis of the revalidated 2026-10-06 developer scan for `261006-simplify-user-roles`, Standard depth, branch `feature/simplify-user-roles`, observed HEAD `0dce0567f18dc72e46aa88d87e5626708b08bc7d`. Full repository breadth with partial deep coverage. No application changes, tests, builds, browser sessions, migrations or target calls were performed.
+
 ## Test Coverage
 
-Source-configured tools: native Node tests for domain modules; Vitest/jsdom/Testing Library for delivery/components; Playwright Chromium/Firefox/mobile Chrome; axe for accessibility. Tests reside in colocated `src/**/*.test.ts` and `tests/{unit,integration,coverage,browser}/`. Node and Vitest configurations enforce 80% line/branch/function floors; aggregate production inventory includes app/src/scripts/proxy/Next config.
+- `src/**/*.test.ts`: colocated Node test-runner tests cover access/domain services, facades, isolation/contracts, synthetic workflows, schedules, import and lifecycle. Static declaration counts are not execution counts because tests use loops and grouped cases; no current pass count is claimed.
+- `tests/unit`, `tests/integration`, `tests/coverage`: Vitest/jsdom plus Testing Library, Node-test adapter for coverage, framework entrypoint/action/session/page tests, CLI and verification tests.
+- `tests/browser`: runtime foundation, parent, staff, admin core/advanced; profile login timing suites and helpers. Standard Playwright runs Chromium, Firefox, Pixel 7 mobile-Chrome with independent synthetic production servers at ports 3100–3102 and deterministic reset. Timing suites are opt-in and excluded from standard browser inventory.
+- `vitest.config.ts` Istanbul coverage includes all production `app`, `src`, scripts, proxy and Next config; excludes tests/declarations; 80% line/branch/function thresholds. `tests/coverage/support/production-inventory.ts` independently inventories runtime/type-only/linkage-only source and refuses omitted runtime coverage. Domain runner also has 80% thresholds.
+- Role-sensitive tests include `src/access/access-service.test.ts`, `src/application/authorization.test.ts`, `facades.test.ts`, directory/core/advanced/staff/parent tests; browser runtime/staff/admin tests; `tests/unit/runtime-boundaries.test.ts:200` asserts exactly five roles; `tests/coverage/app-session-boundaries.test.ts` and staff/admin page coverage have explicit old profiles. Login suites iterate profiles but helpers branch on `staff` and require appropriate main content/control IDs (`tests/browser/support/profile-login-measurement.ts:21`).
+- Verification manifest has **39 scenarios: 33 local and six linked-target/outstanding**. Outstanding IDs: `SAFARI-DESKTOP-SMOKE`, `SAFARI-MOBILE-SMOKE`, `TARGET-SUPABASE-AUTH-RLS`, `TARGET-SUPABASE-PERSISTENCE`, `TARGET-SCHEDULER-PROVIDER`, `TARGET-VERCEL-PREVIEW-STAGING`. This is inventory, not new evidence of pass/fail.
 
-**No tests, build or current coverage measurement were run in Reverse Engineering.** Historical counts and percentages are not current evidence.
+## Linting, CI/CD and Documentation
 
-## Login Regression and Measurement Limits
+- Lint and format are blocking scripts; their path scope covers App Router, application/runtime, tests/scripts and config. Older domain modules are often compressed onto very long lines and are outside the explicit lint/format command paths. Naming and explicit ports are generally clear; exception handling and state unions exist at facade boundaries.
+- CI `.github/workflows/ci.yml`: PRs/main pushes, immutable action revisions, read-only contents permissions, concurrency cancellation. Validate installs locked dependencies and browsers then runs `verify:local`: toolchain, manifests, format, lint, types, tests, coverage, security, build, smoke, full browser suite and evidence aggregation.
+- A dependent build-evidence job rebuilds synthetic output, creates CycloneDX SBOM, archives `.next` without cache, writes unsigned commit/run metadata and SHA256SUMS, uploads private artifact for 14 days. It does not use GitHub attestation API. Current team/project steering still requests an artifact attestation, whereas this intentional private-repository implementation is unsigned; practices discovery should reconcile descriptive evidence honestly through its authorized process.
+- Security: nonce CSP, production eval blocked, same-origin mutation endpoints, signed HttpOnly Lax local cookie, non-enumerating denial contracts, scope/version checks, field allowlists. The synthetic signing constant and nonsecure local cookie are synthetic behavior, not a production auth implementation.
+- `scan-artifacts.ts` implements privacy/secret regex scans, limited app/src dangerous-code SAST patterns, and no-deploy command scans; these are bounded scanners, not complete security analysis. `npm audit --audit-level=high` blocks high/critical dependency findings when verification runs.
+- `README.md`, Hungarian usage guide and verification runbook document local startup, five current roles and linked-target limitations. Historical aidlc/qa reports are prior evidence and may contain old role names or outdated counts; preserve their historical meaning.
 
-`test:login-performance` defines ten Chromium cases: five profiles in development and production, each measuring first login and switching with zero retries and a 5000 ms assertion. Timing starts at form submit and ends at the correct greeting plus usable navigation. Readiness and initial `/` are loaded before timing. Development uses a unique empty output directory; production uses a prebuilt bundle/fresh server. This excludes full cold server startup/initial root compilation and later navigation to a profile's business landing page.
+## Technical Debt
 
-Route integration tests directly invoke handlers for all five profiles, cookie rotation/sign-out/redirect and denial. Component tests render selector/shell without a server. Browser foundation covers parent selection and parent-to-staff switching; business browser suites reset fixtures and measure subsequent navigation after login. These are useful behavioral surfaces, not reproduction of the reported actual-server delay.
+1. Role vocabularies are duplicated across five domain IDs, five hyphenated profile roles, profile IDs, UI resolvers, matrices, grants and SQL. Centralization or exhaustive type checks may help implementation, but changing identifiers requires all consumers and runtime rejection checks.
+2. Domain `AccessService` grant semantics, application matrix semantics and SQL policies differ (group import, kindergarten role governance and sensitive fields). The verification JSON additionally allows sensitive administrator fields absent from the current application display-name allowlist. Treat this as a policy-alignment risk, not permission to silently broaden access.
+3. `AccessService` unknown-role fallback grants staff-like read behavior for matching scope. SQL role text has no constraint. Removing roles from TypeScript is insufficient to prevent legacy/unknown runtime grants from retaining access.
+4. Process-local synthetic stores simulate transactions, durable jobs, import recovery and grant revocation; their success cannot prove persistence or production restart behavior. Production adapter is a validated, unlinked slot.
+5. Archive ownership strings use the obsolete kindergarten administrator label. Workgroup/process owners are distinct from application authorization roles, and kindergarten groups are business entities used for scope enforcement. Cleanup requires a precise interpretation of “unnecessary groups.”
+6. Large files include application admin facade (~500 lines), synthetic advanced (~500), synthetic core (~430), parent synthetic (~415); older domains often use one-line methods. No circular-dependency proof or unused-code compiler analysis was performed. No TODO/FIXME/HACK or suppression matches were found in the bounded app/src/scripts/tests/.github search, which does not prove absence of broader debt.
+7. Manifest/reference validation does not establish semantic parity across the three executable authorization layers. Historical reports and static scope dictionaries are not current runtime evidence.
 
-The prior login intent reports sub-second isolated first/switch samples but explicitly no reproduced delay or production login correction. Canonical `verify:local` and standard browser configuration exclude the timing suite. Acceptance must explicitly execute the timing check and capture the affected existing environment, with server/browser segment timing and all five profiles preserved.
+## Role Change Risk Assessment
 
-## Linting, Formatting and CI/CD
+High cross-cutting authorization impact across grants, matrices, profiles/cookies, UI gates, sensitive directory fields, RLS, ownership metadata and tests/manifests. Teacher behavior and legacy disposition remain unresolved. Explicit runtime rejection and semantic policy alignment need implementation evidence; preserve family/group privacy, immediate revocation and last-admin protection.
 
-ESLint flat Next web-vitals/TypeScript config is blocking at zero warnings; Prettier is also blocking. Current lint/format commands use selective paths and omit portions of older domain/synthetic modules. GitHub Actions runs pinned checkout/setup-node, locked install/browser install and `verify:local` on PR/main. Main pushes additionally rebuild, generate SBOM and attest provenance. No executable deployment workflow or linked target was found.
+## Assessment Limits
 
-Local verification includes toolchain/manifests/format/lint/typecheck/test/coverage/security/build/smoke/standard browser/evidence. Security checks combine regex secret/SAST scanning with npm high/critical audit; configured checks do not prove runtime security. Team policy requires green checks, 80% coverage, no serious/critical accessibility violations and blocking high/critical dependency/SAST findings.
-
-## Documentation Quality
-
-README records supported startup/environment precedence, loopback use, watcher polling workaround, checks and outstanding targets. Explicit port and result contracts support maintainability. Hungarian user guide/source references exist but were only inventoried; prior intent evidence is historical.
-
-## Technical Debt and Follow-up
-
-| Finding | Evidence / implication |
-|---|---|
-| Reported delay unmeasured | Reproduce on the actual local server; isolated success does not close this defect |
-| Cache clearing hypothesis | Session route sends `Clear-Site-Data: "cache"`; measure browser cache/assets and preserve session isolation before changing it |
-| Compilation/environment hypothesis | Runtime composition/application-barrel imports, output contention, watcher/resource behavior and browser redirects need measured attribution |
-| Toolchain mismatch | Shell Node 26 versus required Node 24; record the running server's actual version; cause not established |
-| Nondurable synthetic state | Module/process stores; unlinked production boundary; no demonstrated real persistence |
-| Divergent authorization paths | Static root navigation versus dynamic business admin revocation; preserve protected role/scope behavior |
-| Migration/lifecycle debt | Partial synthetic rollback simulation and SQL security-definer/RLS contracts require later real-target validation |
-
-## Outstanding Evidence
-
-Committed local acceptance report references SHA `71a3b5f8d74be036b10571690e439d865fb5d664`, distinct from scan HEAD. Safari/mobile Safari, Supabase auth/RLS/persistence, provider/scheduler and Vercel checks remain outstanding. `.env.local` is synthetic, but effective settings of an already-running server were not checked. No login speed improvement or fix is claimed.
+Full repository breadth with partial deep coverage; no fresh passing counts, measured coverage, performance or security certification. Historical summaries are prior evidence. Static manifest reference checks do not prove executable policy parity or real integrations. The production inventory helper `tests/coverage/support/production-inventory.ts` was read deeply, but verified coverage is demoted to shallow because the current `coverage/` ignore rule prevents its inclusion in the mint utility's empty temporary index. The other 53 analyzed paths have fingerprint `30b17c6daf49b37eea5f622f21905a0df9b26923`, minted using the refreshed snapshot's approved Git access. This limitation affects the coverage claim, not the retained static finding that the helper inventories runtime/type-only/linkage-only source and refuses omitted runtime coverage.

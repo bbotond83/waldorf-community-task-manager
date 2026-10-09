@@ -70,13 +70,13 @@ test("archive restore conflict preserves the archived item", async ({ page }) =>
   await page.goto("/");
   if (
     !(await page
-      .getByTestId("profile-selector-kindergarten-admin-local-button")
+      .getByTestId("profile-selector-super-admin-local-button")
       .isVisible()
       .catch(() => false))
   ) {
     await page.getByTestId("app-shell-switch-profile-button").click();
   }
-  await page.getByTestId("profile-selector-kindergarten-admin-local-button").click();
+  await page.getByTestId("profile-selector-super-admin-local-button").click();
   await page.goto("/admin/archivum/year-2026?scenario=conflict");
   await page.getByTestId("admin-record-restore-form-submit-button").click();
   await expect(page.getByTestId("admin-record-restore-form-state-conflict")).toContainText(

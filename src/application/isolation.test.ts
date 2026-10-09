@@ -17,7 +17,7 @@ const productionFiles = [
   "projection.ts",
   "results.ts",
   "session-facade.ts",
-  "staff-facade.ts",
+  "teacher-facade.ts",
   "validation.ts",
 ];
 

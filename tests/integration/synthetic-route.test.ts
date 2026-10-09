@@ -1,3 +1,8 @@
+import {
+  getSyntheticAccessState,
+  resetSyntheticAccessState,
+  setSyntheticAccessState,
+} from "../../src/runtime/synthetic/access-state.ts";
 import { NextRequest } from "next/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { POST as resetSyntheticFixtures } from "../../app/api/synthetic/reset/route";
@@ -19,7 +24,10 @@ function formRequest(profileId: string, origin = localOrigin) {
   });
 }
 
-afterEach(() => vi.unstubAllEnvs());
+afterEach(() => {
+  vi.unstubAllEnvs();
+  resetSyntheticAccessState();
+});
 
 describe("synthetic-only route boundary", () => {
   it.each(SYNTHETIC_PROFILES)(
@@ -109,8 +117,33 @@ describe("synthetic-only route boundary", () => {
         headers: { host: "127.0.0.1:3400", origin: localOrigin },
       }),
     );
-    expect(sessionResponse.status).toBe(404);
+    expect(sessionResponse.status).toBe(503);
     expect(resetResponse.status).toBe(404);
     expect(sessionResponse.cookies.get(SESSION_COOKIE_NAME)).toBeUndefined();
   });
+});
+
+it.each(["staff-local", "kindergarten-admin-local"])(
+  "rejects removed profile %s without session alias",
+  async (profileId) => {
+    vi.stubEnv("APP_RUNTIME_MODE", "synthetic");
+    const response = await selectSyntheticProfile(formRequest(profileId));
+    expect(response.status).toBe(400);
+    expect(response.cookies.get(SESSION_COOKIE_NAME)).toBeUndefined();
+  },
+);
+it("returns unavailable 503 for invalid composition without cookies", async () => {
+  vi.stubEnv("APP_RUNTIME_MODE", "invalid");
+  const response = await selectSyntheticProfile(formRequest("parent-local"));
+  expect(response.status).toBe(503);
+  expect(response.cookies.get(SESSION_COOKIE_NAME)).toBeUndefined();
+});
+
+it("rejects inactive or revoked authoritative profile before cookie issuance", async () => {
+  vi.stubEnv("APP_RUNTIME_MODE", "synthetic");
+  const state = getSyntheticAccessState("parent-local")!;
+  setSyntheticAccessState("parent-local", { ...state, isActive: false });
+  const response = await selectSyntheticProfile(formRequest("parent-local"));
+  expect(response.status).toBe(400);
+  expect(response.cookies.get(SESSION_COOKIE_NAME)).toBeUndefined();
 });

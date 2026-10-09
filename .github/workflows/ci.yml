@@ -38,6 +38,14 @@ jobs:
         run: npm ci
       - name: Install browser dependencies
         run: npx playwright install --with-deps chromium firefox
+      - name: Install PostgreSQL 18 tools without a service or default cluster
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-common
+          echo 'create_main_cluster = false' | sudo tee -a /etc/postgresql-common/createcluster.conf
+          sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+          sudo apt-get install -y postgresql-18 postgresql-client-18
+          echo '/usr/lib/postgresql/18/bin' >> "$GITHUB_PATH"
       - name: Run the complete local verification pipeline
         run: npm run verify:local
 

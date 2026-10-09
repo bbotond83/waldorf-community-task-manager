@@ -1,3 +1,4 @@
+import { sessionGrantBindings } from "../access/session-grants.ts";
 import assert from "node:assert/strict";
 import { beforeEach, describe, it } from "node:test";
 import type { Scope } from "../access/index.ts";
@@ -15,6 +16,7 @@ function session(scope = groupScope): SessionContext {
   return {
     subjectId: `admin-${scope.id}`,
     authorizationVersion: 1,
+    ...sessionGrantBindings(`admin-${scope.id}`, "group_admin", [scope]),
     roles: ["group_admin"],
     scopes: [scope],
     runtimeMode: "synthetic",
@@ -113,7 +115,10 @@ describe("SyntheticAdminPort assignments and archive", () => {
   it("leaves an archived record unchanged on restore conflict", async () => {
     const organizationSession: SessionContext = {
       ...session({ id: "org-napsugar", type: "organization", organizationId: "org-napsugar" }),
-      roles: ["kindergarten_admin"],
+      ...sessionGrantBindings("admin-org-napsugar", "super_admin", [
+        { id: "org-napsugar", type: "organization", organizationId: "org-napsugar" },
+      ]),
+      roles: ["super_admin"],
     };
     const { facade } = setup(organizationSession);
     const result = await facade.restoreRecord(organizationSession, {

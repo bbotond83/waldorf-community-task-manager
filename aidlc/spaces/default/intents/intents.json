@@ -33,5 +33,12 @@
     "dirName": "261005-profile-login-delay",
     "scope": "bugfix",
     "status": "complete"
+  },
+  {
+    "uuid": "01a110cd-dfbf-71ab-9460-5846cff0d44b",
+    "slug": "simplify-user-roles",
+    "dirName": "261006-simplify-user-roles",
+    "scope": "classic",
+    "status": "complete"
   }
 ]

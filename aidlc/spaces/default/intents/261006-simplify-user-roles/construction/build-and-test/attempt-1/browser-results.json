@@ -1,0 +1,58 @@
+[
+  {
+    "name": "unit-16",
+    "command": "PATH=/opt/homebrew/opt/node@24/bin:$PATH npm run test:browser -- tests/browser/teacher-web.spec.ts",
+    "started": "2026-10-08T10:44:32.736477+00:00",
+    "seconds": 0.98,
+    "exit": 1,
+    "log": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/build-and-test/logs/unit-16.log"
+  },
+  {
+    "name": "unit-17",
+    "command": "PATH=/opt/homebrew/opt/node@24/bin:$PATH npm run test:browser -- tests/browser/teacher-web.spec.ts --grep @a11y",
+    "started": "2026-10-08T10:44:33.713280+00:00",
+    "seconds": 0.44,
+    "exit": 1,
+    "log": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/build-and-test/logs/unit-17.log"
+  },
+  {
+    "name": "unit-19",
+    "command": "PATH=/opt/homebrew/opt/node@24/bin:$PATH npm run test:browser -- tests/browser/runtime-foundation.spec.ts",
+    "started": "2026-10-08T10:44:34.153039+00:00",
+    "seconds": 0.4,
+    "exit": 1,
+    "log": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/build-and-test/logs/unit-19.log"
+  },
+  {
+    "name": "unit-28",
+    "command": "PATH=/opt/homebrew/opt/node@24/bin:$PATH npm run test:browser -- tests/browser/parent-web.spec.ts tests/browser/admin-core.spec.ts tests/browser/admin-advanced.spec.ts",
+    "started": "2026-10-08T10:44:34.557197+00:00",
+    "seconds": 0.38,
+    "exit": 1,
+    "log": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/build-and-test/logs/unit-28.log"
+  },
+  {
+    "name": "unit-29",
+    "command": "PATH=/opt/homebrew/opt/node@24/bin:$PATH npm run test:browser -- tests/browser/parent-web.spec.ts tests/browser/admin-core.spec.ts tests/browser/admin-advanced.spec.ts --grep @a11y",
+    "started": "2026-10-08T10:44:34.934628+00:00",
+    "seconds": 0.37,
+    "exit": 1,
+    "log": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/build-and-test/logs/unit-29.log"
+  },
+  {
+    "name": "browser",
+    "command": "PATH=/opt/homebrew/opt/node@24/bin:$PATH npm run test:browser",
+    "started": "2026-10-08T10:44:35.300442+00:00",
+    "seconds": 0.41,
+    "exit": 1,
+    "log": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/build-and-test/logs/browser.log"
+  },
+  {
+    "name": "performance",
+    "command": "PATH=/opt/homebrew/opt/node@24/bin:$PATH npm run test:login-performance",
+    "started": "2026-10-08T10:44:35.709370+00:00",
+    "seconds": 6.17,
+    "exit": 1,
+    "log": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/build-and-test/logs/performance.log"
+  }
+]

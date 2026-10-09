@@ -231,3 +231,35 @@ promotion belong to a separate, linked-target workflow after all required gates 
 ## AI DLC Version
 
 [2.5.11] - 2026-07-24
+
+## Disposable current-role database verification
+
+Use Node24/npm11 and PostgreSQL18 tools (`psql`, `initdb`, `pg_ctl`). On macOS the
+approved Homebrew package is `postgresql@18`; the harness locates
+`/opt/homebrew/opt/postgresql@18/bin` directly. On Linux expose PostgreSQL18's
+binary directory on `PATH`. Missing tools or a different major version fail
+verification; checks are never skipped. CI installs the PostgreSQL18 packages
+using the [official PostgreSQL Apt instructions](https://www.postgresql.org/download/linux/ubuntu/)
+and disables creation of a default package cluster before installation. CI
+execution remains unverified until that job actually runs.
+
+```sh
+npm run test:database:roles
+```
+
+This mandatory check is also part of `npm run verify:local`. It creates only
+a fresh temporary cluster with a private Unix socket, no TCP listener and
+invented supported-schema records. It executes the actual current-role
+migration and asserts preservation, generation/repeat behavior, negative
+preflight, instrumented rollback, observed concurrent lock exclusion, scoped
+RLS and redacted governance evidence. Each command and SQL statement has a
+deadline; the runner stops its owned cluster and removes its temporary data
+in cleanup. It never reads deployment connection strings or uses an existing
+cluster. Sandbox environments must permit PostgreSQL shared memory.
+
+This proves actual disposable PostgreSQL behavior for the declared supported
+schema. It does not prove compatibility with an unlinked deployment, issuer
+configuration or privileged production writer. Historical SQL/evidence is
+preserved; the new test baseline uses a nonreserved alias in its historical
+helper scaffold. Existing application final-administrator transaction tests
+remain separate from the disposable SQL checks.

@@ -1,3 +1,4 @@
+import { grantAllows, isAuthorizationVersion, isRoleScope } from "../access/role-policy.ts";
 import type { Role, Scope } from "../access/index.ts";
 import type {
   ApplicationResult,
@@ -35,7 +36,7 @@ type MatrixRow = Readonly<{
   explicitDeny?: boolean;
 }>;
 
-export const AUTHORIZATION_MATRIX_VERSION = "2026-08-12.1";
+export const AUTHORIZATION_MATRIX_VERSION = "four-role-v1";
 
 const DISPLAY_NAME_FIELDS = ["SF-DISPLAY-NAME", "SF-PARTICIPANT-NAME"] as const;
 
@@ -61,12 +62,12 @@ export const AUTHORIZATION_MATRIX: readonly MatrixRow[] = Object.freeze([
     },
   },
   {
-    id: "AUTH-STAFF-SCHEDULE",
-    roles: ["read_only_staff"],
+    id: "AUTH-TEACHER-TRACKING",
+    roles: ["kindergarten_teacher"],
     actions: ["read"],
     resources: ["schedule", "coordination"],
     fields: DISPLAY_NAME_FIELDS,
-    navigation: { id: "staff-schedule", label: "Beosztás", href: "/munkatars/beosztas" },
+    navigation: { id: "teacher-tracking", label: "Beosztás", href: "/teacher/schedule" },
   },
   {
     id: "AUTH-GROUP-ADMIN-CORE",
@@ -83,25 +84,6 @@ export const AUTHORIZATION_MATRIX: readonly MatrixRow[] = Object.freeze([
     resources: ["import"],
     fields: [],
     explicitDeny: true,
-  },
-  {
-    id: "AUTH-KINDERGARTEN-ADMIN",
-    roles: ["kindergarten_admin"],
-    actions: ["read", "create", "update", "delete", "manage"],
-    resources: [
-      "dashboard",
-      "record",
-      "task",
-      "assignment",
-      "approval",
-      "archive",
-      "import",
-      "reminder",
-      "lifecycle",
-      "settings",
-    ],
-    fields: DISPLAY_NAME_FIELDS,
-    navigation: { id: "admin-dashboard", label: "Áttekintés", href: "/admin" },
   },
   {
     id: "AUTH-SUPER-ADMIN",
@@ -134,9 +116,8 @@ export const AUTHORIZATION_MATRIX: readonly MatrixRow[] = Object.freeze([
 
 const HOME_PATH_BY_ROLE: Readonly<Record<Role, string>> = Object.freeze({
   parent: "/szulo/feladatok",
-  read_only_staff: "/munkatars/beosztas",
+  kindergarten_teacher: "/teacher/schedule",
   group_admin: "/admin",
-  kindergarten_admin: "/admin",
   super_admin: "/admin",
 });
 
@@ -152,10 +133,14 @@ export class AuthorizationContract {
     session: SessionContext,
     request: AuthorizationRequest,
   ): Promise<ApplicationResult<AuthorizedContext>> {
-    if (!isValidSessionMode(session)) return denied("INVALID_SESSION_MODE");
+    if (!isValidSessionMode(session) || !isCurrentSession(session))
+      return denied("INVALID_SESSION_MODE");
 
     const currentVersion = await this.versions.getCurrentVersion(session.subjectId);
-    if (currentVersion === undefined || currentVersion !== session.authorizationVersion) {
+    if (
+      !isAuthorizationVersion(currentVersion) ||
+      currentVersion !== session.authorizationVersion
+    ) {
       await this.versions.clearProtectedCache(session.subjectId);
       return invalidated("AUTHORIZATION_VERSION_STALE");
     }
@@ -177,8 +162,12 @@ export class AuthorizationContract {
   }
 
   async navigation(session: SessionContext): Promise<ApplicationResult<NavigationModel>> {
+    if (!isValidSessionMode(session) || !isCurrentSession(session)) return denied();
     const currentVersion = await this.versions.getCurrentVersion(session.subjectId);
-    if (currentVersion === undefined || currentVersion !== session.authorizationVersion) {
+    if (
+      !isAuthorizationVersion(currentVersion) ||
+      currentVersion !== session.authorizationVersion
+    ) {
       await this.versions.clearProtectedCache(session.subjectId);
       return invalidated("AUTHORIZATION_VERSION_STALE");
     }
@@ -187,9 +176,16 @@ export class AuthorizationContract {
       (row) =>
         !row.explicitDeny &&
         row.navigation !== undefined &&
-        row.roles.some((role) => session.roles.includes(role)),
+        session.grants.some(
+          (grant) =>
+            grant.revokedAt === undefined &&
+            isRoleScope(grant.role, grant.scope) &&
+            row.roles.includes(grant.role),
+        ),
     ).map((row) => row.navigation!);
-    const firstRole = session.roles[0];
+    const firstRole = session.grants.find(
+      (grant) => grant.revokedAt === undefined && isRoleScope(grant.role, grant.scope),
+    )?.role;
     if (!firstRole || items.length === 0) return denied();
 
     return success(
@@ -208,19 +204,41 @@ function matchesRow(
   session: SessionContext,
   request: AuthorizationRequest,
 ): boolean {
+  const fields = request.fields ?? [];
+  const fieldNames: Readonly<Record<string, string>> = {
+    "SF-DISPLAY-NAME": "display_name",
+    "SF-PARTICIPANT-NAME": "participant_name",
+  };
   return (
-    row.roles.some((role) => session.roles.includes(role)) &&
     row.actions.includes(request.action) &&
     row.resources.includes(request.resource) &&
-    session.scopes.some((scope) => scopeContains(scope, request.scope)) &&
-    (request.fields ?? []).every((field) => row.fields.includes(field))
+    fields.every((field) => row.fields.includes(field)) &&
+    session.grants.some(
+      (grant) =>
+        grant.subjectId === session.subjectId &&
+        row.roles.includes(grant.role) &&
+        (fields.length ? fields : [undefined]).every((field) =>
+          grantAllows(grant, {
+            action: request.action,
+            resource: {
+              kind: request.resource,
+              scope: request.scope,
+              field: field ? (fieldNames[field] ?? field) : undefined,
+            },
+          }),
+        ),
+    )
   );
 }
-
-function scopeContains(grant: Scope, requested: Scope): boolean {
+function isCurrentSession(session: SessionContext): boolean {
   return (
-    grant.organizationId === requested.organizationId &&
-    (grant.type === "organization" || (grant.type === requested.type && grant.id === requested.id))
+    session.isActive === true &&
+    isAuthorizationVersion(session.authorizationVersion) &&
+    Array.isArray(session.grants) &&
+    session.grants.length > 0 &&
+    session.grants.every(
+      (grant) => grant.subjectId === session.subjectId && isRoleScope(grant.role, grant.scope),
+    )
   );
 }
 
