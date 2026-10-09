@@ -1,0 +1,143 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+import {
+  CURRENT_ROLES,
+  effectiveGrants,
+  grantAllows,
+  isAuthorizationVersion,
+  isCurrentRole,
+  isRoleScope,
+  scopeContains,
+} from "./role-policy.ts";
+import type { RoleGrant, Scope } from "./types.ts";
+const group: Scope = { id: "oak", type: "group", organizationId: "org" };
+const family: Scope = { ...group, type: "family", id: "family" };
+const org: Scope = { ...group, type: "organization", id: "org" };
+const grant = (role: RoleGrant["role"], scope: Scope): RoleGrant => ({
+  id: "grant",
+  subjectId: "user",
+  role,
+  scope,
+  grantedAt: "2026-10-06",
+});
+test("current vocabulary exhaustively excludes legacy and unknown values", () => {
+  assert.deepEqual(CURRENT_ROLES, ["parent", "group_admin", "kindergarten_teacher", "super_admin"]);
+  for (const role of CURRENT_ROLES) assert.equal(isCurrentRole(role), true);
+  for (const role of ["read_only_staff", "kindergarten_admin", "staff", "", null, undefined, {}])
+    assert.equal(isCurrentRole(role), false);
+});
+test("each role requires its precise scope shape", () => {
+  for (const role of CURRENT_ROLES)
+    for (const scope of [group, family, org])
+      assert.equal(
+        isRoleScope(role, scope),
+        scope.type ===
+          (role === "parent" ? "family" : role === "super_admin" ? "organization" : "group"),
+      );
+  assert.equal(isRoleScope("super_admin", { ...org, id: "elsewhere" }), false);
+  assert.equal(isRoleScope("parent", { ...family, id: "" }), false);
+});
+test("same identifiers cannot cross organization or scope type", () => {
+  assert.equal(scopeContains(group, { ...group, organizationId: "other" }), false);
+  assert.equal(scopeContains(group, { ...group, type: "family" }), false);
+  assert.equal(scopeContains(org, group), true);
+});
+test("teacher tracking allows only safe scoped reads", () => {
+  const teacher = grant("kindergarten_teacher", group);
+  for (const action of ["create", "update", "delete", "manage"] as const)
+    assert.equal(
+      grantAllows(teacher, { action, resource: { kind: "schedule", scope: group } }),
+      false,
+    );
+  assert.equal(
+    grantAllows(teacher, { action: "read", resource: { kind: "schedule", scope: group } }),
+    true,
+  );
+  for (const field of ["email", "phone", "allergen_note"])
+    assert.equal(
+      grantAllows(teacher, { action: "read", resource: { kind: "schedule", scope: group, field } }),
+      false,
+    );
+  assert.equal(
+    grantAllows(teacher, { action: "read", resource: { kind: "family", scope: group } }),
+    false,
+  );
+  assert.equal(
+    grantAllows(teacher, {
+      action: "read",
+      resource: { kind: "coordination", scope: group, field: "display_name" },
+    }),
+    true,
+  );
+});
+test("retained role branches deny advanced group operations and private parent fields", () => {
+  const admin = grant("group_admin", group),
+    parent = grant("parent", family);
+  for (const kind of ["import", "reminder", "lifecycle", "settings", "role_grant", "unknown"])
+    assert.equal(grantAllows(admin, { action: "manage", resource: { kind, scope: group } }), false);
+  assert.equal(
+    grantAllows(admin, { action: "update", resource: { kind: "task", scope: group } }),
+    true,
+  );
+  assert.equal(
+    grantAllows(parent, { action: "update", resource: { kind: "contribution", scope: family } }),
+    true,
+  );
+  assert.equal(
+    grantAllows(parent, { action: "update", resource: { kind: "assignment", scope: family } }),
+    false,
+  );
+  assert.equal(
+    grantAllows(parent, {
+      action: "read",
+      resource: { kind: "family", scope: family, field: "email" },
+    }),
+    false,
+  );
+  assert.equal(
+    grantAllows(grant("super_admin", org), {
+      action: "manage",
+      resource: { kind: "role_grant", scope: group },
+    }),
+    true,
+  );
+});
+test("unknown, invalid and revoked grants never authorize", () => {
+  for (const candidate of [
+    { ...grant("kindergarten_teacher", group), role: "unknown" } as unknown as RoleGrant,
+    { ...grant("kindergarten_teacher", org) },
+    { ...grant("kindergarten_teacher", group), revokedAt: "" },
+  ])
+    assert.equal(
+      grantAllows(candidate, { action: "read", resource: { kind: "schedule", scope: group } }),
+      false,
+    );
+});
+test("effective dedup preserves history and ignores revoked invalid rows", () => {
+  const original = grant("kindergarten_teacher", group);
+  const rows = [
+    original,
+    { ...original, id: "duplicate" },
+    { ...original, id: "revoked", revokedAt: "2026" },
+    { ...original, id: "invalid", scope: org },
+  ];
+  assert.deepEqual(effectiveGrants(rows), [original]);
+  assert.equal(rows.length, 4);
+});
+test("authorization versions use the supported positive database range", () => {
+  for (const value of [1, 2, 2147483647]) assert.equal(isAuthorizationVersion(value), true);
+  for (const value of [0, -1, 1.2, NaN, Infinity, 2147483648, "1", undefined])
+    assert.equal(isAuthorizationVersion(value), false);
+});
+
+test("Group admin preserves scoped queue/year reads without generic advanced dispatch", () => {
+  const admin = grant("group_admin", group);
+  for (const kind of ["admin_queue", "school_year"]) {
+    assert.equal(grantAllows(admin, { action: "read", resource: { kind, scope: group } }), true);
+    assert.equal(grantAllows(admin, { action: "manage", resource: { kind, scope: group } }), false);
+  }
+  assert.equal(
+    grantAllows(admin, { action: "manage", resource: { kind: "admin_operation", scope: group } }),
+    false,
+  );
+});

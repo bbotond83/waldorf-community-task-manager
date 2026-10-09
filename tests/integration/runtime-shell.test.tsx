@@ -9,7 +9,7 @@ describe("runtime shell", () => {
   it("renders every privacy-safe test profile with stable controls", () => {
     render(<ProfileSelector profiles={SYNTHETIC_PROFILES} />);
     expect(screen.getByRole("heading", { name: "Helyi tesztprofil kiválasztása" })).toBeVisible();
-    expect(screen.getAllByRole("button", { name: "Profil használata" })).toHaveLength(5);
+    expect(screen.getAllByRole("button", { name: "Profil használata" })).toHaveLength(4);
     expect(screen.getByTestId("profile-selector-parent-local-button")).toBeVisible();
   });
 
@@ -53,4 +53,41 @@ describe("runtime shell", () => {
     expect(screen.getByText("CONFIG_PRODUCTION_INVALID")).toBeVisible();
     expect(document.body).not.toHaveTextContent("Production runtime configuration is invalid.");
   });
+});
+
+it("shows four role controls and no removed profile selection", () => {
+  render(<ProfileSelector profiles={SYNTHETIC_PROFILES} />);
+  expect(screen.getByRole("heading", { name: "Óvónő" })).toBeVisible();
+  expect(screen.getByTestId("profile-selector-kindergarten-teacher-local-button")).toHaveAttribute(
+    "type",
+    "submit",
+  );
+  expect(screen.queryByTestId("profile-selector-staff-local-button")).not.toBeInTheDocument();
+  expect(
+    screen.queryByTestId("profile-selector-kindergarten-admin-local-button"),
+  ).not.toBeInTheDocument();
+});
+it("teacher shell announces localized role and current navigation without mutations", () => {
+  render(
+    <AppShell profile={SYNTHETIC_PROFILES[1]}>
+      <h1>Óvónői kezdőlap</h1>
+    </AppShell>,
+  );
+  expect(screen.getByRole("status")).toHaveTextContent("Óvónő profil aktív.");
+  expect(screen.getByTestId("app-shell-navigation-teacher-tracking")).toHaveAttribute(
+    "href",
+    "/teacher/schedule",
+  );
+  expect(screen.getByTestId("app-shell-skip-link")).toHaveAttribute("href", "#fo-tartalom");
+  expect(screen.getByTestId("app-shell-main")).toHaveAttribute("tabindex", "-1");
+  expect(screen.queryByRole("link", { name: "Importálás" })).not.toBeInTheDocument();
+});
+it("selector uses native keyboard-operable forms and stable accessible submit names", () => {
+  render(<ProfileSelector profiles={SYNTHETIC_PROFILES} />);
+  for (const profile of SYNTHETIC_PROFILES) {
+    const form = screen.getByTestId(`profile-selector-${profile.id}-form`);
+    expect(form).toHaveAttribute("method", "post");
+    expect(form).toHaveAttribute("action", "/api/synthetic/session");
+    expect(within(form).getByRole("button", { name: "Profil használata" })).toBeEnabled();
+  }
 });

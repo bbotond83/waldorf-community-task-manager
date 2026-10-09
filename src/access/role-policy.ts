@@ -1,0 +1,125 @@
+import type { AuthorizationRequest, Role, RoleGrant, Scope } from "./types.ts";
+
+export const CURRENT_ROLES = Object.freeze([
+  "parent",
+  "group_admin",
+  "kindergarten_teacher",
+  "super_admin",
+] as const);
+export function isCurrentRole(value: unknown): value is Role {
+  return CURRENT_ROLES.some((role) => role === value);
+}
+export function isValidScope(scope: Scope): boolean {
+  return (
+    !!scope &&
+    typeof scope.id === "string" &&
+    scope.id.length > 0 &&
+    typeof scope.organizationId === "string" &&
+    scope.organizationId.length > 0 &&
+    ["organization", "group", "family"].includes(scope.type) &&
+    (scope.type !== "organization" || scope.id === scope.organizationId)
+  );
+}
+export function isRoleScope(role: unknown, scope: Scope): boolean {
+  if (!isCurrentRole(role) || !isValidScope(scope)) return false;
+  return (
+    scope.type ===
+    (role === "parent" ? "family" : role === "super_admin" ? "organization" : "group")
+  );
+}
+export function scopeContains(grant: Scope, requested: Scope): boolean {
+  return (
+    isValidScope(grant) &&
+    isValidScope(requested) &&
+    grant.organizationId === requested.organizationId &&
+    (grant.type === "organization" || (grant.type === requested.type && grant.id === requested.id))
+  );
+}
+export function effectiveGrants(grants: readonly RoleGrant[]): RoleGrant[] {
+  const seen = new Set<string>();
+  return grants.filter((grant) => {
+    if (grant.revokedAt !== undefined || !isRoleScope(grant.role, grant.scope)) return false;
+    const key = JSON.stringify([
+      grant.subjectId,
+      grant.role,
+      grant.scope.type,
+      grant.scope.id,
+      grant.scope.organizationId,
+    ]);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+const CORE_RESOURCES = new Set([
+  "dashboard",
+  "record",
+  "task",
+  "assignment",
+  "approval",
+  "archive",
+  "group",
+  "child",
+  "family",
+  "parent",
+]);
+const TRACKING_FIELDS = new Set([
+  "display_name",
+  "participant_name",
+  "owner_display_name",
+  "assignee_display_names",
+  "current_status",
+]);
+export function grantAllows(
+  grant: Pick<RoleGrant, "role" | "scope" | "revokedAt">,
+  request: AuthorizationRequest,
+): boolean {
+  if (
+    grant.revokedAt !== undefined ||
+    !isRoleScope(grant.role, grant.scope) ||
+    !scopeContains(grant.scope, request.resource.scope)
+  )
+    return false;
+  if (!["read", "create", "update", "delete", "manage"].includes(request.action)) return false;
+  switch (grant.role) {
+    case "super_admin":
+      return true;
+    case "group_admin":
+      return (
+        CORE_RESOURCES.has(request.resource.kind) ||
+        (request.action === "read" &&
+          ["admin_queue", "school_year"].includes(request.resource.kind))
+      );
+    case "kindergarten_teacher":
+      return (
+        request.action === "read" &&
+        ((request.resource.kind === "schedule" &&
+          (!request.resource.field || TRACKING_FIELDS.has(request.resource.field))) ||
+          (request.resource.kind === "coordination" && request.resource.field === "display_name"))
+      );
+    case "parent":
+      return parentCan(request);
+    default:
+      return false;
+  }
+}
+function parentCan({ action, resource }: AuthorizationRequest): boolean {
+  if (resource.field && !TRACKING_FIELDS.has(resource.field)) return false;
+  switch (resource.kind) {
+    case "family":
+      return action === "read";
+    case "assignment":
+      return action === "read" || action === "create";
+    case "contribution":
+    case "notification":
+      return action === "read" || action === "update";
+    case "swap_request":
+    case "cancellation_request":
+      return action === "create" || action === "read";
+    default:
+      return false;
+  }
+}
+export function isAuthorizationVersion(value: unknown): value is number {
+  return typeof value === "number" && Number.isInteger(value) && value > 0 && value <= 2147483647;
+}

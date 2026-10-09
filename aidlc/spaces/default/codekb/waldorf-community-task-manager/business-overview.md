@@ -1,22 +1,31 @@
 # Business Overview
 
+Static synthesis of the revalidated 2026-10-06 developer scan for `261006-simplify-user-roles`, Standard depth, branch `feature/simplify-user-roles`, observed HEAD `0dce0567f18dc72e46aa88d87e5626708b08bc7d`. Full repository breadth with partial deep coverage. No application changes, tests, builds, browser sessions, migrations or target calls were performed.
+
 ## Business Domain and Purpose
 
-Waldorf Community Task Manager coordinates school community duties, family participation, staff schedules and administrator approvals. Hungarian user interfaces use English technical identifiers. This is one private npm application with a synthetic local runtime; live authentication, persistence, notification and deployment targets remain unverified.
+The application coordinates community participation, duties and administrative records for a Waldorf kindergarten. Hungarian browser copy serves local synthetic personas; production backend composition is not linked.
 
-## Actors and Key Functionality
+## Key Functionality
 
-- Parents view family assignments, request swaps/cancellations, read notifications, assess contribution eligibility and accept invitations.
-- Staff read scoped schedules.
-- Administrators manage records, tasks, approvals, archives, school years, migration previews/recovery, reminders, privacy lifecycle and settings.
-- Access, directory, coordination and privacy services enforce scope, sensitive-field projection, optimistic versions, request decisions and audit boundaries.
+Families, parents, children, school years and kindergarten groups; capacity-aware duty signup, swaps and cancellation approvals; own-family contributions/allergen access and notifications; date-filtered staff schedules; administrative records/tasks/assignments/queues/archives; seventeen-sheet legacy import with conflict resolution and rollback; reminders, grant revocation, privacy lifecycle and settings.
 
-## Current Intent and Evidence Boundary
+## Current Users and Roles
 
-Intent `261005-profile-login-delay` addresses the reported nearly three-minute login affecting all profiles. Five local profiles—parent, staff and three administrator variants—share the synthetic login chain described in [architecture.md](architecture.md). The goal is actual-environment reproduction, causal correction and completion within 5000 ms for every profile; none of these outcomes has been demonstrated by this scan.
+| Concept | Domain role | Current responsibility |
+| --- | --- | --- |
+| Parent | `parent` | Own-family participation, requests and notifications |
+| Group Administrator | `group_admin` | Granted-group core administration; application import denied |
+| Kindergarten Administrator | `kindergarten_admin` | Organization administration/advanced operations; application governance denied |
+| Read-only Staff | `read_only_staff` | Granted-group schedule viewing; sensitive fields and mutations denied |
+| Super Administrator | `super_admin` | Organization administration and governance |
 
-The previous intent delivered isolated login regression coverage without reproducing the delay or applying a login-path correction. Its historical fast samples cannot establish behavior on the user's current server. Source inspection found no external-auth call or intentional multi-minute wait in the shared application login chain.
+The requested future catalog contains Parent, Group admin, Kindergarten teacher and Super administrator. No teacher role exists now. Teacher permissions/home/scope and legacy-role migration or rejection require approval in requirements. [Dependencies](dependencies.md) records the current role representations.
 
-## Source and Coverage
+## Groups and Business Ownership
 
-Synthesized from `261005-profile-login-delay/inception/reverse-engineering/developer-scan.md`. This Full rescan replaces nine documents at Minimal depth; verified deep coverage is partial and listed in [reverse-engineering-timestamp.md](reverse-engineering-timestamp.md).
+Kindergarten groups are business entities and authorization scopes. Staff fixtures include Tölgyfa/Napraforgó groups; workgroup/finance/library/water-test labels are process owners. These are distinct from role categories. Five import archive owners currently say `kindergarten-admin`; a future owner must be chosen without losing legacy sheet coverage. “Unnecessary groups” must be clarified before deleting business entities.
+
+## Operational and Privacy Boundaries
+
+Family and granted-group constraints, field allowlists, immediate revocation/version checks, last-admin protection and redacted audit are existing safeguards. Domain, application and SQL policy differ. Synthetic transactions/provider behavior do not prove production durability, Supabase/RLS, scheduler/email or deployment behavior.

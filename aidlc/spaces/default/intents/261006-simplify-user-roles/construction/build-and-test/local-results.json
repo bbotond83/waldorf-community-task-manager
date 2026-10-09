@@ -1,0 +1,298 @@
+[
+  {
+    "name": "unit-01",
+    "command": "PATH=/opt/homebrew/opt/node@24/bin:$PATH node --experimental-strip-types --test src/access/access-service.test.ts src/access/access-matrix.test.ts src/application/authorization.test.ts",
+    "started": "2026-10-08T14:47:08.924597+00:00",
+    "seconds": 0.16,
+    "exit": 0,
+    "log": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/build-and-test/logs/attempt-2/unit-01.log"
+  },
+  {
+    "name": "unit-02",
+    "command": "PATH=/opt/homebrew/opt/node@24/bin:$PATH npx vitest run --config vitest.config.ts --project delivery tests/unit/runtime-boundaries.test.ts tests/integration/synthetic-route.test.ts tests/integration/runtime-shell.test.tsx",
+    "started": "2026-10-08T14:47:09.088411+00:00",
+    "seconds": 5.44,
+    "exit": 0,
+    "log": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/build-and-test/logs/attempt-2/unit-02.log"
+  },
+  {
+    "name": "unit-03",
+    "command": "PATH=/opt/homebrew/opt/node@24/bin:$PATH node --experimental-strip-types --test src/access/role-policy.test.ts src/access/current-role-migration.test.ts",
+    "started": "2026-10-08T14:47:14.534928+00:00",
+    "seconds": 0.13,
+    "exit": 0,
+    "log": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/build-and-test/logs/attempt-2/unit-03.log"
+  },
+  {
+    "name": "unit-04",
+    "command": "PATH=/opt/homebrew/opt/node@24/bin:$PATH node --experimental-strip-types --test src/access/legacy-role-conversion.test.ts src/access/transaction.test.ts src/access/access-service.test.ts",
+    "started": "2026-10-08T14:47:14.677238+00:00",
+    "seconds": 0.14,
+    "exit": 0,
+    "log": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/build-and-test/logs/attempt-2/unit-04.log"
+  },
+  {
+    "name": "unit-05",
+    "command": "PATH=/opt/homebrew/opt/node@24/bin:$PATH node --experimental-strip-types --test src/access/access-service.test.ts src/access/access-matrix.test.ts src/directory/field-policy.test.ts src/directory/directory-service.test.ts src/application/authorization.test.ts src/application/contracts.test.ts src/application/facades.test.ts src/application/isolation.test.ts",
+    "started": "2026-10-08T14:47:14.828612+00:00",
+    "seconds": 0.17,
+    "exit": 0,
+    "log": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/build-and-test/logs/attempt-2/unit-05.log"
+  },
+  {
+    "name": "unit-06",
+    "command": "PATH=/opt/homebrew/opt/node@24/bin:$PATH npx vitest run --config vitest.config.ts --project delivery tests/unit/runtime-boundaries.test.ts tests/unit/current-role-session.test.ts tests/integration/synthetic-route.test.ts tests/integration/runtime-shell.test.tsx",
+    "started": "2026-10-08T14:47:15.009628+00:00",
+    "seconds": 2.15,
+    "exit": 0,
+    "log": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/build-and-test/logs/attempt-2/unit-06.log"
+  },
+  {
+    "name": "unit-08",
+    "command": "PATH=/opt/homebrew/opt/node@24/bin:$PATH node --experimental-strip-types --test src/teacher-tracking/schedule-service.test.ts src/teacher-web/synthetic-teacher.test.ts",
+    "started": "2026-10-08T14:47:17.175824+00:00",
+    "seconds": 0.16,
+    "exit": 0,
+    "log": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/build-and-test/logs/attempt-2/unit-08.log"
+  },
+  {
+    "name": "unit-09",
+    "command": "PATH=/opt/homebrew/opt/node@24/bin:$PATH npm run test:delivery -- tests/integration/teacher-components.test.tsx tests/coverage/teacher-pages.test.tsx",
+    "started": "2026-10-08T14:47:17.348871+00:00",
+    "seconds": 1.48,
+    "exit": 0,
+    "log": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/build-and-test/logs/attempt-2/unit-09.log"
+  },
+  {
+    "name": "unit-10",
+    "command": "PATH=/opt/homebrew/opt/node@24/bin:$PATH npx --no-install prettier --check tests/browser/runtime-foundation.spec.ts",
+    "started": "2026-10-08T14:47:18.829093+00:00",
+    "seconds": 0.63,
+    "exit": 0,
+    "log": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/build-and-test/logs/attempt-2/unit-10.log"
+  },
+  {
+    "name": "unit-11",
+    "command": "PATH=/opt/homebrew/opt/node@24/bin:$PATH npx --no-install eslint tests/browser/runtime-foundation.spec.ts --max-warnings 0",
+    "started": "2026-10-08T14:47:19.458514+00:00",
+    "seconds": 15.43,
+    "exit": 0,
+    "log": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/build-and-test/logs/attempt-2/unit-11.log"
+  },
+  {
+    "name": "unit-12",
+    "command": "PATH=/opt/homebrew/opt/node@24/bin:$PATH node --experimental-strip-types --test src/teacher-tracking/tracking-model.test.ts src/teacher-tracking/schedule-service.test.ts",
+    "started": "2026-10-08T14:47:34.890631+00:00",
+    "seconds": 0.13,
+    "exit": 0,
+    "log": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/build-and-test/logs/attempt-2/unit-12.log"
+  },
+  {
+    "name": "unit-13",
+    "command": "PATH=/opt/homebrew/opt/node@24/bin:$PATH node --experimental-strip-types --test src/teacher-web/synthetic-teacher-repository.test.ts src/teacher-web/synthetic-teacher.test.ts",
+    "started": "2026-10-08T14:47:35.030840+00:00",
+    "seconds": 0.14,
+    "exit": 0,
+    "log": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/build-and-test/logs/attempt-2/unit-13.log"
+  },
+  {
+    "name": "unit-14",
+    "command": "PATH=/opt/homebrew/opt/node@24/bin:$PATH node --experimental-strip-types --test src/application/teacher-facade.test.ts src/application/isolation.test.ts",
+    "started": "2026-10-08T14:47:35.189771+00:00",
+    "seconds": 0.15,
+    "exit": 0,
+    "log": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/build-and-test/logs/attempt-2/unit-14.log"
+  },
+  {
+    "name": "unit-15",
+    "command": "PATH=/opt/homebrew/opt/node@24/bin:$PATH node --experimental-strip-types --test --test-name-pattern='Teacher|teacher' src/application/facades.test.ts",
+    "started": "2026-10-08T14:47:35.350434+00:00",
+    "seconds": 0.14,
+    "exit": 0,
+    "log": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/build-and-test/logs/attempt-2/unit-15.log"
+  },
+  {
+    "name": "unit-16",
+    "command": "PATH=/opt/homebrew/opt/node@24/bin:$PATH npm run test:delivery -- tests/integration/teacher-boundaries.test.ts",
+    "started": "2026-10-08T14:47:35.509653+00:00",
+    "seconds": 1.82,
+    "exit": 0,
+    "log": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/build-and-test/logs/attempt-2/unit-16.log"
+  },
+  {
+    "name": "unit-17",
+    "command": "PATH=/opt/homebrew/opt/node@24/bin:$PATH npm run test:delivery -- tests/unit/teacher-filters.test.ts tests/integration/teacher-routes.test.ts",
+    "started": "2026-10-08T14:47:37.330371+00:00",
+    "seconds": 1.74,
+    "exit": 0,
+    "log": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/build-and-test/logs/attempt-2/unit-17.log"
+  },
+  {
+    "name": "unit-18",
+    "command": "PATH=/opt/homebrew/opt/node@24/bin:$PATH npm run test:delivery -- tests/coverage/app-entrypoints.test.tsx -t 'Teacher|teacher|compatibility'",
+    "started": "2026-10-08T14:47:39.074212+00:00",
+    "seconds": 1.92,
+    "exit": 0,
+    "log": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/build-and-test/logs/attempt-2/unit-18.log"
+  },
+  {
+    "name": "unit-21",
+    "command": "PATH=/opt/homebrew/opt/node@24/bin:$PATH npm run test:delivery -- tests/coverage/production-inventory.test.ts -t 'U2 teacher inventory'",
+    "started": "2026-10-08T14:47:41.002941+00:00",
+    "seconds": 1.68,
+    "exit": 0,
+    "log": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/build-and-test/logs/attempt-2/unit-21.log"
+  },
+  {
+    "name": "unit-23",
+    "command": "PATH=/opt/homebrew/opt/node@24/bin:$PATH node --experimental-strip-types --test src/teacher-tracking/tracking-model.test.ts src/teacher-tracking/schedule-service.test.ts src/teacher-web/synthetic-teacher-repository.test.ts src/teacher-web/synthetic-teacher.test.ts src/application/teacher-facade.test.ts src/application/isolation.test.ts",
+    "started": "2026-10-08T14:47:42.686570+00:00",
+    "seconds": 0.22,
+    "exit": 0,
+    "log": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/build-and-test/logs/attempt-2/unit-23.log"
+  },
+  {
+    "name": "unit-24",
+    "command": "PATH=/opt/homebrew/opt/node@24/bin:$PATH npm run test:delivery -- tests/unit/teacher-filters.test.ts tests/integration/teacher-boundaries.test.ts tests/integration/teacher-routes.test.ts tests/integration/teacher-components.test.tsx tests/coverage/teacher-pages.test.tsx",
+    "started": "2026-10-08T14:47:42.916152+00:00",
+    "seconds": 1.97,
+    "exit": 0,
+    "log": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/build-and-test/logs/attempt-2/unit-24.log"
+  },
+  {
+    "name": "unit-25",
+    "command": "PATH=/opt/homebrew/opt/node@24/bin:$PATH node --experimental-strip-types --test src/admin-experience/admin-service.test.ts src/import-migration/import-service.test.ts",
+    "started": "2026-10-08T14:47:44.887464+00:00",
+    "seconds": 0.14,
+    "exit": 0,
+    "log": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/build-and-test/logs/attempt-2/unit-25.log"
+  },
+  {
+    "name": "unit-26",
+    "command": "PATH=/opt/homebrew/opt/node@24/bin:$PATH npm run test:delivery -- tests/unit/verification-core.test.ts",
+    "started": "2026-10-08T14:47:45.036048+00:00",
+    "seconds": 1.48,
+    "exit": 0,
+    "log": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/build-and-test/logs/attempt-2/unit-26.log"
+  },
+  {
+    "name": "unit-27",
+    "command": "PATH=/opt/homebrew/opt/node@24/bin:$PATH node --experimental-strip-types --test src/import-migration/import-service.test.ts",
+    "started": "2026-10-08T14:47:46.529767+00:00",
+    "seconds": 0.16,
+    "exit": 0,
+    "log": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/build-and-test/logs/attempt-2/unit-27.log"
+  },
+  {
+    "name": "unit-28",
+    "command": "PATH=/opt/homebrew/opt/node@24/bin:$PATH node --experimental-strip-types --test src/application/admin-facade.test.ts src/admin-experience/admin-service.test.ts",
+    "started": "2026-10-08T14:47:46.709636+00:00",
+    "seconds": 0.15,
+    "exit": 0,
+    "log": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/build-and-test/logs/attempt-2/unit-28.log"
+  },
+  {
+    "name": "unit-29",
+    "command": "PATH=/opt/homebrew/opt/node@24/bin:$PATH npm run test:delivery -- tests/integration/retained-workflows.test.ts",
+    "started": "2026-10-08T14:47:46.877320+00:00",
+    "seconds": 1.82,
+    "exit": 0,
+    "log": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/build-and-test/logs/attempt-2/unit-29.log"
+  },
+  {
+    "name": "unit-30",
+    "command": "PATH=/opt/homebrew/opt/node@24/bin:$PATH npm run test:delivery -- tests/unit/current-role-references.test.ts tests/unit/verification-core.test.ts tests/coverage/verification-entrypoints.test.ts",
+    "started": "2026-10-08T14:47:48.706621+00:00",
+    "seconds": 4.56,
+    "exit": 0,
+    "log": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/build-and-test/logs/attempt-2/unit-30.log"
+  },
+  {
+    "name": "unit-33",
+    "command": "PATH=/opt/homebrew/opt/node@24/bin:$PATH node --experimental-strip-types --test src/import-migration/import-service.test.ts src/admin-experience/admin-service.test.ts src/application/admin-facade.test.ts",
+    "started": "2026-10-08T14:47:53.272006+00:00",
+    "seconds": 0.18,
+    "exit": 0,
+    "log": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/build-and-test/logs/attempt-2/unit-33.log"
+  },
+  {
+    "name": "unit-34",
+    "command": "PATH=/opt/homebrew/opt/node@24/bin:$PATH npm run test:delivery -- tests/integration/retained-workflows.test.ts tests/unit/current-role-references.test.ts tests/unit/verification-core.test.ts tests/coverage/verification-entrypoints.test.ts",
+    "started": "2026-10-08T14:47:53.461093+00:00",
+    "seconds": 2.7,
+    "exit": 0,
+    "log": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/build-and-test/logs/attempt-2/unit-34.log"
+  },
+  {
+    "name": "unit-35",
+    "command": "PATH=/opt/homebrew/opt/node@24/bin:$PATH npm run test:delivery -- tests/coverage/production-inventory.test.ts",
+    "started": "2026-10-08T14:47:56.166921+00:00",
+    "seconds": 1.5,
+    "exit": 0,
+    "log": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/build-and-test/logs/attempt-2/unit-35.log"
+  },
+  {
+    "name": "typecheck",
+    "command": "PATH=/opt/homebrew/opt/node@24/bin:$PATH npm run typecheck",
+    "started": "2026-10-08T14:47:57.687179+00:00",
+    "seconds": 2.34,
+    "exit": 0,
+    "log": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/build-and-test/logs/attempt-2/typecheck.log"
+  },
+  {
+    "name": "test",
+    "command": "PATH=/opt/homebrew/opt/node@24/bin:$PATH npm test",
+    "started": "2026-10-08T14:48:00.053698+00:00",
+    "seconds": 9.75,
+    "exit": 0,
+    "log": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/build-and-test/logs/attempt-2/test.log"
+  },
+  {
+    "name": "coverage",
+    "command": "PATH=/opt/homebrew/opt/node@24/bin:$PATH npm run test:coverage",
+    "started": "2026-10-08T14:48:09.815939+00:00",
+    "seconds": 11.19,
+    "exit": 0,
+    "log": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/build-and-test/logs/attempt-2/coverage.log"
+  },
+  {
+    "name": "format",
+    "command": "PATH=/opt/homebrew/opt/node@24/bin:$PATH npm run format:check",
+    "started": "2026-10-08T14:48:21.012871+00:00",
+    "seconds": 1.47,
+    "exit": 0,
+    "log": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/build-and-test/logs/attempt-2/format.log"
+  },
+  {
+    "name": "lint",
+    "command": "PATH=/opt/homebrew/opt/node@24/bin:$PATH npm run lint",
+    "started": "2026-10-08T14:48:22.488319+00:00",
+    "seconds": 3.15,
+    "exit": 0,
+    "log": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/build-and-test/logs/attempt-2/lint.log"
+  },
+  {
+    "name": "manifests",
+    "command": "PATH=/opt/homebrew/opt/node@24/bin:$PATH npm run verify:manifests",
+    "started": "2026-10-08T14:48:25.653491+00:00",
+    "seconds": 0.29,
+    "exit": 0,
+    "log": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/build-and-test/logs/attempt-2/manifests.log"
+  },
+  {
+    "name": "security",
+    "command": "PATH=/opt/homebrew/opt/node@24/bin:$PATH npm run verify:security",
+    "started": "2026-10-08T14:48:25.948319+00:00",
+    "seconds": 5.13,
+    "exit": 0,
+    "log": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/build-and-test/logs/attempt-2/security.log"
+  },
+  {
+    "name": "smoke",
+    "command": "PATH=/opt/homebrew/opt/node@24/bin:$PATH npm run smoke:start",
+    "started": "2026-10-08T14:48:31.100909+00:00",
+    "seconds": 2.98,
+    "exit": 0,
+    "log": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/build-and-test/logs/attempt-2/smoke.log"
+  }
+]

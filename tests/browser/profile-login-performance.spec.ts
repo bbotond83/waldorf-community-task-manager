@@ -42,7 +42,7 @@ for (const mode of ["development", "production"] as const) {
         await expect(
           page.getByRole("heading", { name: `Üdvözlünk, ${previous.label}!`, exact: true }),
         ).toHaveCount(0);
-        if (profile.role === "parent" || profile.role === "staff") {
+        if (profile.role === "parent" || profile.role === "kindergarten-teacher") {
           await page.goto(`${server.origin}/admin/import`);
           await expect(
             page.getByRole("heading", { name: "Nincs jogosultság", exact: true }),

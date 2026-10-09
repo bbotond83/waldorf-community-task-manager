@@ -1,0 +1,432 @@
+[
+  {
+    "id": "NFR1.1",
+    "source": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/u1-current-role-foundation/nfr-requirements/security-requirements.md",
+    "expected": "Every protected boundary rejects unknown/removed role values, unsupported role scopes, inactive/revoked subjects, stale/missing versions and cross-organization authority; zero unauthorized successful cases in the defined matrix. No default-role fallback.",
+    "method": "Domain/application/runtime negative and positive matrix cases, including mixed grants that cannot combine role and scope. SQL checks labeled static until executed on a database.",
+    "actual": "Current domain/application/delivery regression tests pass; paired scope, privacy, mutation and no-data denials remain. App evidence is synthetic and SQL-shape checks are static; actual local PostgreSQL evidence is identified separately.",
+    "evidence": "logs/attempt-2/test.log; logs/attempt-2/browser.log; local-results.json; source-provenance.json",
+    "owner": "Build and Test",
+    "verdict": "Met"
+  },
+  {
+    "id": "NFR1.2",
+    "source": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/u1-current-role-foundation/nfr-requirements/security-requirements.md",
+    "expected": "Kindergarten teacher mutations and raw private-family reads are denied in every defined case; Parent own-family and Group admin core scope restrictions remain; advanced/governance cases require organization Super administrator. Denials produce zero business state changes and no protected response fields.",
+    "method": "Before/after repository snapshots, spies proving commands not called, field assertions and integrated consumer cases. U2 owns teacher projection/UI, U3 owns retained workflow integration.",
+    "actual": "Current domain/application/delivery regression tests pass; paired scope, privacy, mutation and no-data denials remain. App evidence is synthetic and SQL-shape checks are static; actual local PostgreSQL evidence is identified separately.",
+    "evidence": "logs/attempt-2/test.log; logs/attempt-2/browser.log; local-results.json; source-provenance.json",
+    "owner": "Build and Test",
+    "verdict": "Met"
+  },
+  {
+    "id": "NFR1.3",
+    "source": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/u1-current-role-foundation/nfr-requirements/security-requirements.md",
+    "expected": "Each supported conversion preserves every nonrole grant field, user activity and all business identifiers/relationships/owners. An affected subject version changes exactly once per conversion; repeat run changes it zero times. Equivalent grants never create duplicate effective authority or reactivate revoked rows.",
+    "method": "Populated active/inactive/revoked/equivalent/repeat fixtures, whole-record comparison and version assertions. Missing-version baseline rule and unsupported issuer precondition from functional-spec must be exercised.",
+    "actual": "PostgreSQL18.6 actual disposable supported-schema cases9/9 pass: unmodified conversion preserves nonrole/history/activity/business snapshots, versions/repeat, negative preflight, six instrumented rollback phases, actual two-connection writer exclusion then removed-role rejection, nonowner role RLS and redacted governance evidence. Existing application transaction/final-admin interleavings also pass; no arbitrary privileged writer or deployed issuer is certified.",
+    "evidence": "logs/attempt-2/database.log; logs/attempt-2/unit-07.log; logs/attempt-2/unit-04.log; logs/attempt-2/unit-05.log; logs/attempt-2/test.log",
+    "owner": "Build and Test",
+    "verdict": "Met"
+  },
+  {
+    "id": "NFR1.4",
+    "source": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/u1-current-role-foundation/nfr-requirements/security-requirements.md",
+    "expected": "Preflight, conversion, version, audit and enforcement changes have one commit boundary. Injected failure at each stage leaves zero partial changes; concurrent writers cannot insert a removed role between preflight and constraint validation. Final qualifying organization administrator cannot be removed, including concurrent operations.",
+    "method": "Transaction rollback tests, deterministic interleaving/concurrent persistence tests where supported, poststate comparisons. Actual database concurrency/RLS proof remains outstanding until executed with local tools; no fixture claims as real target evidence.",
+    "actual": "PostgreSQL18.6 actual disposable supported-schema cases9/9 pass: unmodified conversion preserves nonrole/history/activity/business snapshots, versions/repeat, negative preflight, six instrumented rollback phases, actual two-connection writer exclusion then removed-role rejection, nonowner role RLS and redacted governance evidence. Existing application transaction/final-admin interleavings also pass; no arbitrary privileged writer or deployed issuer is certified.",
+    "evidence": "logs/attempt-2/database.log; logs/attempt-2/unit-07.log; logs/attempt-2/unit-04.log; logs/attempt-2/unit-05.log; logs/attempt-2/test.log",
+    "owner": "Build and Test",
+    "verdict": "Met"
+  },
+  {
+    "id": "NFR1.5",
+    "source": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/u1-current-role-foundation/nfr-requirements/security-requirements.md",
+    "expected": "Authorization/conversion evidence excludes credentials, tokens, contact, financial, allergen and unrelated family/display data. Existing historical evidence is append-only; conversion retains original/current role identity in restricted transaction-bound evidence.",
+    "method": "Structured audit allowlist and sensitive sentinel assertions, no history rewrite comparison; database evidence access checked only when executable. Existing retention policy stays unchanged.",
+    "actual": "PostgreSQL18.6 actual disposable supported-schema cases9/9 pass: unmodified conversion preserves nonrole/history/activity/business snapshots, versions/repeat, negative preflight, six instrumented rollback phases, actual two-connection writer exclusion then removed-role rejection, nonowner role RLS and redacted governance evidence. Existing application transaction/final-admin interleavings also pass; no arbitrary privileged writer or deployed issuer is certified.",
+    "evidence": "logs/attempt-2/database.log; logs/attempt-2/unit-07.log; logs/attempt-2/unit-04.log; logs/attempt-2/unit-05.log; logs/attempt-2/test.log",
+    "owner": "Build and Test",
+    "verdict": "Met"
+  },
+  {
+    "id": "NFR1.6",
+    "source": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/u1-current-role-foundation/nfr-requirements/security-requirements.md",
+    "expected": "Removed synthetic profile cookies require fresh valid selection/sign-in. Retain signature validation, eight-hour expiry, nonce rotation, origin/mode checks, HttpOnly/SameSite and secure-cookie behavior. Production remains unavailable without local fallback.",
+    "method": "Session/form unit and boundary cases; stale profile/version, tampered signature, expired cookie, rejected origin/mode and inactive grant cases. No old-profile aliases.",
+    "actual": "Current domain/application/delivery regression tests pass; paired scope, privacy, mutation and no-data denials remain. App evidence is synthetic and SQL-shape checks are static; actual local PostgreSQL evidence is identified separately.",
+    "evidence": "logs/attempt-2/test.log; logs/attempt-2/browser.log; local-results.json; source-provenance.json",
+    "owner": "Build and Test",
+    "verdict": "Met"
+  },
+  {
+    "id": "NFR2.1",
+    "source": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/u1-current-role-foundation/nfr-requirements/security-requirements.md",
+    "expected": "Strict type checking and all applicable Unit tests pass; no failing existing regressions. Implement each applicable testable layer, then write/run its tests before the next layer.",
+    "method": "Current local command output under the approved test-after posture. Unit checkpoint: npm run typecheck and npm test, through the already authorized combined command.",
+    "actual": "Current strict types/tests/format/lint/build/start/browser/security gates all exit0. Full production151-source coverage94.91% lines/83.75% branches/93.96% functions;108 browser cases include12 Axe/keyboard cases with0 serious/critical violations; dependency audit0 vulnerabilities.",
+    "evidence": "local-results.json; build-results.json; browser-results.json; logs/attempt-2/coverage.log; logs/attempt-2/security.log",
+    "owner": "Build and Test",
+    "verdict": "Met"
+  },
+  {
+    "id": "NFR2.2",
+    "source": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/u1-current-role-foundation/nfr-requirements/security-requirements.md",
+    "expected": "Integrated delivery meets at least 80% production line, branch and function coverage; blocking formatting/lint, production build, deterministic start smoke and critical browser flow remain green, with zero serious/critical automated accessibility findings.",
+    "method": "Final Build and Test current execution reports across all Units; not claimed from this Unit's artifact or checkpoint.",
+    "actual": "Current strict types/tests/format/lint/build/start/browser/security gates all exit0. Full production151-source coverage94.91% lines/83.75% branches/93.96% functions;108 browser cases include12 Axe/keyboard cases with0 serious/critical violations; dependency audit0 vulnerabilities.",
+    "evidence": "local-results.json; build-results.json; browser-results.json; logs/attempt-2/coverage.log; logs/attempt-2/security.log",
+    "owner": "Build and Test",
+    "verdict": "Met"
+  },
+  {
+    "id": "NFR2.3",
+    "source": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/u1-current-role-foundation/nfr-requirements/security-requirements.md",
+    "expected": "High/critical dependency and SAST findings block delivery; existing secret scanning and immutable action pins remain. Private SBOM/archive/unsigned metadata/checksums remain explicitly unsigned with the existing 14-day artifact retention.",
+    "method": "Final current scan/CI evidence, no waiver or signed-attestation claim. No signing/deployment service added.",
+    "actual": "Privacy59, secrets962, SAST212 and no-deploy212 scanned files pass; npm audit0 vulnerabilities, no high/critical waiver. Next16.3.8/sharp0.35.5 patched resolution; immutable action pins and unsigned private14-day evidence policy retained; remote CI not run.",
+    "evidence": "logs/attempt-2/security.log; .github/workflows/ci.yml; source-provenance.json",
+    "owner": "Build and Test",
+    "verdict": "Met"
+  },
+  {
+    "id": "NFR3.1",
+    "source": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/u1-current-role-foundation/nfr-requirements/security-requirements.md",
+    "expected": "Current technical identifiers use Kindergarten teacher consistently; current Hungarian role copy is \u00d3v\u00f3n\u0151. No fifth selectable/authorizing role outside explicit migration/regression/history handling. Preserve ports, constructor injection and explicit result boundaries.",
+    "method": "Exhaustive types/validation and catalog tests; remaining executable reference/copy inventory belongs to U3.",
+    "actual": "Current domain/application/delivery regression tests pass; paired scope, privacy, mutation and no-data denials remain. App evidence is synthetic and SQL-shape checks are static; actual local PostgreSQL evidence is identified separately.",
+    "evidence": "logs/attempt-2/test.log; logs/attempt-2/browser.log; local-results.json; source-provenance.json",
+    "owner": "Build and Test",
+    "verdict": "Met"
+  },
+  {
+    "id": "NFR3.2",
+    "source": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/u1-current-role-foundation/nfr-requirements/security-requirements.md",
+    "expected": "Current selector/navigation/session failure behavior remains keyboard operable with existing names/focus/announcements; no protected cached content on invalidation.",
+    "method": "Unit presentation contract assertions plus final critical-flow keyboard/accessibility execution. U2 supplies teacher screen-specific checks.",
+    "actual": "Current108 browser cases pass across Chromium/Firefox/mobile Chromium, including12 Axe/keyboard cases with0 serious/critical violations. Teacher24/explicit Axe3, runtime12, retained72/explicit Axe9 scoped results pass and overlap108. Native controls, focus/history isolation, responsive parity and unchanged <2000ms first-view budgets pass.",
+    "evidence": "browser-results.json; logs/attempt-2/browser.log; logs/attempt-2/unit-19.log; logs/attempt-2/unit-20.log; logs/attempt-2/unit-22.log; logs/attempt-2/unit-31.log; logs/attempt-2/unit-32.log",
+    "owner": "Build and Test",
+    "verdict": "Met"
+  },
+  {
+    "id": "NFR1.28",
+    "source": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/u2-teacher-tracking/nfr-requirements/observability-requirements.md",
+    "expected": "Retain existing audit/result correlation for authorization and integration failures without logging projected names, source records, credentials or raw query strings.",
+    "method": "Inspect shared audit behavior and diagnostics; sentinel sensitive fields absent from emitted telemetry. Existing controlled audit actor/scope identifiers remain where the shared contract requires them.",
+    "actual": "Current domain/application/delivery regression tests pass; paired scope, privacy, mutation and no-data denials remain. App evidence is synthetic and SQL-shape checks are static; actual local PostgreSQL evidence is identified separately.",
+    "evidence": "logs/attempt-2/test.log; logs/attempt-2/browser.log; local-results.json; source-provenance.json",
+    "owner": "Build and Test",
+    "verdict": "Met"
+  },
+  {
+    "id": "NFR2.26",
+    "source": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/u2-teacher-tracking/nfr-requirements/observability-requirements.md",
+    "expected": "Verification reports distinguish synthetic/static checks, actual local DB execution and real target RLS/integration checks. Preserve current tested SHA and unsigned private CI evidence policy.",
+    "method": "Evidence manifest labels actual execution; missing linked target remains outstanding, never passed by static source tests.",
+    "actual": "Current dirty-source hashes distinguish baseline HEAD from tested working tree. Local synthetic app/static SQL/actual disposable PostgreSQL classes are separate. Local next-env and ignored TypeScript cache retain original hashes. Immutable40hex CI action pins, unsigned private SBOM/archive/checksum policy and14-day retention retained; remote CI and linked deployment remain outstanding.",
+    "evidence": "source-provenance.json; .github/workflows/ci.yml; logs/attempt-2/database.log; logs/attempt-2/manifests.log",
+    "owner": "Build and Test",
+    "verdict": "Met"
+  },
+  {
+    "id": "NFR2.21",
+    "source": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/u2-teacher-tracking/nfr-requirements/performance-requirements.md",
+    "expected": "Preserve established runnable-app performance checks without adding a new numeric latency target.",
+    "method": "Execute existing relevant browser/profile timing and build/start checks at final verification; capture exact configured thresholds and actual results from executable checks. No substitute historical counts.",
+    "actual": "All8 development/production profile benchmark cases pass;24 actual login measurements; maximum918.70ms <=5000ms. Teacher/admin browser first-view <2000ms assertions also pass. Test wall time is not login latency; workload is local invented profiles/three teacher source records, not production capacity.",
+    "evidence": "performance-measurements.json; logs/attempt-2/performance.log; logs/attempt-2/unit-19.log; logs/attempt-2/unit-31.log",
+    "owner": "Build and Test",
+    "verdict": "Met"
+  },
+  {
+    "id": "NFR2.22",
+    "source": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/u2-teacher-tracking/nfr-requirements/performance-requirements.md",
+    "expected": "Bound the date query to real dates with elapsed difference at most 31 days and one currently authorized group; avoid repeated source reads per entry.",
+    "method": "Instrument fake read boundary for list/detail/refetch; verify one bounded request per workflow, no per-row fetch loop and no automatic retry loop. Record fixture size and process-local conditions.",
+    "actual": "Current domain/application/delivery regression tests pass; paired scope, privacy, mutation and no-data denials remain. App evidence is synthetic and SQL-shape checks are static; actual local PostgreSQL evidence is identified separately.",
+    "evidence": "logs/attempt-2/test.log; logs/attempt-2/browser.log; local-results.json; source-provenance.json",
+    "owner": "Build and Test",
+    "verdict": "Met"
+  },
+  {
+    "id": "NFR1.21",
+    "source": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/u2-teacher-tracking/nfr-requirements/performance-requirements.md",
+    "expected": "Performance optimization must preserve fresh grant/version and current source reads.",
+    "method": "Revoke a grant and change source data between requests; subsequent requests deny or expose new authorized values. No permanent projection/status cache.",
+    "actual": "Current domain/application/delivery regression tests pass; paired scope, privacy, mutation and no-data denials remain. App evidence is synthetic and SQL-shape checks are static; actual local PostgreSQL evidence is identified separately.",
+    "evidence": "logs/attempt-2/test.log; logs/attempt-2/browser.log; local-results.json; source-provenance.json",
+    "owner": "Build and Test",
+    "verdict": "Met"
+  },
+  {
+    "id": "NFR1.29",
+    "source": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/u2-teacher-tracking/nfr-requirements/reliability-requirements.md",
+    "expected": "Fail closed on invalidated session, denied scope, malformed/mismatched source and infrastructure failure; return no stale/partial protected data.",
+    "method": "Inject each failure after a prior success and verify current result and markup expose no previous rows/names/counts.",
+    "actual": "Current domain/application/delivery regression tests pass; paired scope, privacy, mutation and no-data denials remain. App evidence is synthetic and SQL-shape checks are static; actual local PostgreSQL evidence is identified separately.",
+    "evidence": "logs/attempt-2/test.log; logs/attempt-2/browser.log; local-results.json; source-provenance.json",
+    "owner": "Build and Test",
+    "verdict": "Met"
+  },
+  {
+    "id": "NFR2.25",
+    "source": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/u2-teacher-tracking/nfr-requirements/reliability-requirements.md",
+    "expected": "Normalize successful zero rows to authorized empty; absent detail remains generic denial. Preserve user retry for retryable failure and later guidance for terminal failure.",
+    "method": "Deterministic state matrix using existing application result/presentation mapping; fresh authority/source on retry, no automatic retry or fabricated successful fallback.",
+    "actual": "Current domain/application/delivery regression tests pass; paired scope, privacy, mutation and no-data denials remain. App evidence is synthetic and SQL-shape checks are static; actual local PostgreSQL evidence is identified separately.",
+    "evidence": "logs/attempt-2/test.log; logs/attempt-2/browser.log; local-results.json; source-provenance.json",
+    "owner": "Build and Test",
+    "verdict": "Met"
+  },
+  {
+    "id": "NFR1.30",
+    "source": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/u2-teacher-tracking/nfr-requirements/reliability-requirements.md",
+    "expected": "Tracking preserves existing group/task/assignment identities and relationships; no tracking write or status lifecycle is introduced.",
+    "method": "Before/after fixture snapshots around reads, failure and denied writes. Modify backing source only through isolated operator/test seam to prove refetch.",
+    "actual": "Current domain/application/delivery regression tests pass; paired scope, privacy, mutation and no-data denials remain. App evidence is synthetic and SQL-shape checks are static; actual local PostgreSQL evidence is identified separately.",
+    "evidence": "logs/attempt-2/test.log; logs/attempt-2/browser.log; local-results.json; source-provenance.json",
+    "owner": "Build and Test",
+    "verdict": "Met"
+  },
+  {
+    "id": "NFR2.24",
+    "source": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/u2-teacher-tracking/nfr-requirements/scalability-requirements.md",
+    "expected": "Preserve the single-app, process-local source/injection boundary and bounded single-group/date reads; introduce no new service, distributed store or infrastructure scaling system.",
+    "method": "Architectural/import inspection and query boundary tests. No estimated production load presented as measured.",
+    "actual": "Current domain/application/delivery regression tests pass; paired scope, privacy, mutation and no-data denials remain. App evidence is synthetic and SQL-shape checks are static; actual local PostgreSQL evidence is identified separately.",
+    "evidence": "logs/attempt-2/test.log; logs/attempt-2/browser.log; local-results.json; source-provenance.json",
+    "owner": "Build and Test",
+    "verdict": "Met"
+  },
+  {
+    "id": "NFR1.27",
+    "source": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/u2-teacher-tracking/nfr-requirements/scalability-requirements.md",
+    "expected": "Isolate request authority and test fixture mutation; one actor/request cannot reuse another actor's projection or grants.",
+    "method": "Interleave authorized, unauthorized and changed-source reads using isolated fixtures and confirm scope/data independence.",
+    "actual": "Current domain/application/delivery regression tests pass; paired scope, privacy, mutation and no-data denials remain. App evidence is synthetic and SQL-shape checks are static; actual local PostgreSQL evidence is identified separately.",
+    "evidence": "logs/attempt-2/test.log; logs/attempt-2/browser.log; local-results.json; source-provenance.json",
+    "owner": "Build and Test",
+    "verdict": "Met"
+  },
+  {
+    "id": "NFR1.22",
+    "source": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/u2-teacher-tracking/nfr-requirements/security-requirements.md",
+    "expected": "Resolve current active teacher grants and authorization version for every list/detail/retry; require matching organization and group before source access.",
+    "method": "No-grant, wrong-group, cross-organization, revoked/inactive and stale-session cases expose no records/names/counts; a source spy records zero calls for pre-query denial.",
+    "actual": "Current domain/application/delivery regression tests pass; paired scope, privacy, mutation and no-data denials remain. App evidence is synthetic and SQL-shape checks are static; actual local PostgreSQL evidence is identified separately.",
+    "evidence": "logs/attempt-2/test.log; logs/attempt-2/browser.log; local-results.json; source-provenance.json",
+    "owner": "Build and Test",
+    "verdict": "Met"
+  },
+  {
+    "id": "NFR1.23",
+    "source": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/u2-teacher-tracking/nfr-requirements/security-requirements.md",
+    "expected": "Teacher requests cannot mutate schedule, task, assignment, approval, import or governance state.",
+    "method": "UI has no mutation controls; forged direct commands independently deny and preserve before/after data through shared U1 enforcement.",
+    "actual": "Current domain/application/delivery regression tests pass; paired scope, privacy, mutation and no-data denials remain. App evidence is synthetic and SQL-shape checks are static; actual local PostgreSQL evidence is identified separately.",
+    "evidence": "logs/attempt-2/test.log; logs/attempt-2/browser.log; local-results.json; source-provenance.json",
+    "owner": "Build and Test",
+    "verdict": "Met"
+  },
+  {
+    "id": "NFR1.24",
+    "source": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/u2-teacher-tracking/nfr-requirements/security-requirements.md",
+    "expected": "Explicit field projection is identical in table/cards/detail and excludes sourceRecordId, organization metadata, finance, allergens, private contact and unrelated fields.",
+    "method": "Inject extra sensitive sentinel fields and wrong-scope rows; verify absence in result/HTML/hidden markup and no partial success for mismatched scope.",
+    "actual": "Current domain/application/delivery regression tests pass; paired scope, privacy, mutation and no-data denials remain. App evidence is synthetic and SQL-shape checks are static; actual local PostgreSQL evidence is identified separately.",
+    "evidence": "logs/attempt-2/test.log; logs/attempt-2/browser.log; local-results.json; source-provenance.json",
+    "owner": "Build and Test",
+    "verdict": "Met"
+  },
+  {
+    "id": "NFR1.25",
+    "source": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/u2-teacher-tracking/nfr-requirements/security-requirements.md",
+    "expected": "Bookmark redirects use fixed same-origin successors, one encoded id segment and whitelisted validated group/date context; destination reauthorizes.",
+    "method": "Test unknown/host/return parameters, malformed/ambiguous context, encoded separators and unauthorized groups. No cookie creation or protected data in compatibility response.",
+    "actual": "Current domain/application/delivery regression tests pass; paired scope, privacy, mutation and no-data denials remain. App evidence is synthetic and SQL-shape checks are static; actual local PostgreSQL evidence is identified separately.",
+    "evidence": "logs/attempt-2/test.log; logs/attempt-2/browser.log; local-results.json; source-provenance.json",
+    "owner": "Build and Test",
+    "verdict": "Met"
+  },
+  {
+    "id": "NFR1.26",
+    "source": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/u2-teacher-tracking/nfr-requirements/security-requirements.md",
+    "expected": "Source display strings and filter inputs remain untrusted; preserve contextual text/URL escaping and safe error envelopes.",
+    "method": "Malicious title/name/status/id sentinels do not create executable markup, inject a destination or reveal stack/raw records.",
+    "actual": "Current domain/application/delivery regression tests pass; paired scope, privacy, mutation and no-data denials remain. App evidence is synthetic and SQL-shape checks are static; actual local PostgreSQL evidence is identified separately.",
+    "evidence": "logs/attempt-2/test.log; logs/attempt-2/browser.log; local-results.json; source-provenance.json",
+    "owner": "Build and Test",
+    "verdict": "Met"
+  },
+  {
+    "id": "NFR2.23",
+    "source": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/u2-teacher-tracking/nfr-requirements/security-requirements.md",
+    "expected": "NFR2.23: Blocking lint, strict typecheck, unit/integration tests, production coverage at least 80% for lines/branches/functions, build, deterministic start smoke, critical browser flow, secret/SAST/dependency scanning are retained. High/critical security findings and serious/critical automated accessibility violations block delivery. Current reports are authoritative. Real DB/RLS validation is distinct from synthetic/static policy evidence.",
+    "method": "Integrated verification",
+    "actual": "Current strict types/tests/format/lint/build/start/browser/security gates all exit0. Full production151-source coverage94.91% lines/83.75% branches/93.96% functions;108 browser cases include12 Axe/keyboard cases with0 serious/critical violations; dependency audit0 vulnerabilities.",
+    "evidence": "local-results.json; build-results.json; browser-results.json; logs/attempt-2/coverage.log; logs/attempt-2/security.log",
+    "owner": "Build and Test",
+    "verdict": "Met"
+  },
+  {
+    "id": "NFR3.21",
+    "source": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/u2-teacher-tracking/nfr-requirements/tech-stack-decisions.md",
+    "expected": "Retain existing strict TypeScript, single Next/React app, module ports and constructor injection.",
+    "method": "Brownfield change; no new package/service or production adapter. Read installed framework documentation before code. Source scan versions are historical evidence; lockfile/installed packages govern implementation.",
+    "actual": "Current domain/application/delivery regression tests pass; paired scope, privacy, mutation and no-data denials remain. App evidence is synthetic and SQL-shape checks are static; actual local PostgreSQL evidence is identified separately.",
+    "evidence": "logs/attempt-2/test.log; logs/attempt-2/browser.log; local-results.json; source-provenance.json",
+    "owner": "Build and Test",
+    "verdict": "Met"
+  },
+  {
+    "id": "NFR3.22",
+    "source": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/u2-teacher-tracking/nfr-requirements/tech-stack-decisions.md",
+    "expected": "Use English teacher module/route names and Hungarian \u00d3v\u00f3n\u0151 UI; retain Budapest date presentation and 44rem responsive parity.",
+    "method": "Current naming and usability requirements; same projected fields and explicit absence text in table/cards/detail.",
+    "actual": "Current108 browser cases pass across Chromium/Firefox/mobile Chromium, including12 Axe/keyboard cases with0 serious/critical violations. Teacher24/explicit Axe3, runtime12, retained72/explicit Axe9 scoped results pass and overlap108. Native controls, focus/history isolation, responsive parity and unchanged <2000ms first-view budgets pass.",
+    "evidence": "browser-results.json; logs/attempt-2/browser.log; logs/attempt-2/unit-19.log; logs/attempt-2/unit-20.log; logs/attempt-2/unit-22.log; logs/attempt-2/unit-31.log; logs/attempt-2/unit-32.log",
+    "owner": "Build and Test",
+    "verdict": "Met"
+  },
+  {
+    "id": "NFR3.23",
+    "source": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/u2-teacher-tracking/nfr-requirements/tech-stack-decisions.md",
+    "expected": "Preserve native keyboard/filter behavior and existing focus/announcement result mapping; resolve mappings explicitly before code.",
+    "method": "Critical browser flow must have zero serious/critical automated accessibility violations plus keyboard checks. No new interaction library.",
+    "actual": "Current108 browser cases pass across Chromium/Firefox/mobile Chromium, including12 Axe/keyboard cases with0 serious/critical violations. Teacher24/explicit Axe3, runtime12, retained72/explicit Axe9 scoped results pass and overlap108. Native controls, focus/history isolation, responsive parity and unchanged <2000ms first-view budgets pass.",
+    "evidence": "browser-results.json; logs/attempt-2/browser.log; logs/attempt-2/unit-19.log; logs/attempt-2/unit-20.log; logs/attempt-2/unit-22.log; logs/attempt-2/unit-31.log; logs/attempt-2/unit-32.log",
+    "owner": "Build and Test",
+    "verdict": "Met"
+  },
+  {
+    "id": "NFR2.27",
+    "source": "aidlc/spaces/default/intents/261006-simplify-user-roles/construction/u2-teacher-tracking/nfr-requirements/tech-stack-decisions.md",
+    "expected": "Retain affirmed test-after ordering and existing Node/Vitest/Playwright/Axe/coverage and CI tools.",
+    "method": "Implement each testable layer, then its tests before advancing. Keep production inventory current; no lowered gate.",
+    "actual": "Current domain/application/delivery regression tests pass; paired scope, privacy, mutation and no-data denials remain. App evidence is synthetic and SQL-shape checks are static; actual local PostgreSQL evidence is identified separately.",
+    "evidence": "logs/attempt-2/test.log; logs/attempt-2/browser.log; local-results.json; source-provenance.json",
+    "owner": "Build and Test",
+    "verdict": "Met"
+  },
+  {
+    "id": "Q-TYPE",
+    "source": "aidlc/spaces/default/memory/team.md; current unit Testing Contracts; U1/U2 NFR design",
+    "expected": "Strict typecheck exit0",
+    "method": "Current executable checks",
+    "actual": "Strict tsc --noEmit --incremental false exit0; production TypeScript passes; ignored cache unchanged.",
+    "evidence": "logs/attempt-2/typecheck.log; logs/attempt-2/build.log; source-provenance.json",
+    "owner": "Build and Test",
+    "verdict": "Met"
+  },
+  {
+    "id": "Q-TEST",
+    "source": "aidlc/spaces/default/memory/team.md; current unit Testing Contracts; U1/U2 NFR design",
+    "expected": "All scoped and full tests pass",
+    "method": "Current executable checks",
+    "actual": "Every35 distinct current exact unit command passes. Full suite223 domain +371 delivery =594 passed,0 failed; coverage594/59 files is an overlapping run. Database9 cases reported separately; scoped filter skips are unrelated cases, not failures.",
+    "evidence": "logs/attempt-2/test.log; local-results.json; database-unit-results.json; browser-results.json",
+    "owner": "Build and Test",
+    "verdict": "Met"
+  },
+  {
+    "id": "Q-COVERAGE",
+    "source": "aidlc/spaces/default/memory/team.md; current unit Testing Contracts; U1/U2 NFR design",
+    "expected": "All production lines/branches/functions >=80%; current complete inventory151",
+    "method": "Current executable checks",
+    "actual": "Domain95.11% lines/87.57% branches/93.27% functions; integrated all-production94.91% lines/83.75% branches/93.96% functions;151-source inventory passes; all80% floors unchanged.",
+    "evidence": "logs/attempt-2/coverage.log; logs/attempt-2/unit-35.log",
+    "owner": "Build and Test",
+    "verdict": "Met"
+  },
+  {
+    "id": "Q-FORMAT",
+    "source": "aidlc/spaces/default/memory/team.md; current unit Testing Contracts; U1/U2 NFR design",
+    "expected": "Prettier exit0",
+    "method": "Current executable checks",
+    "actual": "Prettier check exit0; no formatting diagnostics.",
+    "evidence": "logs/attempt-2/format.log",
+    "owner": "Build and Test",
+    "verdict": "Met"
+  },
+  {
+    "id": "Q-LINT",
+    "source": "aidlc/spaces/default/memory/team.md; current unit Testing Contracts; U1/U2 NFR design",
+    "expected": "ESLint max warnings0",
+    "method": "Current executable checks",
+    "actual": "ESLint max-warnings0 exit0; no diagnostics.",
+    "evidence": "logs/attempt-2/lint.log",
+    "owner": "Build and Test",
+    "verdict": "Met"
+  },
+  {
+    "id": "Q-BUILD",
+    "source": "aidlc/spaces/default/memory/team.md; current unit Testing Contracts; U1/U2 NFR design",
+    "expected": "Production synthetic build exit0 with type checks",
+    "method": "Current executable checks",
+    "actual": "Next16.3.8 production synthetic build exit0; static pages4/4 and strict TypeScript pass.",
+    "evidence": "logs/attempt-2/build.log",
+    "owner": "Build and Test",
+    "verdict": "Met"
+  },
+  {
+    "id": "Q-SMOKE",
+    "source": "aidlc/spaces/default/memory/team.md; current unit Testing Contracts; U1/U2 NFR design",
+    "expected": "Deterministic synthetic start SMOKE_START_OK",
+    "method": "Current executable checks",
+    "actual": "SMOKE_START_OK: waldorf-local-ready; exit0.",
+    "evidence": "logs/attempt-2/smoke.log",
+    "owner": "Build and Test",
+    "verdict": "Met"
+  },
+  {
+    "id": "Q-BROWSER",
+    "source": "aidlc/spaces/default/memory/team.md; current unit Testing Contracts; U1/U2 NFR design",
+    "expected": "All configured critical flows and zero serious/critical Axe",
+    "method": "Current executable checks",
+    "actual": "Current108 browser cases pass across Chromium/Firefox/mobile Chromium, including12 Axe/keyboard cases with0 serious/critical violations. Teacher24/explicit Axe3, runtime12, retained72/explicit Axe9 scoped results pass and overlap108. Native controls, focus/history isolation, responsive parity and unchanged <2000ms first-view budgets pass.",
+    "evidence": "browser-results.json; logs/attempt-2/browser.log; logs/attempt-2/unit-19.log; logs/attempt-2/unit-20.log; logs/attempt-2/unit-22.log; logs/attempt-2/unit-31.log; logs/attempt-2/unit-32.log",
+    "owner": "Build and Test",
+    "verdict": "Met"
+  },
+  {
+    "id": "Q-PERFORMANCE",
+    "source": "aidlc/spaces/default/memory/team.md; current unit Testing Contracts; U1/U2 NFR design",
+    "expected": "Existing executable browser/performance budgets unchanged and passing",
+    "method": "Current executable checks",
+    "actual": "All8 development/production profile benchmark cases pass;24 actual login measurements; maximum918.70ms <=5000ms. Teacher/admin browser first-view <2000ms assertions also pass. Test wall time is not login latency; workload is local invented profiles/three teacher source records, not production capacity.",
+    "evidence": "performance-measurements.json; logs/attempt-2/performance.log; logs/attempt-2/unit-19.log; logs/attempt-2/unit-31.log",
+    "owner": "Build and Test",
+    "verdict": "Met"
+  },
+  {
+    "id": "Q-SECURITY",
+    "source": "aidlc/spaces/default/memory/team.md; current unit Testing Contracts; U1/U2 NFR design",
+    "expected": "Secret/privacy/SAST/no-deploy scans exit0; npm audit no high/critical",
+    "method": "Current executable checks",
+    "actual": "Privacy59, secrets962, SAST212 and no-deploy212 scanned files pass; npm audit0 vulnerabilities, no high/critical waiver. Next16.3.8/sharp0.35.5 patched resolution; immutable action pins and unsigned private14-day evidence policy retained; remote CI not run.",
+    "evidence": "logs/attempt-2/security.log; .github/workflows/ci.yml; source-provenance.json",
+    "owner": "Build and Test",
+    "verdict": "Met"
+  },
+  {
+    "id": "Q-DB",
+    "source": "aidlc/spaces/default/memory/team.md; current unit Testing Contracts; U1/U2 NFR design",
+    "expected": "Actual supported PostgreSQL migration/locking/RLS proof for U1NFR1.4; no synthetic/static substitution",
+    "method": "Current executable checks",
+    "actual": "PostgreSQL18.6 actual disposable supported-schema cases9/9 pass: unmodified conversion preserves nonrole/history/activity/business snapshots, versions/repeat, negative preflight, six instrumented rollback phases, actual two-connection writer exclusion then removed-role rejection, nonowner role RLS and redacted governance evidence. Existing application transaction/final-admin interleavings also pass; no arbitrary privileged writer or deployed issuer is certified.",
+    "evidence": "logs/attempt-2/database.log; logs/attempt-2/unit-07.log; logs/attempt-2/unit-04.log; logs/attempt-2/unit-05.log; logs/attempt-2/test.log",
+    "owner": "Build and Test",
+    "verdict": "Met"
+  },
+  {
+    "id": "Q-EVIDENCE",
+    "source": "aidlc/spaces/default/memory/team.md; current unit Testing Contracts; U1/U2 NFR design",
+    "expected": "Current source provenance, clearly synthetic/static labels; unsigned private CI policy14days retained",
+    "method": "Current executable checks",
+    "actual": "Current dirty-source hashes distinguish baseline HEAD from tested working tree. Local synthetic app/static SQL/actual disposable PostgreSQL classes are separate. Local next-env and ignored TypeScript cache retain original hashes. Immutable40hex CI action pins, unsigned private SBOM/archive/checksum policy and14-day retention retained; remote CI and linked deployment remain outstanding.",
+    "evidence": "source-provenance.json; .github/workflows/ci.yml; logs/attempt-2/database.log; logs/attempt-2/manifests.log",
+    "owner": "Build and Test",
+    "verdict": "Met"
+  }
+]

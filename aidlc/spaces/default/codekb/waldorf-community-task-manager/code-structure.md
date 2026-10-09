@@ -1,32 +1,41 @@
 # Code Structure
 
+Static synthesis of the revalidated 2026-10-06 developer scan for `261006-simplify-user-roles`, Standard depth, branch `feature/simplify-user-roles`, observed HEAD `0dce0567f18dc72e46aa88d87e5626708b08bc7d`. Full repository breadth with partial deep coverage. No application changes, tests, builds, browser sessions, migrations or target calls were performed.
+
 ## Package and Module Organization
 
-One private package, `waldorf-community-task-manager` v0.2.0; no npm workspace packages.
+One private ESM package `waldorf-community-task-manager` version `0.2.0`; no workspace packages or separate deployable services. Breadth inventory: 80 tracked `src` files, 71 `app` files, nine scripts, one SQL migration and one GitHub workflow. These are source counts, not execution counts.
 
-| Location | Classification and purpose |
-|---|---|
-| `app/` | Next.js pages, layouts, Route Handlers, Server Actions, forms, loading/error states and CSS |
-| `src/access/`, `directory/`, `coordination/`, `notifications/` | Authorization, relationships, task coordination and notification domain services/ports |
-| `src/parent-experience/`, `staff-schedule/`, `admin-experience/` | Role-specific domain services |
-| `src/import-migration/`, `privacy-audit/` | Migration preview/transaction and privacy lifecycle contracts |
-| `src/application/` | DTOs, typed results, validation, authorization/projection/idempotency and session/role facades |
-| `src/parent-web/`, `staff-web/`, `admin-core/`, `admin-advanced/` | Synthetic application adapters, presentation support and stores |
-| `src/runtime/` | Runtime config/composition, profile selector, shell, origin guard and signed session; synthetic/production modes |
-| `scripts/`, `verification/` | Executable local checks plus verification contracts/runbooks and evidence |
-| `tests/`, colocated `*.test.ts` | Unit, integration, browser and coverage infrastructure |
-| `supabase/migrations/` | Proposed SQL/RLS/RPC schema, not exercised against a target |
-| `.github/workflows/` | CI build/check/security/provenance pipeline |
-| `aidlc/`, `source-materials/`, user guide and `qa-results/` | Lifecycle records, original references and historical evidence |
+| Path | Purpose |
+| --- | --- |
+| `app/` | Hungarian pages/layouts, actions, HTTP routes and UI components |
+| `src/application/` | Facades, authorization contracts, results, projection, idempotency and evidence |
+| `src/runtime/` | Config, profiles/signed sessions, shell and production composition |
+| `src/access/`, `src/directory/`, `src/coordination/` | Grants/authorization, family/group directory and duty coordination |
+| `src/notifications/`, `src/privacy-audit/`, `src/import-migration/` | Jobs/provider ports, retention, import/archive registry |
+| `src/parent-experience/`, `src/staff-schedule/`, `src/admin-experience/` | Persona-oriented domains |
+| `src/parent-web/`, `src/staff-web/`, `src/admin-core/`, `src/admin-advanced/` | Process-local adapters and fixtures |
+| `scripts/`, `tests/`, `verification/` | Toolchain/delivery runners, suites, manifests and fixtures |
+| `supabase/migrations/`, `.github/workflows/ci.yml` | Intended RLS/database surface and locked CI/private evidence |
+| `source-materials/`, `qa-results/` | Workbook inventory and historical evidence |
+| `aidlc/`, `.aidlc-archive/`, `.codex/`, `.agents/` | Workflow knowledge/history and framework tooling |
 
-## Code Patterns and Boundaries
+## File Classification
 
-Strict TypeScript; explicit port interfaces and constructor injection; discriminated application failures; role/scope context derived at server boundaries; optimistic versions and idempotency keys for applicable mutations. Synthetic adapters are direct application-port implementations and need not traverse the older domain service implementations. Older services have some dense one-line formatting.
+TS/TSX production source, colocated domain `*.test.ts`, JSON manifests/fixtures/lockfile, SQL migration and Markdown usage/history. Existing generated `next-env.d.ts` local edit remains unchanged.
+
+## Code Patterns
+
+App Router → runtime/session and facades → authorization/ports → synthetic adapters or domain services → repository/provider interfaces. Explicit ports, barrel exports, result states and field projection concentrate public boundaries. Older domains often compress methods into long lines and lie outside explicit app/application/runtime lint/format command paths. Navigation cannot replace layout/action authorization.
 
 ## Build and Configuration
 
-npm lockfile; `next dev`, `next build`, `next start` and `tsc --noEmit`. Node 24/npm 11 are required by toolchain checks. `predev` uses development environment loading; build/start use production defaults. `APP_RUNTIME_MODE` is distinct from `NODE_ENV`, so a production build may still be synthetic. The optional restricted `.next/login-performance-*` output isolates development measurements; ordinary development uses `.next`.
+- npm lockfile with Node **24.x** / npm **11.x**, `.npmrc` engine strictness, `.nvmrc` 24, and toolchain prehooks. `next dev`, `next build`, `next start`; development/start default to loopback.
+- Strict TypeScript, ES2024, bundler resolution, no emit, `.ts` import extensions. Next.js uses App Router, promise-based params/searchParams, async cookies and a root `proxy.ts` CSP boundary.
+- Config: `package.json`, `package-lock.json`, `tsconfig.json`, `next.config.ts`, `eslint.config.mjs`, `.prettierrc.json`, `vitest.config.ts`, three Playwright configs.
+- Dependency direction: App Router → runtime/session + application facades → authorization/ports → synthetic adapters or domain services → repository/provider interfaces. Access types are shared across domains. Barrel exports concentrate public surfaces. Production composition currently initializes an authorization port returning no current version and makes no backend call (`src/runtime/production/composition.ts:8`).
+- No code changes were made; Next.js API documentation must be consulted before future implementation, per `AGENTS.md`.
 
-## Coverage Qualification
+## Role Change Surface
 
-The scan inventoried the whole repository but did not deeply assess every UI detail, barrel, test or reference file. The exact scope is [reverse-engineering-timestamp.md](reverse-engineering-timestamp.md); public surfaces and component ownership are in their dedicated documents.
+[Dependencies](dependencies.md) maps role types, profiles, session gates, contracts, RLS and verification. Historical records retain the meaning of old roles. Before future Next.js implementation read the installed guides required by `AGENTS.md`.

@@ -40,14 +40,7 @@ export async function resolveParentSession(): Promise<ParentSessionResult> {
       profile: resolved.profile,
       familyId: PARENT_FAMILY_SCOPE.id,
       familyScope: PARENT_FAMILY_SCOPE,
-      applicationSession: {
-        subjectId: resolved.profile.id,
-        authorizationVersion: resolved.authorizationVersion,
-        roles: ["parent"],
-        scopes: [PARENT_FAMILY_SCOPE],
-        runtimeMode: "synthetic",
-        isSynthetic: true,
-      },
+      applicationSession: resolved.actor,
     },
   };
 }

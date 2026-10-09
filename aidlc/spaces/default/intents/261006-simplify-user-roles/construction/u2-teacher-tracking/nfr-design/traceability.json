@@ -1,0 +1,130 @@
+{
+  "stage": "nfr-design",
+  "unit": "u2-teacher-tracking",
+  "upstream_ids": [
+    "NFR2.21",
+    "NFR2.22",
+    "NFR1.21",
+    "NFR1.22",
+    "NFR1.23",
+    "NFR1.24",
+    "NFR1.25",
+    "NFR1.26",
+    "NFR2.23",
+    "NFR1.27",
+    "NFR2.24",
+    "NFR1.29",
+    "NFR2.25",
+    "NFR1.30",
+    "NFR1.28",
+    "NFR2.26",
+    "NFR3.21",
+    "NFR3.22",
+    "NFR3.23",
+    "NFR2.27"
+  ],
+  "coverage": [
+    {
+      "id": "NFR2.21",
+      "status": "OK",
+      "target": "performance-design.md"
+    },
+    {
+      "id": "NFR2.22",
+      "status": "OK",
+      "target": "performance-design.md"
+    },
+    {
+      "id": "NFR1.21",
+      "status": "OK",
+      "target": "performance-design.md"
+    },
+    {
+      "id": "NFR1.22",
+      "status": "OK",
+      "target": "security-design.md"
+    },
+    {
+      "id": "NFR1.23",
+      "status": "OK",
+      "target": "security-design.md"
+    },
+    {
+      "id": "NFR1.24",
+      "status": "OK",
+      "target": "security-design.md"
+    },
+    {
+      "id": "NFR1.25",
+      "status": "OK",
+      "target": "security-design.md"
+    },
+    {
+      "id": "NFR1.26",
+      "status": "OK",
+      "target": "security-design.md"
+    },
+    {
+      "id": "NFR2.23",
+      "status": "OK",
+      "target": "security-design.md"
+    },
+    {
+      "id": "NFR1.27",
+      "status": "OK",
+      "target": "scalability-design.md"
+    },
+    {
+      "id": "NFR2.24",
+      "status": "OK",
+      "target": "scalability-design.md"
+    },
+    {
+      "id": "NFR1.29",
+      "status": "OK",
+      "target": "reliability-design.md"
+    },
+    {
+      "id": "NFR2.25",
+      "status": "OK",
+      "target": "reliability-design.md"
+    },
+    {
+      "id": "NFR1.30",
+      "status": "OK",
+      "target": "reliability-design.md"
+    },
+    {
+      "id": "NFR1.28",
+      "status": "OK",
+      "target": "observability-design.md"
+    },
+    {
+      "id": "NFR2.26",
+      "status": "OK",
+      "target": "observability-design.md"
+    },
+    {
+      "id": "NFR3.21",
+      "status": "OK",
+      "target": "logical-components.md"
+    },
+    {
+      "id": "NFR3.22",
+      "status": "OK",
+      "target": "logical-components.md"
+    },
+    {
+      "id": "NFR3.23",
+      "status": "OK",
+      "target": "logical-components.md"
+    },
+    {
+      "id": "NFR2.27",
+      "status": "OK",
+      "target": "logical-components.md"
+    }
+  ],
+  "reverse": []
+}
+

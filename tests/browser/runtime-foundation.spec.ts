@@ -23,11 +23,9 @@ test("switching profiles clears the prior projection", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Üdvözlünk, Szülő!" })).toBeFocused();
   await page.getByTestId("app-shell-switch-profile-button").click();
   await expect(page.getByRole("heading", { name: "Helyi tesztprofil kiválasztása" })).toBeVisible();
-  await page.getByTestId("profile-selector-staff-local-button").click();
-  await expect(
-    page.getByRole("heading", { name: "Üdvözlünk, Munkatárs (csak olvasás)!" }),
-  ).toBeVisible();
-  await expect(page.getByTestId("app-shell-navigation-staff-schedule")).toBeVisible();
+  await page.getByTestId("profile-selector-kindergarten-teacher-local-button").click();
+  await expect(page.getByRole("heading", { name: "Üdvözlünk, Óvónő!" })).toBeVisible();
+  await expect(page.getByTestId("app-shell-navigation-teacher-tracking")).toBeVisible();
   await expect(page.getByTestId("app-shell-navigation-parent-duties")).toHaveCount(0);
 });
 
@@ -53,7 +51,7 @@ test("sign-out and history cannot restore a previous profile's protected content
   await expect(page.getByTestId("duty-list")).toHaveCount(0);
   await expect(page.getByTestId("app-shell-profile-summary")).toHaveCount(0);
   await page.goto("/");
-  await page.getByTestId("profile-selector-staff-local-button").click();
+  await page.getByTestId("profile-selector-kindergarten-teacher-local-button").click();
   await page.goto("/szulo/feladatok");
   await expect(page.getByRole("heading", { name: "Nincs jogosultság", exact: true })).toBeVisible();
   await expect(page.getByTestId("duty-list")).toHaveCount(0);

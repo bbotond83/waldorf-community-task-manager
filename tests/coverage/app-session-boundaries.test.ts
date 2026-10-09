@@ -31,48 +31,47 @@ function signIn(id: string) {
 }
 import { resolveAdminSession } from "../../app/admin/_lib/session.ts";
 import { resolveParentSession } from "../../app/szulo/_lib/session.ts";
-import { resolveStaffSession } from "../../app/munkatars/_lib/session.ts";
+import { resolveTeacherSession } from "../../app/teacher/_lib/session.ts";
 import { resolveAdminFacade } from "../../app/admin/_lib/facade.ts";
 import { resolveParentFacade } from "../../app/szulo/_lib/facade.ts";
-import { resolveStaffFacade } from "../../app/munkatars/_lib/facade.ts";
+import { resolveTeacherFacade } from "../../app/teacher/_lib/facade.ts";
 import { mapApplicationResult } from "../../app/admin/_lib/action-state.ts";
 import { mapParentResult } from "../../app/szulo/_lib/action-state.ts";
 import * as result from "../../src/application/results.ts";
 it("resolves signed-out, granted, forbidden and invalid configuration sessions", async () => {
-  for (const resolver of [resolveAdminSession, resolveParentSession, resolveStaffSession])
+  for (const resolver of [resolveAdminSession, resolveParentSession, resolveTeacherSession])
     expect((await resolver()).state).toBe("signed-out");
   for (const [id, resolver] of [
     ["group-admin-local", resolveAdminSession],
-    ["kindergarten-admin-local", resolveAdminSession],
     ["super-admin-local", resolveAdminSession],
     ["parent-local", resolveParentSession],
-    ["staff-local", resolveStaffSession],
+    ["kindergarten-teacher-local", resolveTeacherSession],
   ] as const) {
     signIn(id);
     expect((await resolver()).state).toBe("success");
   }
   signIn("parent-local");
   expect((await resolveAdminSession()).state).toBe("denied");
-  expect((await resolveStaffSession()).state).toBe("denied");
-  signIn("staff-local");
+  expect((await resolveTeacherSession()).state).toBe("denied");
+  signIn("kindergarten-teacher-local");
   expect((await resolveParentSession()).state).toBe("denied");
   vi.stubEnv("APP_RUNTIME_MODE", "invalid");
-  for (const resolver of [resolveAdminSession, resolveParentSession, resolveStaffSession])
+  for (const resolver of [resolveAdminSession, resolveParentSession, resolveTeacherSession])
     expect((await resolver()).state).toBe("configuration-error");
-  for (const resolver of [resolveAdminFacade, resolveParentFacade, resolveStaffFacade])
+  for (const resolver of [resolveAdminFacade, resolveParentFacade, resolveTeacherFacade])
     expect(await resolver()).toBeUndefined();
 });
 it("returns real synthetic facades and refuses production-unlinked mode", async () => {
   expect(await resolveAdminFacade()).toBeDefined();
   expect(await resolveParentFacade()).toBeDefined();
-  expect(await resolveStaffFacade()).toBeDefined();
+  expect(await resolveTeacherFacade()).toBeDefined();
   vi.stubEnv("APP_RUNTIME_MODE", "production");
   vi.stubEnv("APP_SESSION_SECRET", "invented".repeat(6));
   vi.stubEnv("SUPABASE_URL", "https://invented.invalid");
   vi.stubEnv("SUPABASE_ANON_KEY", "invented".repeat(6));
-  for (const resolver of [resolveAdminSession, resolveParentSession, resolveStaffSession])
+  for (const resolver of [resolveAdminSession, resolveParentSession, resolveTeacherSession])
     expect((await resolver()).state).toBe("denied");
-  for (const resolver of [resolveAdminFacade, resolveParentFacade, resolveStaffFacade])
+  for (const resolver of [resolveAdminFacade, resolveParentFacade, resolveTeacherFacade])
     expect(await resolver()).toBeUndefined();
 });
 it("maps explicit application states to safe actionable presentation", () => {

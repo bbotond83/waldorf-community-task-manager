@@ -1,3 +1,4 @@
+import { sessionGrantBindings } from "../access/session-grants.ts";
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
@@ -18,6 +19,9 @@ import type { AuthorizedContext, Clock, IdGenerator, SessionContext } from "./in
 const session: SessionContext = {
   subjectId: "parent-synthetic-1",
   authorizationVersion: 1,
+  ...sessionGrantBindings("parent-synthetic-1", "parent", [
+    { id: "family-1", type: "family", organizationId: "org-1" },
+  ]),
   roles: ["parent"],
   scopes: [{ id: "family-1", type: "family", organizationId: "org-1" }],
   runtimeMode: "synthetic",

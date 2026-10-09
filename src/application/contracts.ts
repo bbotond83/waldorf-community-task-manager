@@ -1,4 +1,4 @@
-import type { Role, Scope } from "../access/index.ts";
+import type { Role, RoleGrant, Scope } from "../access/index.ts";
 
 export type RuntimeMode = "synthetic" | "production";
 
@@ -65,6 +65,8 @@ export type ApplicationResult<T> =
 export type SessionContext = Readonly<{
   subjectId: string;
   authorizationVersion: number;
+  isActive: boolean;
+  grants: readonly RoleGrant[];
   roles: readonly Role[];
   scopes: readonly Scope[];
   runtimeMode: RuntimeMode;
@@ -81,10 +83,9 @@ export type AuthorizedContext = Readonly<{
 export type AuthorizationMatrixRowId =
   | "AUTH-PARENT-DUTIES"
   | "AUTH-PARENT-NOTIFICATIONS"
-  | "AUTH-STAFF-SCHEDULE"
+  | "AUTH-TEACHER-TRACKING"
   | "AUTH-GROUP-ADMIN-CORE"
   | "AUTH-GRP-IMPORT-DENY"
-  | "AUTH-KINDERGARTEN-ADMIN"
   | "AUTH-SUPER-ADMIN"
   | "AUTH-SUPER-GOVERNANCE";
 
@@ -151,16 +152,9 @@ export type NotificationModel = Readonly<{
 
 export type NotificationListModel = Readonly<{ notifications: readonly NotificationModel[] }>;
 
-export type ScheduleEntryModel = Readonly<{
-  id: string;
-  startsAt: string;
-  endsAt: string;
-  title: string;
-  location: string;
-  coordinationDisplayName?: string;
-}>;
-
-export type ScheduleModel = Readonly<{ entries: readonly ScheduleEntryModel[] }>;
+export type { TrackingEntry } from "../teacher-tracking/tracking-model.ts";
+import type { TrackingEntry } from "../teacher-tracking/tracking-model.ts";
+export type TrackingModel = Readonly<{ entries: readonly TrackingEntry[] }>;
 
 export type DashboardModel = Readonly<{
   scopeId: string;
@@ -247,7 +241,7 @@ export type GrantOutcome = Readonly<{
 export type GrantModel = Readonly<{
   id: string;
   subjectLabel: string;
-  role: "group_admin" | "kindergarten_admin" | "super_admin";
+  role: Role;
   scopeLabel: string;
   version: number;
   isSelf: boolean;

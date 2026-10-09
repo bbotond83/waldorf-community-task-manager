@@ -285,3 +285,19 @@ it("rewrites only invented Firefox metadata in owned resources", async () => {
     );
   } else expect(options).toEqual({});
 });
+
+it.each(["fifth-profile", "removed-role", "wrong-home", "unknown-row-role", "unknown-role-allow", "old-row", "old-route"])("rejects current catalog/reference drift %s", kind => {
+ const fixturePath = join(root, "verification/fixtures.json"); const matrixPath = join(root, "verification/authorization-matrix.json"); const scenarioPath = join(root, "verification/scenarios.json");
+ const fixture = loadJson<{ profiles: { id: string; role: string; home: string }[] }>(fixturePath);
+ const matrix = loadJson<{ rows: { id: string; role: string; effect: string; route: string }[] }>(matrixPath);
+ const manifest = loadJson<{ scenarios: import("../../scripts/verification/core.ts").Scenario[] }>(scenarioPath);
+ if (kind === "fifth-profile") fixture.profiles.push({ id: "staff-local", role: "read_only_staff", home: "/munkatars/beosztas" });
+ if (kind === "removed-role") fixture.profiles[0]!.role = "kindergarten_admin";
+ if (kind === "wrong-home") fixture.profiles[0]!.home = "/other";
+ if (kind === "unknown-row-role") matrix.rows[0]!.role = "removed";
+ if (kind === "unknown-role-allow") matrix.rows[0]!.role = "any_authenticated";
+ if (kind === "old-row") matrix.rows[0]!.id = "AUTH-STAFF-OLD";
+ if (kind === "old-route") manifest.scenarios[0]!.route = "/munkatars/beosztas";
+ writeFileSync(fixturePath, JSON.stringify(fixture)); writeFileSync(matrixPath, JSON.stringify(matrix)); writeFileSync(scenarioPath, JSON.stringify(manifest));
+ expect(() => validateManifests(root)).toThrow(/current|unknown|obsolete|deny/);
+});

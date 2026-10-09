@@ -1,0 +1,130 @@
+{
+  "stage": "infrastructure-design",
+  "unit": "u2-teacher-tracking",
+  "upstream_ids": [
+    "NFR1.21",
+    "NFR1.22",
+    "NFR1.23",
+    "NFR1.24",
+    "NFR1.25",
+    "NFR1.26",
+    "NFR1.27",
+    "NFR1.28",
+    "NFR1.29",
+    "NFR1.30",
+    "NFR2.21",
+    "NFR2.22",
+    "NFR2.23",
+    "NFR2.24",
+    "NFR2.25",
+    "NFR2.26",
+    "NFR2.27",
+    "NFR3.21",
+    "NFR3.22",
+    "NFR3.23"
+  ],
+  "coverage": [
+    {
+      "id": "NFR1.21",
+      "status": "N/A",
+      "target": "Application-level injected read/projection/result enforcement; no new infrastructure resource required; see infrastructure-specification.md"
+    },
+    {
+      "id": "NFR1.22",
+      "status": "N/A",
+      "target": "Application-level injected read/projection/result enforcement; no new infrastructure resource required; see infrastructure-specification.md"
+    },
+    {
+      "id": "NFR1.23",
+      "status": "N/A",
+      "target": "Application-level injected read/projection/result enforcement; no new infrastructure resource required; see infrastructure-specification.md"
+    },
+    {
+      "id": "NFR1.24",
+      "status": "N/A",
+      "target": "Application-level injected read/projection/result enforcement; no new infrastructure resource required; see infrastructure-specification.md"
+    },
+    {
+      "id": "NFR1.25",
+      "status": "N/A",
+      "target": "Application-level injected read/projection/result enforcement; no new infrastructure resource required; see infrastructure-specification.md"
+    },
+    {
+      "id": "NFR1.26",
+      "status": "N/A",
+      "target": "Application-level injected read/projection/result enforcement; no new infrastructure resource required; see infrastructure-specification.md"
+    },
+    {
+      "id": "NFR1.27",
+      "status": "N/A",
+      "target": "Application-level injected read/projection/result enforcement; no new infrastructure resource required; see infrastructure-specification.md"
+    },
+    {
+      "id": "NFR1.28",
+      "status": "OK",
+      "target": "monitoring-design.md: existing safe audit and diagnostics"
+    },
+    {
+      "id": "NFR1.29",
+      "status": "N/A",
+      "target": "Application-level injected read/projection/result enforcement; no new infrastructure resource required; see infrastructure-specification.md"
+    },
+    {
+      "id": "NFR1.30",
+      "status": "N/A",
+      "target": "Application-level injected read/projection/result enforcement; no new infrastructure resource required; see infrastructure-specification.md"
+    },
+    {
+      "id": "NFR2.21",
+      "status": "OK",
+      "target": "cicd-pipeline.md: existing performance check configuration"
+    },
+    {
+      "id": "NFR2.22",
+      "status": "N/A",
+      "target": "Application-level injected read/projection/result enforcement; no new infrastructure resource required; see infrastructure-specification.md"
+    },
+    {
+      "id": "NFR2.23",
+      "status": "OK",
+      "target": "cicd-pipeline.md: unchanged blocking quality/security gates"
+    },
+    {
+      "id": "NFR2.24",
+      "status": "N/A",
+      "target": "Application-level injected read/projection/result enforcement; no new infrastructure resource required; see infrastructure-specification.md"
+    },
+    {
+      "id": "NFR2.25",
+      "status": "N/A",
+      "target": "Application-level injected read/projection/result enforcement; no new infrastructure resource required; see infrastructure-specification.md"
+    },
+    {
+      "id": "NFR2.26",
+      "status": "OK",
+      "target": "monitoring-design.md: separate actual execution evidence"
+    },
+    {
+      "id": "NFR2.27",
+      "status": "OK",
+      "target": "cicd-pipeline.md: test-after and existing CI tools"
+    },
+    {
+      "id": "NFR3.21",
+      "status": "OK",
+      "target": "infrastructure-specification.md: existing single application"
+    },
+    {
+      "id": "NFR3.22",
+      "status": "OK",
+      "target": "cicd-pipeline.md: localized responsive critical browser flow"
+    },
+    {
+      "id": "NFR3.23",
+      "status": "OK",
+      "target": "monitoring-design.md: accessibility and keyboard checks"
+    }
+  ],
+  "reverse": []
+}
+

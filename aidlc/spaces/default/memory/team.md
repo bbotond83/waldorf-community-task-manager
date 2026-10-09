@@ -15,6 +15,9 @@ We use a scope-dependent walking skeleton. When the active scope enables it, we 
 
 ## Testing Posture
 
+- **Methodology**: test-after
+- **Ordering**: Implement each testable layer, then write and run its tests before moving to the next layer.
+
 We write tests in the same change as the code and add a regression test for every defect. We enforce at least 80% line, branch, and function coverage across all production source.
 
 Before merge, we require strict type checking, tests, a production build, deterministic start smoke, the critical browser flow, and dependency scanning that blocks high and critical findings. The critical browser flow must have no serious or critical automated accessibility violations. Provisioned integrations do not count as verified until they are exercised against their real targets.
@@ -27,7 +30,10 @@ We automatically build and deploy eligible changes to staging. We promote immuta
 
 We use strict, idiomatic TypeScript with English technical identifiers and Hungarian user-facing copy. We use Prettier and ESLint as blocking checks. We preserve functional module boundaries, explicit ports, constructor injection at infrastructure seams, and colocated `*.test.ts` files.
 
-We represent expected application failures as explicit result states and map unexpected infrastructure errors at the application boundary. CI includes secret scanning and SAST, with high and critical SAST findings blocking delivery. We pin CI actions to immutable revisions and add an SBOM and artifact attestation when a deployable artifact exists.
+We represent expected application failures as explicit result states and map unexpected infrastructure errors at the application boundary. CI includes secret scanning and SAST, with high and critical SAST findings blocking delivery. We pin CI actions to immutable revisions. For this private repository, validated changes produce a CycloneDX SBOM, a synthetic build archive, explicitly unsigned commit/run metadata and SHA256 checksums retained as private Actions artifacts for 14 days. These records are not cryptographic artifact attestations.
+
+The private evidence approach reflects the later human instruction to keep the repository private and fix the unsupported attestation service, followed by their merge of PR #9. It supersedes the older attestation wording for this repository; signing infrastructure is not added to this role change.
+
 ## Forbidden
 
 <!-- Team-specific forbidden patterns -->

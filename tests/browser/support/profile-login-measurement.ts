@@ -23,8 +23,8 @@ export async function assertProfileMainReady(page: Page, profile: SyntheticProfi
     page.getByTestId(
       profile.role === "parent"
         ? "parent-duties-page"
-        : profile.role === "staff"
-          ? "staff-schedule-page"
+        : profile.role === "kindergarten-teacher"
+          ? "teacher-schedule-page"
           : "admin-dashboard-page",
     ),
   ).toBeVisible();
@@ -44,14 +44,14 @@ export async function assertProfileMainReady(page: Page, profile: SyntheticProfi
     await expect(page.getByTestId("duty-list").locator("li").first()).toBeVisible();
     await expect(page.getByTestId("duty-filter-select")).toBeEnabled();
     await expect(page.getByTestId("duty-filter-submit-button")).toBeEnabled();
-  } else if (profile.role === "staff") {
+  } else if (profile.role === "kindergarten-teacher") {
     await expect(page.getByRole("heading", { name: "Beosztás", exact: true })).toBeVisible();
-    await expect(page.getByTestId("staff-schedule")).toBeVisible();
+    await expect(page.getByTestId("teacher-schedule")).toBeVisible();
     await expect(
-      page.getByTestId("staff-schedule-table").locator("tbody tr").first(),
+      page.getByTestId("teacher-schedule-table").locator("tbody tr").first(),
     ).toBeVisible();
-    await expect(page.getByTestId("staff-schedule-group-select")).toBeEnabled();
-    await expect(page.getByTestId("staff-schedule-filter-submit-button")).toBeEnabled();
+    await expect(page.getByTestId("teacher-schedule-group-select")).toBeEnabled();
+    await expect(page.getByTestId("teacher-schedule-filter-submit-button")).toBeEnabled();
   } else {
     await expect(page.getByRole("heading", { name: "Áttekintés", exact: true })).toBeVisible();
     for (const id of [
@@ -163,8 +163,8 @@ export async function exercisePrimaryControl(page: Page, profile: SyntheticProfi
   if (profile.role === "parent") {
     await page.getByTestId("duty-filter-submit-button").click();
     await assertProfileMainReady(page, profile);
-  } else if (profile.role === "staff") {
-    await page.getByTestId("staff-schedule-filter-submit-button").click();
+  } else if (profile.role === "kindergarten-teacher") {
+    await page.getByTestId("teacher-schedule-filter-submit-button").click();
     await assertProfileMainReady(page, profile);
   } else {
     await page.getByTestId("app-shell-navigation-admin-tasks").click();

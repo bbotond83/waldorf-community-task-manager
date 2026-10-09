@@ -1,3 +1,4 @@
+import { resetSyntheticAccessState } from "../../../../src/runtime/synthetic/access-state.ts";
 import { NextResponse, type NextRequest } from "next/server";
 import { resetSyntheticAdminFixtures } from "../../../../src/admin-core/synthetic-admin.ts";
 import { resetSyntheticAdvancedFixtures } from "../../../../src/admin-advanced/index.ts";
@@ -16,6 +17,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: { code: "REQUEST_ORIGIN_DENIED" } }, { status: 403 });
   }
 
+  resetSyntheticAccessState();
   resetSyntheticAdminFixtures();
   resetSyntheticAdvancedFixtures();
   resetSyntheticParentState();

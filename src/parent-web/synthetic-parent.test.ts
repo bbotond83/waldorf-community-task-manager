@@ -1,3 +1,4 @@
+import { sessionGrantBindings } from "../access/session-grants.ts";
 import assert from "node:assert/strict";
 import { beforeEach, describe, it } from "node:test";
 import {
@@ -16,6 +17,7 @@ import {
 const session: SessionContext = Object.freeze({
   subjectId: "parent-local",
   authorizationVersion: 1,
+  ...sessionGrantBindings("parent-local", "parent", [PARENT_FAMILY_SCOPE]),
   roles: ["parent"] as const,
   scopes: [PARENT_FAMILY_SCOPE],
   runtimeMode: "synthetic",
@@ -25,7 +27,7 @@ const session: SessionContext = Object.freeze({
 function facade() {
   return createSyntheticParentFacade(
     new AuthorizationContract(
-      new InMemoryAuthorizationVersions({ "parent-local": 1, "staff-local": 1 }),
+      new InMemoryAuthorizationVersions({ "parent-local": 1, "kindergarten-teacher-local": 1 }),
     ),
   );
 }
@@ -202,8 +204,8 @@ describe("synthetic Parent façade", () => {
     });
     const staffSession = {
       ...session,
-      subjectId: "staff-local",
-      roles: ["read_only_staff"] as const,
+      subjectId: "kindergarten-teacher-local",
+      roles: ["kindergarten_teacher"] as const,
     };
     const staff = await app.updateOwnContribution(staffSession, {
       familyScope: PARENT_FAMILY_SCOPE,

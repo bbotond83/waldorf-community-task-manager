@@ -1,75 +1,133 @@
 # Component Inventory
 
-These headings are the literal component identities used by the scope marker. Health ratings describe source boundaries and evidence gaps, not measured service health. Every listed component has deeply read implementation paths; complete directory coverage is not implied.
+Static synthesis of the revalidated 2026-10-06 developer scan for `261006-simplify-user-roles`, Standard depth, branch `feature/simplify-user-roles`, observed HEAD `0dce0567f18dc72e46aa88d87e5626708b08bc7d`. Full repository breadth with partial deep coverage. No application changes, tests, builds, browser sessions, migrations or target calls were performed.
 
-## Access
+## Inventory Basis
 
-Authorization, role grants/revocation, authorization-version invalidation; owns access contracts. Depends on injected users/grants/audit/clock and optional Supabase RPC adapter. **At-risk:** real RPC/RLS behavior unverified.
+Every discovered application/domain module and delivery surface is catalogued. Health labels are static risk assessments; shallow inventory does not certify component correctness.
+
+## Access and Authorization
+
+- **Path**: `src/access`
+- **Responsibility / ownership**: Grants, scoped policy, revocation and redacted audit.
+- **Dependencies**: Repositories/authorization ports; domain consumers.
+- **Health**: At-risk: unknown-role fallback and policy duplication.
 
 ## Directory
 
-Family/parent/child/group relationships, archive/restore and field projection. Depends on access/grants and directory repository/audit. **Healthy source boundary;** persistence is synthetic/injected.
+- **Path**: `src/directory`
+- **Responsibility / ownership**: Families, parents, children, school-year/groups, consent and archives.
+- **Dependencies**: Access grants, transactional repository and visibility recalculation.
+- **Health**: At-risk: sensitive-field and role checks.
 
 ## Coordination
 
-Signup, capacity/version checks, swap/cancellation requests and decisions. Depends on directory visibility, task/assignment repository and events/audit. **Healthy source boundary;** target durability unverified.
+- **Path**: `src/coordination`
+- **Responsibility / ownership**: Signup/capacity, swaps, approvals and contributions/allergens.
+- **Dependencies**: Directory visibility, transactions and assignment events.
+- **Health**: Partial deep service coverage.
 
 ## Notifications
 
-7-day/24-hour reminder creation, due-job dispatch and cancellation. Depends on store, queue, dispatcher/provider ports. **At-risk:** real provider/scheduler evidence outstanding.
+- **Path**: `src/notifications`
+- **Responsibility / ownership**: Scheduling, deduplication, dispatch/retry/cancel.
+- **Dependencies**: Queue/store/provider ports.
+- **Health**: At-risk: real provider/persistence unlinked.
 
-## Parent Experience
+## Privacy Lifecycle
 
-Family assignments, request views, contribution eligibility and own notification reads. Depends on directory, role repository and optional commands. **Healthy source boundary.**
-
-## Staff Schedule
-
-Read-only bounded schedule projection; depends on authorizer and schedule repository. **Healthy source boundary.**
-
-## Admin Experience
-
-Queue/school-year/generic operations and archive destinations for legacy sheets. Depends on access and import mapping. **Healthy source boundary.**
+- **Path**: `src/privacy-audit`
+- **Responsibility / ownership**: Deferral, deletion/anonymization and retention.
+- **Dependencies**: Repository transaction; 30-day grace, 365-day audit purge and holds.
+- **Health**: Partial deep service coverage; production execution unknown.
 
 ## Import Migration
 
-17-sheet registry, consent/cell checks, immutable previews, conflicts and commit/rollback. Owns migration orchestration via repository transaction port. **At-risk:** synthetic rollback snapshot limitations and real transaction validation remain.
+- **Path**: `src/import-migration`
+- **Responsibility / ownership**: Seventeen-sheet consent/conflicts, fingerprint commit and rollback.
+- **Dependencies**: Transactional repository, archive/process owners.
+- **Health**: At-risk: legacy administrator archive ownership.
 
-## Privacy Audit
+## Parent Experience
 
-Departure grace period, sibling/hold eligibility, delete/anonymize and one-year audit retention. Depends on lifecycle repository/clock. **At-risk:** real retention and deletion execution unverified.
+- **Path**: `src/parent-experience`
+- **Responsibility / ownership**: Own-family duties, notifications and commands.
+- **Dependencies**: Directory visibility and parent repository.
+- **Health**: Partial deep service coverage.
 
-## Application
+## Staff Schedule
 
-Result/DTO contracts, session and role facades, authorization/projection/idempotency and event/evidence ports. Depends on domain/access types and injected adapters. **Healthy explicit boundary;** parallel legacy/direct-adapter implementations can diverge.
+- **Path**: `src/staff-schedule`
+- **Responsibility / ownership**: Read-only projected schedules; maximum 31-day filter.
+- **Dependencies**: Access and schedule repository.
+- **Health**: At-risk: teacher behavior undecided.
 
-## Parent Web
+## Admin Experience
 
-Synthetic duties, requests, notifications, contribution and invitation gateway. Depends on application facades; owns module-local state/cache. **At-risk:** nondurable state.
+- **Path**: `src/admin-experience`
+- **Responsibility / ownership**: Scoped queues, school years and archive operations.
+- **Dependencies**: Access, repositories/operation ports, import destinations.
+- **Health**: At-risk: policy alignment.
 
-## Staff Web
+## Application Facades
 
-Synthetic schedule fixtures and failure scenarios; depends on staff facade/authorization. **Healthy fixture boundary;** not live persistence evidence.
+- **Path**: `src/application`
+- **Responsibility / ownership**: Contracts, policy matrix, orchestration, results/idempotency/evidence.
+- **Dependencies**: Access types and domain/session/adaptor ports.
+- **Health**: At-risk: large facade and duplicated policy.
 
-## Admin Core
+## Runtime and Sessions
 
-Synthetic records/tasks/approvals, scope/version checks and idempotency; depends on admin facade and owns process-global store. **At-risk:** nondurable state.
+- **Path**: `src/runtime`
+- **Responsibility / ownership**: Config, composition, catalog, signed cookie and shell.
+- **Dependencies**: Zod, Node crypto, application policy and synthetic adapters.
+- **Health**: At-risk: five-role catalog; unlinked production.
 
-## Admin Advanced
+## Admin Core Adapter
 
-Import recovery, reminders, governance/revocation, lifecycle/settings; composite admin port over process-global state. **At-risk:** persistence/provider and lifecycle evidence incomplete.
+- **Path**: `src/admin-core`
+- **Responsibility / ownership**: Synthetic records/tasks/assignments/approvals/archives.
+- **Dependencies**: Admin facade ports and runtime authorization.
+- **Health**: Shallow: process-local state.
 
-## Runtime
+## Admin Advanced Adapter
 
-Config/mode composition, five profiles, signed session, selector/shell and origin guard. Depends on Zod, Node crypto and application authorization. **At-risk:** shared login delay not reproduced or attributed; production composition unlinked.
+- **Path**: `src/admin-advanced`
+- **Responsibility / ownership**: Synthetic import/reminders/governance/lifecycle/settings.
+- **Dependencies**: Core adapter and advanced store; facade guards.
+- **Health**: Shallow: process-local transactions.
 
-## App Routes
+## Parent Web Adapter
 
-Public authentication/invitation, three HTTP handlers and protected parent/staff/admin pages/actions. Depends on asynchronous Next cookies/params, runtime/role boundaries and facade helpers. **At-risk:** root and business-page latency require separate actual-environment measurement.
+- **Path**: `src/parent-web`
+- **Responsibility / ownership**: Synthetic duties/notifications/invitations/session.
+- **Dependencies**: Parent/session facades and catalog.
+- **Health**: Shallow: mutable fixture stores.
 
-## Local Verification
+## Staff Web Adapter
 
-Toolchain/environment checks, manifests, coverage/security, build/smoke/browser/evidence orchestration. Depends on Node APIs, Next environment loader and Playwright. **At-risk:** login timing suite is opt-in and current checks were not run.
+- **Path**: `src/staff-web`
+- **Responsibility / ownership**: Schedules, business group scopes and failure fixtures.
+- **Dependencies**: Staff facade and field projection.
+- **Health**: Partial deep coverage; legacy staff role.
 
-## Supabase Schema
+## App Router Web
 
-Six proposed application tables and three authorization RPCs using PostgreSQL/Supabase identity and RLS. **At-risk:** unlinked/unexercised target.
+- **Path**: `app`
+- **Responsibility / ownership**: Hungarian pages, layouts, actions and access states.
+- **Dependencies**: Runtime/session and application facades.
+- **Health**: Partial deep coverage; independent persona gates.
+
+## SQL Persistence Policies
+
+- **Path**: `supabase/migrations`
+- **Responsibility / ownership**: Intended tables/grants/RLS functions.
+- **Dependencies**: Supabase contract.
+- **Health**: At-risk: unconstrained text roles; execution unknown.
+
+## Verification and Delivery
+
+- **Path**: `scripts, tests, verification, .github`
+- **Responsibility / ownership**: Manifests, local runners, bounded scans, suites and CI/evidence.
+- **Dependencies**: Node, Vitest, Playwright and build tools.
+- **Health**: Partial deep coverage; manifest parity and six targets outstanding.

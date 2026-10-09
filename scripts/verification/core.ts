@@ -1,3 +1,5 @@
+import { SYNTHETIC_PROFILES } from "../../src/runtime/synthetic/profiles.ts";
+import { isCurrentRole } from "../../src/access/role-policy.ts";
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
@@ -136,10 +138,33 @@ export function validateManifests(root = process.cwd()): Scenario[] {
     scenarios.map(({ id }) => id),
     "scenario IDs",
   );
+  // Bind current executable fixtures to the runtime catalog, never removed aliases.
+  if (profiles.length !== SYNTHETIC_PROFILES.length)
+    throw new Error("current profile catalog must contain exactly four roles");
+  for (const runtime of SYNTHETIC_PROFILES) {
+    const profile = profiles.find((candidate) => candidate.id === runtime.id);
+    if (
+      !profile ||
+      profile.role !== runtime.role.replaceAll("-", "_") ||
+      profile.home !== runtime.homePath
+    )
+      throw new Error("current profile catalog role/home mismatch");
+  }
   const knownRows = new Set(rowIds);
   const knownFields = new Set(fieldIds);
   const knownProfiles = new Set(profileIds);
   for (const row of rows) {
+    if (
+      !isCurrentRole(row.role) &&
+      !["anonymous_or_unknown", "any_authenticated"].includes(String(row.role))
+    )
+      throw new Error(`${String(row.id)} contains a removed or unknown current role`);
+    if (!isCurrentRole(row.role) && row.effect !== "deny")
+      throw new Error("unknown role row must deny");
+    if (
+      /(?:AUTH-STAFF|AUTH-KINDERGARTEN|\/munkatars)/.test(`${String(row.id)}:${String(row.route)}`)
+    )
+      throw new Error("authorization matrix contains obsolete current references");
     for (const field of (row.fields as string[]) ?? [])
       if (!knownFields.has(field))
         throw new Error(`${String(row.id)} references unknown field ${field}`);
@@ -154,6 +179,8 @@ export function validateManifests(root = process.cwd()): Scenario[] {
       scenario.matrixRows.length === 0
     )
       throw new Error(`${scenario.id || "scenario"} is incomplete`);
+    if (/(?:LOCAL-STAFF|LOCAL-KINDERGARTEN|\/munkatars)/.test(`${scenario.id}:${scenario.route}`))
+      throw new Error("scenario contains obsolete current references");
     if (!knownProfiles.has(scenario.profile))
       throw new Error(`${scenario.id} references unknown profile ${scenario.profile}`);
     for (const rowId of scenario.matrixRows)

@@ -4,7 +4,11 @@
     {
       "id": "SF-DISPLAY-NAME",
       "purpose": "coordination label",
-      "allowed": ["authorized participants", "scoped staff", "scoped administrators"],
+      "allowed": [
+        "authorized participants",
+        "scoped kindergarten teachers",
+        "scoped administrators"
+      ],
       "redactFrom": ["unrelated responses"],
       "lifecycle": "anonymize with historical record"
     },
@@ -20,7 +24,7 @@
       "purpose": "account and delivery",
       "allowed": ["own approved account flow", "in-scope administrators"],
       "redactFrom": [
-        "staff",
+        "kindergarten teachers",
         "normal parent views",
         "logs",
         "audit",
@@ -35,7 +39,7 @@
       "purpose": "approved contact",
       "allowed": ["own approved account flow", "in-scope administrators"],
       "redactFrom": [
-        "staff",
+        "kindergarten teachers",
         "normal parent views",
         "logs",
         "audit",
@@ -49,7 +53,15 @@
       "id": "SF-LOCALITY",
       "purpose": "restricted imported municipality",
       "allowed": ["in-scope administrators"],
-      "redactFrom": ["parents", "staff", "logs", "audit", "fixtures", "screenshots", "reports"],
+      "redactFrom": [
+        "parents",
+        "kindergarten teachers",
+        "logs",
+        "audit",
+        "fixtures",
+        "screenshots",
+        "reports"
+      ],
       "lifecycle": "delete after last-child grace period"
     },
     {
@@ -58,7 +70,7 @@
       "allowed": ["own profile", "in-scope administrators when required"],
       "redactFrom": [
         "parents other than owner",
-        "staff",
+        "kindergarten teachers",
         "logs",
         "audit",
         "fixtures",

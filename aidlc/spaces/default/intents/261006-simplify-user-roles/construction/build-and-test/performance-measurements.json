@@ -1,0 +1,182 @@
+{
+  "stats": {
+    "startTime": "2026-10-08T15:01:05.243Z",
+    "duration": 31774.997,
+    "expected": 8,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "budget_ms": 5000,
+  "samples": [
+    {
+      "mode": "development",
+      "profile": "parent-local",
+      "kind": "first",
+      "elapsed_ms": 840.099853515625,
+      "result": "success"
+    },
+    {
+      "mode": "development",
+      "profile": "parent-local",
+      "kind": "switch-source-setup",
+      "elapsed_ms": 568,
+      "result": "success"
+    },
+    {
+      "mode": "development",
+      "profile": "parent-local",
+      "kind": "switch",
+      "elapsed_ms": 256.89990234375,
+      "result": "success"
+    },
+    {
+      "mode": "development",
+      "profile": "kindergarten-teacher-local",
+      "kind": "first",
+      "elapsed_ms": 797.199951171875,
+      "result": "success"
+    },
+    {
+      "mode": "development",
+      "profile": "kindergarten-teacher-local",
+      "kind": "switch-source-setup",
+      "elapsed_ms": 393,
+      "result": "success"
+    },
+    {
+      "mode": "development",
+      "profile": "kindergarten-teacher-local",
+      "kind": "switch",
+      "elapsed_ms": 266.699951171875,
+      "result": "success"
+    },
+    {
+      "mode": "development",
+      "profile": "group-admin-local",
+      "kind": "first",
+      "elapsed_ms": 918.7001953125,
+      "result": "success"
+    },
+    {
+      "mode": "development",
+      "profile": "group-admin-local",
+      "kind": "switch-source-setup",
+      "elapsed_ms": 306.099853515625,
+      "result": "success"
+    },
+    {
+      "mode": "development",
+      "profile": "group-admin-local",
+      "kind": "switch",
+      "elapsed_ms": 255.099853515625,
+      "result": "success"
+    },
+    {
+      "mode": "development",
+      "profile": "super-admin-local",
+      "kind": "first",
+      "elapsed_ms": 834.400146484375,
+      "result": "success"
+    },
+    {
+      "mode": "development",
+      "profile": "super-admin-local",
+      "kind": "switch-source-setup",
+      "elapsed_ms": 511.69970703125,
+      "result": "success"
+    },
+    {
+      "mode": "development",
+      "profile": "super-admin-local",
+      "kind": "switch",
+      "elapsed_ms": 323,
+      "result": "success"
+    },
+    {
+      "mode": "production",
+      "profile": "parent-local",
+      "kind": "first",
+      "elapsed_ms": 172.10009765625,
+      "result": "success"
+    },
+    {
+      "mode": "production",
+      "profile": "parent-local",
+      "kind": "switch-source-setup",
+      "elapsed_ms": 169.39990234375,
+      "result": "success"
+    },
+    {
+      "mode": "production",
+      "profile": "parent-local",
+      "kind": "switch",
+      "elapsed_ms": 151.099853515625,
+      "result": "success"
+    },
+    {
+      "mode": "production",
+      "profile": "kindergarten-teacher-local",
+      "kind": "first",
+      "elapsed_ms": 174.5,
+      "result": "success"
+    },
+    {
+      "mode": "production",
+      "profile": "kindergarten-teacher-local",
+      "kind": "switch-source-setup",
+      "elapsed_ms": 144.300048828125,
+      "result": "success"
+    },
+    {
+      "mode": "production",
+      "profile": "kindergarten-teacher-local",
+      "kind": "switch",
+      "elapsed_ms": 141.699951171875,
+      "result": "success"
+    },
+    {
+      "mode": "production",
+      "profile": "group-admin-local",
+      "kind": "first",
+      "elapsed_ms": 151.10009765625,
+      "result": "success"
+    },
+    {
+      "mode": "production",
+      "profile": "group-admin-local",
+      "kind": "switch-source-setup",
+      "elapsed_ms": 145.300048828125,
+      "result": "success"
+    },
+    {
+      "mode": "production",
+      "profile": "group-admin-local",
+      "kind": "switch",
+      "elapsed_ms": 129.7001953125,
+      "result": "success"
+    },
+    {
+      "mode": "production",
+      "profile": "super-admin-local",
+      "kind": "first",
+      "elapsed_ms": 180.400146484375,
+      "result": "success"
+    },
+    {
+      "mode": "production",
+      "profile": "super-admin-local",
+      "kind": "switch-source-setup",
+      "elapsed_ms": 143.699951171875,
+      "result": "success"
+    },
+    {
+      "mode": "production",
+      "profile": "super-admin-local",
+      "kind": "switch",
+      "elapsed_ms": 163.80029296875,
+      "result": "success"
+    }
+  ],
+  "max_ms": 918.7001953125
+}

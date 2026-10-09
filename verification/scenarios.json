@@ -132,18 +132,18 @@
       "browsers": ["chromium", "firefox", "mobile-chrome"]
     },
     {
-      "id": "LOCAL-STAFF-SCHEDULE",
+      "id": "LOCAL-TEACHER-TRACKING",
       "storyIds": ["US-LR-05", "US-13"],
       "requirementIds": ["FR-LR-09", "FR-03", "NFR-LR-05"],
       "target": "local",
       "command": "npm run test:browser",
-      "profile": "staff-local",
-      "route": "/munkatars/beosztas",
+      "profile": "kindergarten-teacher-local",
+      "route": "/teacher/schedule",
       "matrixRows": [
-        "AUTH-STAFF-SCHEDULE-ALLOW",
-        "AUTH-STAFF-MUTATION-DENY",
-        "AUTH-STAFF-SENSITIVE-FIELDS-DENY",
-        "AUTH-STAFF-OUT-OF-SCOPE-DENY"
+        "AUTH-TEACHER-TRACKING-ALLOW",
+        "AUTH-TEACHER-MUTATION-DENY",
+        "AUTH-TEACHER-SENSITIVE-FIELDS-DENY",
+        "AUTH-TEACHER-OUT-OF-SCOPE-DENY"
       ],
       "expected": "PASS",
       "evidence": "browser",
@@ -168,9 +168,9 @@
       "requirementIds": ["FR-LR-10a", "FR-05a", "NFR-08"],
       "target": "local",
       "command": "npm run test:browser",
-      "profile": "kindergarten-admin-local",
+      "profile": "super-admin-local",
       "route": "/admin/archivum",
-      "matrixRows": ["AUTH-KINDERGARTEN-ADMIN-ALLOW"],
+      "matrixRows": ["AUTH-SUPER-ADMIN-ALLOW"],
       "expected": "PASS",
       "evidence": "browser",
       "browsers": ["chromium", "firefox", "mobile-chrome"]
@@ -220,9 +220,9 @@
       "requirementIds": ["FR-LR-10a", "FR-08", "FR-09", "FR-10", "FR-11", "FR-12a"],
       "target": "local",
       "command": "npm run test:browser",
-      "profile": "kindergarten-admin-local",
+      "profile": "super-admin-local",
       "route": "/admin/import",
-      "matrixRows": ["AUTH-KINDERGARTEN-ADMIN-ALLOW", "AUTH-GRP-IMPORT-DENY"],
+      "matrixRows": ["AUTH-SUPER-ADMIN-ALLOW", "AUTH-GRP-IMPORT-DENY"],
       "expected": "PASS",
       "evidence": "browser",
       "browsers": ["chromium", "firefox", "mobile-chrome"]
@@ -233,9 +233,9 @@
       "requirementIds": ["FR-LR-10a", "FR-14", "FR-17"],
       "target": "local",
       "command": "npm run test:browser",
-      "profile": "kindergarten-admin-local",
+      "profile": "super-admin-local",
       "route": "/admin/emlekeztetok",
-      "matrixRows": ["AUTH-KINDERGARTEN-ADMIN-ALLOW"],
+      "matrixRows": ["AUTH-SUPER-ADMIN-ALLOW"],
       "expected": "PASS",
       "evidence": "browser",
       "browsers": ["chromium", "firefox", "mobile-chrome"]
@@ -246,9 +246,9 @@
       "requirementIds": ["FR-LR-10a", "FR-15", "FR-18", "NFR-02a", "NFR-02h"],
       "target": "local",
       "command": "npm run test:browser",
-      "profile": "kindergarten-admin-local",
+      "profile": "super-admin-local",
       "route": "/admin/adatvedelem",
-      "matrixRows": ["AUTH-KINDERGARTEN-ADMIN-ALLOW"],
+      "matrixRows": ["AUTH-SUPER-ADMIN-ALLOW"],
       "expected": "PASS",
       "evidence": "browser",
       "browsers": ["chromium", "firefox", "mobile-chrome"]
@@ -263,7 +263,7 @@
       "route": "/admin/beallitasok",
       "matrixRows": [
         "AUTH-SUPER-ADMIN-ALLOW",
-        "AUTH-KINDERGARTEN-GOVERNANCE-DENY",
+        "AUTH-SUPER-GOVERNANCE-ALLOW",
         "AUTH-IMMEDIATE-REVOCATION-DENY"
       ],
       "expected": "PASS",
@@ -276,9 +276,9 @@
       "requirementIds": ["FR-12", "NFR-03"],
       "target": "local",
       "command": "npm test",
-      "profile": "kindergarten-admin-local",
+      "profile": "super-admin-local",
       "route": "/admin/import",
-      "matrixRows": ["AUTH-KINDERGARTEN-ADMIN-ALLOW"],
+      "matrixRows": ["AUTH-SUPER-ADMIN-ALLOW"],
       "expected": "PASS",
       "evidence": "test"
     },
@@ -292,9 +292,9 @@
       "route": "/",
       "matrixRows": [
         "AUTH-PARENT-UNRELATED-DENY",
-        "AUTH-STAFF-SENSITIVE-FIELDS-DENY",
+        "AUTH-TEACHER-SENSITIVE-FIELDS-DENY",
         "AUTH-GROUP-ADMIN-OUT-OF-SCOPE-DENY",
-        "AUTH-KINDERGARTEN-GOVERNANCE-DENY",
+        "AUTH-NON-SUPER-ADVANCED-DENY",
         "AUTH-IMMEDIATE-REVOCATION-DENY"
       ],
       "expected": "PASS",
@@ -370,9 +370,9 @@
       "requirementIds": ["NFR-08"],
       "target": "local",
       "command": "npm run test:browser",
-      "profile": "staff-local",
-      "route": "/munkatars/beosztas",
-      "matrixRows": ["AUTH-STAFF-SCHEDULE-ALLOW"],
+      "profile": "kindergarten-teacher-local",
+      "route": "/teacher/schedule",
+      "matrixRows": ["AUTH-TEACHER-TRACKING-ALLOW"],
       "expected": "PASS",
       "evidence": "browser",
       "browsers": ["chromium", "firefox", "mobile-chrome"]
@@ -383,9 +383,9 @@
       "requirementIds": ["NFR-08"],
       "target": "local",
       "command": "npm run test:browser",
-      "profile": "kindergarten-admin-local",
+      "profile": "super-admin-local",
       "route": "/admin/archivum",
-      "matrixRows": ["AUTH-KINDERGARTEN-ADMIN-ALLOW"],
+      "matrixRows": ["AUTH-SUPER-ADMIN-ALLOW"],
       "expected": "PASS",
       "evidence": "browser",
       "browsers": ["chromium", "firefox", "mobile-chrome"]
@@ -400,9 +400,9 @@
       "route": "/",
       "matrixRows": [
         "AUTH-PARENT-SENSITIVE-FIELDS-DENY",
-        "AUTH-STAFF-SENSITIVE-FIELDS-DENY",
+        "AUTH-TEACHER-SENSITIVE-FIELDS-DENY",
         "AUTH-GROUP-ADMIN-OUT-OF-SCOPE-DENY",
-        "AUTH-KINDERGARTEN-GOVERNANCE-DENY"
+        "AUTH-NON-SUPER-ADVANCED-DENY"
       ],
       "expected": "PASS",
       "evidence": "manifest"
@@ -413,9 +413,9 @@
       "requirementIds": ["NFR-08"],
       "target": "local",
       "command": "npm run test:browser",
-      "profile": "kindergarten-admin-local",
+      "profile": "super-admin-local",
       "route": "/admin/import",
-      "matrixRows": ["AUTH-KINDERGARTEN-ADMIN-ALLOW"],
+      "matrixRows": ["AUTH-SUPER-ADMIN-ALLOW"],
       "expected": "PASS",
       "evidence": "browser",
       "browsers": ["chromium", "firefox", "mobile-chrome"]
@@ -426,9 +426,9 @@
       "requirementIds": ["NFR-08"],
       "target": "local",
       "command": "npm run test:browser",
-      "profile": "kindergarten-admin-local",
+      "profile": "super-admin-local",
       "route": "/admin/emlekeztetok",
-      "matrixRows": ["AUTH-KINDERGARTEN-ADMIN-ALLOW"],
+      "matrixRows": ["AUTH-SUPER-ADMIN-ALLOW"],
       "expected": "PASS",
       "evidence": "browser",
       "browsers": ["chromium", "firefox", "mobile-chrome"]
@@ -439,9 +439,9 @@
       "requirementIds": ["NFR-08"],
       "target": "local",
       "command": "npm run test:browser",
-      "profile": "kindergarten-admin-local",
+      "profile": "super-admin-local",
       "route": "/admin/adatvedelem",
-      "matrixRows": ["AUTH-KINDERGARTEN-ADMIN-ALLOW"],
+      "matrixRows": ["AUTH-SUPER-ADMIN-ALLOW"],
       "expected": "PASS",
       "evidence": "browser",
       "browsers": ["chromium", "firefox", "mobile-chrome"]
@@ -490,9 +490,9 @@
       "requirementIds": ["FR-LR-10b"],
       "target": "linked-target",
       "command": "future linked-target suite",
-      "profile": "kindergarten-admin-local",
+      "profile": "super-admin-local",
       "route": "/admin/import",
-      "matrixRows": ["AUTH-KINDERGARTEN-ADMIN-ALLOW"],
+      "matrixRows": ["AUTH-SUPER-ADMIN-ALLOW"],
       "expected": "OUTSTANDING",
       "evidence": "linked-target"
     },
@@ -502,9 +502,9 @@
       "requirementIds": ["FR-LR-10b"],
       "target": "linked-target",
       "command": "future linked-target suite",
-      "profile": "kindergarten-admin-local",
+      "profile": "super-admin-local",
       "route": "/admin/emlekeztetok",
-      "matrixRows": ["AUTH-KINDERGARTEN-ADMIN-ALLOW"],
+      "matrixRows": ["AUTH-SUPER-ADMIN-ALLOW"],
       "expected": "OUTSTANDING",
       "evidence": "linked-target"
     },

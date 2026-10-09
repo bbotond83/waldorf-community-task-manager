@@ -637,29 +637,29 @@ nav a:hover {
   color: white;
 }
 
-.staff-page {
+.teacher-page {
   padding-block: clamp(1.5rem, 4vw, 3rem);
 }
 
-.staff-page > header {
+.teacher-page > header {
   margin-block: 1rem 1.5rem;
 }
 
-.staff-filter,
-.staff-state,
-.staff-card,
-.staff-detail-grid > div {
+.teacher-filter,
+.teacher-state,
+.teacher-card,
+.teacher-detail-grid > div {
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
   background: var(--color-surface);
 }
 
-.staff-filter {
+.teacher-filter {
   margin-block: 1rem;
   padding: 1rem;
 }
 
-.staff-filter fieldset {
+.teacher-filter fieldset {
   display: grid;
   grid-template-columns: auto minmax(9rem, 1fr) auto minmax(9rem, 1fr);
   align-items: end;
@@ -669,20 +669,20 @@ nav a:hover {
   border: 0;
 }
 
-.staff-filter legend {
+.teacher-filter legend {
   grid-column: 1 / -1;
   margin-bottom: 0.25rem;
   font-size: 1.15rem;
   font-weight: 750;
 }
 
-.staff-filter label,
-.staff-detail-grid dt {
+.teacher-filter label,
+.teacher-detail-grid dt {
   font-weight: 750;
 }
 
-.staff-filter select,
-.staff-filter input {
+.teacher-filter select,
+.teacher-filter input {
   width: 100%;
   min-width: 0;
   min-height: 44px;
@@ -692,14 +692,14 @@ nav a:hover {
   font: inherit;
 }
 
-.staff-filter button,
-.staff-filter a {
+.teacher-filter button,
+.teacher-filter a {
   display: inline-flex;
   align-items: center;
   justify-content: center;
 }
 
-.staff-table-wrapper {
+.teacher-table-wrapper {
   position: relative;
   overflow-x: auto;
   border: 1px solid var(--color-border);
@@ -707,82 +707,82 @@ nav a:hover {
   background: var(--color-surface);
 }
 
-.staff-table {
+.teacher-table {
   width: 100%;
   border-collapse: collapse;
 }
 
-.staff-table caption {
+.teacher-table caption {
   padding: 1rem;
   font-weight: 750;
   text-align: left;
 }
 
-.staff-table th,
-.staff-table td {
+.teacher-table th,
+.teacher-table td {
   padding: 0.85rem;
   border-top: 1px solid var(--color-border);
   text-align: left;
   vertical-align: top;
 }
 
-.staff-table a,
-.staff-card a,
-.staff-state a,
-.staff-page > a {
+.teacher-table a,
+.teacher-card a,
+.teacher-state a,
+.teacher-page > a {
   display: inline-flex;
   align-items: center;
   padding-inline: 0.3rem;
 }
 
-.staff-card-list {
+.teacher-card-list {
   display: none;
   gap: 1rem;
   padding: 0;
   list-style: none;
 }
 
-.staff-card {
+.teacher-card {
   min-width: 0;
   padding: 1rem;
 }
 
-.staff-card h2 {
+.teacher-card h2 {
   margin-top: 0;
 }
 
-.staff-card dl,
-.staff-detail-grid {
+.teacher-card dl,
+.teacher-detail-grid {
   display: grid;
   gap: 1rem;
 }
 
-.staff-card dl div,
-.staff-detail-grid > div {
+.teacher-card dl div,
+.teacher-detail-grid > div {
   min-width: 0;
 }
 
-.staff-card dt,
-.staff-detail-grid dt {
+.teacher-card dt,
+.teacher-detail-grid dt {
   font-weight: 750;
 }
 
-.staff-card dd,
-.staff-detail-grid dd {
+.teacher-card dd,
+.teacher-detail-grid dd {
   margin: 0.25rem 0 0;
 }
 
-.staff-detail-grid {
+.teacher-detail-grid {
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
   margin-block: 1rem;
 }
 
-.staff-detail-grid > div,
-.staff-state {
+.teacher-detail-grid > div,
+.teacher-state {
   padding: 1rem;
 }
 
-.staff-state-error {
+.teacher-state-error {
   border-left: 0.35rem solid var(--color-primary);
   background: #fff1ed;
 }
@@ -828,15 +828,15 @@ nav a:hover {
     width: 100%;
   }
 
-  .staff-filter fieldset {
+  .teacher-filter fieldset {
     grid-template-columns: 1fr;
   }
 
-  .staff-table-wrapper {
+  .teacher-table-wrapper {
     display: none;
   }
 
-  .staff-card-list {
+  .teacher-card-list {
     display: grid;
   }
 }
@@ -848,4 +848,10 @@ nav a:hover {
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+.teacher-table td,
+.teacher-card dd,
+.teacher-detail-grid dd {
+  overflow-wrap: anywhere;
 }

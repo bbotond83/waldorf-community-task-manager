@@ -179,7 +179,7 @@ it("renders role layout, denial and configuration error", async () => {
   const Layout = (await import("../../app/szulo/layout.tsx")).default;
   signIn("parent-local");
   expect(html(await Layout({ children: "Owned child" }))).toContain("Owned child");
-  signIn("staff-local");
+  signIn("kindergarten-teacher-local");
   expect(html(await Layout({ children: "Owned child" }))).not.toContain("Owned child");
   vi.stubEnv("APP_RUNTIME_MODE", "invalid");
   expect(html(await Layout({ children: "Owned child" }))).not.toContain("Owned child");

@@ -1,0 +1,28 @@
+{
+  "stage": "nfr-requirements",
+  "unit": "u2-teacher-tracking",
+  "upstream_ids": [
+    "NFR1",
+    "NFR2",
+    "NFR3"
+  ],
+  "coverage": [
+    {
+      "id": "NFR1",
+      "status": "OK",
+      "target": "NFR1.21, NFR1.22, NFR1.23, NFR1.24, NFR1.25, NFR1.26, NFR1.27, NFR1.28, NFR1.29, NFR1.30"
+    },
+    {
+      "id": "NFR2",
+      "status": "OK",
+      "target": "NFR2.21, NFR2.22, NFR2.23, NFR2.24, NFR2.25, NFR2.26, NFR2.27"
+    },
+    {
+      "id": "NFR3",
+      "status": "OK",
+      "target": "NFR3.21, NFR3.22, NFR3.23"
+    }
+  ],
+  "reverse": []
+}
+

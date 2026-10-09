@@ -28,6 +28,7 @@ const commands = [
   { key: "lint", args: ["run", "lint"] },
   { key: "typecheck", args: ["run", "typecheck"] },
   { key: "tests", args: ["test"] },
+  { key: "database-roles", args: ["run", "test:database:roles"] },
   { key: "coverage", args: ["run", "test:coverage"] },
   { key: "security", args: ["run", "verify:security"] },
   { key: "build", args: ["run", "build"] },

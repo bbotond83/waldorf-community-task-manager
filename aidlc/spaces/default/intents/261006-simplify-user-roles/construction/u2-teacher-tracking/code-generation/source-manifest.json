@@ -1,0 +1,190 @@
+{
+  "stage": "code-generation",
+  "unit": "u2-teacher-tracking",
+  "version": 1,
+  "writes": [
+    {
+      "path": ".gitignore"
+    },
+    {
+      "path": "app/globals.css"
+    },
+    {
+      "path": "app/munkatars/_components/FocusedStateSection.tsx"
+    },
+    {
+      "path": "app/munkatars/_components/StaffAccessState.tsx"
+    },
+    {
+      "path": "app/munkatars/_components/StaffStatePanel.tsx"
+    },
+    {
+      "path": "app/munkatars/_lib/facade.ts"
+    },
+    {
+      "path": "app/munkatars/_lib/filters.ts"
+    },
+    {
+      "path": "app/munkatars/_lib/session.ts"
+    },
+    {
+      "path": "app/munkatars/beosztas/"
+    },
+    {
+      "path": "app/munkatars/error.tsx"
+    },
+    {
+      "path": "app/munkatars/layout.tsx"
+    },
+    {
+      "path": "app/munkatars/loading.tsx"
+    },
+    {
+      "path": "app/teacher/_components/FocusedStateSection.tsx"
+    },
+    {
+      "path": "app/teacher/_components/TeacherAccessState.tsx"
+    },
+    {
+      "path": "app/teacher/_components/TeacherStatePanel.tsx"
+    },
+    {
+      "path": "app/teacher/_lib/compatibility.ts"
+    },
+    {
+      "path": "app/teacher/_lib/facade.ts"
+    },
+    {
+      "path": "app/teacher/_lib/filters.ts"
+    },
+    {
+      "path": "app/teacher/_lib/session.ts"
+    },
+    {
+      "path": "app/teacher/error.tsx"
+    },
+    {
+      "path": "app/teacher/layout.tsx"
+    },
+    {
+      "path": "app/teacher/loading.tsx"
+    },
+    {
+      "path": "app/teacher/schedule/"
+    },
+    {
+      "path": "src/application/contracts.ts"
+    },
+    {
+      "path": "src/application/facade-pipeline.ts"
+    },
+    {
+      "path": "src/application/facades.test.ts"
+    },
+    {
+      "path": "src/application/index.ts"
+    },
+    {
+      "path": "src/application/isolation.test.ts"
+    },
+    {
+      "path": "src/application/staff-facade.ts"
+    },
+    {
+      "path": "src/application/teacher-facade.test.ts"
+    },
+    {
+      "path": "src/application/teacher-facade.ts"
+    },
+    {
+      "path": "src/staff-schedule/index.ts"
+    },
+    {
+      "path": "src/staff-schedule/schedule-service.test.ts"
+    },
+    {
+      "path": "src/staff-schedule/schedule-service.ts"
+    },
+    {
+      "path": "src/staff-web/index.ts"
+    },
+    {
+      "path": "src/staff-web/synthetic-staff.test.ts"
+    },
+    {
+      "path": "src/staff-web/synthetic-staff.ts"
+    },
+    {
+      "path": "src/teacher-tracking/index.ts"
+    },
+    {
+      "path": "src/teacher-tracking/schedule-service.test.ts"
+    },
+    {
+      "path": "src/teacher-tracking/schedule-service.ts"
+    },
+    {
+      "path": "src/teacher-tracking/tracking-model.test.ts"
+    },
+    {
+      "path": "src/teacher-tracking/tracking-model.ts"
+    },
+    {
+      "path": "src/teacher-web/index.ts"
+    },
+    {
+      "path": "src/teacher-web/synthetic-teacher-repository.test.ts"
+    },
+    {
+      "path": "src/teacher-web/synthetic-teacher-repository.ts"
+    },
+    {
+      "path": "src/teacher-web/synthetic-teacher.test.ts"
+    },
+    {
+      "path": "src/teacher-web/synthetic-teacher.ts"
+    },
+    {
+      "path": "tests/browser/runtime-foundation.spec.ts"
+    },
+    {
+      "path": "tests/browser/staff-web.spec.ts"
+    },
+    {
+      "path": "tests/browser/support/profile-login-measurement.ts"
+    },
+    {
+      "path": "tests/browser/teacher-web.spec.ts"
+    },
+    {
+      "path": "tests/coverage/app-entrypoints.test.tsx"
+    },
+    {
+      "path": "tests/coverage/app-session-boundaries.test.ts"
+    },
+    {
+      "path": "tests/coverage/production-inventory.test.ts"
+    },
+    {
+      "path": "tests/coverage/staff-pages.test.tsx"
+    },
+    {
+      "path": "tests/coverage/teacher-pages.test.tsx"
+    },
+    {
+      "path": "tests/integration/staff-components.test.tsx"
+    },
+    {
+      "path": "tests/integration/teacher-boundaries.test.ts"
+    },
+    {
+      "path": "tests/integration/teacher-components.test.tsx"
+    },
+    {
+      "path": "tests/integration/teacher-routes.test.ts"
+    },
+    {
+      "path": "tests/unit/teacher-filters.test.ts"
+    }
+  ]
+}

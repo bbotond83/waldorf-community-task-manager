@@ -3,9 +3,8 @@ import type { NavigationItem } from "../../application/index.ts";
 
 export const syntheticProfileIdSchema = z.enum([
   "parent-local",
-  "staff-local",
+  "kindergarten-teacher-local",
   "group-admin-local",
-  "kindergarten-admin-local",
   "super-admin-local",
 ]);
 
@@ -15,7 +14,7 @@ export type { NavigationItem } from "../../application/index.ts";
 
 export type SyntheticProfile = {
   id: SyntheticProfileId;
-  role: "parent" | "staff" | "group-admin" | "kindergarten-admin" | "super-admin";
+  role: "parent" | "kindergarten-teacher" | "group-admin" | "super-admin";
   label: string;
   scopeSummary: string;
   authorizationVersion: number;
@@ -28,8 +27,8 @@ const parentNavigation: readonly NavigationItem[] = [
   { id: "parent-notifications", label: "Értesítések", href: "/szulo/ertesitesek" },
 ];
 
-const staffNavigation: readonly NavigationItem[] = [
-  { id: "staff-schedule", label: "Beosztás", href: "/munkatars/beosztas" },
+const kindergartenTeacherNavigation: readonly NavigationItem[] = [
+  { id: "teacher-tracking", label: "Beosztás", href: "/teacher/schedule" },
 ];
 
 const groupAdminNavigation: readonly NavigationItem[] = [
@@ -58,13 +57,13 @@ export const SYNTHETIC_PROFILES: readonly SyntheticProfile[] = Object.freeze([
     navigation: parentNavigation,
   },
   {
-    id: "staff-local",
-    role: "staff",
-    label: "Munkatárs (csak olvasás)",
+    id: "kindergarten-teacher-local",
+    role: "kindergarten-teacher",
+    label: "Óvónő",
     scopeSummary: "Egy kitalált csoport beosztása, módosítás nélkül",
     authorizationVersion: 1,
-    homePath: "/munkatars/beosztas",
-    navigation: staffNavigation,
+    homePath: "/teacher/schedule",
+    navigation: kindergartenTeacherNavigation,
   },
   {
     id: "group-admin-local",
@@ -74,15 +73,6 @@ export const SYNTHETIC_PROFILES: readonly SyntheticProfile[] = Object.freeze([
     authorizationVersion: 1,
     homePath: "/admin",
     navigation: groupAdminNavigation,
-  },
-  {
-    id: "kindergarten-admin-local",
-    role: "kindergarten-admin",
-    label: "Óvodaadminisztrátor",
-    scopeSummary: "A kitalált óvoda teljes működési köre",
-    authorizationVersion: 1,
-    homePath: "/admin",
-    navigation: organizationAdminNavigation,
   },
   {
     id: "super-admin-local",

@@ -27,9 +27,8 @@ export type AdminSessionResult =
 
 const ROLE_BY_PROFILE: Readonly<Record<SyntheticProfile["role"], Role>> = {
   parent: "parent",
-  staff: "read_only_staff",
+  "kindergarten-teacher": "kindergarten_teacher",
   "group-admin": "group_admin",
-  "kindergarten-admin": "kindergarten_admin",
   "super-admin": "super_admin",
 };
 
@@ -54,20 +53,13 @@ export async function resolveAdminSession(): Promise<AdminSessionResult> {
     data: {
       profile: withCoreNavigation(session.profile),
       scope,
-      applicationSession: {
-        subjectId: session.profile.id,
-        authorizationVersion: session.authorizationVersion,
-        roles: [role],
-        scopes: [scope],
-        runtimeMode: "synthetic",
-        isSynthetic: true,
-      },
+      applicationSession: session.actor,
     },
   };
 }
 
-function isAdministrator(role: Role): role is "group_admin" | "kindergarten_admin" | "super_admin" {
-  return role === "group_admin" || role === "kindergarten_admin" || role === "super_admin";
+function isAdministrator(role: Role): role is "group_admin" | "super_admin" {
+  return role === "group_admin" || role === "super_admin";
 }
 
 function scopeForProfile(profile: SyntheticProfile): Scope {

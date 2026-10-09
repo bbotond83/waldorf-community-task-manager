@@ -1,0 +1,14 @@
+{
+  "stage": "domain-design",
+  "upstream_ids": ["US1.1", "US2.1", "US2.2", "US3.1", "US3.2", "US3.3", "US4.1", "US4.2"],
+  "coverage": [
+    { "id": "US1.1", "status": "OK", "target": "Runtime" },
+    { "id": "US2.1", "status": "OK", "target": "KindergartenTeacherTracking" },
+    { "id": "US2.2", "status": "OK", "target": "Access" },
+    { "id": "US3.1", "status": "OK", "target": "Access" },
+    { "id": "US3.2", "status": "OK", "target": "Access" },
+    { "id": "US3.3", "status": "OK", "target": "Runtime" },
+    { "id": "US4.1", "status": "OK", "target": "AdminExperience" },
+    { "id": "US4.2", "status": "OK", "target": "Directory" }
+  ]
+}

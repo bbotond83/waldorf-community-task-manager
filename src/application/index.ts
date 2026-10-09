@@ -25,8 +25,8 @@ export {
   UnsafeProjectionError,
 } from "./projection.ts";
 export * from "./results.ts";
-export { StaffApplicationFacade } from "./staff-facade.ts";
-export type { StaffApplicationPort } from "./staff-facade.ts";
+export { TeacherApplicationFacade } from "./teacher-facade.ts";
+export type { TeacherApplicationPort } from "./teacher-facade.ts";
 export { SessionApplicationFacade } from "./session-facade.ts";
 export type { SessionGateway } from "./session-facade.ts";
 export type * from "./contracts.ts";

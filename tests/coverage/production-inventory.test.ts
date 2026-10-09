@@ -72,7 +72,7 @@ describe("honest executable denominator", () => {
     ).toBe(1);
     expect(validateProductionCoverage({ "./src/example.ts": counter }, [runtime]).measured).toBe(1);
   });
-  it("discovers all application/scripts and separates tests/declarations", () => {
+  it("U2 teacher inventory discovers all application/scripts and separates tests/declarations", () => {
     const inventory = discoverProduction();
     expect(inventory.some((entry) => entry.path === "scripts/validate-runtime-config.ts")).toBe(
       true,
@@ -81,6 +81,17 @@ describe("honest executable denominator", () => {
     expect(
       inventory.some((entry) => entry.path.includes(".test.") || entry.path.endsWith(".d.ts")),
     ).toBe(false);
-    expect(inventory.length).toBe(141);
+    expect(inventory.length).toBe(151);
+    expect(inventory.some((entry) => entry.path === "scripts/verification/current-role-database.ts")).toBe(true);
+    for (const path of ["src/teacher-tracking/tracking-model.ts", "src/teacher-web/synthetic-teacher-repository.ts", "app/teacher/_lib/compatibility.ts", "app/munkatars/beosztas/route.ts", "app/munkatars/beosztas/[id]/route.ts"]) expect(inventory.some(entry => entry.path === path)).toBe(true);
+    expect(inventory.some(entry => entry.path.startsWith("src/staff-") || entry.path === "src/application/staff-facade.ts")).toBe(false);
+    for (const path of [
+      "src/access/role-policy.ts",
+      "src/access/legacy-role-conversion.ts",
+      "src/access/session-grants.ts",
+      "src/runtime/synthetic/access-state.ts",
+    ]) {
+      expect(inventory.some((entry) => entry.path === path)).toBe(true);
+    }
   });
 });

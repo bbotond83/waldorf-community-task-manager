@@ -1,3 +1,4 @@
+import { currentSyntheticActor } from "../runtime/synthetic/access-state.ts";
 import type { Scope } from "../access/index.ts";
 import {
   FacadePipeline,
@@ -400,12 +401,5 @@ export function createSyntheticParentSessionFacade(
 function parentApplicationSession(): SessionContext | undefined {
   const profile = getSyntheticProfile("parent-local");
   if (!profile) return undefined;
-  return Object.freeze({
-    subjectId: profile.id,
-    authorizationVersion: profile.authorizationVersion,
-    roles: ["parent"] as const,
-    scopes: [PARENT_FAMILY_SCOPE],
-    runtimeMode: "synthetic",
-    isSynthetic: true,
-  });
+  return currentSyntheticActor(profile.id);
 }

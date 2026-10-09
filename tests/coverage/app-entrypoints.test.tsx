@@ -119,5 +119,12 @@ it("resets synthetic fixtures and hides routes outside synthetic mode", async ()
   expect((await reset(request("parent-local", "https://invented.invalid"))).status).toBe(403);
   vi.stubEnv("APP_RUNTIME_MODE", "invalid");
   expect((await reset(request("parent-local"))).status).toBe(404);
-  expect((await select(request("parent-local"))).status).toBe(404);
+  expect((await select(request("parent-local"))).status).toBe(503);
+});
+
+it("Teacher compatibility handlers are fixed redirects without session creation", async () => {
+ const { GET } = await import("../../app/munkatars/beosztas/route.ts");
+ const response = GET(new Request("http://local/munkatars/beosztas?scenario=terminal&returnTo=https://evil"));
+ expect(response.status).toBe(307); expect(response.headers.get("location")).toBe("/teacher/schedule");
+ expect(response.headers.get("set-cookie")).toBeNull(); expect(await response.text()).toBe("");
 });

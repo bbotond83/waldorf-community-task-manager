@@ -92,3 +92,14 @@ describe("verification manifests", () => {
     expect(() => validateEvidence(record, scenarios, root)).toThrow(/cannot upgrade/);
   });
 });
+
+describe("current four-role manifest contract", () => {
+  it("uses current teacher and Super rows instead of obsolete allowed roles", () => {
+    const current = validateManifests();
+    expect(current.every((s) => !/staff-local|kindergarten-admin-local/.test(s.profile))).toBe(
+      true,
+    );
+    expect(current.some((s) => s.matrixRows.includes("AUTH-SUPER-GOVERNANCE-ALLOW"))).toBe(true);
+    expect(current.some((s) => s.matrixRows.includes("AUTH-NON-SUPER-ADVANCED-DENY"))).toBe(true);
+  });
+});

@@ -36,7 +36,12 @@ export class SessionApplicationFacade {
   async resolve(sessionReference: string): Promise<ApplicationResult<SessionContext>> {
     try {
       const session = await this.gateway.resolve(sessionReference);
-      return session ? success(session, "SESSION_RESOLVED") : denied("SESSION_REQUIRED");
+      if (!session) return denied("SESSION_REQUIRED");
+      const navigation = await this.authorization.navigation(session);
+      if (navigation.state === "success") return success(session, "SESSION_RESOLVED");
+      return navigation.state === "recovery"
+        ? terminalFailure("SESSION_DEPENDENCY_FAILURE")
+        : navigation;
     } catch {
       return terminalFailure("SESSION_DEPENDENCY_FAILURE");
     }
@@ -91,9 +96,12 @@ export class SessionApplicationFacade {
         operation === "select"
           ? await this.gateway.selectSynthetic(profileId)
           : await this.gateway.switchSynthetic(profileId);
-      return session
-        ? success(session, "SYNTHETIC_SESSION_READY")
-        : denied("PROFILE_NOT_AVAILABLE");
+      if (!session) return denied("PROFILE_NOT_AVAILABLE");
+      const navigation = await this.authorization.navigation(session);
+      if (navigation.state === "success") return success(session, "SYNTHETIC_SESSION_READY");
+      return navigation.state === "recovery"
+        ? terminalFailure("SESSION_DEPENDENCY_FAILURE")
+        : navigation;
     } catch {
       return terminalFailure("SESSION_DEPENDENCY_FAILURE");
     }

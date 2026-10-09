@@ -1,3 +1,5 @@
+import { currentSyntheticActor } from "../synthetic/access-state.ts";
+import type { SessionContext as ApplicationSession } from "../../application/contracts.ts";
 import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import { z } from "zod";
 import { getSyntheticProfile, type SyntheticProfile } from "../synthetic/profiles.ts";
@@ -15,6 +17,7 @@ const sessionPayloadSchema = z.object({
 
 export type SessionContext = {
   profile: SyntheticProfile;
+  actor: ApplicationSession;
   authorizationVersion: number;
   issuedAt: number;
 };
@@ -34,9 +37,11 @@ function hasValidSignature(payload: string, signature: string, secret: string): 
 }
 
 export function createSyntheticSessionToken(profile: SyntheticProfile, now = Date.now()): string {
+  const actor = currentSyntheticActor(profile.id);
+  if (!actor) throw new Error("SYNTHETIC_PROFILE_INVALID");
   const payload = encodeJson({
     profileId: profile.id,
-    authorizationVersion: profile.authorizationVersion,
+    authorizationVersion: actor.authorizationVersion,
     issuedAt: now,
     nonce: randomBytes(16).toString("hex"),
   });
@@ -62,16 +67,22 @@ export function resolveSyntheticSession(
     const parsed = sessionPayloadSchema.safeParse(
       JSON.parse(Buffer.from(payload, "base64url").toString("utf8")),
     );
-    if (!parsed.success || now - parsed.data.issuedAt > SESSION_MAX_AGE_SECONDS * 1000) {
+    if (
+      !parsed.success ||
+      parsed.data.issuedAt > now ||
+      now - parsed.data.issuedAt > SESSION_MAX_AGE_SECONDS * 1000
+    ) {
       return undefined;
     }
 
     const profile = getSyntheticProfile(parsed.data.profileId);
-    if (!profile || profile.authorizationVersion !== parsed.data.authorizationVersion) {
+    const actor = profile && currentSyntheticActor(profile.id);
+    if (!profile || !actor || actor.authorizationVersion !== parsed.data.authorizationVersion) {
       return undefined;
     }
     return {
       profile,
+      actor,
       authorizationVersion: parsed.data.authorizationVersion,
       issuedAt: parsed.data.issuedAt,
     };

@@ -1,0 +1,135 @@
+{
+  "stage": "code-generation",
+  "unit": "u3-retained-workflows-cleanup",
+  "upstream_ids": [
+    "AC4.1.1",
+    "AC4.1.2",
+    "AC4.1.3",
+    "AC4.1.4",
+    "AC4.2.1",
+    "AC4.2.2",
+    "AC4.2.3",
+    "AC4.2.4",
+    "FR1",
+    "FR2",
+    "FR3",
+    "FR4",
+    "FR5",
+    "FR11",
+    "FR12",
+    "FR13",
+    "FR14",
+    "FR15",
+    "NFR1",
+    "NFR3",
+    "NFR2"
+  ],
+  "coverage": [
+    {
+      "id": "AC4.1.1",
+      "status": "OK",
+      "target": "tests/integration/retained-workflows.test.ts"
+    },
+    {
+      "id": "AC4.1.2",
+      "status": "OK",
+      "target": "src/application/admin-facade.test.ts"
+    },
+    {
+      "id": "AC4.1.3",
+      "status": "OK",
+      "target": "tests/integration/retained-workflows.test.ts"
+    },
+    {
+      "id": "AC4.1.4",
+      "status": "OK",
+      "target": "src/application/admin-facade.test.ts"
+    },
+    {
+      "id": "AC4.2.1",
+      "status": "OK",
+      "target": "tests/unit/current-role-references.test.ts"
+    },
+    {
+      "id": "AC4.2.2",
+      "status": "OK",
+      "target": "src/import-migration/import-service.test.ts"
+    },
+    {
+      "id": "AC4.2.3",
+      "status": "OK",
+      "target": "tests/integration/retained-workflows.test.ts"
+    },
+    {
+      "id": "AC4.2.4",
+      "status": "OK",
+      "target": "tests/unit/current-role-references.test.ts"
+    },
+    {
+      "id": "FR1",
+      "status": "OK",
+      "target": "scripts/verification/core.ts"
+    },
+    {
+      "id": "FR2",
+      "status": "OK",
+      "target": "verification/AUTHORIZATION.md"
+    },
+    {
+      "id": "FR3",
+      "status": "OK",
+      "target": "tests/integration/retained-workflows.test.ts"
+    },
+    {
+      "id": "FR4",
+      "status": "OK",
+      "target": "src/admin-experience/admin-service.test.ts"
+    },
+    {
+      "id": "FR5",
+      "status": "OK",
+      "target": "tests/integration/retained-workflows.test.ts"
+    },
+    {
+      "id": "FR11",
+      "status": "OK",
+      "target": "tests/integration/retained-workflows.test.ts"
+    },
+    {
+      "id": "FR12",
+      "status": "OK",
+      "target": "src/application/admin-facade.test.ts"
+    },
+    {
+      "id": "FR13",
+      "status": "OK",
+      "target": "tests/coverage/verification-entrypoints.test.ts"
+    },
+    {
+      "id": "FR14",
+      "status": "OK",
+      "target": "tests/unit/current-role-references.test.ts"
+    },
+    {
+      "id": "FR15",
+      "status": "OK",
+      "target": "src/import-migration/import-service.test.ts"
+    },
+    {
+      "id": "NFR1",
+      "status": "OK",
+      "target": "src/application/admin-facade.test.ts"
+    },
+    {
+      "id": "NFR3",
+      "status": "OK",
+      "target": "tests/browser/admin-advanced.spec.ts"
+    },
+    {
+      "id": "NFR2",
+      "status": "OK",
+      "target": "tests/coverage/verification-entrypoints.test.ts"
+    }
+  ],
+  "reverse": []
+}

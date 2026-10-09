@@ -1,0 +1,271 @@
+import { beforeEach, expect, it } from "vitest";
+import {
+  AccessService,
+  InMemoryAccessTransaction,
+  InMemoryAuditWriter,
+  InMemoryRoleGrantRepository,
+  InMemoryUserRepository,
+  type Scope,
+  type Role,
+} from "../../src/access/index.ts";
+import { convertLegacyRoles } from "../../src/access/legacy-role-conversion.ts";
+import { sessionGrantBindings } from "../../src/access/session-grants.ts";
+import {
+  AuthorizationContract,
+  InMemoryAuthorizationVersions,
+  type SessionContext,
+} from "../../src/application/index.ts";
+import { AdminExperienceService } from "../../src/admin-experience/admin-service.ts";
+import {
+  createSyntheticParentFacade,
+  PARENT_FAMILY_ID,
+  PARENT_FAMILY_SCOPE,
+  resetSyntheticParentState,
+} from "../../src/parent-web/index.ts";
+import {
+  createSyntheticAdminFacade,
+  SyntheticAdminPort,
+  resetSyntheticAdminFixtures,
+} from "../../src/admin-core/synthetic-admin.ts";
+import {
+  createSyntheticAdvancedAdminFacade,
+  resetSyntheticAdvancedFixtures,
+} from "../../src/admin-advanced/synthetic-advanced.ts";
+const group: Scope = { id: "group-boroka", type: "group", organizationId: "org-napsugar" };
+const org: Scope = { id: "org-napsugar", type: "organization", organizationId: "org-napsugar" };
+function session(role: Role, scope: Scope, id = "actor"): SessionContext {
+  return {
+    subjectId: id,
+    authorizationVersion: 1,
+    ...sessionGrantBindings(id, role, [scope]),
+    roles: [role],
+    scopes: [scope],
+    runtimeMode: "synthetic",
+    isSynthetic: true,
+  };
+}
+function authorization(id = "actor") {
+  return new AuthorizationContract(new InMemoryAuthorizationVersions({ [id]: 1 }));
+}
+beforeEach(() => {
+  resetSyntheticParentState();
+  resetSyntheticAdminFixtures();
+  resetSyntheticAdvancedFixtures();
+});
+it("Parent own participation requests and notifications remain permitted while other family denies", async () => {
+  const actor = session("parent", PARENT_FAMILY_SCOPE, "parent-local");
+  const app = createSyntheticParentFacade(authorization(actor.subjectId));
+  const own = { familyScope: PARENT_FAMILY_SCOPE, familyId: PARENT_FAMILY_ID };
+  expect((await app.listDuties(actor, own)).state).toBe("success");
+  const signup = {
+    ...own,
+    dutyId: "duty-garden",
+    expectedVersion: 1,
+    idempotencyKey: "signup:retained:1",
+  };
+  const first = await app.signUp(actor, signup);
+  expect(first.state).toBe("success");
+  expect(await app.signUp(actor, signup)).toEqual(first);
+  expect(
+    (
+      await app.requestSwap(actor, {
+        ...own,
+        assignmentId: "assignment-lampas",
+        counterpartId: "assignment-counterpart",
+        expectedVersion: 4,
+        idempotencyKey: "swap:retained:1",
+      })
+    ).state,
+  ).toBe("success");
+  expect((await app.listNotifications(actor, PARENT_FAMILY_SCOPE)).state).toBe("success");
+  expect(
+    (
+      await app.markNotificationRead(actor, {
+        familyScope: PARENT_FAMILY_SCOPE,
+        notificationId: "notice-7-day",
+        idempotencyKey: "notice:retained:1",
+      })
+    ).state,
+  ).toBe("success");
+  const before = await app.listDuties(actor, own);
+  const denied = await app.signUp(actor, {
+    ...signup,
+    familyScope: { ...PARENT_FAMILY_SCOPE, id: "other" },
+    familyId: "other",
+    idempotencyKey: "signup:other:1",
+  });
+  expect(denied.state).toBe("denied");
+  expect(denied).not.toHaveProperty("data");
+  expect(await app.listDuties(actor, own)).toEqual(before);
+});
+it("Group core fixtures preserve records and permit assignments while ungranted scopes deny", async () => {
+  const actor = session("group_admin", group);
+  const app = createSyntheticAdminFacade(authorization());
+  const before = await app.listRecords(actor, group);
+  expect(before.state).toBe("success");
+  expect(
+    (
+      await app.assign(actor, {
+        scope: group,
+        id: "task-kert",
+        expectedVersion: 1,
+        idempotencyKey: "assign:retained:1",
+        payload: { scenario: "eligible" },
+      })
+    ).state,
+  ).toBe("success");
+  expect((await app.listRecords(actor, { ...group, id: "other" })).state).toBe("denied");
+  expect((await app.getRecord(actor, group, "family", "family-napraforgo")).state).toBe("denied");
+  expect(await app.listRecords(actor, group)).toEqual(before);
+});
+it("real Access dispatch permits Group record approval archive and denies advanced without mutation", () => {
+  const actor = session("group_admin", group);
+  const users = new InMemoryUserRepository([
+    { id: actor.subjectId, isActive: true, authorizationVersion: 1 },
+  ]);
+  const grants = new InMemoryRoleGrantRepository([...actor.grants]);
+  const audit = new InMemoryAuditWriter();
+  const access = new AccessService(users, grants, audit);
+  const writes: string[] = [];
+  const service = new AdminExperienceService(
+    { listQueue: () => [], findSchoolYear: () => undefined },
+    access,
+    {
+      execute: (_a, _s, op) => {
+        writes.push(op);
+        return true;
+      },
+    },
+  );
+  const before = grants.list();
+  for (const op of ["record", "approval", "archive"] as const)
+    expect(service.operate(actor, group, op).state).toBe("ready");
+  for (const op of ["role", "import", "privacy"] as const)
+    expect(service.operate(actor, group, op).state).toBe("denied");
+  expect(service.operate(actor, { ...group, id: "other" }, "record").state).toBe("denied");
+  expect(writes).toEqual(["record", "approval", "archive"]);
+  expect(grants.list()).toEqual(before);
+  expect(JSON.stringify(audit.events)).not.toMatch(/email|phone|protected.?reason/);
+});
+it("Super current organization retains import reminders privacy settings and governance", async () => {
+  const actor = session("super_admin", org, "super-admin-local");
+  const app = createSyntheticAdvancedAdminFacade(
+    authorization(actor.subjectId),
+    new SyntheticAdminPort(),
+  );
+  for (const result of [
+    await app.import.status(actor, org),
+    await app.reminders.list(actor, org),
+    await app.lifecycle.list(actor, org),
+    await app.settings.get(actor, org),
+    await app.governance.list(actor, org),
+  ])
+    expect(["success", "empty"]).toContain(result.state);
+  const wrong = { ...org, id: "other", organizationId: "other" };
+  expect((await app.settings.get(actor, wrong)).state).toBe("denied");
+});
+it("all non-Super advanced requests deny and leave authorized advanced snapshots unchanged", async () => {
+  const versions = new InMemoryAuthorizationVersions({ actor: 1, "super-admin-local": 1 });
+  const app = createSyntheticAdvancedAdminFacade(
+    new AuthorizationContract(versions),
+    new SyntheticAdminPort(),
+  );
+  const admin = session("super_admin", org, "super-admin-local");
+  const before = await app.governance.list(admin, org);
+  for (const [role, scope] of [
+    ["parent", PARENT_FAMILY_SCOPE],
+    ["kindergarten_teacher", group],
+    ["group_admin", group],
+  ] as const) {
+    const actor = session(role, scope);
+    const command = {
+      scope: org,
+      id: "target",
+      expectedVersion: 1,
+      idempotencyKey: "denied:retained:1",
+    };
+    for (const result of [
+      await app.import.commit(actor, command),
+      await app.reminders.retry(actor, command),
+      await app.lifecycle.run(actor, command),
+      await app.settings.save(actor, command),
+      await app.governance.updateGrant(actor, command),
+    ]) {
+      expect(result.state).toBe("denied");
+      expect(result).not.toHaveProperty("data");
+    }
+  }
+  expect(await app.governance.list(admin, org)).toEqual(before);
+});
+it("populated explicit U1 conversion preserves identity and enables current Super governance", async () => {
+  const users = new InMemoryUserRepository([
+    { id: "converted", isActive: true, authorizationVersion: 1 },
+  ]);
+  const grants = new InMemoryRoleGrantRepository();
+  grants.loadConversionFixture([
+    {
+      id: "legacy-admin",
+      subjectId: "converted",
+      role: "kindergarten_admin",
+      scope: org,
+      grantedAt: "2026-01-01",
+    },
+  ]);
+  const audit = new InMemoryAuditWriter();
+  const store = new InMemoryAccessTransaction(users, grants, audit);
+  expect(
+    convertLegacyRoles(
+      store,
+      { supportedSchema: true, authoritativeIssuerBaseline: "verified-v1" },
+      "u3-fixture",
+    ).state,
+  ).toBe("converted");
+  const actor: SessionContext = {
+    ...session("super_admin", org, "converted"),
+    authorizationVersion: 2,
+    grants: grants.list(),
+  };
+  const app = createSyntheticAdvancedAdminFacade(
+    new AuthorizationContract({
+      getCurrentVersion: (id) => users.findById(id)?.authorizationVersion,
+      clearProtectedCache() {},
+    }),
+    new SyntheticAdminPort(),
+  );
+  expect((await app.governance.list(actor, org)).state).toBe("success");
+  expect(grants.list()[0]).toMatchObject({
+    id: "legacy-admin",
+    subjectId: "converted",
+    role: "super_admin",
+    scope: org,
+    grantedAt: "2026-01-01",
+  });
+  expect((await app.governance.list({ ...actor, authorizationVersion: 1 }, org)).state).toBe(
+    "invalidated",
+  );
+});
+it("inactive revoked and equivalent current grants preserve authority boundaries and data", async () => {
+  const actor = session("super_admin", org, "super-admin-local");
+  const app = createSyntheticAdvancedAdminFacade(
+    authorization(actor.subjectId),
+    new SyntheticAdminPort(),
+  );
+  const before = await app.settings.get(actor, org);
+  expect(
+    (
+      await app.settings.get(
+        {
+          ...actor,
+          grants: [...actor.grants, ...actor.grants.map((g) => ({ ...g, id: "equivalent" }))],
+        },
+        org,
+      )
+    ).state,
+  ).toBe("success");
+  for (const context of [
+    { ...actor, isActive: false },
+    { ...actor, grants: actor.grants.map((g) => ({ ...g, revokedAt: "now" })) },
+  ])
+    expect((await app.settings.get(context, org)).state).toBe("denied");
+  expect(await app.settings.get(actor, org)).toEqual(before);
+});

@@ -87,6 +87,8 @@
 - ALWAYS run CI secret scanning and SAST, with high and critical SAST findings blocking delivery. (affirmed 2026-08-12)
 - ALWAYS pin CI actions to immutable revisions. (affirmed 2026-08-12)
 - ALWAYS generate an SBOM and artifact attestation when a deployable artifact exists. (affirmed 2026-08-12)
+None. (affirmed 2026-10-06)
+
 ## Corrections
 
 <!-- Project-specific corrections from human feedback. -->
