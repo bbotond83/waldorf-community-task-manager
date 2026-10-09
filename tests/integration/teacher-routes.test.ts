@@ -101,7 +101,8 @@ it("Teacher malformed group gets grantderived validation only, no protected read
   );
   const destination = new URL(compatibilityLocation({ csoport: "<bad>" }), "http://local");
   const filters = parseTeacherFilters(Object.fromEntries(destination.searchParams), session);
-  expect(filters.groupId).toBe("group-oak");
+  // A malformed group is dropped (never reflected); the dates carry the invalid marker.
+  expect(filters.groupId).toBe("");
   expect((await facade.getSchedule(session, filters)).state).toBe("validation");
   expect(reads).toBe(0);
 });

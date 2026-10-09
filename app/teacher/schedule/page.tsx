@@ -5,9 +5,11 @@ import { TeacherStatePanel } from "../_components/TeacherStatePanel.tsx";
 import {
   parseTeacherFilters,
   teacherFilterQuery,
+  teacherScheduleHref,
   type TeacherSearchParams,
 } from "../_lib/filters.ts";
 import { resolveTeacherFacade } from "../_lib/facade.ts";
+import { readTeacherSchedule } from "../_lib/schedule.ts";
 import { resolveTeacherSession } from "../_lib/session.ts";
 
 export default async function TeacherSchedulePage({
@@ -19,11 +21,7 @@ export default async function TeacherSchedulePage({
   const filters = parseTeacherFilters(await searchParams, session.data.applicationSession);
   const facade = await resolveTeacherFacade(filters.scenario);
   if (session.state !== "success" || !facade) return null;
-  const result = await facade.getSchedule(session.data.applicationSession, {
-    groupScope: filters.groupScope,
-    from: filters.from,
-    to: filters.to,
-  });
+  const result = await readTeacherSchedule(facade, session.data.applicationSession, filters);
   const retryFilters = { ...filters, scenario: "ready" as const };
 
   return (
@@ -40,7 +38,7 @@ export default async function TeacherSchedulePage({
         result.state === "validation") && <ScheduleFilter filters={filters} />}
       <TeacherStatePanel
         result={result}
-        retryHref={`/teacher/schedule?${teacherFilterQuery(retryFilters)}`}
+        retryHref={teacherScheduleHref(teacherFilterQuery(retryFilters))}
         testId="teacher-schedule"
       >
         {(model) => <ScheduleCollection entries={model.entries} filters={filters} />}

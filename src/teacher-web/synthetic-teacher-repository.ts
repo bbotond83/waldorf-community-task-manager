@@ -1,6 +1,6 @@
 import type { Scope } from "../access/index.ts";
 import {
-  isTrackingRange,
+  isOptionalTrackingRange,
   isTrackingSource,
   type TrackingSourceRecord,
   type TrackingQuery,
@@ -100,9 +100,11 @@ export function createSyntheticTeacherRepository(
   let current = records.map(snapshot);
   const repository: TeacherScheduleRepository = Object.freeze({
     readCurrent(query: TrackingQuery) {
-      if (!isTrackingRange(query.from, query.to)) throw new Error("Invalid tracking range");
-      const from = Date.parse(`${query.from}T00:00:00.000Z`);
-      const to = Date.parse(`${query.to}T23:59:59.999Z`);
+      if (!isOptionalTrackingRange(query.from, query.to)) throw new Error("Invalid tracking range");
+      // A missing limit leaves that side open.
+      const from =
+        query.from === undefined ? -Infinity : Date.parse(`${query.from}T00:00:00.000Z`);
+      const to = query.to === undefined ? Infinity : Date.parse(`${query.to}T23:59:59.999Z`);
       return Object.freeze(
         current
           .filter(

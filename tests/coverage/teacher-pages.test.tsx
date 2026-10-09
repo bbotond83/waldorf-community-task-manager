@@ -48,6 +48,45 @@ it("Teacher renders permitted schedule with real projections", async () => {
   expect(output.toLocaleLowerCase("hu")).toContain("beosztás");
   expect(output).not.toContain("protectedReason");
 });
+it("Teacher first visit lists every granted group with empty filter fields", async () => {
+  signIn("kindergarten-teacher-local");
+  const page = (await import("../../app/teacher/schedule/page.tsx")).default as (
+    input: ReturnType<typeof props>,
+  ) => ReactNode | Promise<ReactNode>;
+  const output = html(await page(props("")));
+  expect(output).toContain("Minden csoport");
+  expect(output).not.toContain("required");
+  expect(output).not.toMatch(/name="from"[^>]*value="[^"]/);
+  expect(output).not.toMatch(/name="to"[^>]*value="[^"]/);
+  for (const id of ["schedule-garden", "schedule-crafts", "schedule-coverage"])
+    expect(output).toContain(`teacher-schedule-row-${id}`);
+  // The source word "Ütemezett" is shown as the shared word, with its symbol.
+  expect(output).toContain("Ütemezve");
+  expect(output).not.toContain("Ütemezett");
+  expect(output).toContain('data-status-icon="calendar"');
+});
+it("Teacher single date and chosen group narrow the list, a swapped range keeps its message", async () => {
+  signIn("kindergarten-teacher-local");
+  const page = (await import("../../app/teacher/schedule/page.tsx")).default as (
+    input: ReturnType<typeof props>,
+  ) => ReactNode | Promise<ReactNode>;
+  const afterFrom = html(await page({ ...props(""), searchParams: Promise.resolve({ from: "2026-08-14" }) }));
+  expect(afterFrom).not.toContain("teacher-schedule-row-schedule-garden");
+  expect(afterFrom).toContain("teacher-schedule-row-schedule-crafts");
+  const sunflower = html(
+    await page({ ...props(""), searchParams: Promise.resolve({ groupId: "group-sunflower" }) }),
+  );
+  expect(sunflower).toContain("teacher-schedule-row-schedule-coverage");
+  expect(sunflower).not.toContain("teacher-schedule-row-schedule-crafts");
+  const swapped = html(
+    await page({
+      ...props(""),
+      searchParams: Promise.resolve({ from: "2026-08-20", to: "2026-08-12" }),
+    }),
+  );
+  expect(swapped).toContain("Érvénytelen szűrés");
+  expect(swapped).toContain("legfeljebb 31 napos");
+});
 it("Teacher withholds schedule content without session", async () => {
   const page = (await import("../../app/teacher/schedule/page.tsx")).default as (
     input: ReturnType<typeof props>,

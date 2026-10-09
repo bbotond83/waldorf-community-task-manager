@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import type { ApplicationResult } from "../../../src/application/index.ts";
+import { FilterClearLink } from "../../../src/runtime/FilterClearLink.tsx";
 import { FocusedStateSection } from "./FocusedStateSection.tsx";
 
 export function TeacherStatePanel<T>({
@@ -29,9 +30,14 @@ export function TeacherStatePanel<T>({
       >
         <h2>Nincs találat</h2>
         <p>A megadott szűrők mellett nincs megjeleníthető beosztás.</p>
-        <Link href={clearHref} data-testid={`${testId}-clear-link`}>
+        <FilterClearLink
+          href={clearHref}
+          className="button-link button-link-secondary"
+          testId={`${testId}-clear-link`}
+          formSelector='[data-testid="teacher-schedule-filter-form"]'
+        >
           Szűrők törlése
-        </Link>
+        </FilterClearLink>
       </section>
     );
   }

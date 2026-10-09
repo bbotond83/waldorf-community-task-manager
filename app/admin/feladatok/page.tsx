@@ -34,7 +34,11 @@ export default async function TasksEventsPage({
         <p>Ütemezés és hozzárendelés a jogosult működési körben.</p>
       </header>
       <div className="admin-page-actions">
-        <Link href="/admin/feladatok/uj" data-testid="admin-task-create-link">
+        <Link
+          href="/admin/feladatok/uj"
+          className="button-link"
+          data-testid="admin-task-create-link"
+        >
           Új feladat vagy esemény
         </Link>
       </div>

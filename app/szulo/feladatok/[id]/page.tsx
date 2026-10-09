@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
-import { dutyStateLabel } from "../../../../src/application/status-labels.ts";
+import { dutyStateDisplay } from "../../../../src/application/status-labels.ts";
+import { StatusBadge } from "../../../../src/runtime/StatusBadge.tsx";
 import {
   NOTIFICATION_LIST_PATH,
   pendingRequests,
@@ -64,7 +65,9 @@ export default async function DutyDetailPage({
               </div>
               <div>
                 <dt>Állapot</dt>
-                <dd data-testid="duty-detail-state">{dutyStateLabel(duty.state)}</dd>
+                <dd data-testid="duty-detail-state">
+                  <StatusBadge {...dutyStateDisplay(duty.state)} />
+                </dd>
               </div>
             </dl>
             <PendingRequestNotice pending={pendingRequests(duty)} />

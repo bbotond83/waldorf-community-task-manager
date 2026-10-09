@@ -13,7 +13,8 @@ export type TrackingEntry = Readonly<{
 }>;
 export type TrackingSourceRecord = TrackingEntry &
   Readonly<{ sourceRecordId: string; organizationId: string }>;
-export type TrackingQuery = Readonly<{ groupScope: Scope; from: string; to: string }>;
+/** A missing `from` or `to` means no limit on that side. */
+export type TrackingQuery = Readonly<{ groupScope: Scope; from?: string; to?: string }>;
 export interface TeacherScheduleRepository {
   readCurrent(
     query: TrackingQuery,
@@ -32,6 +33,16 @@ export function isTrackingRange(from: unknown, to: unknown): boolean {
     from <= to &&
     Date.parse(to) - Date.parse(from) <= 31 * 24 * 60 * 60 * 1000
   );
+}
+/**
+ * Like `isTrackingRange`, but each limit is optional: no dates is no limit, one date is a one-sided
+ * limit (a calendar date is all it needs), and a filled pair keeps the strict range rules.
+ */
+export function isOptionalTrackingRange(from: unknown, to: unknown): boolean {
+  if (from === undefined && to === undefined) return true;
+  if (from === undefined) return isCalendarDate(to);
+  if (to === undefined) return isCalendarDate(from);
+  return isTrackingRange(from, to);
 }
 export function isTrackingSource(value: unknown): value is TrackingSourceRecord {
   if (!value || typeof value !== "object") return false;

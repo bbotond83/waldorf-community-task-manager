@@ -6,7 +6,8 @@ import { restoreRecordAction } from "../../actions.ts";
 import { resolveAdminFacade } from "../../_lib/facade.ts";
 import { resolveAdminSession } from "../../_lib/session.ts";
 import { terminalFailure } from "../../../../src/application/results.ts";
-import { statusLabel } from "../../../../src/application/status-labels.ts";
+import { statusDisplay } from "../../../../src/application/status-labels.ts";
+import { StatusBadge } from "../../../../src/runtime/StatusBadge.tsx";
 
 export default async function ArchiveDetailPage({
   params,
@@ -28,17 +29,19 @@ export default async function ArchiveDetailPage({
       <header>
         <AdminBackLink list="archive" />
         <p className="eyebrow">Archívum</p>
-        <h1 tabIndex={-1}>Archivált rekord</h1>
+        <h1 tabIndex={-1}>Archivált elem</h1>
       </header>
       <AsyncStatePanel
         result={result}
         testId="admin-archive-detail-state"
-        emptyMessage="A rekord nem található."
+        emptyMessage="Az elem nem található."
       >
         {(record) => (
           <>
             <h2>{record.title}</h2>
-            <p>Állapot: {statusLabel(record.state)}</p>
+            <p>
+              Állapot: <StatusBadge {...statusDisplay(record.state)} />
+            </p>
             <AdminMutationForm
               action={restoreRecordAction}
               submitLabel="Visszaállítás"

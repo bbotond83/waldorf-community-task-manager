@@ -20,5 +20,8 @@
 ## Current intent (functional-test fixes, scope bugfix)
 Follows two shipped rounds (visual overhaul; navigation polish: whole-card lists, Hungarian state words, notification checkbox, one consistent menu per profile, per-role landing pages: parent lands on Értesítések). The functional test now reports defects in parent notifications (link target, read state, current menu item, back link), parent menu order, admin lists and filters, admin "new" forms, parent swap/cancel pending state, and demo/test wording visible to users ("– Firefox próba", "– mobil próba", "Korreláció", "Verzió", scenario selectors). Findings are in architecture.md and code-quality-assessment.md.
 
+## Current intent (admin list polish, scope bugfix, depth Minimal)
+Follows the functional-test fixes round. The user reports polish defects on filters and lists: the teacher schedule "Szűrők törlése" control does not clear the fields (it resets to the default group and dates), admin filter bars have no clear control and their labels and controls are not aligned, the "Új rekord" / "Új feladat vagy esemény" links are plain links rather than buttons, the word "rekord" appears in user-facing copy, and status words are plain text without a symbol or colour cue. Findings: architecture.md (List item pattern) and code-quality-assessment.md.
+
 ## Constraints
 Privacy-first (kitalált data only), 80 percent coverage, accessibility (axe, serious/critical blocking), Vercel two-environment release model with deployment workflows intentionally disabled until a linked target exists.

@@ -52,7 +52,7 @@ test("Super Administrator completes seven-step import once", async ({ page }) =>
   await expect(page.getByTestId("admin-import-commit-form")).toBeVisible();
   await page.getByTestId("admin-import-confirm-checkbox").check();
   await page.getByTestId("admin-import-commit-form-submit-button").click();
-  await expect(page.getByTestId("admin-import-outcome")).toContainText("3 rekord");
+  await expect(page.getByTestId("admin-import-outcome")).toContainText("3 elem");
   expect(Date.now() - startedAt).toBeLessThan(2_000);
   await expect(page.locator("body")).not.toContainText(/email|provider body|telefonszám/i);
 });

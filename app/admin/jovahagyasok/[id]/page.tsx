@@ -7,7 +7,8 @@ import { decideApprovalAction } from "../../actions.ts";
 import { resolveAdminFacade } from "../../_lib/facade.ts";
 import { resolveAdminSession } from "../../_lib/session.ts";
 import { denied, terminalFailure } from "../../../../src/application/results.ts";
-import { statusLabel } from "../../../../src/application/status-labels.ts";
+import { statusDisplay } from "../../../../src/application/status-labels.ts";
+import { StatusBadge } from "../../../../src/runtime/StatusBadge.tsx";
 
 export default async function ApprovalDetailPage({
   params,
@@ -50,7 +51,9 @@ export default async function ApprovalDetailPage({
           <div className="admin-detail-grid">
             <section>
               <h2>{approval.title}</h2>
-              <p>Állapot: {statusLabel(approval.state)}</p>
+              <p>
+                Állapot: <StatusBadge {...statusDisplay(approval.state)} />
+              </p>
               <p className="admin-safe-reason">
                 A kérelem részletei a jóváhagyási típus engedélyezett, személyes adatot nem
                 tartalmazó összefoglalója.

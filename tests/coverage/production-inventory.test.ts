@@ -81,9 +81,12 @@ describe("honest executable denominator", () => {
     expect(
       inventory.some((entry) => entry.path.includes(".test.") || entry.path.endsWith(".d.ts")),
     ).toBe(false);
-    expect(inventory.length).toBe(161);
+    expect(inventory.length).toBe(164);
     for (const path of [
       "src/runtime/AppNav.tsx",
+      "src/runtime/StatusBadge.tsx",
+      "src/runtime/FilterClearLink.tsx",
+      "app/teacher/_lib/schedule.ts",
       "src/runtime/BackToHomeLink.tsx",
       "src/application/status-labels.ts",
       "src/parent-web/notification-context.ts",

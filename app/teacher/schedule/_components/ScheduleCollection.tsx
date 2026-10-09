@@ -1,14 +1,18 @@
 import Link from "next/link";
 import type { TrackingEntry } from "../../../../src/application/index.ts";
+import { teacherStatusDisplay } from "../../../../src/application/status-labels.ts";
+import { StatusBadge } from "../../../../src/runtime/StatusBadge.tsx";
 import type { TeacherFilters } from "../../_lib/filters.ts";
-import { teacherFilterQuery } from "../../_lib/filters.ts";
+import { teacherDetailQuery } from "../../_lib/filters.ts";
 
 export function ScheduleCollection({
   entries,
   filters,
 }: Readonly<{ entries: readonly TrackingEntry[]; filters: TeacherFilters }>) {
-  const query = teacherFilterQuery(filters);
-  const groupLabel = filters.groups.find(({ scope }) => scope.id === filters.groupId)?.label ?? "";
+  // Every entry opens with its own group, so the all-groups list never guesses a group.
+  const detailQuery = (entry: TrackingEntry) => teacherDetailQuery(filters, entry.groupId);
+  const groupLabelOf = (entry: TrackingEntry) =>
+    filters.groups.find(({ scope }) => scope.id === entry.groupId)?.label ?? "";
   return (
     <div className="teacher-collection" data-testid="teacher-schedule-collection">
       <div className="teacher-table-wrapper">
@@ -34,13 +38,13 @@ export function ScheduleCollection({
                   {/* One link per row: the link is stretched over the whole row with CSS. */}
                   <Link
                     className="teacher-row-link"
-                    href={`/teacher/schedule/${encodeURIComponent(entry.id)}?${query}`}
+                    href={`/teacher/schedule/${encodeURIComponent(entry.id)}?${detailQuery(entry)}`}
                     data-testid={`teacher-schedule-open-${entry.id}`}
                   >
                     {entry.title}
                   </Link>
                 </td>
-                <td>{groupLabel}</td>
+                <td>{groupLabelOf(entry)}</td>
                 <td>{entry.location}</td>
                 <td>{entry.coordinationDisplayName ?? "Nem szükséges"}</td>
                 <td>{entry.ownerDisplayName ?? "Nincs kijelölt felelős"}</td>
@@ -49,7 +53,9 @@ export function ScheduleCollection({
                     ? entry.assigneeDisplayNames.join(", ")
                     : "Nincs beosztott"}
                 </td>
-                <td>{entry.currentStatusLabel ?? "Nincs elérhető állapot"}</td>
+                <td>
+                  <StatusBadge {...teacherStatusDisplay(entry.currentStatusLabel)} />
+                </td>
               </tr>
             ))}
           </tbody>
@@ -66,7 +72,7 @@ export function ScheduleCollection({
               {/* One link per card: the link is stretched over the whole card with CSS. */}
               <Link
                 className="teacher-card-link"
-                href={`/teacher/schedule/${encodeURIComponent(entry.id)}?${query}`}
+                href={`/teacher/schedule/${encodeURIComponent(entry.id)}?${detailQuery(entry)}`}
                 data-testid={`teacher-schedule-card-open-${entry.id}`}
               >
                 {entry.title}
@@ -83,7 +89,7 @@ export function ScheduleCollection({
               </div>
               <div>
                 <dt>Engedélyezett csoport</dt>
-                <dd>{groupLabel}</dd>
+                <dd>{groupLabelOf(entry)}</dd>
               </div>
               <div>
                 <dt>Koordináció</dt>
@@ -129,7 +135,9 @@ export function TrackingFields({ entry }: Readonly<{ entry: TrackingEntry }>) {
       </div>
       <div>
         <dt>Állapot</dt>
-        <dd>{entry.currentStatusLabel ?? "Nincs elérhető állapot"}</dd>
+        <dd>
+          <StatusBadge {...teacherStatusDisplay(entry.currentStatusLabel)} />
+        </dd>
       </div>
     </>
   );

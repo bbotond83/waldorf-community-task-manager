@@ -155,7 +155,9 @@ it("shows the pending notice and hides both request links while a request waits"
   expect(pending).not.toContain('data-testid="swap-request-link"');
   expect(pending).not.toContain('data-testid="cancellation-request-link"');
   // The task page and the task list read the same state word.
-  expect(pending).toContain('data-testid="duty-detail-state">Cserekérelem folyamatban');
+  expect(pending).toMatch(
+    /data-testid="duty-detail-state"><span class="status-badge"><svg [^>]*aria-hidden="true"[^>]*>.*<\/svg>Cserekérelem folyamatban<\/span>/s,
+  );
 });
 
 it("shows the cancellation notice for a waiting cancellation request", async () => {

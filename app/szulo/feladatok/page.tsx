@@ -1,4 +1,9 @@
-import { DUTY_STATE_LABELS, dutyStateLabel } from "../../../src/application/status-labels.ts";
+import {
+  DUTY_STATE_LABELS,
+  dutyStateDisplay,
+  dutyStateOptionText,
+} from "../../../src/application/status-labels.ts";
+import { StatusBadge } from "../../../src/runtime/StatusBadge.tsx";
 import { ParentStatePanel } from "../_components/ParentStatePanel.tsx";
 import { resolveParentFacade } from "../_lib/facade.ts";
 import { resolveParentSession } from "../_lib/session.ts";
@@ -27,18 +32,27 @@ export default async function ParentDutiesPage({
         <p>Csak a kapcsolt, kitalált család számára engedélyezett feladatok láthatók.</p>
       </header>
       <form className="parent-filter" action="/szulo/feladatok" data-testid="duty-filter-form">
-        <label htmlFor="allapot">Állapot</label>
-        <select id="allapot" name="allapot" defaultValue={allapot} data-testid="duty-filter-select">
-          <option value="">Minden állapot</option>
-          {Object.entries(DUTY_STATE_LABELS).map(([value, label]) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
-        </select>
-        <button type="submit" data-testid="duty-filter-submit-button">
-          Szűrés
-        </button>
+        <div className="filter-field">
+          <label htmlFor="allapot">Állapot</label>
+          <select
+            id="allapot"
+            name="allapot"
+            defaultValue={allapot}
+            data-testid="duty-filter-select"
+          >
+            <option value="">Minden állapot</option>
+            {Object.keys(DUTY_STATE_LABELS).map((value) => (
+              <option key={value} value={value}>
+                {dutyStateOptionText(value)}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="filter-actions">
+          <button type="submit" data-testid="duty-filter-submit-button">
+            Szűrés
+          </button>
+        </div>
       </form>
       <ParentStatePanel result={result} emptyMessage="Nincs kapcsolt feladat." testId="duties">
         {(model) => {
@@ -55,7 +69,11 @@ export default async function ParentDutiesPage({
                   >
                     <h2>{duty.title}</h2>
                     <p>{formatBudapestDate(duty.dueAt)}</p>
-                    <strong className="parent-state-badge">{dutyStateLabel(duty.state)}</strong>
+                    <StatusBadge
+                      as="strong"
+                      className="parent-state-badge"
+                      {...dutyStateDisplay(duty.state)}
+                    />
                   </a>
                 </li>
               ))}

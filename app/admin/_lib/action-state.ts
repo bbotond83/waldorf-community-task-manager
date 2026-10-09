@@ -66,7 +66,7 @@ function translateFieldErrors(
 
 function conflictMessage(code: string): string {
   if (code === "RESTORE_CONFLICT")
-    return "A rekord nem állítható vissza, mert ütköző aktív rekord létezik.";
+    return "Az elem nem állítható vissza, mert ütköző aktív elem létezik.";
   if (code === "VERSION_CONFLICT")
     return "Az adatok időközben megváltoztak. Töltse újra az oldalt.";
   if (code === "ASSIGNMENT_INELIGIBLE")

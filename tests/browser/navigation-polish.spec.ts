@@ -163,9 +163,9 @@ test("admin filters keep their values and show Hungarian words", async ({ page }
   await expect(select).toHaveValue("pending");
   await expect(select.locator("option")).toHaveText([
     "Minden állapot",
-    "Függőben",
-    "Jóváhagyva",
-    "Elutasítva",
+    "◔ Függőben",
+    "✓ Jóváhagyva",
+    "✕ Elutasítva",
   ]);
   expect(await page.locator(".admin-collection").innerText()).toContain("Függőben");
 });

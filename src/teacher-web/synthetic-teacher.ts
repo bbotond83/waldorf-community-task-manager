@@ -37,8 +37,8 @@ export class SyntheticTeacherScheduleAdapter {
   async getSchedule(input: {
     actorId: string;
     groupScope: Scope;
-    from: string;
-    to: string;
+    from?: string;
+    to?: string;
   }): Promise<DomainOutcome<{ entries: readonly TrackingSourceRecord[] }>> {
     if (this.scenario === "retryable" || this.scenario === "terminal")
       throw new SyntheticTeacherDependencyError(this.scenario);

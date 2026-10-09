@@ -3,15 +3,15 @@
 ## Run Record
 
 - Date: 2026-10-09
-- Commit: f51c84477aacb9810ac4bda810a1e4952d259712
+- Commit: 2cc6e42ebf799f1a985ef93a38250c71febe7ac7
 
 ## Scope of Analysis
 
 ```yaml
 scope_version: 1
 kind: partial
-intent: 261009-functional-test-fixes
-fingerprint: 1cc16c4e947810a8fb4cbcaedd590b584e6ab1a7
+intent: admin-list-polish
+fingerprint: 031a49e82ab81e1b3c69e56ed96613a6ec93884f
 analyzed:
   paths:
     - app/
@@ -20,21 +20,28 @@ analyzed:
     - tests/
     - verification/
   components:
+    - ScheduleFilter
+    - ScheduleCollection
+    - TeacherStatePanel
+    - AdminFilterBar
+    - AdminPagination
+    - AdminBackLink
+    - ResponsiveCollection
+    - Admin record and task create pages
+    - ParentDutiesPage
+    - Status labels
+    - Global stylesheet
     - AppShell
     - AppNav
     - BackToHomeLink
     - Synthetic profiles
     - Admin session
-    - ResponsiveCollection
-    - AdminFilterBar
     - AdminMutationForm
-    - Admin pages with raw demo-facing text
-    - ParentDutiesPage
+    - Admin pages with demo-facing text
     - ParentDutyDetailPage
     - ParentRequestPages
     - ParentNotificationsPage
     - NotificationReadForm
-    - Status labels
 shallow:
   paths:
     - package.json
@@ -44,6 +51,7 @@ shallow:
     - proxy.ts
     - .github/workflows/ci.yml
     - .env.example
+    - HASZNALATI_UTMUTATO_HU.md
     - src/access/
     - src/admin-core/
     - src/admin-advanced/

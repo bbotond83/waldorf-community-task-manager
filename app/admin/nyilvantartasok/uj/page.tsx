@@ -9,18 +9,18 @@ export default function NewRecordPage() {
       <header>
         <AdminBackLink list="records" />
         <p className="eyebrow">Nyilvántartások</p>
-        <h1 tabIndex={-1}>Új rekord</h1>
+        <h1 tabIndex={-1}>Új elem</h1>
       </header>
       <AdminMutationForm
         action={saveRecordAction}
-        submitLabel="Rekord létrehozása"
+        submitLabel="Elem létrehozása"
         testId="admin-record-create-form"
         successLink={ADMIN_LIST_LINKS.records}
       >
         <input type="hidden" name="id" value="new" />
         <input type="hidden" name="expectedVersion" value="1" />
         <input type="hidden" name="idempotencyKey" value={`record:create:${randomUUID()}`} />
-        <label htmlFor="kind">Rekord típusa</label>
+        <label htmlFor="kind">Elem típusa</label>
         <select id="kind" name="kind" data-testid="admin-record-kind-select">
           <option value="family">Család</option>
           <option value="child">Gyermek</option>

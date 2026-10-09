@@ -79,7 +79,8 @@ it("renders permitted record detail with real projections", async () => {
     input: ReturnType<typeof props>,
   ) => ReactNode | Promise<ReactNode>;
   const output = html(await page(props("family-feny")));
-  expect(output.toLocaleLowerCase("hu")).toContain("rekord részletei");
+  expect(output.toLocaleLowerCase("hu")).toContain("elem részletei");
+  expect(output.toLocaleLowerCase("hu")).not.toContain("rekord");
   expect(output).not.toContain("protectedReason");
 });
 it("withholds record detail content without session", async () => {

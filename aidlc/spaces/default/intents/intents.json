@@ -64,5 +64,13 @@
     "scope": "bugfix",
     "status": "complete",
     "request": "7db047ce"
+  },
+  {
+    "uuid": "01a121b8-50e6-7898-afd0-1c21a798f49f",
+    "slug": "admin-list-polish",
+    "dirName": "261009-admin-list-polish",
+    "scope": "bugfix",
+    "status": "complete",
+    "request": "b49de12a"
   }
 ]
