@@ -1,10 +1,18 @@
+import { BackToHomeLink } from "../../../src/runtime/BackToHomeLink.tsx";
+
 type AdminAccessStateProps = Readonly<{
   kind: "denied" | "configuration-error";
   message?: string;
   embedded?: boolean;
+  homePath?: string;
 }>;
 
-export function AdminAccessState({ kind, message, embedded = false }: AdminAccessStateProps) {
+export function AdminAccessState({
+  kind,
+  message,
+  embedded = false,
+  homePath,
+}: AdminAccessStateProps) {
   const isDenied = kind === "denied";
   const content = (
     <>
@@ -17,9 +25,11 @@ export function AdminAccessState({ kind, message, embedded = false }: AdminAcces
           ? "Ehhez a művelethez nincs megfelelő jogosultság."
           : (message ?? "Ellenőrizze a helyi futtatási beállításokat.")}
       </p>
-      <Link href="/" data-testid="admin-access-state-home-link">
-        Vissza a kezdőlapra
-      </Link>
+      <BackToHomeLink
+        homePath={homePath}
+        label="Vissza a kezdőlapra"
+        testId="admin-access-state-home-link"
+      />
     </>
   );
   return embedded ? (
@@ -32,4 +42,3 @@ export function AdminAccessState({ kind, message, embedded = false }: AdminAcces
     </main>
   );
 }
-import Link from "next/link";

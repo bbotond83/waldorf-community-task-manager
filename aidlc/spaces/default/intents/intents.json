@@ -48,5 +48,13 @@
     "scope": "bugfix",
     "status": "complete",
     "request": "f7966cbd"
+  },
+  {
+    "uuid": "01a12097-eeca-7aeb-bf2a-963388099699",
+    "slug": "navigation-polish",
+    "dirName": "261009-navigation-polish",
+    "scope": "bugfix",
+    "status": "complete",
+    "request": "e67c9b2b"
   }
 ]

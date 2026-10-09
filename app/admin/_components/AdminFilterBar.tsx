@@ -1,3 +1,5 @@
+import { statusLabel } from "../../../src/application/status-labels.ts";
+
 type AdminFilterBarProps = Readonly<{
   action: string;
   query?: string;
@@ -22,10 +24,10 @@ export function AdminFilterBar({ action, query = "", state = "" }: AdminFilterBa
         data-testid="admin-filter-state-select"
       >
         <option value="">Minden állapot</option>
-        <option value="active">Aktív</option>
-        <option value="archived">Archivált</option>
-        <option value="open">Nyitott</option>
-        <option value="pending">Függőben</option>
+        <option value="active">{statusLabel("active")}</option>
+        <option value="archived">{statusLabel("archived")}</option>
+        <option value="open">{statusLabel("open")}</option>
+        <option value="pending">{statusLabel("pending")}</option>
       </select>
       <button type="submit" data-testid="admin-filter-submit-button">
         Szűrés

@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { AppNav } from "./AppNav.tsx";
 import { BrandMark } from "./BrandMark.tsx";
 import type { SyntheticProfile } from "./synthetic/profiles.ts";
 
@@ -16,7 +17,7 @@ export function AppShell({ profile, children, statusMessage }: AppShellProps) {
       </a>
       <header className="site-header">
         <div className="site-header-brand">
-          <BrandMark size={48} />
+          <BrandMark size={48} href={profile.homePath} />
           <div>
             <p className="eyebrow">Waldorf közösségi feladatkezelő</p>
             <p className="profile-summary" data-testid="app-shell-profile-summary">
@@ -46,20 +47,7 @@ export function AppShell({ profile, children, statusMessage }: AppShellProps) {
         </form>
       </header>
 
-      <details className="navigation-panel" open>
-        <summary data-testid="app-shell-navigation-toggle">Navigáció</summary>
-        <nav aria-label="Fő navigáció" data-testid="app-shell-navigation">
-          <ul>
-            {profile.navigation.map((item) => (
-              <li key={item.id}>
-                <a href={item.href} data-testid={`app-shell-navigation-${item.id}`}>
-                  {item.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      </details>
+      {profile.navigation.length > 0 && <AppNav items={profile.navigation} />}
 
       <main id="fo-tartalom" tabIndex={-1} data-testid="app-shell-main">
         {children}

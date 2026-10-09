@@ -77,6 +77,16 @@ button:hover {
   outline-offset: 3px;
 }
 
+/*
+ * Pages move focus to their heading (or the main area) on load so screen readers start in the
+ * right place. These targets are not controls, so no ring is drawn around them; every
+ * interactive control keeps the ring above when it is reached by keyboard.
+ */
+[tabindex="-1"]:focus,
+[tabindex="-1"]:focus-visible {
+  outline: none;
+}
+
 .skip-link {
   position: fixed;
   z-index: 10;
@@ -105,8 +115,7 @@ button:hover {
 }
 
 .selector-heading,
-.centered-panel,
-.home-panel {
+.centered-panel {
   max-width: 48rem;
 }
 
@@ -139,8 +148,7 @@ h1 {
   margin-block: 2rem;
 }
 
-.centered-panel,
-.home-panel {
+.centered-panel {
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
   background: var(--color-surface);
@@ -174,6 +182,8 @@ h1 {
 
 .profile-card:hover,
 .parent-card:hover,
+.admin-card:hover,
+.teacher-card:hover,
 .dashboard-link:hover {
   border-color: var(--color-primary);
   background: var(--color-info-bg);
@@ -182,6 +192,8 @@ h1 {
 
 .profile-card:active,
 .parent-card:active,
+.admin-card:active,
+.teacher-card:active,
 .dashboard-link:active {
   transform: translateY(0);
   background: var(--color-danger-bg);
@@ -237,12 +249,7 @@ h1 {
   height: auto;
 }
 
-.home-panel {
-  border-top: 0.3rem solid var(--color-accent-ochre);
-}
-
-.centered-panel,
-.home-panel {
+.centered-panel {
   margin-block: clamp(2rem, 6vw, 5rem);
   padding: clamp(1.25rem, 4vw, 3rem);
 }
@@ -307,6 +314,49 @@ nav a {
 
 nav a:hover {
   background: var(--color-surface);
+}
+
+/* Main menu: pill-shaped buttons with hover, pressed and current-page states. */
+.navigation-panel nav ul {
+  gap: 0.6rem;
+}
+
+.navigation-panel nav a.nav-button {
+  justify-content: center;
+  min-height: 44px;
+  padding: 0.55rem 1.1rem;
+  color: var(--color-primary-dark);
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 999px;
+  background: var(--color-surface);
+  transition:
+    transform 120ms ease,
+    background-color 120ms ease,
+    border-color 120ms ease;
+}
+
+.navigation-panel nav a.nav-button:hover {
+  border-color: var(--color-primary);
+  background: var(--color-info-bg);
+  transform: translateY(-1px);
+}
+
+.navigation-panel nav a.nav-button:active {
+  background: var(--color-danger-bg);
+  transform: translateY(0);
+}
+
+.navigation-panel nav a.nav-button[aria-current="page"] {
+  color: white;
+  border-color: var(--color-primary-dark);
+  background: var(--color-primary);
+}
+
+.navigation-panel nav a.nav-button[aria-current="page"]:hover {
+  background: var(--color-primary-dark);
 }
 
 .visually-hidden {
@@ -397,6 +447,7 @@ nav a:hover {
 .admin-form input,
 .admin-form select,
 .admin-form textarea {
+  max-width: 100%;
   min-height: 44px;
   border: 1px solid var(--color-border-strong);
   border-radius: 0.5rem;
@@ -412,20 +463,34 @@ nav a:hover {
 }
 .admin-card {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 1rem;
+  padding: 0;
+  transition:
+    transform 120ms ease,
+    border-color 120ms ease;
 }
-.admin-card > div {
+.admin-card .admin-card-link {
   display: flex;
+  flex: 1;
   flex-direction: column;
+  justify-content: center;
+  gap: 0.2rem;
+  min-height: 44px;
+  padding: 1rem;
+  color: inherit;
+  text-decoration: none;
+  border-radius: var(--radius);
+}
+.admin-card .admin-card-link strong {
+  color: var(--color-primary-dark);
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
 }
 .admin-state-badge {
   color: var(--color-muted);
 }
 .admin-form {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 0.65rem;
   padding: 1rem;
 }
@@ -524,6 +589,7 @@ nav a:hover {
 
 .advanced-filter select,
 .advanced-panel select {
+  max-width: 100%;
   min-height: 44px;
   border: 1px solid var(--color-border-strong);
   border-radius: 0.5rem;
@@ -704,8 +770,7 @@ nav a:hover {
 }
 
 .parent-page-actions a,
-.parent-public-page a,
-.notification-actions a {
+.parent-public-page a {
   display: inline-flex;
   align-items: center;
   padding-inline: 0.35rem;
@@ -757,17 +822,83 @@ nav a:hover {
   margin: 0.25rem 0 0;
 }
 
-.parent-page-actions,
-.notification-actions {
+.parent-page-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
   margin-block: 1rem;
 }
 
-.notification-card > div:last-child {
+/*
+ * Notification card: the whole content is one link on the left, the "read" checkbox sits beside
+ * it on the right. The form is transparent to the grid so the status message can span the card.
+ * Works from 320 px wide: the checkbox column is only as wide as its short label.
+ */
+.parent-card.notification-card {
   display: grid;
-  gap: 0.5rem;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: stretch;
+  gap: 0;
+}
+
+.notification-card .parent-card-link {
+  min-width: 0;
+}
+
+.notification-card .parent-card-link p {
+  margin-block: 0.15rem;
+}
+
+.notification-read-form {
+  display: contents;
+}
+
+.notification-read-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  min-width: 44px;
+  min-height: 44px;
+  max-width: 7.5rem;
+  padding: 1rem 1rem 1rem 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: center;
+  cursor: pointer;
+}
+
+.notification-read-label input[type="checkbox"] {
+  width: 1.5rem;
+  height: 1.5rem;
+  margin: 0;
+  accent-color: var(--color-primary);
+  cursor: inherit;
+}
+
+.notification-read-label input[type="checkbox"]:disabled {
+  cursor: default;
+}
+
+.notification-read-state {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid var(--color-border);
+  border-left: 0.35rem solid var(--color-primary);
+  background: var(--color-danger-bg);
+}
+
+.notification-read-state[role="status"] {
+  border-left-color: var(--color-success);
+  background: var(--color-success-bg);
+}
+
+.notification-read-form noscript {
+  grid-column: 2;
+  padding: 0 1rem 1rem 0.5rem;
 }
 
 .parent-public-page > .skip-link {
@@ -880,8 +1011,53 @@ nav a:hover {
 }
 
 .teacher-card {
+  position: relative;
   min-width: 0;
   padding: 1rem;
+  transition:
+    transform 120ms ease,
+    border-color 120ms ease;
+}
+
+/* Whole-row and whole-card links: the one link is stretched over its row or card. */
+.teacher-table tbody tr {
+  position: relative;
+  transition: background-color 120ms ease;
+}
+
+.teacher-table tbody tr:hover {
+  background: var(--color-info-bg);
+}
+
+.teacher-table tbody tr:active {
+  background: var(--color-danger-bg);
+}
+
+.teacher-table a.teacher-row-link,
+.teacher-card a.teacher-card-link {
+  min-height: 44px;
+  color: var(--color-primary-dark);
+  font-weight: 750;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
+.teacher-row-link::after,
+.teacher-card-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.teacher-row-link:focus-visible,
+.teacher-card-link:focus-visible {
+  outline: none;
+}
+
+.teacher-row-link:focus-visible::after,
+.teacher-card-link:focus-visible::after {
+  outline: 3px solid var(--color-focus);
+  outline-offset: -3px;
 }
 
 .teacher-card h2 {
@@ -927,10 +1103,6 @@ nav a:hover {
 @media (max-width: 44rem) {
   .admin-filter {
     grid-template-columns: 1fr;
-  }
-  .admin-card {
-    align-items: stretch;
-    flex-direction: column;
   }
 }
 
@@ -984,6 +1156,24 @@ nav a:hover {
   *::after {
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
+  }
+
+  /* No hover or press movement; colour changes still show the state. */
+  .nav-button:hover,
+  .nav-button:active,
+  .profile-card:hover,
+  .profile-card:active,
+  .parent-card:hover,
+  .parent-card:active,
+  .admin-card:hover,
+  .admin-card:active,
+  .teacher-card:hover,
+  .teacher-card:active,
+  .notification-card:hover,
+  .notification-card:active,
+  .dashboard-link:hover,
+  .dashboard-link:active {
+    transform: none !important;
   }
 }
 

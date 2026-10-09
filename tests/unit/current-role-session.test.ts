@@ -42,6 +42,14 @@ describe("current role session", () => {
     expect(teacher().role).toBe("kindergarten-teacher");
     expect(teacher().homePath).toBe("/teacher/schedule");
   });
+  it("each profile opens its own default page", () => {
+    expect(SYNTHETIC_PROFILES.map((profile) => [profile.id, profile.homePath])).toEqual([
+      ["parent-local", "/szulo/ertesitesek"],
+      ["kindergarten-teacher-local", "/teacher/schedule"],
+      ["group-admin-local", "/admin"],
+      ["super-admin-local", "/admin"],
+    ]);
+  });
   it.each(["staff-local", "kindergarten-admin-local"])(
     "removed profile %s requires fresh selection with no alias",
     (id) => {

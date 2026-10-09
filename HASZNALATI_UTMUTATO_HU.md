@@ -30,10 +30,24 @@ végezhetsz.
 | Profil | Mit ellenőrizhetsz? |
 |---|---|
 | **Szülő** | Egy kitalált család feladatai, jelentkezések és értesítések |
-| **Munkatárs (csak olvasás)** | A kijelölt csoport beosztása; módosítási művelet nélkül |
-| **Csoportadminisztrátor** | A Boróka csoport áttekintése, feladatai és jóváhagyásai |
-| **Óvodaadminisztrátor** | Nyilvántartások, feladatok, importálás, emlékeztetők, adatvédelem és beállítások |
-| **Szuperadminisztrátor** | Óvodai adminisztráció és szuperadminisztrátori jogosultságkezelés |
+| **Óvónő (csak olvasás)** | A kijelölt csoport beosztása; módosítási művelet nélkül |
+| **Csoportadminisztrátor** | A Boróka csoport áttekintése, nyilvántartásai, feladatai, jóváhagyásai és archívuma |
+| **Szuperadminisztrátor** | Óvodai adminisztráció (importálás, emlékeztetők, adatvédelem, beállítások) és jogosultságkezelés |
+
+A profil kiválasztása után nincs külön üdvözlő oldal: a program rögtön az
+adott profil alapértelmezett oldalát nyitja meg.
+
+| Profil | Alapértelmezett oldal | Menü (minden oldalon ugyanaz) |
+|---|---|---|
+| **Szülő** | Értesítések | Feladatok, Értesítések |
+| **Óvónő** | Beosztás | nincs menü, mert a Beosztás az egyetlen oldal |
+| **Csoportadminisztrátor** | Áttekintés | Áttekintés, Nyilvántartások, Feladatok és események, Jóváhagyások, Archívum |
+| **Szuperadminisztrátor** | Áttekintés | az előbbi öt, majd Importálás, Emlékeztetők, Adatvédelem, Beállítások |
+
+A menüpontok gombként jelennek meg; az éppen megnyitott oldal kiemelt
+(sötétebb) gomb. Telefonon a **Navigáció** felirattal összecsukható a menü.
+A fejléc logójára kattintva mindig a profil alapértelmezett oldalára jutsz
+vissza.
 
 Másik szerepkör kipróbálásához kattints a felső sávban a
 **Tesztprofil váltása** gombra, majd válassz új profilt. Ez a munkamenetet
@@ -41,8 +55,8 @@ váltja; a módosított szintetikus adatokat külön kell alaphelyzetbe állíta
 
 ## 3. Szülői felület
 
-Válaszd a **Szülő** profilt. A navigációban a **Feladatok** és az
-**Értesítések** jelenik meg.
+Válaszd a **Szülő** profilt. A program az **Értesítések** oldalt nyitja meg;
+a menüben a **Feladatok** és az **Értesítések** gomb jelenik meg.
 
 ### 3.1 Feladatok böngészése és jelentkezés
 
@@ -73,10 +87,15 @@ Válaszd a **Szülő** profilt. A navigációban a **Feladatok** és az
 
 ### 3.3 Értesítések és meghívóállapotok
 
-1. Nyisd meg az **Értesítések** oldalt.
-2. Nyiss meg egy értesítéshez tartozó feladatot.
-3. Egy olvasatlan értesítésnél kattints az **Olvasottnak jelölés** műveletre,
-   majd ellenőrizd az állapotváltozást.
+1. Nyisd meg az **Értesítések** oldalt (ez a szülő alapértelmezett oldala).
+2. Kattints egy értesítés kártyájára, bárhová a kártyán: megnyílik a
+   hozzá tartozó feladat. Külön „Megnyitás” hivatkozás nincs.
+3. A kártya jobb oldalán lévő **Olvasottnak jelölöm** jelölőnégyzet
+   bejelölése azonnal olvasottnak jelöli az értesítést. Az olvasott
+   értesítés négyzete bejelölt és nem módosítható. Hiba esetén a négyzet
+   visszaáll, és rövid magyar hibaüzenet jelenik meg a kártyán.
+   JavaScript nélkül a négyzet mellett megjelenő **Mentés** gombbal
+   küldhető el a jelölés.
 4. A következő címekkel kipróbálhatod a meghívóoldal különböző állapotait:
    - `/meghivas/parent-valid-invitation`
    - `/meghivas/parent-expired-invitation`
@@ -87,15 +106,17 @@ Válaszd a **Szülő** profilt. A navigációban a **Feladatok** és az
 
 ## 4. Munkatársi, csak olvasási felület
 
-Válaszd a **Munkatárs (csak olvasás)** profilt. A navigációból nyisd meg a
-**Beosztás** oldalt.
+Válaszd a **Óvónő** profilt. A program a **Beosztás** oldalt nyitja meg.
+Menü nincs, mert ez az egyetlen oldal; a részletek oldalon és a tiltott
+oldalak üzenetén a **Vissza a beosztáshoz** hivatkozás, valamint a fejléc
+logója visszavisz ide.
 
 1. Ellenőrizd a Tölgyfa csoport beosztását.
 2. Állítsd a kezdő és záró dátumot egyaránt **2026-08-14** értékre, majd
    kattints a **Szűrés** gombra. A találatok között meg kell jelennie a
    **Kézműves előkészítés** tevékenységnek.
-3. Kattints egy feladat kártyájára a részletek megnyitásához, majd térj vissza. A dátumszűrők
-   maradjanak meg.
+3. Kattints egy beosztási tétel sorára vagy kártyájára (bárhová rajta) a
+   részletek megnyitásához, majd térj vissza. A dátumszűrők maradjanak meg.
 4. Próbálj olyan dátumtartományt megadni, amelyre nincs találat; ellenőrizd
    az üres állapotot és a **Szűrők törlése** linket.
 5. Ellenőrizd, hogy az oldalon nincs feladatmódosító vagy jóváhagyó művelet,
@@ -112,8 +133,12 @@ kell kapnod.
 
 ## 5. Csoportadminisztrátori felület
 
-Válaszd a **Csoportadminisztrátor** profilt. Az **Áttekintés**,
-**Feladatok** és **Jóváhagyások** menüpont érhető el.
+Válaszd a **Csoportadminisztrátor** profilt. A program az **Áttekintés**
+oldalt nyitja meg; a menüben az **Áttekintés**, **Nyilvántartások**,
+**Feladatok és események**, **Jóváhagyások** és **Archívum** gomb látszik.
+A listák elemei egyetlen kattintható kártyák (nincs külön „Részletek”
+hivatkozás), az állapotok magyarul jelennek meg (Függőben, Jóváhagyva,
+Aktív, Archivált, Nyitott, Ütemezve).
 
 1. Az áttekintő oldalon jegyezd fel a függő jóváhagyások számát.
 2. Nyisd meg a feladatokat, szűrj vagy keress rá a
@@ -123,15 +148,16 @@ Válaszd a **Csoportadminisztrátor** profilt. Az **Áttekintés**,
    a jogosult, szabad kapacitású forgatókönyvet.
 4. Nyisd meg a **Jóváhagyások** listát. Válassz egy függő feladatcsere- vagy
    lemondási kérelmet, jelöld meg a döntést, majd rögzítsd.
-5. Opcionális: közvetlenül próbáld megnyitni a
-   `/admin/import` vagy `/admin/nyilvantartasok` címet. A csoportadminisztrátor
-   ezekhez nem férhet hozzá.
+5. Opcionális: közvetlenül próbáld megnyitni az `/admin/import`,
+   `/admin/emlekeztetok`, `/admin/adatvedelem` vagy `/admin/beallitasok`
+   címet. A csoportadminisztrátor ezekhez nem férhet hozzá, és a menüjében
+   sem szerepelnek.
 
-## 6. Óvodaadminisztrátori felület
+## 6. Szuperadminisztrátori felület
 
-Válaszd az **Óvodaadminisztrátor** profilt. A csoportadminisztrátori
-funkciókon felül a következők jelennek meg: **Nyilvántartások**,
-**Importálás**, **Emlékeztetők**, **Adatvédelem** és **Beállítások**.
+Válaszd a **Szuperadminisztrátor** profilt. A csoportadminisztrátori
+menüpontokon felül a következők jelennek meg: **Importálás**,
+**Emlékeztetők**, **Adatvédelem** és **Beállítások**.
 
 ### 6.1 Nyilvántartás és feladat
 
@@ -220,7 +246,9 @@ kiszolgálót a terminálban **Ctrl+C** billentyűkombinációval állíthatod l
 
 | Próba | Elvárt eredmény | Eredmény / megjegyzés |
 |---|---|---|
-| Profilok és navigáció | Csak a profilhoz tartozó menüpontok látszanak | |
+| Profilok és navigáció | Minden profil az alapértelmezett oldalát nyitja; a menü minden oldalon ugyanaz, az aktuális oldal kiemelt; az óvónőnek nincs menüje | |
+| Listaelemek és állapotok | Minden listaelem egyetlen kattintható kártya; az állapotok magyarul látszanak | |
+| Értesítés olvasottnak jelölése | A négyzet bejelölése azonnal olvasottá teszi; az olvasott négyzet bejelölt és nem módosítható | |
 | Szülői jelentkezés | Nyitott feladat vállalható; betelt/nem jogosult feladat nem | |
 | Csere és lemondás | Kérelem elküldése sikeres, az indoklás nem jelenik meg más nézetben | |
 | Munkatársi beosztás | Szűrés és részletek működnek; nincs módosító művelet | |

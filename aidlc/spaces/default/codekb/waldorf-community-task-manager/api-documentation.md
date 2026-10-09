@@ -1,31 +1,24 @@
 # API Documentation
 
-## HTTP Route Handlers
-
-| Method and path | File | Behaviour |
+## Route handlers
+| Method path | Purpose | Notes |
 |---|---|---|
-| GET `/api/readiness` | `app/api/readiness/route.ts` | Readiness probe used by Playwright web servers and start smoke |
-| POST `/api/synthetic/session` | `app/api/synthetic/session/route.ts` | Form field `profileId` (zod enum: `parent-local`, `kindergarten-teacher-local`, `group-admin-local`, `super-admin-local`; empty string clears the cookie). 503 outside synthetic mode, 403 on cross-origin, 400 on invalid body/profile, otherwise 303 to `/` |
-| POST `/api/synthetic/reset` | `app/api/synthetic/reset/route.ts` | Resets synthetic state for tests (same-origin) |
-| GET `/munkatars/beosztas`, `/munkatars/beosztas/[id]` | `app/munkatars/beosztas/*` | Legacy 307 redirect to teacher schedule via `compatibilityLocation` |
+| POST /api/synthetic/session | Select or clear a synthetic profile | Same-origin check; empty `profileId` clears cookie; valid id sets signed cookie; always 303 to `/` (app/api/synthetic/session/route.ts:33,35,46); 400 `SYNTHETIC_PROFILE_INVALID`, 403 `REQUEST_ORIGIN_DENIED`, 503 outside synthetic mode |
+| POST /api/synthetic/reset | Reset synthetic fixture state | Used by browser tests |
+| GET /api/readiness | Readiness probe | `{status:"ready",mode}` or 503 with config error code |
+| GET munkatars/beosztas, /[id] | Schedule route handlers for colleagues | Teacher compatibility routes |
 
-## Pages (UI routes)
+## Server actions
+- app/szulo/actions.ts: sign up, swap, cancel, contribution, `markNotificationReadAction` (:70-92; input `id`, `idempotencyKey`; returns `ParentActionState` with `link`).
+- app/admin/actions.ts, app/admin/advanced-actions.ts: records, tasks, assignments, approvals, import, reminders, lifecycle, settings.
+- app/belepes/actions.ts: parent synthetic login, returns `destination` (default /szulo/feladatok).
+- app/meghivas/[token]/actions.ts: accept and resend invitation.
 
-- Entry `/`; parent login `/belepes?tovabb=`; parent `/szulo/feladatok[?allapot=]`, `/szulo/feladatok/[id]`, `/csere`, `/lemondas`, `/szulo/ertesitesek`.
-- Admin `/admin`, `/admin/feladatok[?q=&state=]`, `/admin/jovahagyasok[?q=&state=]`, `/admin/nyilvantartasok[?q=&state=]`, detail pages, `/admin/import`, `/emlekeztetok`, `/adatvedelem`, `/beallitasok`, `/archivum`.
-- Teacher `/teacher/schedule[?groupId=&from=&to=]`, `/teacher/schedule/[id]`.
-- Invitation `/meghivas/[token]`, `/hozzaferes-megtagadva`.
+## Page routes (Hungarian paths)
+Public: /, /belepes, /meghivas/[token], /hozzaferes-megtagadva. Parent: /szulo/feladatok, /szulo/feladatok/[id], .../csere, .../lemondas, /szulo/ertesitesek. Teacher: /teacher/schedule, /teacher/schedule/[id]. Admin: /admin, /admin/nyilvantartasok(+/uj,/[id]), /admin/feladatok(+/uj,/[id]), /admin/jovahagyasok(+/[id]), /admin/archivum(+/[id]), /admin/emlekeztetok, /admin/adatvedelem, /admin/beallitasok, /admin/import.
 
-Admin list filter vocabulary (`AdminFilterBar.tsx`): `state` in `active|archived|open|pending` plus free text `q`. Item states in synthetic data: `active`, `archived`, `open`, `scheduled`, `pending`, `approved` (`src/admin-core/synthetic-admin.ts`). Parent duty filter `allapot` values: `available|full|ineligible|assigned|swap-pending|cancellation-pending`.
+## Internal contracts
+`NavigationItem {id,label,href}`, `NavigationModel {homePath,items}`, `AdminItemModel {id,title,state:string,version?}`, `NotificationModel {id,title,link,isRead,timing,providerStatus}`, `DutyListItemModel.state` enum, `TrackingEntry` (src/application/contracts.ts). Authorization: `AUTHORIZATION_MATRIX` version `four-role-v1`.
 
-## Internal Application Ports
-
-`src/application/` exposes `ParentApplicationPort` (listDuties, getDuty, signUp, swap/cancel requests, notifications), `AdminApplicationPort` (`getDashboard`, `listRecords`, `listTasks`, `listApprovals`, detail and mutation operations), `TeacherApplicationPort`, `SessionGateway`. All return `ApplicationResult<T>` (states in `contracts.ts:48-63`). `NavigationItem = { id, label, href }` drives the shell navigation.
-
-## Server Actions
-
-`authenticateParentAction`, parent `signUpAction`/`updateContributionAction` and swap/cancel actions, admin and advanced-admin mutations, invitation actions.
-
-## Contract Constraints for UI Work
-
-No API contract change is needed for the intent: profile selection keeps the `profileId` form POST; list/detail routes and query parameters stay as above.
+## Query parameters
+`state`, `q` (admin lists, state values active|archived|open|pending), `allapot` (parent duty filter), teacher filter params via app/teacher/_lib/filters.ts.

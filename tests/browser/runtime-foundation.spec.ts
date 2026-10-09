@@ -12,20 +12,30 @@ test("selects a synthetic parent profile and renders its permitted shell", async
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "Helyi tesztprofil kiválasztása" })).toBeVisible();
   await page.getByTestId("profile-selector-parent-local-button").click();
-  await expect(page.getByRole("heading", { name: "Üdvözlünk, Szülő!" })).toBeFocused();
+  // The parent lands on Értesítések; there is no welcome page any more.
+  await expect(page).toHaveURL(/\/szulo\/ertesitesek$/);
+  await expect(page.getByRole("heading", { name: "Értesítések", exact: true })).toBeFocused();
+  await expect(page.getByText("Üdvözlünk")).toHaveCount(0);
   await expect(page.getByTestId("app-shell-navigation-parent-duties")).toBeVisible();
+  await expect(page.getByTestId("app-shell-navigation-parent-notifications")).toHaveAttribute(
+    "aria-current",
+    "page",
+  );
   await expect(page.getByTestId("app-shell-navigation-admin-import")).toHaveCount(0);
 });
 
 test("switching profiles clears the prior projection", async ({ page }) => {
   await page.goto("/");
   await page.getByTestId("profile-selector-parent-local-button").click();
-  await expect(page.getByRole("heading", { name: "Üdvözlünk, Szülő!" })).toBeFocused();
+  await expect(page.getByRole("heading", { name: "Értesítések", exact: true })).toBeFocused();
   await page.getByTestId("app-shell-switch-profile-button").click();
   await expect(page.getByRole("heading", { name: "Helyi tesztprofil kiválasztása" })).toBeVisible();
   await page.getByTestId("profile-selector-kindergarten-teacher-local-button").click();
-  await expect(page.getByRole("heading", { name: "Üdvözlünk, Óvónő!" })).toBeVisible();
-  await expect(page.getByTestId("app-shell-navigation-teacher-tracking")).toBeVisible();
+  await expect(page).toHaveURL(/\/teacher\/schedule$/);
+  await expect(page.getByRole("heading", { name: "Beosztás", exact: true })).toBeVisible();
+  // The teacher has a single page, so there is no menu and no menu toggle.
+  await expect(page.getByTestId("app-shell-navigation")).toHaveCount(0);
+  await expect(page.getByTestId("app-shell-navigation-toggle")).toHaveCount(0);
   await expect(page.getByTestId("app-shell-navigation-parent-duties")).toHaveCount(0);
 });
 

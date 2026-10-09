@@ -3,6 +3,7 @@ import { AdminMutationForm } from "../_components/AdminMutationForm.tsx";
 import { retryReminderAction } from "../advanced-actions.ts";
 import { resolveAdminFacade } from "../_lib/facade.ts";
 import { resolveAdminSession } from "../_lib/session.ts";
+import { statusLabel } from "../../../src/application/status-labels.ts";
 
 export default async function ReminderMonitorPage({
   searchParams,
@@ -34,9 +35,9 @@ export default async function ReminderMonitorPage({
         <label htmlFor="status">Állapot</label>
         <select id="status" name="status" defaultValue={query.status ?? ""}>
           <option value="">Mind</option>
-          <option value="retryable">Újrapróbálható</option>
-          <option value="sent">Elküldve</option>
-          <option value="stale">Elavult</option>
+          <option value="retryable">{statusLabel("retryable")}</option>
+          <option value="sent">{statusLabel("sent")}</option>
+          <option value="stale">{statusLabel("stale")}</option>
         </select>
         <button type="submit" data-testid="admin-reminder-filter-submit">
           Szűrés
@@ -52,7 +53,7 @@ export default async function ReminderMonitorPage({
               <dl className="advanced-details">
                 <div>
                   <dt>Állapot</dt>
-                  <dd>{job.status}</dd>
+                  <dd>{statusLabel(job.status)}</dd>
                 </div>
                 <div>
                   <dt>Kísérlet</dt>

@@ -113,14 +113,26 @@ test("notification read and authorized link are explicit and provider state is s
   await expect(page.getByTestId(`notification-card-${noticeId}`)).toContainText(
     "Szimulált szolgáltató",
   );
-  await page.getByTestId(`notification-read-button-${noticeId}`).click();
-  await expect(page.getByTestId(`notification-state-${noticeId}-success`)).toContainText(
-    "olvasottként",
-  );
-  await expect(page.getByTestId(`notification-result-link-${noticeId}`)).toHaveAttribute(
+  // The whole card is one link to the authorized target; no separate "Megnyitás" link remains.
+  await expect(page.getByTestId(`notification-link-${noticeId}`)).toHaveAttribute(
     "href",
     `/szulo/feladatok/${dutyId}`,
   );
+  await expect(page.getByTestId(`notification-card-${noticeId}`).getByRole("link")).toHaveCount(1);
+  // Ticking the checkbox marks the notification as read at once (no extra button).
+  const checkbox = page.getByTestId(`notification-read-checkbox-${noticeId}`);
+  await expect(checkbox).toHaveAccessibleName(/^Olvasottnak jelölöm /);
+  // The tick submits through the hydrated form, so wait for the page scripts to finish loading.
+  await page.waitForLoadState("networkidle");
+  await checkbox.check();
+  await expect(page.getByTestId(`notification-state-${noticeId}-success`)).toContainText(
+    "olvasottként",
+  );
+  await expect(checkbox).toBeChecked();
+  await expect(checkbox).toBeDisabled();
+  await page.reload();
+  await expect(page.getByTestId(`notification-read-checkbox-${noticeId}`)).toBeChecked();
+  await expect(page.getByTestId(`notification-read-checkbox-${noticeId}`)).toBeDisabled();
 });
 
 test("Parent sees permitted allergen text and edits only the own contribution note", async ({

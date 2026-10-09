@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { AdminAccessState } from "../../app/admin/_components/AdminAccessState.tsx";
 import { AdminFilterBar } from "../../app/admin/_components/AdminFilterBar.tsx";
@@ -85,11 +85,36 @@ describe("administrator shared presentation", () => {
         testId="records"
       />,
     );
-    expect(screen.getByTestId("records-item-family-feny")).toHaveTextContent("active");
+    expect(screen.getByTestId("records-item-family-feny")).toHaveTextContent("Aktív");
+    expect(screen.getByTestId("records-item-family-feny")).not.toHaveTextContent("active");
     expect(screen.getByTestId("records-open-family-feny")).toHaveAttribute(
       "href",
       "/admin/nyilvantartasok/family-feny",
     );
+  });
+
+  it("makes each item one whole-card link with one accessible name and no Részletek link", () => {
+    render(
+      <ResponsiveCollection
+        items={[
+          { id: "approval-csere", title: "Feladatcsere-kérelem", state: "pending", version: 1 },
+          { id: "odd", title: "Új elem", state: "something-new" },
+        ]}
+        basePath="/admin/jovahagyasok"
+        testId="approvals"
+      />,
+    );
+    const items = screen.getAllByRole("listitem");
+    expect(items).toHaveLength(2);
+    for (const item of items) expect(within(item).getAllByRole("link")).toHaveLength(1);
+    expect(screen.getByRole("link", { name: "Feladatcsere-kérelem Függőben" })).toHaveAttribute(
+      "href",
+      "/admin/jovahagyasok/approval-csere",
+    );
+    // A state without a Hungarian label never shows the raw value.
+    expect(screen.getByRole("link", { name: "Új elem Ismeretlen állapot" })).toBeVisible();
+    expect(document.body).not.toHaveTextContent("Részletek");
+    expect(document.body).not.toHaveTextContent("something-new");
   });
 
   it("renders empty collection without an interactive link", () => {
@@ -118,6 +143,13 @@ describe("administrator shared presentation", () => {
     expect(document.body).not.toHaveTextContent("family-feny");
   });
 
+  it("leads a teacher who opened an admin page back to Beosztás", () => {
+    render(<AdminAccessState kind="denied" homePath="/teacher/schedule" />);
+    const back = screen.getByTestId("admin-access-state-home-link");
+    expect(back).toHaveTextContent("Vissza a beosztáshoz");
+    expect(back).toHaveAttribute("href", "/teacher/schedule");
+  });
+
   it("renders a safe configuration failure", () => {
     render(<AdminAccessState kind="configuration-error" message="Hiányzó futtatási beállítás." />);
     expect(screen.getByTestId("admin-configuration-error")).toHaveTextContent(
@@ -137,6 +169,18 @@ describe("administrator shared presentation", () => {
     expect(screen.getByLabelText("Keresés")).toHaveValue("kert");
     expect(screen.getByLabelText("Állapot")).toHaveValue("open");
     expect(screen.getByTestId("admin-filter-submit-button")).toBeInTheDocument();
+  });
+
+  it("shows Hungarian state words while the option values stay unchanged", () => {
+    render(<AdminFilterBar action="/admin/feladatok" />);
+    const options = within(screen.getByLabelText("Állapot")).getAllByRole("option");
+    expect(options.map((option) => [option.getAttribute("value"), option.textContent])).toEqual([
+      ["", "Minden állapot"],
+      ["active", "Aktív"],
+      ["archived", "Archivált"],
+      ["open", "Nyitott"],
+      ["pending", "Függőben"],
+    ]);
   });
 
   it("renders empty filter defaults", () => {

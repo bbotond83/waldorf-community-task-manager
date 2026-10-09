@@ -27,19 +27,20 @@ const parentNavigation: readonly NavigationItem[] = [
   { id: "parent-notifications", label: "Értesítések", href: "/szulo/ertesitesek" },
 ];
 
-const kindergartenTeacherNavigation: readonly NavigationItem[] = [
-  { id: "teacher-tracking", label: "Beosztás", href: "/teacher/schedule" },
-];
+// The teacher's only page is Beosztás, so the shell shows no menu for this profile.
+const kindergartenTeacherNavigation: readonly NavigationItem[] = [];
 
+// One consistent menu per profile: every page shows exactly this list (no request-time rewrite).
 const groupAdminNavigation: readonly NavigationItem[] = [
   { id: "admin-dashboard", label: "Áttekintés", href: "/admin" },
-  { id: "admin-tasks", label: "Feladatok", href: "/admin/feladatok" },
+  { id: "admin-records", label: "Nyilvántartások", href: "/admin/nyilvantartasok" },
+  { id: "admin-tasks", label: "Feladatok és események", href: "/admin/feladatok" },
   { id: "admin-approvals", label: "Jóváhagyások", href: "/admin/jovahagyasok" },
+  { id: "admin-archive", label: "Archívum", href: "/admin/archivum" },
 ];
 
 const organizationAdminNavigation: readonly NavigationItem[] = [
   ...groupAdminNavigation,
-  { id: "admin-records", label: "Nyilvántartások", href: "/admin/nyilvantartasok" },
   { id: "admin-import", label: "Importálás", href: "/admin/import" },
   { id: "admin-reminders", label: "Emlékeztetők", href: "/admin/emlekeztetok" },
   { id: "admin-privacy", label: "Adatvédelem", href: "/admin/adatvedelem" },
@@ -53,7 +54,7 @@ export const SYNTHETIC_PROFILES: readonly SyntheticProfile[] = Object.freeze([
     label: "Szülő",
     scopeSummary: "Egy kitalált család saját feladatai",
     authorizationVersion: 1,
-    homePath: "/szulo/feladatok",
+    homePath: "/szulo/ertesitesek",
     navigation: parentNavigation,
   },
   {

@@ -66,6 +66,18 @@ test("assignment capacity conflict and approval success are explicit", async ({
   );
 });
 
+test("a whole approval item opens its detail and shows Hungarian states", async ({ page }) => {
+  await selectGroupAdministrator(page);
+  await page.goto("/admin/jovahagyasok");
+  const list = page.getByTestId("admin-approvals-list");
+  await expect(list).not.toContainText(/pending|approved|active|archived/);
+  await expect(list.locator("li").first()).toContainText("Függőben");
+  // Clicking the state word (not the title) still opens the item.
+  await list.locator("li").first().locator(".admin-state-badge").click();
+  await expect(page).toHaveURL(/\/admin\/jovahagyasok\/approval-/);
+  await expect(page.getByText(/Állapot: (Függőben|Jóváhagyva)/)).toBeVisible();
+});
+
 test("archive restore conflict preserves the archived item", async ({ page }) => {
   await page.goto("/");
   if (
@@ -82,7 +94,7 @@ test("archive restore conflict preserves the archived item", async ({ page }) =>
   await expect(page.getByTestId("admin-record-restore-form-state-conflict")).toContainText(
     "nem állítható vissza",
   );
-  await expect(page.getByText("Állapot: archived")).toBeVisible();
+  await expect(page.getByText("Állapot: Archivált")).toBeVisible();
 });
 
 test("Group Administrator direct import access is generically denied", async ({ page }) => {

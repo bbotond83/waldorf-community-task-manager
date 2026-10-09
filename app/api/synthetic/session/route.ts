@@ -43,7 +43,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: { code: "SYNTHETIC_PROFILE_INVALID" } }, { status: 400 });
   }
 
-  const response = NextResponse.redirect(redirectTarget, 303);
+  // Choosing a profile opens that profile's default page directly (no welcome page).
+  const response = NextResponse.redirect(
+    new URL(profile.homePath, request.headers.get("origin")!),
+    303,
+  );
   response.cookies.set(
     SESSION_COOKIE_NAME,
     createSyntheticSessionToken(profile),

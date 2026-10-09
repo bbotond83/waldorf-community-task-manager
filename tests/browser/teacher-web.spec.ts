@@ -200,3 +200,47 @@ test("Teacher old bookmarks redirect safely and destination independently denies
   await expect(page.getByTestId("teacher-schedule-validation")).toBeVisible();
   await expect(page.getByTestId("teacher-schedule-table")).toHaveCount(0);
 });
+
+test("Teacher opens an entry with a click on any part of its row or card and by keyboard", async ({
+  page,
+}, testInfo) => {
+  const isMobile = testInfo.project.name === "mobile-chrome";
+  await page.goto("/teacher/schedule");
+  const item = page.getByTestId(
+    isMobile ? "teacher-schedule-card-schedule-garden" : "teacher-schedule-row-schedule-garden",
+  );
+  // A click on the item's text outside its title opens the same detail page.
+  // The stretched link covers the item, so click by position like a person would.
+  const target = isMobile ? item.locator("dd").first() : item.getByRole("cell").nth(3);
+  await target.scrollIntoViewIfNeeded();
+  const box = (await target.boundingBox())!;
+  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+  await expect(page).toHaveURL(/\/teacher\/schedule\/schedule-garden/);
+  await expect(page.getByTestId("teacher-schedule-detail-fields")).toBeVisible();
+  await page.getByTestId("teacher-schedule-detail-back-link").click();
+  await expect(page).toHaveURL(/\/teacher\/schedule\?/);
+
+  // Keyboard: the one link of the row or card is reachable and opens the entry with Enter.
+  const link = page.getByTestId(
+    isMobile
+      ? "teacher-schedule-card-open-schedule-garden"
+      : "teacher-schedule-open-schedule-garden",
+  );
+  await link.focus();
+  await expect(link).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(page).toHaveURL(/\/teacher\/schedule\/schedule-garden/);
+});
+
+test("Teacher has no menu and finds the way back to Beosztás from other pages", async ({
+  page,
+}) => {
+  await page.goto("/teacher/schedule");
+  await expect(page.getByTestId("app-shell-navigation")).toHaveCount(0);
+  await expect(page.getByTestId("app-shell-navigation-toggle")).toHaveCount(0);
+  await expect(page.getByTestId("brand-link")).toHaveAttribute("href", "/teacher/schedule");
+  await page.goto("/admin");
+  await expect(page.getByRole("heading", { name: "Nincs jogosultság", exact: true })).toBeVisible();
+  await page.getByRole("link", { name: "Vissza a beosztáshoz" }).click();
+  await expect(page).toHaveURL(/\/teacher\/schedule$/);
+});

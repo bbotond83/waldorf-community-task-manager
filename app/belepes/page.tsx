@@ -1,4 +1,5 @@
 import { BrandMark } from "../../src/runtime/BrandMark.tsx";
+import { getSyntheticProfile } from "../../src/runtime/synthetic/profiles.ts";
 import { resolveParentSession } from "../szulo/_lib/session.ts";
 import { AuthenticationEntry } from "./AuthenticationEntry.tsx";
 
@@ -9,8 +10,9 @@ export default async function LoginPage({
 }: {
   searchParams: Promise<{ tovabb?: string }>;
 }) {
-  const { tovabb = "/szulo/feladatok" } = await searchParams;
-  const intendedPath = /^\/szulo(?:\/|$)/.test(tovabb) ? tovabb : "/szulo/feladatok";
+  const defaultPath = getSyntheticProfile("parent-local")!.homePath;
+  const { tovabb = defaultPath } = await searchParams;
+  const intendedPath = /^\/szulo(?:\/|$)/.test(tovabb) ? tovabb : defaultPath;
   const session = await resolveParentSession();
   return (
     <main id="fo-tartalom" className="centered-panel parent-public-page" data-testid="login-page">
@@ -25,7 +27,7 @@ export default async function LoginPage({
           <h2>Közelgő feladat</h2>
           <p>A következő vállalt feladat: Lámpás ünnep előkészítése.</p>
           <a href={intendedPath} data-testid="upcoming-duty-link">
-            Tovább a feladatokhoz
+            Tovább az alkalmazásba
           </a>
         </section>
       ) : (

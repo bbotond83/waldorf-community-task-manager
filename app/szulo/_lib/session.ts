@@ -21,7 +21,7 @@ export type ParentSession = Readonly<{
 export type ParentSessionResult =
   | { state: "success"; data: ParentSession }
   | { state: "signed-out" }
-  | { state: "denied" }
+  | { state: "denied"; homePath?: string }
   | { state: "configuration-error" };
 
 export async function resolveParentSession(): Promise<ParentSessionResult> {
@@ -32,7 +32,9 @@ export async function resolveParentSession(): Promise<ParentSessionResult> {
   const cookieStore = await cookies();
   const resolved = resolveSyntheticSession(cookieStore.get(SESSION_COOKIE_NAME)?.value);
   if (!resolved) return { state: "signed-out" };
-  if (resolved.profile.role !== "parent") return { state: "denied" };
+  if (resolved.profile.role !== "parent") {
+    return { state: "denied", homePath: resolved.profile.homePath };
+  }
 
   return {
     state: "success",

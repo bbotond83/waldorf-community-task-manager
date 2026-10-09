@@ -1,6 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
 import { SYNTHETIC_PROFILES } from "../../src/runtime/synthetic/profiles.ts";
-import { greetingName } from "./support/profile-login-measurement.ts";
 
 async function resetToChooser(page: Page) {
   await page.goto("/");
@@ -45,22 +44,25 @@ for (const width of [320, 375]) {
 test("a chooser card selects the profile with mouse and with keyboard", async ({ page }) => {
   await resetToChooser(page);
   await page.getByTestId("profile-selector-parent-local-button").click();
-  await expect(page.getByRole("heading", { name: greetingName("Szülő") })).toBeFocused();
+  const heading = page.getByRole("heading", { name: "Értesítések", exact: true });
+  await expect(heading).toBeFocused();
+  // The heading takes focus for screen readers but no box is drawn around it.
+  expect(await heading.evaluate((element) => getComputedStyle(element).outlineStyle)).toBe("none");
   await page.getByTestId("app-shell-switch-profile-button").click();
   const card = page.getByTestId("profile-selector-kindergarten-teacher-local-button");
   await card.focus();
   await expect(card).toBeFocused();
   await page.keyboard.press("Enter");
-  await expect(page.getByRole("heading", { name: greetingName("Óvónő") })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Beosztás", exact: true })).toBeVisible();
 });
 
-test("the header logo returns to the start page", async ({ page }) => {
+test("the header logo returns to the profile's default page", async ({ page }) => {
   await resetToChooser(page);
   await page.getByTestId("profile-selector-parent-local-button").click();
   await page.goto("/szulo/feladatok");
   await page.getByTestId("brand-link").click();
-  await expect(page).toHaveURL(/\/$/);
-  await expect(page.getByRole("heading", { name: greetingName("Szülő") })).toBeVisible();
+  await expect(page).toHaveURL(/\/szulo\/ertesitesek$/);
+  await expect(page.getByRole("heading", { name: "Értesítések", exact: true })).toBeVisible();
 });
 
 test("admin overview card opens pending approvals with the same count", async ({ page }) => {
@@ -109,5 +111,5 @@ test("the chooser stays usable and stable when images fail to load (R-05)", asyn
   const failed = await page.getByRole("heading", { level: 1 }).boundingBox();
   expect(failed?.y).toBeCloseTo(loaded!.y, 0);
   await page.getByTestId("profile-selector-parent-local-button").click();
-  await expect(page.getByRole("heading", { name: greetingName("Szülő") })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Értesítések", exact: true })).toBeVisible();
 });

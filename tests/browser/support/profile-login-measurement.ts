@@ -12,11 +12,6 @@ export type LoginMeasurement = {
   requests: { path: string; method: string; duration: number }[];
 };
 
-/** The greeting heading is plain text (no soft hyphens); CSS hyphenation handles wrapping. */
-export function greetingName(label: string): string {
-  return `Üdvözlünk, ${label}!`;
-}
-
 export function assertLoginDuration(elapsed: number) {
   if (!Number.isFinite(elapsed) || elapsed < 0 || elapsed > 5000) {
     throw new Error(`Profile login must complete within 5000 ms; observed ${elapsed} ms`);
@@ -27,7 +22,7 @@ export async function assertProfileMainReady(page: Page, profile: SyntheticProfi
   await expect(
     page.getByTestId(
       profile.role === "parent"
-        ? "parent-duties-page"
+        ? "parent-notifications-page"
         : profile.role === "kindergarten-teacher"
           ? "teacher-schedule-page"
           : "admin-dashboard-page",
@@ -35,6 +30,11 @@ export async function assertProfileMainReady(page: Page, profile: SyntheticProfi
   ).toBeVisible();
   await expect(page).toHaveURL(new RegExp(`${profile.homePath.replaceAll("/", "\\/")}(\\?.*)?$`));
   await expect(page.getByTestId("app-shell-profile-summary")).toContainText(profile.label);
+  if (profile.navigation.length === 0) {
+    // A profile with a single page (the teacher) has no menu and no menu toggle.
+    await expect(page.getByTestId("app-shell-navigation")).toHaveCount(0);
+    await expect(page.getByTestId("app-shell-navigation-toggle")).toHaveCount(0);
+  }
   for (const item of profile.navigation) {
     const link = page.getByTestId(`app-shell-navigation-${item.id}`);
     await expect(link).toBeVisible();
@@ -42,13 +42,8 @@ export async function assertProfileMainReady(page: Page, profile: SyntheticProfi
     await expect(link).toHaveAttribute("href", item.href);
   }
   if (profile.role === "parent") {
-    await expect(
-      page.getByRole("heading", { name: "Családi feladatok", exact: true }),
-    ).toBeVisible();
-    await expect(page.getByTestId("duties")).toBeVisible();
-    await expect(page.getByTestId("duty-list").locator("li").first()).toBeVisible();
-    await expect(page.getByTestId("duty-filter-select")).toBeEnabled();
-    await expect(page.getByTestId("duty-filter-submit-button")).toBeEnabled();
+    await expect(page.getByRole("heading", { name: "Értesítések", exact: true })).toBeVisible();
+    await expect(page.getByTestId("notification-list").locator("li").first()).toBeVisible();
   } else if (profile.role === "kindergarten-teacher") {
     await expect(page.getByRole("heading", { name: "Beosztás", exact: true })).toBeVisible();
     await expect(page.getByTestId("teacher-schedule")).toBeVisible();
@@ -112,10 +107,7 @@ export async function measureProfileLogin(
       );
     });
     await page.getByTestId(`profile-selector-${profile.id}-button`).click();
-    await expect(page.getByRole("heading", { name: greetingName(profile.label) })).toBeVisible();
-    const home = profile.navigation.find((item) => item.href === profile.homePath);
-    if (!home) throw new Error(`Missing main navigation for ${profile.id}`);
-    await page.getByTestId(`app-shell-navigation-${home.id}`).click();
+    // The session route redirects straight to the profile's default page (no welcome page).
     await assertProfileMainReady(page, profile);
   } catch (error) {
     failure = error;
@@ -154,17 +146,18 @@ export async function measureProfileLogin(
 }
 
 export function permittedNavigationIds(profile: SyntheticProfile) {
-  // AdminLayout's existing withCoreNavigation adds these scoped core pages to all administrators.
-  return new Set([
-    ...profile.navigation.map((item) => item.id),
-    ...(profile.homePath === "/admin" ? ["admin-records", "admin-archive"] : []),
-  ]);
+  // The one menu of each profile is defined in profiles.ts and shown unchanged on every page.
+  return new Set(profile.navigation.map((item) => item.id));
 }
 
 export async function exercisePrimaryControl(page: Page, profile: SyntheticProfile) {
   if (profile.role === "parent") {
-    await page.getByTestId("duty-filter-submit-button").click();
-    await assertProfileMainReady(page, profile);
+    await page.getByTestId("app-shell-navigation-parent-duties").click();
+    await expect(page).toHaveURL(/\/szulo\/feladatok$/);
+    await expect(
+      page.getByRole("heading", { name: "Családi feladatok", exact: true }),
+    ).toBeVisible();
+    await expect(page.getByTestId("duty-filter-submit-button")).toBeEnabled();
   } else if (profile.role === "kindergarten-teacher") {
     await page.getByTestId("teacher-schedule-filter-submit-button").click();
     await assertProfileMainReady(page, profile);

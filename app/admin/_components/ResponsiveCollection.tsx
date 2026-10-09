@@ -1,6 +1,8 @@
 import Link from "next/link";
 import type { AdminItemModel } from "../../../src/application/index.ts";
+import { statusLabel } from "../../../src/application/status-labels.ts";
 
+/** Each item is one link (title and Hungarian state) that opens the item anywhere on the card. */
 export function ResponsiveCollection({
   items,
   basePath,
@@ -10,15 +12,13 @@ export function ResponsiveCollection({
     <ul className="admin-collection" data-testid={testId}>
       {items.map((item) => (
         <li className="admin-card" key={item.id} data-testid={`${testId}-item-${item.id}`}>
-          <div>
-            <strong>{item.title}</strong>
-            <span className="admin-state-badge">{item.state}</span>
-          </div>
           <Link
+            className="admin-card-link"
             href={`${basePath}/${encodeURIComponent(item.id)}`}
             data-testid={`${testId}-open-${item.id}`}
           >
-            Részletek
+            <strong>{item.title}</strong>{" "}
+            <span className="admin-state-badge">{statusLabel(item.state)}</span>
           </Link>
         </li>
       ))}

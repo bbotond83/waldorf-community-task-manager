@@ -3,6 +3,7 @@ import { AdminMutationForm } from "../_components/AdminMutationForm.tsx";
 import { runLifecycleAction } from "../advanced-actions.ts";
 import { resolveAdminFacade } from "../_lib/facade.ts";
 import { resolveAdminSession } from "../_lib/session.ts";
+import { statusLabel } from "../../../src/application/status-labels.ts";
 
 export default async function PrivacyLifecyclePage({
   searchParams,
@@ -37,7 +38,7 @@ export default async function PrivacyLifecyclePage({
             >
               <h2>{candidate.label}</h2>
               <p>
-                Állapot: <strong>{candidate.eligibility}</strong>
+                Állapot: <strong>{statusLabel(candidate.eligibility)}</strong>
               </p>
               {candidate.blockerSummary && (
                 <p className="blocked-panel">Blokkoló: {candidate.blockerSummary}</p>

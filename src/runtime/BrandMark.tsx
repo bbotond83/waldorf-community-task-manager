@@ -3,8 +3,16 @@ import Link from "next/link";
 
 export const BRAND_NAME = "Cinkotai Waldorf Óvoda";
 
-/** Kindergarten logo; links to the start page unless `linked` is false. */
-export function BrandMark({ linked = true, size = 56 }: { linked?: boolean; size?: number }) {
+/** Kindergarten logo; links to `href` (the start page by default) unless `linked` is false. */
+export function BrandMark({
+  linked = true,
+  size = 56,
+  href = "/",
+}: {
+  linked?: boolean;
+  size?: number;
+  href?: string;
+}) {
   const image = (
     <Image
       className="brand-mark"
@@ -17,7 +25,7 @@ export function BrandMark({ linked = true, size = 56 }: { linked?: boolean; size
   );
   if (!linked) return image;
   return (
-    <Link className="brand-link" href="/" data-testid="brand-link">
+    <Link className="brand-link" href={href} data-testid="brand-link">
       {image}
     </Link>
   );

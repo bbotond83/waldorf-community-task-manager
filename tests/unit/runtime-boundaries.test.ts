@@ -26,7 +26,7 @@ describe("profile login measurement boundary", () => {
   it("accepts the inclusive five-second boundary", () => {
     expect(() => assertLoginDuration(5000)).not.toThrow();
   });
-  it("includes the existing scoped administrator core links without granting parent or staff access", () => {
+  it("takes the permitted links from the one menu of each profile", () => {
     expect(permittedNavigationIds(SYNTHETIC_PROFILES[2]).has("admin-archive")).toBe(true);
     expect(permittedNavigationIds(SYNTHETIC_PROFILES[2]).has("admin-records")).toBe(true);
     expect(permittedNavigationIds(SYNTHETIC_PROFILES[2]).has("admin-import")).toBe(false);
@@ -34,7 +34,7 @@ describe("profile login measurement boundary", () => {
       "parent-duties",
       "parent-notifications",
     ]);
-    expect([...permittedNavigationIds(SYNTHETIC_PROFILES[1])]).toEqual(["teacher-tracking"]);
+    expect([...permittedNavigationIds(SYNTHETIC_PROFILES[1])]).toEqual([]);
   });
   it("rejects a successful but over-budget login", () => {
     expect(() => assertLoginDuration(5001)).toThrow("within 5000 ms");
@@ -58,7 +58,7 @@ describe("profile login measurement boundary", () => {
       expect(records).toEqual([
         expect.objectContaining({
           profile: "parent-local",
-          destination: "/szulo/feladatok",
+          destination: "/szulo/ertesitesek",
           elapsed,
           observedElapsed: expect.any(Number),
           result: "failed",

@@ -9,7 +9,9 @@ export const dynamic = "force-dynamic";
 export default async function AdminLayout({ children }: Readonly<{ children: ReactNode }>) {
   const session = await resolveAdminSession();
   if (session.state === "signed-out") redirect("/");
-  if (session.state === "denied") return <AdminAccessState kind="denied" />;
+  if (session.state === "denied") {
+    return <AdminAccessState kind="denied" homePath={session.homePath} />;
+  }
   if (session.state === "configuration-error") {
     return <AdminAccessState kind="configuration-error" message={session.message} />;
   }

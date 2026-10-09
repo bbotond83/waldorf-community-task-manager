@@ -23,13 +23,13 @@ describe("runtime shell", () => {
     expect(cover[0]).toHaveAttribute("alt", "");
   });
 
-  it("links the logo in the app header to the start page", () => {
+  it("links the logo in the app header to the profile's default page", () => {
     render(
       <AppShell profile={SYNTHETIC_PROFILES[2]}>
         <h1>Kezdőlap</h1>
       </AppShell>,
     );
-    expect(screen.getByTestId("brand-link")).toHaveAttribute("href", "/");
+    expect(screen.getByTestId("brand-link")).toHaveAttribute("href", "/admin");
     expect(screen.getByRole("img", { name: "Cinkotai Waldorf Óvoda" })).toBeVisible();
     expect(screen.getByRole("status")).toHaveTextContent("Csoportadminisztrátor profil aktív.");
   });
@@ -57,7 +57,27 @@ describe("runtime shell", () => {
       "href",
       "/szulo/feladatok",
     );
+    expect(navigation.getByRole("link", { name: "Értesítések" })).toHaveAttribute(
+      "href",
+      "/szulo/ertesitesek",
+    );
+    expect(navigation.getAllByRole("link")).toHaveLength(2);
     expect(navigation.queryByRole("link", { name: "Importálás" })).not.toBeInTheDocument();
+  });
+
+  it.each([
+    ["group-admin-local", 5],
+    ["super-admin-local", 9],
+  ])("shows the one menu of %s with %i items", (profileId, count) => {
+    const profile = SYNTHETIC_PROFILES.find((candidate) => candidate.id === profileId)!;
+    render(
+      <AppShell profile={profile}>
+        <h1>Kezdőlap</h1>
+      </AppShell>,
+    );
+    const links = within(screen.getByRole("navigation")).getAllByRole("link");
+    expect(links.map((link) => link.textContent)).toEqual(profile.navigation.map((i) => i.label));
+    expect(links).toHaveLength(count);
   });
 
   it("renders a redacted configuration failure", () => {
@@ -88,17 +108,16 @@ it("shows four role controls and no removed profile selection", () => {
     screen.queryByTestId("profile-selector-kindergarten-admin-local-button"),
   ).not.toBeInTheDocument();
 });
-it("teacher shell announces localized role and current navigation without mutations", () => {
+it("teacher shell announces the localized role and has no menu", () => {
   render(
     <AppShell profile={SYNTHETIC_PROFILES[1]}>
       <h1>Óvónői kezdőlap</h1>
     </AppShell>,
   );
   expect(screen.getByRole("status")).toHaveTextContent("Óvónő profil aktív.");
-  expect(screen.getByTestId("app-shell-navigation-teacher-tracking")).toHaveAttribute(
-    "href",
-    "/teacher/schedule",
-  );
+  expect(screen.queryByRole("navigation")).not.toBeInTheDocument();
+  expect(screen.queryByTestId("app-shell-navigation-toggle")).not.toBeInTheDocument();
+  expect(screen.getByTestId("brand-link")).toHaveAttribute("href", "/teacher/schedule");
   expect(screen.getByTestId("app-shell-skip-link")).toHaveAttribute("href", "#fo-tartalom");
   expect(screen.getByTestId("app-shell-main")).toHaveAttribute("tabindex", "-1");
   expect(screen.queryByRole("link", { name: "Importálás" })).not.toBeInTheDocument();

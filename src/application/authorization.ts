@@ -115,7 +115,7 @@ export const AUTHORIZATION_MATRIX: readonly MatrixRow[] = Object.freeze([
 ]);
 
 const HOME_PATH_BY_ROLE: Readonly<Record<Role, string>> = Object.freeze({
-  parent: "/szulo/feladatok",
+  parent: "/szulo/ertesitesek",
   kindergarten_teacher: "/teacher/schedule",
   group_admin: "/admin",
   super_admin: "/admin",
