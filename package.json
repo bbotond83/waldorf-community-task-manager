@@ -21,9 +21,12 @@
     "format": "prettier --write app src/application src/runtime tests scripts verification *.config.* README.md",
     "format:check": "prettier --check app src/application src/runtime tests scripts verification *.config.* README.md",
     "test:domain": "node --experimental-strip-types --test \"src/**/*.test.ts\"",
+    "test:scripts": "node --experimental-strip-types --test \"scripts/**/*.test.ts\"",
     "test:delivery": "vitest run --config vitest.config.ts",
     "test:database:roles": "node --experimental-strip-types --test tests/database/current-role-migration.test.ts",
-    "test": "npm run test:domain && npm run test:delivery",
+    "test:database:stack": "node --experimental-strip-types --test tests/database/migrations.test.ts tests/database/audit.test.ts tests/database/idempotency.test.ts tests/database/holds.test.ts tests/database/worker.test.ts",
+    "test:database:shuffled": "node --experimental-strip-types scripts/db/shuffled-tests.ts",
+    "test": "npm run test:domain && npm run test:scripts && npm run test:delivery",
     "test:coverage:domain": "node --experimental-strip-types --experimental-test-coverage --test-coverage-lines=80 --test-coverage-branches=80 --test-coverage-functions=80 --test \"src/**/*.test.ts\"",
     "test:coverage:delivery": "vitest run --config vitest.config.ts --coverage",
     "test:coverage": "npm run test:coverage:domain && npm run test:coverage:delivery",
@@ -39,10 +42,15 @@
     "verify:no-deploy": "node --experimental-strip-types scripts/verification/scan-artifacts.ts no-deploy",
     "verify:security": "npm run scan:privacy && npm run scan:secrets && npm run scan:sast && npm run verify:no-deploy && npm audit --audit-level=high",
     "verify:local": "node --experimental-strip-types scripts/verification/run-local-verification.ts",
-    "verify": "npm run verify:local"
+    "verify": "npm run verify:local",
+    "db:start": "node --experimental-strip-types scripts/db/start.ts",
+    "db:stop": "node --experimental-strip-types scripts/db/stop.ts",
+    "db:migrate": "node --experimental-strip-types scripts/db/migrate.ts",
+    "db:worker": "node --experimental-strip-types scripts/db/worker.ts"
   },
   "dependencies": {
     "@next/env": "16.4.0",
+    "@supabase/supabase-js": "2.117.3",
     "next": "16.4.0",
     "react": "latest",
     "react-dom": "latest",
@@ -59,6 +67,7 @@
     "@testing-library/jest-dom": "latest",
     "@testing-library/react": "latest",
     "@types/node": "^24.0.0",
+    "@types/pg": "8.23.1",
     "@types/react": "latest",
     "@types/react-dom": "latest",
     "@vitest/coverage-istanbul": "4.1.11",
@@ -66,7 +75,9 @@
     "eslint": "latest",
     "eslint-config-next": "16.3.8",
     "jsdom": "latest",
+    "pg": "8.23.1",
     "prettier": "latest",
+    "supabase": "2.120.0",
     "typescript": "^5.9.0",
     "vitest": "4.1.11"
   }

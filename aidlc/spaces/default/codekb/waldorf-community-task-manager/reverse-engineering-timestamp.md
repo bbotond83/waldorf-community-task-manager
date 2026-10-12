@@ -2,69 +2,47 @@
 
 ## Run Record
 
-- Date: 2026-10-09
-- Commit: 2cc6e42ebf799f1a985ef93a38250c71febe7ac7
+- Date: 2026-10-12
+- Commit: 80bd4f48a2ca395bd21a29f33e4b46e3b1bf4163
+- Branch: feature/real-backend-local
+- Run type: full rescan (all 9 artifacts replaced), intent 261012-real-backend-local, Comprehensive depth
+- Executed during the scan: `npm run test:domain` (258 pass), Vitest delivery project (531 pass), migration 1 applied to a throwaway PostgreSQL 18.6 cluster (failed with a syntax error at `grant`)
+- Skimmed, not read assertion by assertion: `app/**` page components, most of `tests/**`, `scripts/verification/{core,run-local-verification,scan-artifacts}.ts`, PRD heading list, workbook sheet list
 
 ## Scope of Analysis
 
 ```yaml
 scope_version: 1
-kind: partial
-intent: admin-list-polish
-fingerprint: 031a49e82ab81e1b3c69e56ed96613a6ec93884f
+kind: full
+intent: 261012-real-backend-local
+fingerprint: da80d0470aab3bf26bdf54bd670b3e8bc0b1e886
 analyzed:
   paths:
-    - app/
-    - src/runtime/
-    - src/application/
-    - tests/
-    - verification/
+    - ./
   components:
-    - ScheduleFilter
-    - ScheduleCollection
-    - TeacherStatePanel
-    - AdminFilterBar
-    - AdminPagination
-    - AdminBackLink
-    - ResponsiveCollection
-    - Admin record and task create pages
-    - ParentDutiesPage
-    - Status labels
-    - Global stylesheet
-    - AppShell
-    - AppNav
-    - BackToHomeLink
-    - Synthetic profiles
-    - Admin session
-    - AdminMutationForm
-    - Admin pages with demo-facing text
-    - ParentDutyDetailPage
-    - ParentRequestPages
-    - ParentNotificationsPage
-    - NotificationReadForm
+    - app
+    - src/application
+    - src/runtime
+    - src/parent-web
+    - src/admin-core
+    - src/admin-advanced
+    - src/teacher-web
+    - src/teacher-tracking
+    - src/access
+    - src/coordination
+    - src/directory
+    - src/import-migration
+    - src/notifications
+    - src/parent-experience
+    - src/privacy-audit
+    - src/admin-experience
+    - supabase/migrations
+    - tests
+    - scripts
+    - verification
 shallow:
   paths:
-    - package.json
-    - vitest.config.ts
-    - playwright.config.ts
-    - next.config.ts
-    - proxy.ts
-    - .github/workflows/ci.yml
-    - .env.example
-    - HASZNALATI_UTMUTATO_HU.md
-    - src/access/
-    - src/admin-core/
-    - src/admin-advanced/
-    - src/admin-experience/
-    - src/coordination/
-    - src/directory/
-    - src/import-migration/
-    - src/notifications/
-    - src/parent-experience/
-    - src/parent-web/
-    - src/privacy-audit/
-    - src/teacher-tracking/
-    - src/teacher-web/
-    - scripts/
-    - supabase/
+    - tests/browser/
+    - scripts/verification/
+    - source-materials/
 ```

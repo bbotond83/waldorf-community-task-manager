@@ -7,8 +7,11 @@ const sql = readFileSync(
 );
 test("static SQL: transaction locks precede all preflight and mutation", () => {
   assert.match(sql, /begin;/);
-  assert.ok(sql.indexOf("lock table public.app_role_grants") < sql.indexOf("do $$"));
-  assert.ok(sql.indexOf("lock table public.app_authorization_versions") < sql.indexOf("do $$"));
+  // The file is schema-neutral (resolved through the session search path), so names are unqualified.
+  assert.ok(sql.indexOf("lock table app_role_grants") > 0);
+  assert.ok(sql.indexOf("lock table app_role_grants") < sql.indexOf("do $$"));
+  assert.ok(sql.indexOf("lock table app_authorization_versions") > 0);
+  assert.ok(sql.indexOf("lock table app_authorization_versions") < sql.indexOf("do $$"));
   assert.match(sql, /commit;\s*$/);
 });
 test("static SQL: unknown issuer/schema/triggers/version overflow block explicitly", () => {
@@ -22,10 +25,10 @@ test("static SQL: unknown issuer/schema/triggers/version overflow block explicit
     assert.ok(sql.includes(marker));
 });
 test("static SQL: only role changes, distinct invalidation and baseline missing version 2", () => {
-  assert.match(sql, /update public.app_role_grants g set role=c\."current_role"/);
+  assert.match(sql, /update app_role_grants g set role=c\."current_role"/);
   assert.match(sql, /select distinct subject_id,2/);
   assert.match(sql, /authorization_version\+1/);
-  assert.doesNotMatch(sql, /delete from public.app_role_grants/i);
+  assert.doesNotMatch(sql, /delete from (?:public\.)?app_role_grants/i);
 });
 test("static SQL: restricted redacted append-only conversion evidence retains roles", () => {
   assert.match(sql, /original_role text/);
@@ -43,8 +46,8 @@ test("static SQL: entire previous policy inventory removed before replacements",
   assert.match(sql, /from pg_policies/);
   assert.match(sql, /drop policy %I/);
   assert.ok(sql.indexOf("drop policy %I") < sql.indexOf("create policy current_grants_self"));
-  assert.match(sql, /drop function if exists public.has_active_scope/);
-  assert.match(sql, /drop function if exists public.has_admin_scope/);
+  assert.match(sql, /drop function if exists has_active_scope/);
+  assert.match(sql, /drop function if exists has_admin_scope/);
 });
 test("static SQL: family identity and supported group relations deny teacher raw access", () => {
   const policies = sql.slice(sql.indexOf("create policy family_current_read"));

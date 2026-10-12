@@ -29,7 +29,11 @@ export default defineConfig({
               resolve: {
                 alias: { "node:test": resolve("tests/coverage/support/node-test-adapter.ts") },
               },
-              test: { name: "domain-coverage", environment: "node", include: ["src/**/*.test.ts"] },
+              test: {
+                name: "domain-coverage",
+                environment: "node",
+                include: ["src/**/*.test.ts", "scripts/**/*.test.ts"],
+              },
             },
           ]
         : []),

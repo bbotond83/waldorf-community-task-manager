@@ -12,10 +12,17 @@ test-results/
 *.tsbuildinfo
 .verification/
 
-# Environment files
+# Environment files (also .env.database.local and .env.service.local written by npm run db:start)
 .env
 .env.*
 !.env.example
+
+# Real-data workbook and other spreadsheets or dumps (the privacy scan fails if one is tracked)
+source-materials/waldorf-community-app/Ovis tábla v2.xlsx
+*.xlsx
+*.xls
+*.ods
+!tests/fixtures/fictitious/**
 
 # Logs
 *.log

@@ -46,8 +46,20 @@ jobs:
           sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
           sudo apt-get install -y postgresql-18 postgresql-client-18
           echo '/usr/lib/postgresql/18/bin' >> "$GITHUB_PATH"
+      # The same command and configuration as on a developer machine (supabase/config.toml). The
+      # container images are pulled on a cold runner, so the step has its own generous timeout; the
+      # 90-second start target is reported only. The runner is an isolated VM, so publishing the
+      # stack's ports on all interfaces is acknowledged here (see npm run db:start --help).
+      - name: Start the local database stack
+        timeout-minutes: 10
+        env:
+          DB_ALLOW_ALL_INTERFACES: "1"
+        run: npm run db:start
       - name: Run the complete local verification pipeline
         run: npm run verify:local
+      - name: Stop the local database stack
+        if: always()
+        run: npm run db:stop
 
   build_evidence:
     name: SBOM and build evidence

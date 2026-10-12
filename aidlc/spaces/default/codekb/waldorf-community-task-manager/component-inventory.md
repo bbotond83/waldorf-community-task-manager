@@ -1,91 +1,94 @@
 # Component Inventory
 
-## AppShell
-src/runtime/AppShell.tsx (server component). Props `{profile: SyntheticProfile, children, statusMessage?}`. Renders skip link "Ugrás a fő tartalomra" (`app-shell-skip-link`, target `#fo-tartalom`), `header.site-header` with `BrandMark` (size 48, linked to `profile.homePath`), eyebrow "Waldorf közösségi feladatkezelő", profile summary (`profile.label` + `scopeSummary`, test id `app-shell-profile-summary`), a POST form to `/api/synthetic/session` with an EMPTY hidden `profileId` and the secondary-button "Tesztprofil váltása" (clears the cookie and returns to the chooser; tests find it by `app-shell-switch-profile-button`), `AppNav` only when `profile.navigation.length > 0` (so the teacher has no menu), `<main id="fo-tartalom" tabIndex=-1>`, and a visually-hidden polite live region (`statusMessage` or "<label> profil aktív."). Rendered only by the three layouts (app/szulo, app/admin, app/teacher layout.tsx) after the area's session resolved; the chooser at `/` uses `ProfileSelector` instead. Contract: no data fetching, no role logic, everything comes from the profile. Risk: the "Tesztprofil váltása" wording and the profile summary text are demo/test copy shown on every screen. Tests: tests/integration/runtime-shell.test.tsx (shell semantics, role announcement, parent navigation projection, teacher shell without menu, logo link), tests/browser/navigation-polish.spec.ts (same menu on every page, 320 px fit), tests/browser/teacher-web.spec.ts (switch button).
+Full rescan, 2026-10-12, HEAD `80bd4f4`. Wiring column: Wired = called by `app/`; Unwired = referenced only by itself and tests.
 
-## AppNav
-src/runtime/AppNav.tsx (client component). Props `{items: readonly NavigationItem[]}`. `AppNav` wraps `SearchAwareNavigation` (reads `useSearchParams`) in `Suspense` with a path-only fallback; `NavigationPanel` renders `<details class="navigation-panel" open>` with summary "Navigáció" (`app-shell-navigation-toggle`) and `<nav aria-label="Fő navigáció">` listing `Link.nav-button` per item (`app-shell-navigation-<id>`), `aria-current="page"` on the current one. Exported pure `currentNavigationId(items, pathname, openedFromNotification=false)`: trims trailing slashes; when the address carries the `ertesites` parameter and the path matches `/szulo/feladatok/<id>` it returns the notification-list item ("Értesítések" stays current while the parent reads the task); else exact href match; else the longest item href that prefixes the path, never `/admin`. Constants: `NOTIFICATION_PARAMETER = "ertesites"`, `NOTIFICATION_LIST_HREF = "/szulo/ertesitesek"`. The store's earlier "path-only decision" description is out of date. Risk: the menu is the same list on every page; any new item must be added to profiles.ts and its path-prefix rule checked. Tests: tests/integration/app-nav.test.tsx (rendering, aria-current, detail page keeps section, parent notification context, longest match, empty menu); tests/browser/navigation-polish.spec.ts.
+## Summary table
 
-## BackToHomeLink
-src/runtime/BackToHomeLink.tsx. Props `{homePath?, label, testId?}`. `Link` to `homePath ?? "/"`; when `homePath` is `/teacher/schedule` the text is forced to "Vissza a beosztáshoz", otherwise the given `label`. Used only by `ParentAccessState` and `AdminAccessState` (denied/error states, which render without the shell). Tests: tests/integration/app-nav.test.tsx (BackToHomeLink block: teacher text, given label, fallback to "/") and tests/browser/navigation-polish.spec.ts (teacher gets back to Beosztás from detail and denied pages).
+| Component | Wiring | Responsibility | Depends on |
+|---|---|---|---|
+| app | Wired | Pages, layouts, actions, API routes, session/facade resolvers | src/runtime, src/application, adapters |
+| src/application | Wired | Authorization, pipeline, idempotency, result model, facades | src/access (types, role-policy, session-grants), src/teacher-tracking |
+| src/runtime | Wired | Config, composition, session cookie, synthetic profiles, UI shell | src/application |
+| src/parent-web | Wired | In-memory parent port | src/application |
+| src/admin-core | Wired | In-memory admin port | src/application |
+| src/admin-advanced | Wired | In-memory import/reminder/governance/lifecycle/settings | src/application, src/runtime (access state) |
+| src/teacher-web | Wired | Teacher schedule adapter | src/application, src/teacher-tracking |
+| src/teacher-tracking | Partly wired | Tracking model plus unwired service | none |
+| src/access | Mostly unwired | Access service, grants, RPC adapter | none |
+| src/coordination | Unwired | Sign-up/swap domain service | none |
+| src/directory | Unwired | Families/children/parents | none |
+| src/import-migration | Unwired | Import service, 17-sheet registry | none |
+| src/notifications | Unwired | Reminder thresholds, durable jobs | none |
+| src/parent-experience | Unwired | Parent read model | none |
+| src/privacy-audit | Unwired | Retention lifecycle | none |
+| src/admin-experience | Unwired | Admin authorization shell | src/import-migration |
+| supabase/migrations | Not applied by app | Two SQL migrations | PostgreSQL, Supabase auth schema |
+| tests | Verification | Five test layers | all |
+| scripts | Tooling | Config validation, toolchain, smoke, local verification, disposable DB | node, psql |
+| verification | Tooling data | Manifests and runbooks | scripts |
 
-## BrandMark
-src/runtime/BrandMark.tsx. Logo image linking to `/` (`brand-link`).
+## Component details
 
-## ProfileSelector
-src/runtime/ProfileSelector.tsx. Cover image plus one POST form per profile (`profile-selector-<id>-button`) to /api/synthetic/session.
+### app
+Next.js route tree (see `code-structure.md`); 5 server action files; layouts gate admin/teacher by redirect, parent by access panel. 47 `scenario` hook occurrences. Depends on `composeRuntime` per request.
 
-## Synthetic profiles
-src/runtime/synthetic/profiles.ts. `SyntheticProfile {id, role, label, scopeSummary, authorizationVersion, homePath, navigation}`; zod `syntheticProfileIdSchema` (parent-local, kindergarten-teacher-local, group-admin-local, super-admin-local); frozen `SYNTHETIC_PROFILES`; `getSyntheticProfile`. Menus (one list per profile, no request-time rewrite): parent `[Értesítések /szulo/ertesitesek, Feladatok /szulo/feladatok]` (Értesítések FIRST at HEAD; earlier store text said the opposite), teacher empty (profile has no menu), group admin 5 items (Áttekintés, Nyilvántartások, Feladatok és események, Jóváhagyások, Archívum), super admin those plus Importálás, Emlékeztetők, Adatvédelem, Beállítások (9). `homePath`: parent `/szulo/ertesitesek`, teacher `/teacher/schedule`, admins `/admin`. Demo copy in `label` ("Szülő", "Óvónő", "Csoportadminisztrátor", "Szuperadminisztrátor") and `scopeSummary` ("Egy kitalált család saját feladatai", "Egy kitalált csoport beosztása, módosítás nélkül", ...) is shown in the shell header and the chooser; "kitalált" is demo wording. Sibling files: synthetic/access-state.ts (in-memory grants per profile, `currentSyntheticActor`, revocation seam used by governance tests), session/session.ts (HMAC-signed cookie `waldorf_local_session`, 8 h, secret constant, `createSyntheticSessionToken`, `resolveSyntheticSession` rejects bad signature, expiry, future issuedAt, stale authorizationVersion). Tests: tests/unit/current-role-session.test.ts, navigation-access.test.ts, runtime-boundaries.test.ts (menu ids in order), tests/coverage/app-session-boundaries.test.ts; menu order changes ripple into specs that import SYNTHETIC_PROFILES (visual-overhaul.spec.ts, support/profile-login-measurement.ts).
+### src/application
+Facades (`parent`, `teacher`, `admin`, `session`), `FacadePipeline`, `AuthorizationContract`, `InMemoryAuthorizationVersions`, `InMemoryIdempotencyStore`, `InMemoryApplicationJournal`. Ports: `AdminApplicationPort`, `ParentApplicationPort`, `TeacherApplicationPort`, `SessionGateway`, `AuthorizationVersionPort`, `IdempotencyStore`, `EventPublisher`, `EvidencePort`, `Clock`, `IdGenerator`. 14 files, 8 tests.
 
-## Admin session
-app/admin/_lib/session.ts (server-only). `resolveAdminSession(): AdminSessionResult` = `success {applicationSession, profile, scope}` | `signed-out` | `denied {homePath?}` | `configuration-error {message}`. Order: compose runtime (error -> configuration-error; non-synthetic -> denied), read cookie via `resolveSyntheticSession`, revoked advanced subject -> denied, role must be group_admin or super_admin, scope = group-boroka for group admin else org-napsugar organization. The admin layout redirects `signed-out` to `/`, shows `AdminAccessState` for denied/config error, otherwise wraps children in `AppShell`. Every admin page re-resolves the session (no shared context). The parent equivalent is app/szulo/_lib/session.ts (`resolveParentSession`, role must be parent, family scope from `PARENT_FAMILY_SCOPE`); the teacher one is app/teacher/_lib/session.ts. Tests: tests/coverage/app-session-boundaries.test.ts (signed-out, granted, forbidden, invalid configuration).
+### src/runtime
+`validateRuntimeConfig`, `composeRuntime`, `RuntimeComposition`, cookie signing `session.ts`, `isSameOrigin`, 4 synthetic profiles, `access-state.ts` module-level Map, `AppShell`, `ProfileSelector`, `AppNav`, `BrandMark`, `StatusBadge`. Production composition unlinked stub. 1 test file in `src` (more in `tests/`).
 
-## AuthorizationContract
-src/application/authorization.ts. Matrix rows, per-row navigation items, `navigation()` with `HOME_PATH_BY_ROLE`, `authorize()`.
+### src/parent-web
+`SyntheticParentPort` (state in `globalThis[Symbol.for("waldorf.syntheticParentState")]`), `createSyntheticParentFacade`, pure `notification-context.ts`. Hardcodes `parent-local`, `family-boroka`; notifications global.
 
-## ResponsiveCollection
-app/admin/_components/ResponsiveCollection.tsx. `ul.admin-collection` of `li.admin-card` (`<testId>-item-<id>`) holding one whole-card `Link` (`<testId>-open-<id>`) with title and `statusLabel(item.state)` badge. Consumers: archivum, jovahagyasok, nyilvantartasok, feladatok pages.
+### src/admin-core
+`SyntheticAdminPort` with 5 records, 3 tasks, 4 approvals; `getSyntheticAdminPort()`, reset function. Fake `assign` and `saveNotes`; dashboard `openImportConflicts` always 0.
 
-## AdminFilterBar
-app/admin/_components/AdminFilterBar.tsx. Props `action`, `list` (`records|tasks|approvals`), `query`, `state`, `unknownState`. GET form `.admin-filter` (test id `admin-filter-form`) with label+input `q` (`#admin-filter-query`, `defaultValue`), label+select `state` (`#admin-filter-state`, "Minden állapot" plus `ADMIN_LIST_STATUS_OPTIONS[list]` rendered with `statusLabel`) and a submit "Szűrés"; `admin-filter-unknown-note` when the address carried a status the list does not offer. Uncontrolled inputs, no key, NO clear control. Used by nyilvantartasok, feladatok, jovahagyasok (not archivum).
+### src/admin-advanced
+`AdvancedWorkflowStore`, `CompositeAdminPort`, `createSyntheticAdvancedAdminFacade`, `isSyntheticAdvancedSubjectRevoked`, `resetSyntheticAdvancedFixtures`. 3 reminder jobs, 3 grants, 3 lifecycle candidates, 2 recipients, preview `preview-waldorf-v1` (30 rows, 1 conflict, fingerprint `sha256:waldorf-advanced-v1:8b12`, commit 3 imported / 1 skipped).
 
-## AdminPagination
-app/admin/_components/AdminPagination.tsx. Static placeholder nav (disabled "Előző oldal", "1. oldal", "Következő oldal"); carries no filters.
+### src/teacher-web
+`SyntheticTeacherScheduleAdapter`, `SYNTHETIC_SCHEDULE` (3 rows), `TEACHER_GROUPS`, `TEACHER_FIXTURE_VERSION="teacher-tracking-local-v1"`. Cleanest promise-capable repository seam.
 
-## AdminBackLink
-app/admin/_components/AdminBackLink.tsx. `ADMIN_LIST_LINKS` (records "Vissza a nyilvántartásokhoz", tasks, approvals, archive), `LIST_RETURN_PARAMETER` ("vissza"), `listReturnQuery({q,state})`, `AdminBackLink`; the list's `q`/`state` travel to detail pages and back.
+### src/teacher-tracking
+`TrackingEntry`, `TrackingSourceRecord`, date range rules, projection, scope match (live); `TeacherScheduleService` (unwired); ports `ScheduleRepository`, `TeacherScheduleRepository`.
 
-## ScheduleFilter
-app/teacher/schedule/_components/ScheduleFilter.tsx. GET form `.teacher-filter` (`teacher-schedule-filter-form`) in a fieldset "Beosztás szűrése": `select#groupId`, `input#from`, `input#to` (date, required, all `defaultValue`), submit "Szűrés", and `Link` "Szűrők törlése" to `/teacher/schedule` (`teacher-schedule-filter-clear-link`). Defaults for the cleared state come from `DEFAULT_TEACHER_FILTERS` in app/teacher/_lib/filters.ts (from 2026-08-12, to 2026-08-20, first granted group). VERIFIED in a browser run (Playwright chromium against localhost:3000, 2026-10-09): the link only requests the bare path; a stored-address filter (from 2026-08-13) is reset to 2026-08-12/2026-08-20 when the fields were not edited, but values typed into a field and not submitted survive the click (from stays 2026-08-14 after clear), and a group chosen through the address (group-sunflower) stays selected in the select after clear until a full reload (reload shows group-oak). So the cause is both semantic (clear = defaults) and stale uncontrolled DOM state after the soft navigation.
+### src/access
+`AccessService`, `convertLegacyRoles`, `InMemoryUserRepository`, `InMemoryRoleGrantRepository`, `InMemoryAuditWriter`, `InMemoryAccessTransaction` (throws `ASYNC_TRANSACTION_UNSUPPORTED` on promises), `SupabaseRouteAdapter`. Live pieces: `types.ts`, `role-policy.ts`, `session-grants.ts`.
 
-## TeacherStatePanel
-app/teacher/_components/TeacherStatePanel.tsx. Maps result state to success children, empty state "Nincs találat" with a second "Szűrők törlése" link (`<testId>-clear-link`, `clearHref` default `/teacher/schedule`), validation/denied/error sections, retry link.
+### src/coordination
+`CoordinationService`, `InMemoryCoordinationRepository`, `InMemoryCoordinationEvents`, `InMemoryCoordinationAuditWriter`.
 
-## Admin record and task create pages
-app/admin/nyilvantartasok/uj/page.tsx ("Új rekord" heading, label "Rekord típusa", submit "Rekord létrehozása", select `kind`) and app/admin/feladatok/uj/page.tsx; both use `AdminBackLink` and `AdminMutationForm`. The list pages link to them with plain `Link`s inside `div.admin-page-actions` ("Új rekord", "Új feladat vagy esemény"; no pill class).
+### src/directory
+`DirectoryService`, `InMemoryDirectoryRepository`, `InMemoryDirectoryAuditWriter`; `Family`, `Child`, `ParentProfile`.
 
-## DeveloperDetails
-app/admin/_components/DeveloperDetails.tsx. Collapsed `details` "Fejlesztői részletek" holding version numbers, correlation ids and scenario selectors on admin detail pages.
+### src/import-migration
+`ImportService`, `InMemoryImportRepository`, `REQUIRED_SHEETS`, `LEGACY_DESTINATIONS`.
 
-## AdminMutationForm
-app/admin/_components/AdminMutationForm.tsx (client). `AdminMutationForm` props `{action: AdminAction, submitLabel, testId, children, successLink?: {href,label}}`: `useActionState(action, {state:"initial"})`; `<form class="admin-form" id/data-testid={testId} noValidate>` (browser required check off so empty required fields reach the action and show the same Hungarian message); summary `div#hibajelzes` (`role=status` on success else `alert`, `<testId>-state-<state>`), focus moves to it on validation/denied/conflict/invalidated/terminal, field-error links `#field`, success shows optional `successLink` (`<testId>-success-link`); submit button `<testId>-submit-button` disabled while pending ("Feldolgozás folyamatban"). Exports also `AdminTextField {id,label,testId,name,defaultValue?,required?,maxLength?}` (label + input + `<id>-error` siblings, context `FieldErrorsContext`, aria-invalid/describedby) and `ErrorSummary`. Layout consequence: label, control and error are flat siblings inside `.admin-form`, the same pattern as the filter bars. Used by the two "uj" pages, record archive/restore, approvals, task assignment, event notes, reminders retry, import, settings and grant revoke. Tests: tests/integration/admin-components.test.tsx:249+ (success link, validation focus, pending), tests/coverage/admin-*.test.tsx pages. Risk: the form is not the place for filters; changing its markup affects every admin form and the `hibajelzes` anchors.
+### src/notifications
+`NotificationService`, `DurableNotificationJobs`, `InMemoryNotificationStore`, `EmailProvider` port.
 
-## Admin pages with raw demo-facing text
-All use `DeveloperDetails` (collapsed `details.developer-details` "Fejlesztői részletek", test ids `developer-details`, `developer-details-toggle`) for technical fields: app/admin/feladatok/[id]/page.tsx (Verzió, "Kapacitási helyzet" scenario select `admin-assignment-scenario-select`, values eligible/ineligible/full/retryable/terminal), nyilvantartasok/[id] (Verzió), emlekeztetok (Korreláció list; eyebrow "Adminisztráció · szimulált szolgáltató"; per job paragraph "…; valódi szolgáltatói kézbesítés: OUTSTANDING." in `p.synthetic-label` OUTSIDE the collapsed section, so "OUTSTANDING" is still user-visible), adatvedelem, beallitasok ("Ellenőrzési forgatókönyv – <subject>" selects per grant), import (`ImportWorkflow.tsx`: scenario selects `admin-import-scenario-select`, commit scenario; outcome text "3 rekord módosult, 1 sor változatlan maradt. Szimulált adatbázishatás; Supabase-tranzakció: OUTSTANDING." is visible). Other remaining demo wording: "kitalált" in parent list intro (app/szulo/feladatok/page.tsx:27), "Szimulált szolgáltató: …" per notification and the notifications intro (app/szulo/ertesitesek/page.tsx:16-19,36), "Szimulált szolgáltató" in admin reminders, `synthetic-label` class. None of these are part of the polish intent except the "rekord" import sentence.
+### src/parent-experience
+`ParentExperienceService`, `InMemoryParentRepository`; overlaps `parent-web`.
 
-## Admin dashboard
-app/admin/page.tsx. Three whole-card `a.dashboard-link` panels (approvals, records, tasks) with counts.
+### src/privacy-audit
+`PrivacyLifecycleService`, `LifecycleRepository`; no adapter.
 
-## ParentDutiesPage
-app/szulo/feladatok/page.tsx. Whole-card `a.parent-card-link` with `strong.parent-state-badge` showing `dutyStateLabel(duty.state)` (shared map `DUTY_STATE_LABELS`; the page-local `STATE_LABELS` is gone); filter form `.parent-filter` (`allapot` select from `DUTY_STATE_LABELS`, no clear control); exports `formatBudapestDate`.
+### src/admin-experience
+`AdminExperienceService`, `AdminRepository`, `Authorizer`, `AdminOperations`; no adapter.
 
-## ParentDutyDetailPage
-app/szulo/feladatok/[id]/page.tsx (server). Params `{id}`, search `{allapot?, ertesites?}`. Loads the duty via `facade.getDuty`; `openedFromNotification` loads the notification list and accepts the `ertesites` id only when it belongs to the parent and its link is exactly this task (`resolveNotificationContext`), otherwise `redirect()`s to the clean task address (keeping `allapot`). Back link `duty-detail-back-link`: "Vissza az értesítésekhez" to `/szulo/ertesitesek` when opened from a notification, else "Vissza a feladatokhoz" to `/szulo/feladatok[?allapot=]` (plain `<a>`, not `Link`). Renders `MarkNotificationRead` for the notification context, `dl.parent-detail-grid` with Időpont (`formatBudapestDate`, imported from ../page.tsx), Helyszín and Állapot (`duty-detail-state`, `dutyStateLabel`), `PendingRequestNotice`, signup `ParentMutationForm` when state `available`, full/ineligible notices, nav "Feladatműveletek" with swap/cancel links only when `assignmentId` and no pending request (`pendingRequests(duty).any` hides them), permitted allergen note, contribution form (textarea `note` required, max 300). Stale store note: the earlier text said links show regardless of pending state and no state is shown; both are fixed at HEAD. Tests: tests/coverage/parent-pages.test.tsx (available/full/ineligible/assigned/swap/cancellation renders), tests/browser/parent-web.spec.ts, navigation-polish.spec.ts. Risk: back link and menu context depend on the `ertesites` query parameter only.
+### supabase/migrations
+`20260806_access_rls.sql` (not applicable to real PostgreSQL, hash-pinned) and `20261006_current_roles.sql` (needs `waldorf.authoritative_issuer_baseline`). Only two files.
 
-## ParentRequestPages
-app/szulo/feladatok/[id]/csere/page.tsx and lemondas/page.tsx (server). Same skeleton: `getDuty`, back link `swap-back-link`/`cancellation-back-link` "Vissza a feladathoz" to `/szulo/feladatok/<id>` (always the task, no filter or notification context), `h1` "Cserekérelem" / "Lemondási kérelem", `ParentStatePanel`, then either a `ParentMutationForm` (hidden id, assignmentId, expectedVersion, idempotencyKey `swap:`/`cancel:<id>:v<version>`, `counterpartId` or scenario-suffixed assignment id from `?scenario=`, textarea `reason` required max 500 with hint "Az indoklás védett adat…") with `alreadyDone={pendingRequests(duty).any}` and `afterSuccess=<PendingRequestPanel>`, or a "no own assignment" message (`swap-ineligible-state`, `cancellation-ineligible-state`). The `?scenario=` parameter is a test-only outcome selector exposed to anyone through the address. Both pages repeat the same hint id `reason-hint`. Tests: tests/coverage/parent-pages.test.tsx, tests/coverage/parent-actions.test.ts, tests/browser/parent-web.spec.ts (pending state after request).
+### tests
+- `src/**/*.test.ts` 32 files, 258 node tests.
+- `tests/unit` 11 files, `tests/integration` 15, `tests/coverage` 16 (Vitest, 531 tests, jsdom).
+- `tests/browser` 11 specs (Playwright), `tests/browser/support/*`.
+- `tests/database/current-role-migration.test.ts` (9 cases) with `tests/database/fixtures/current-role-baseline.sql`.
+- `tests/coverage/support/production-coverage-reporter.ts`, `production-inventory.ts`.
 
-## ParentMutationForm and PendingRequestNotice
-app/szulo/_components/ParentMutationForm.tsx (client): props `{action, submitLabel, testId, children?, afterSuccess?, alreadyDone?}`; `useActionState`; after success (or `alreadyDone`) with `afterSuccess` set, fields and submit are replaced by that content so a request is not sent twice; state div `<testId>-state-<state>` with focus on failure; submit `<testId>-submit-button`. PendingRequestNotice.tsx: `PendingRequestPanel {pending, dutyId, testId}` (notice plus "Vissza a feladathoz") and `PendingRequestNotice {pending}` (`pending-swap-notice` / `pending-cancellation-notice` text from `dutyStateLabel("swap-pending"|"cancellation-pending")`; renders nothing when none). Tests: tests/integration/parent-components.test.tsx.
+### scripts
+`validate-runtime-config.ts`, `validate-toolchain.mjs`, `start-smoke.mjs`, `verification/{core,run-local-verification,scan-artifacts,current-role-database,firefox-launch}.ts`.
 
-## ParentNotificationsPage
-app/szulo/ertesitesek/page.tsx (server, the parent's default page). `ul.parent-collection` of `li.parent-card.notification-card[.notification-card-read]` (`notification-card-<id>`) holding a whole-card `a.parent-card-link` (`notification-link-<id>`, href `notificationHref(notification)`: task links get `?ertesites=<id>`), `h2` title, `TIMING_LABEL` text, `p.synthetic-label` with `PROVIDER_LABEL` ("Szimulált szolgáltató: …"), `strong` "Olvasott"/"Olvasatlan" (server-rendered from `notification.isRead`), and the sibling `NotificationReadForm`. Intro text: "A szolgáltatói állapotok helyben szimuláltak; valós kézbesítést nem igazolnak." `h1` is `autoFocus`. Read state refreshes through `revalidatePath("/szulo/ertesitesek")` in the action (older store text said it did not). Tests: tests/coverage/parent-pages.test.tsx:180-216 (real projections, whole-card link plus one checkbox), tests/browser/navigation-polish.spec.ts:173-225 (card opens target, checkbox marks read, padding, 320 px), tests/browser/parent-web.spec.ts.
-
-## NotificationReadForm
-app/szulo/_components/NotificationReadForm.tsx (client). Props `{id, title, isRead}`. `useActionState(markNotificationReadAction)`; hidden `idempotencyKey` `notice:<id>:read`; label "Olvasottnak jelölöm" plus visually-hidden title (accessible name = label + title); checkbox `notification-read-checkbox-<id>` (`name=id`, `defaultChecked`/`disabled` when read or done or pending, `aria-busy`), `onChange` calls `form.requestSubmit()` only when ticked; failure state unticks and refocuses the box (validation shows VALIDATION_HINT); success moves focus to the sibling `notification-link-<id>` found via `form.closest("li")`; `<noscript>` fallback button "Mentés" (`notification-read-save-<id>`); state `<p>` `notification-state-<id>-<state>`. Risks: relies on the card being an `li` containing the link (focus), the page text "Olvasatlan" only changes after a revalidated render, an unticked box cannot be re-ticked once done. Tests: tests/integration/notification-read-form.test.tsx (name, one submit on tick, focus move, disabled while busy, validation text, read state, untick no-op, noscript button).
-
-## MarkNotificationRead
-app/szulo/_components/MarkNotificationRead.tsx (client, renders null). On mount of a task page opened from a notification it calls `markNotificationReadAction` with a fresh key `notice:<id>:open:<uuid>`; failures are swallowed. So opening a notification card now marks it read (the earlier "opening does not mark it read" is out of date). Tests: tests/integration/mark-notification-read.test.tsx.
-
-## ScheduleCollection
-app/teacher/schedule/_components/ScheduleCollection.tsx. Desktop table and mobile card list with whole-row/whole-card links carrying `teacherFilterQuery`; status column/field shows `entry.currentStatusLabel` (free text from the repository, not mapped through `STATUS_LABELS`; null shows "Nincs elérhető állapot"); exports `formatScheduleRange`, `TrackingFields`.
-
-## Status labels
-src/application/status-labels.ts. `STATUS_LABELS` (34 Hungarian labels), `statusLabel`, `UNKNOWN_STATUS_LABEL`, `DUTY_STATE_LABELS` + `dutyStateLabel` (parent words), `ADMIN_LIST_STATUS_OPTIONS` (per list), `resolveListStatus`; tests in status-labels.test.ts. Rendered as plain text (no symbol, no background): `span.admin-state-badge` in ResponsiveCollection, "Állapot: ..." paragraphs on admin detail pages, filter `<option>` text, reminders and privacy pages, parent `strong.parent-state-badge`, parent detail `dd`.
-
-## Global stylesheet
-app/globals.css. Tokens (:root lines 3-20, contrast-tested in tests/unit/design-tokens.test.ts), global `button` pill rule, `.secondary-button`, nav pills, filter layouts (`.admin-filter` 5-column grid, `.teacher-filter fieldset` 4-column grid, `.parent-filter` 3 columns, `.advanced-filter` flex, `.admin-form` single column), `.admin-page-actions`, card styles for admin, parent, teacher, notifications, responsive block (<=44rem collapses filters to one column).
-
-## Domain modules
-src/access, admin-core, admin-advanced, admin-experience, coordination, directory, import-migration, notifications, parent-experience, parent-web, privacy-audit, teacher-tracking, teacher-web: in-memory synthetic services and repositories with colocated tests. `parent-web/synthetic-parent.ts` holds duty and notification fixtures (including the "– Firefox próba" / "– mobil próba" copies), request state and reset.
+### verification
+`authorization-matrix.json`, `fixtures.json` (`waldorf-local-v1`, 30 families, `hu-HU`, `Europe/Budapest`), `scenarios.json`, `sensitive-fields.json`, `evidence.schema.json`, `RUNBOOK.md`, `AUTHORIZATION.md`.

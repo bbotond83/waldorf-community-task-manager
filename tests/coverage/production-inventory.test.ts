@@ -81,7 +81,8 @@ describe("honest executable denominator", () => {
     expect(
       inventory.some((entry) => entry.path.includes(".test.") || entry.path.endsWith(".d.ts")),
     ).toBe(false);
-    expect(inventory.length).toBe(164);
+    // 164 earlier files plus the 13 production files U1 adds (scripts/db, src/runtime/database, scan-core).
+    expect(inventory.length).toBe(177);
     for (const path of [
       "src/runtime/AppNav.tsx",
       "src/runtime/StatusBadge.tsx",
