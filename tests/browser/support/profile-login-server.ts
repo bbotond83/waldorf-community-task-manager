@@ -1,8 +1,8 @@
 import { spawn } from "node:child_process";
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile, rm, writeFile } from "node:fs/promises";
 export { assertLoginDuration, measureProfileLogin } from "./profile-login-measurement.ts";
 
-async function restoreGeneratedTypes(distDir: string, previousEnv: string) {
+async function restoreGeneratedTypes(distDir: string, previousEnv: string | null) {
   const configPath = "tsconfig.json";
   const configText = await readFile(configPath, "utf8");
   const config = JSON.parse(configText) as { include: string[] };
@@ -11,6 +11,11 @@ async function restoreGeneratedTypes(distDir: string, previousEnv: string) {
   if (filtered.length !== config.include.length) {
     config.include = filtered;
     await writeFile(configPath, `${JSON.stringify(config, null, 2)}\n`);
+  }
+  if (previousEnv === null) {
+    // next-env.d.ts is generated and untracked: leave no generated file behind.
+    await rm("next-env.d.ts", { force: true });
+    return;
   }
   const envText = await readFile("next-env.d.ts", "utf8");
   if (envText.includes(`./${distDir}/`)) {
@@ -30,7 +35,7 @@ async function restoreGeneratedTypes(distDir: string, previousEnv: string) {
 }
 
 export async function startLoginServer(mode: "development" | "production", port: number) {
-  const previousEnv = await readFile("next-env.d.ts", "utf8");
+  const previousEnv = await readFile("next-env.d.ts", "utf8").catch(() => null);
   const distDir = `.next/login-performance-${process.pid}-${Date.now()}`;
   const env: NodeJS.ProcessEnv = {
     ...process.env,
