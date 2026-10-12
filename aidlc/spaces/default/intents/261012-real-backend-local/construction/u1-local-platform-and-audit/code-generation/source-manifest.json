@@ -33,7 +33,6 @@
     { "path": "tests/database/current-role-migration.test.ts" },
     { "path": "tests/unit/current-role-references.test.ts" },
     { "path": "tests/coverage/production-inventory.test.ts" },
-    { "path": "src/access/current-role-migration.test.ts" },
-    { "path": "source-materials/waldorf-community-app/Ovis tábla v2.xlsx" }
+    { "path": "src/access/current-role-migration.test.ts" }
   ]
 }

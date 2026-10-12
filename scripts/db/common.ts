@@ -108,7 +108,42 @@ export function loadToolingSettings(reader: EnvironmentReader): ToolingSettings 
       { setting: missing.join(",") },
     );
   }
+  assertLocalAddress("DATABASE_URL", databaseUrl!);
+  assertLocalAddress("SUPABASE_URL", apiUrl!);
   return { databaseUrl: databaseUrl!, apiUrl: apiUrl!, publicKey: publicKey! };
+}
+
+const LOCAL_HOSTS: ReadonlySet<string> = new Set(["127.0.0.1", "localhost", "[::1]", "::1"]);
+
+/**
+ * The tooling (migrate, worker reset) drops and truncates data, so it only ever talks to a
+ * database on this machine. Anything else is refused before a connection is made.
+ */
+export function assertLocalAddress(setting: string, address: string): void {
+  let host: string;
+  let hasQuery: boolean;
+  try {
+    const parsed = new URL(address);
+    host = parsed.hostname.toLowerCase();
+    // Query parameters such as ?host= or ?hostaddr= can redirect the connection target.
+    hasQuery = parsed.search !== "" || address.includes("?");
+  } catch {
+    throw new ToolingError("settings", `${setting} is not a valid address.`, { setting });
+  }
+  if (hasQuery || host.includes(",")) {
+    throw new ToolingError(
+      "settings",
+      `${setting} must not carry query parameters or several hosts; the database tooling only accepts a plain local address.`,
+      { setting },
+    );
+  }
+  if (!LOCAL_HOSTS.has(host)) {
+    throw new ToolingError(
+      "settings",
+      `${setting} must point at this machine (127.0.0.1, localhost or ::1); the database tooling refuses any other host.`,
+      { setting },
+    );
+  }
 }
 
 /** The message shown for any failure: step first, secrets removed. */

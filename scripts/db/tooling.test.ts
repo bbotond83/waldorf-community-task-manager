@@ -115,15 +115,48 @@ describe("shared tooling helpers", () => {
 
   it("reads settings from the environment before the local files and names what is missing", () => {
     const settings = loadToolingSettings({
-      environment: { DATABASE_URL: "postgresql://override" },
+      environment: { DATABASE_URL: "postgresql://postgres@127.0.0.1:54322/override" },
       readFile: (path) => FILES[path],
     });
-    assert.equal(settings.databaseUrl, "postgresql://override");
+    assert.equal(settings.databaseUrl, "postgresql://postgres@127.0.0.1:54322/override");
     assert.equal(settings.apiUrl, "http://127.0.0.1:54321");
     assert.throws(
       () => loadToolingSettings({ environment: {}, readFile: () => undefined }),
       /DATABASE_URL, SUPABASE_URL, SUPABASE_ANON_KEY/,
     );
+  });
+
+  it("refuses a database or API address that is not on this machine", () => {
+    const load = (environment: Record<string, string>) =>
+      loadToolingSettings({ environment, readFile: (path) => FILES[path] });
+    for (const host of ["127.0.0.1", "localhost", "[::1]", "LOCALHOST"]) {
+      assert.doesNotThrow(() =>
+        load({ DATABASE_URL: `postgresql://postgres@${host}:54322/postgres` }),
+      );
+    }
+    for (const url of [
+      "postgresql://postgres@db.example.co:5432/postgres",
+      "postgresql://postgres@10.0.0.5:5432/postgres",
+      "postgresql://postgres@127.0.0.1.evil.example:5432/postgres",
+    ]) {
+      assert.throws(() => load({ DATABASE_URL: url }), /DATABASE_URL must point at this machine/);
+    }
+    assert.throws(
+      () => load({ SUPABASE_URL: "https://project.supabase.co" }),
+      /SUPABASE_URL must point at this machine/,
+    );
+    assert.throws(() => load({ DATABASE_URL: "not a url" }), /DATABASE_URL is not a valid address/);
+    for (const url of [
+      "postgresql://postgres:p@127.0.0.1:54322/postgres?host=evil.example",
+      "postgresql://postgres:p@127.0.0.1:54322/postgres?hostaddr=10.0.0.5",
+      "postgresql://postgres@127.0.0.1:54322/postgres?",
+      "postgresql://postgres@127.0.0.1,evil.example:54322/postgres",
+    ]) {
+      assert.throws(
+        () => load({ DATABASE_URL: url }),
+        /query parameters or several hosts|not a valid address|must point at this machine/,
+      );
+    }
   });
 
   it("describes a failure with its step and redacts secrets, also for unexpected errors", () => {
