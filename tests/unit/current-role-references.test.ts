@@ -98,5 +98,5 @@ it("historical baseline migration and local-only exclusion remain independent of
     ).not.toContain("next-env.d.ts");
   expect(
     createHash("sha256").update(read("supabase/migrations/20260806_access_rls.sql")).digest("hex"),
-  ).toBe("a34b85b7ddae4a51643b2b9ee8a5356cb6ea18e3fd1fdce5394fa39e96a2449d");
+  ).toBe("2d176c02b418f72cadf41b8a1c5f672bba19d1b047f14b19ae25cfedf1567631");
 });

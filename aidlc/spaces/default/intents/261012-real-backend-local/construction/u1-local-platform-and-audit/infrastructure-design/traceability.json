@@ -1,0 +1,31 @@
+{
+  "stage": "infrastructure-design",
+  "unit": "u1-local-platform-and-audit",
+  "upstream_ids": ["NFR1.1", "NFR1.4", "NFR1.6", "NFR1.7", "NFR1.11", "NFR1.12", "NFR1.13", "NFR1.14", "NFR2.1", "NFR2.6", "NFR2.7", "NFR3.1", "NFR3.3", "NFR3.4", "NFR4.1", "NFR4.2", "NFR4.3", "NFR4.4", "NFR4.5", "NFR6.1", "NFR6.2", "NFR6.3", "NFR6.6", "NFR6.7"],
+  "coverage": [
+    { "id": "NFR1.1", "status": "OK", "target": "Shared Infrastructure: audit write function and tables; Indexes and Pinning Checks: catalogue test of elevated functions" },
+    { "id": "NFR1.4", "status": "OK", "target": "Keys table: service-role key only in the tooling's ignored file" },
+    { "id": "NFR1.6", "status": "OK", "target": "Keys table: secret scan allowlist; cicd-pipeline.md stage 3" },
+    { "id": "NFR1.7", "status": "OK", "target": "cicd-pipeline.md stage 3: privacy scan" },
+    { "id": "NFR1.11", "status": "OK", "target": "monitoring-design.md Logs and Tracing" },
+    { "id": "NFR1.12", "status": "OK", "target": "monitoring-design.md Alerts: failures name the step; cicd-pipeline.md stage to gate mapping" },
+    { "id": "NFR1.13", "status": "OK", "target": "cicd-pipeline.md Secrets Management in CI: nothing printed that contains the service-role key" },
+    { "id": "NFR1.14", "status": "OK", "target": "monitoring-design.md Logs and Tracing: normal CI job output" },
+    { "id": "NFR2.1", "status": "OK", "target": "Deployment: containers on Docker Desktop via the pinned Supabase CLI" },
+    { "id": "NFR2.6", "status": "OK", "target": "cicd-pipeline.md stage 4 and Deviation From the NFR Wording: same stack started by the CLI in CI instead of a service container" },
+    { "id": "NFR2.7", "status": "OK", "target": "cicd-pipeline.md Stage to Gate Mapping: type check, lint, format, tests, build, coverage as blocking gates" },
+    { "id": "NFR3.1", "status": "OK", "target": "Worker Schemas: four predeclared schemas worker_1 to worker_4" },
+    { "id": "NFR3.3", "status": "OK", "target": "Indexes and Pinning Checks: migrations create the named indexes" },
+    { "id": "NFR3.4", "status": "OK", "target": "cicd-pipeline.md stage 6: database-backed tests; random-order run is a test-runner setting added in code generation" },
+    { "id": "NFR4.1", "status": "OK", "target": "monitoring-design.md Metrics: stack start time; cicd-pipeline.md stage 4 (reported only on a cold CI runner)" },
+    { "id": "NFR4.2", "status": "OK", "target": "monitoring-design.md Metrics: migration time" },
+    { "id": "NFR4.3", "status": "OK", "target": "monitoring-design.md Metrics: worker schema creation time" },
+    { "id": "NFR4.4", "status": "OK", "target": "monitoring-design.md Metrics: scan time" },
+    { "id": "NFR4.5", "status": "OK", "target": "monitoring-design.md Metrics: audit overhead measured by a database test" },
+    { "id": "NFR6.1", "status": "OK", "target": "cicd-pipeline.md stage 6: migration repeatability test (apply twice)" },
+    { "id": "NFR6.2", "status": "OK", "target": "cicd-pipeline.md stage 6: migrations applied to an empty database in CI" },
+    { "id": "NFR6.3", "status": "OK", "target": "Deployment: Docker volumes, reset drops and recreates" },
+    { "id": "NFR6.6", "status": "OK", "target": "monitoring-design.md Alerts: Docker unavailable or port in use" },
+    { "id": "NFR6.7", "status": "OK", "target": "Worker Schemas: confirmation request with the schema profile header, up to 10 seconds" }
+  ]
+}

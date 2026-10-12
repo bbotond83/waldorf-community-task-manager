@@ -1,0 +1,30 @@
+## Review
+
+**Verdict:** READY
+**Reviewer:** aidlc-architecture-reviewer-agent
+**Date:** 2026-10-12T15:07:10Z
+**Iteration:** 1
+
+### Findings
+
+| ID | Severity | Location | Finding | Required action | Status |
+|---|---|---|---|---|---|
+| R-01 | Major | aidlc/spaces/default/intents/261012-real-backend-local/construction/u1-local-platform-and-audit/nfr-requirements/security-requirements.md > NFR1.1, NFR1.2, NFR1.9 | The audit boundary relies on elevated database functions, but no requirement or check covers the main way such functions get forged: a function that does not pin its search path to its own schema plus the system catalogue (functional rule BR1.5), or one that does not run with execute rights only for the intended callers. The checks listed only try wrong-role calls and direct inserts. A function with an unpinned search path would pass all of them and still be hijackable. | Add a security requirement and check: a database test (or catalogue query) asserts that every elevated function in the default schema and in a worker schema pins its search path, and that no file hard-codes a schema name. | New |
+| R-02 | Minor | aidlc/spaces/default/intents/261012-real-backend-local/construction/u1-local-platform-and-audit/nfr-requirements/reliability-requirements.md > NFR6.1 | "The second run is a no-op or fails with a clear message and changes nothing" allows two different behaviours, so the test has no single pass criterion. The tracking of applied files is also not stated. | Choose one behaviour (for example: the second run reports "nothing to apply" and exits successfully) and state how applied files are tracked. | New |
+| R-03 | Minor | aidlc/spaces/default/intents/261012-real-backend-local/construction/u1-local-platform-and-audit/nfr-requirements/performance-requirements.md > NFR4.1 to NFR4.5 and closing paragraph | The targets are written as limits ("90 seconds or less") but the closing note says they are only reported and never fail a run. NFR4.5 (50 ms) is measured by a database test, which would be flaky if it enforced. It is unclear whether NFR4.5 is a pass/fail test or a report line. | State explicitly which targets are report-only and which, if any, fail a test. For NFR4.5, give the measurement method (number of runs, median or maximum) and state whether it blocks. | New |
+| R-04 | Minor | aidlc/spaces/default/intents/261012-real-backend-local/construction/u1-local-platform-and-audit/nfr-requirements/security-requirements.md > NFR1.4 and tech-stack-decisions.md > NFR2.5 | NFR1.4 asks for a "bundle scan" of client output, but the only scanning tooling decided is the extension of the tracked-file scripts (NFR2.5, Q4). Built output is not a tracked file, so no decided mechanism performs the bundle scan. NFR1.6 also names no allowlist for well-known local demo keys or test fixtures that look like JWTs. | Name the mechanism (a scan of the build output step in the existing script, run after the production build) and define how a legitimate JWT-shaped fixture is allowed, or state that none is allowed. | New |
+| R-05 | Minor | aidlc/spaces/default/intents/261012-real-backend-local/construction/u1-local-platform-and-audit/nfr-requirements/scalability-requirements.md > NFR3.1, NFR3.2 | The default-schema run required by BR10.4 shares one schema with no worker isolation, and the worker-name limit does not include a length cap, although schema names are substituted into SQL and Postgres truncates identifiers at 63 bytes (clash risk after prefixing). | Add that default-schema tests do not run concurrently with each other in the shared schema, and cap the worker-name length so the full schema name stays within the identifier limit. | New |
+| R-06 | Minor | aidlc/spaces/default/intents/261012-real-backend-local/construction/u1-local-platform-and-audit/nfr-requirements/security-requirements.md > threat considerations | The local stack publishes well-known default keys and ports. There is no requirement that the stack listens only on the loopback interface, so on a shared network the database and API are reachable with default credentials. | Add a requirement and check that the start command binds the stack's published ports to loopback only, or record the exposure as an accepted local risk. | New |
+| R-07 | Minor | aidlc/spaces/default/intents/261012-real-backend-local/construction/u1-local-platform-and-audit/nfr-requirements/traceability.json > NFR1 and observability-requirements.md > NFR1.15 | NFR1 is marked fully OK for U1, but its upstream text (other parents' contact details unreadable by database rules) is not covered here and is not noted as a later-unit item. NFR1.15 states a future capability (admin reading) and its check ("audit function tests") is not a test of that statement. | Record the contact-privacy part of NFR1 as covered in the owning later unit, and reword or drop NFR1.15 so it states a checkable U1 outcome (for example, a denied event is stored and readable through the database by the owner role). | New |
+
+### Validation Tool Results
+
+| Tool | Result | Interpretation |
+|---|---|---|
+| Manual ID check | NFR1.1 to NFR1.15, NFR2.1 to NFR2.7, NFR3.1 to NFR3.5, NFR4.1 to NFR4.5, NFR6.1 to NFR6.7, NFR8.1 are all unique and every one is listed in traceability.json | Traceability is complete for NFR1 to NFR8; NFR5 and NFR7 are marked N/A with reasons |
+| Consistency with Q1 to Q5 | All five answers (timings, forward-only migrations, reporting, scanners, 4 workers) are reflected exactly | No contradiction with confirmed answers |
+| Consistency with rules.md | BR1.3, BR1.4, BR3.3, BR3.4, BR3.6, BR3.9, BR10.1 to BR10.4, BR11.1 are each traceable to a requirement; BR1.5 is not (see Major finding) | One gap |
+
+### Summary
+
+The NFR set is measurable, consistent with the confirmed answers and the functional rules, and the IDs are unique and fully traced. The one Major gap is the missing check that elevated audit functions pin their search path; the remaining items are Minor wording and coverage clarifications.

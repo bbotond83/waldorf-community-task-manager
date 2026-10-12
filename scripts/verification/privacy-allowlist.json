@@ -1,0 +1,15 @@
+{
+  "description": "Allowlist for scripts/verification/scan-artifacts.ts. Everything here is public by design: example addresses, example phone numbers, schema files that are not data dumps, record folders, and the SHA-256 hashes of the Supabase CLI's documented local default keys.",
+  "emailDomains": ["example.com", "example.net", "example.org", "example.test", "example.invalid"],
+  "emails": ["git@github.com"],
+  "phoneNumbers": [],
+  "allowedPaths": ["supabase/migrations/", "supabase/roles.sql", "tests/database/fixtures/"],
+  "ignoredPrefixes": ["aidlc/", ".aidlc-archive/", "source-materials/"],
+  "secretIgnoredPrefixes": ["aidlc/", "source-materials/"],
+  "defaultKeyHashes": [
+    "bf1725a8f98bea37e88618702e725ba84bd8acdb2647c5e0ed638bfd685791cf",
+    "70541e07fd4f900b66e289f5be55c85f9bef1def4924a5b0c518c45ea1688c12",
+    "9705102db0d5f99ee08daa19a73e510d9877a2a9add9369da247cbbe6c2a0140",
+    "c85debb55f2f204d868cc1552c42faa143b4c675f61363ab040dd50b5b5304cd"
+  ]
+}

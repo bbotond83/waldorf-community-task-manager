@@ -167,10 +167,10 @@ describe(
 
     it("instrumented faults after every transaction phase restore roles, versions, evidence, constraints and policies", async () => {
       const markers = [
-        "create table if not exists public.app_role_conversion_evidence",
-        "insert into public.app_authorization_versions",
-        "insert into public.app_role_conversion_evidence",
-        "alter table public.app_role_grants drop constraint",
+        "create table if not exists app_role_conversion_evidence",
+        "insert into app_authorization_versions",
+        "insert into app_role_conversion_evidence",
+        "alter table app_role_grants drop constraint",
         "-- Inventory/remove EVERY existing policy",
         "commit;",
       ];

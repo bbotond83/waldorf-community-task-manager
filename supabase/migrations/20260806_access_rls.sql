@@ -14,26 +14,26 @@ create table if not exists app_authorization_versions (
 alter table app_role_grants enable row level security;
 create policy "active scoped grant only" on app_role_grants for select using (subject_id = auth.uid() and revoked_at is null);
 create or replace function authorization_version_for(requested_subject_id uuid)
-returns integer language sql stable security definer set search_path = public
+returns integer language sql stable security definer set search_path from current
 as $$ select authorization_version from app_authorization_versions where subject_id = requested_subject_id $$;
 
 create or replace function has_active_scope(requested_organization_id uuid, requested_scope_id uuid)
-returns boolean language sql stable security definer set search_path = public
+returns boolean language sql stable security definer set search_path from current
 as $$ select exists (
-  select 1 from app_role_grants grant
-  where grant.subject_id = auth.uid() and grant.revoked_at is null
-    and grant.organization_id = requested_organization_id
-    and (grant.scope_type = 'organization' or grant.scope_id = requested_scope_id)
+  select 1 from app_role_grants g
+  where g.subject_id = auth.uid() and g.revoked_at is null
+    and g.organization_id = requested_organization_id
+    and (g.scope_type = 'organization' or g.scope_id = requested_scope_id)
 ) $$;
 
 create or replace function has_admin_scope(requested_organization_id uuid, requested_scope_id uuid)
-returns boolean language sql stable security definer set search_path = public
+returns boolean language sql stable security definer set search_path from current
 as $$ select exists (
-  select 1 from app_role_grants grant
-  where grant.subject_id = auth.uid() and grant.revoked_at is null
-    and grant.role in ('super_admin', 'kindergarten_admin', 'group_admin')
-    and grant.organization_id = requested_organization_id
-    and (grant.scope_type = 'organization' or grant.scope_id = requested_scope_id)
+  select 1 from app_role_grants g
+  where g.subject_id = auth.uid() and g.revoked_at is null
+    and g.role in ('super_admin', 'kindergarten_admin', 'group_admin')
+    and g.organization_id = requested_organization_id
+    and (g.scope_type = 'organization' or g.scope_id = requested_scope_id)
 ) $$;
 
 -- Domain-table RLS policies call has_active_scope(organization_id, scope_id).

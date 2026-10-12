@@ -29,6 +29,11 @@ const commands = [
   { key: "typecheck", args: ["run", "typecheck"] },
   { key: "tests", args: ["test"] },
   { key: "database-roles", args: ["run", "test:database:roles"] },
+  // Database stage (needs the local stack: `npm run db:start`, started by CI before this pipeline).
+  // The database tests run in worker schemas and once in the default schema (BR10.4).
+  { key: "database-migrate", args: ["run", "db:migrate"] },
+  { key: "database-stack", args: ["run", "test:database:stack"] },
+  { key: "database-shuffled", args: ["run", "test:database:shuffled"] },
   { key: "coverage", args: ["run", "test:coverage"] },
   { key: "security", args: ["run", "verify:security"] },
   { key: "build", args: ["run", "build"] },

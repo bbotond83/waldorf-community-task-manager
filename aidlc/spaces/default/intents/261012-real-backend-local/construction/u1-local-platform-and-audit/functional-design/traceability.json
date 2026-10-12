@@ -1,0 +1,31 @@
+{
+  "stage": "functional-design",
+  "unit": "u1-local-platform-and-audit",
+  "upstream_ids": ["FR1.1", "FR1.2", "FR1.3", "FR1.4", "FR3.1", "FR3.2", "FR3.5", "FR3.6", "FR4.2", "FR10.2", "FR10.3", "FR11.1"],
+  "coverage": [
+    { "id": "FR1.1", "status": "OK", "target": "BR1.1" },
+    { "id": "FR1.2", "status": "OK", "target": "BR1.2" },
+    { "id": "FR1.3", "status": "OK", "target": "BR1.3" },
+    { "id": "FR1.4", "status": "OK", "target": "BR1.4" },
+    { "id": "FR3.1", "status": "OK", "target": "BR3.1" },
+    { "id": "FR3.2", "status": "OK", "target": "BR3.1" },
+    { "id": "FR3.5", "status": "OK", "target": "BR3.2" },
+    { "id": "FR3.6", "status": "OK", "target": "BR3.6" },
+    { "id": "FR4.2", "status": "OK", "target": "BR4.1" },
+    { "id": "FR10.2", "status": "OK", "target": "BR10.1" },
+    { "id": "FR10.3", "status": "OK", "target": "BR10.2" },
+    { "id": "FR11.1", "status": "OK", "target": "BR11.1" }
+  ],
+  "reverse": [
+    { "id": "BR1.5", "status": "N/A", "target": "technical rule: same migrations per schema (supports FR10.2)" },
+    { "id": "BR3.3", "status": "N/A", "target": "technical rule: atomic audit (supports FR3.5)" },
+    { "id": "BR3.4", "status": "N/A", "target": "technical rule: audit content limits (supports FR3.5, NFR1)" },
+    { "id": "BR3.5", "status": "N/A", "target": "technical rule: hold uniqueness (supports FR3.5)" },
+    { "id": "BR3.7", "status": "N/A", "target": "technical rule: idempotency expiry (supports FR3.6)" },
+    { "id": "BR3.8", "status": "N/A", "target": "technical rule: stale update refusal (supports FR3.6)" },
+    { "id": "BR3.9", "status": "N/A", "target": "technical rule: audit function access and actor derivation (supports FR3.5, NFR1)" },
+    { "id": "BR10.3", "status": "N/A", "target": "technical rule: worker schema exposure and selection (supports FR10.2)" },
+    { "id": "BR10.4", "status": "N/A", "target": "technical rule: tests also run on the default schema (supports FR10.2, FR10.3)" },
+    { "id": "BR11.2", "status": "N/A", "target": "policy rule: workbook untracked (supports FR11.1)" }
+  ]
+}

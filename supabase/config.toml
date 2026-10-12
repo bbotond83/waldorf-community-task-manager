@@ -1,0 +1,66 @@
+# Local development stack: Postgres, sign-in service (Auth), data API and the mail catcher.
+# Everything else is switched off on purpose (plan U1, infrastructure-specification.md).
+# Reference: https://supabase.com/docs/guides/local-development/cli/config
+project_id = "waldorf-community-task-manager"
+
+[api]
+enabled = true
+port = 54321
+# The default schema plus four worker schemas, so parallel test workers each use their own.
+# Raising the worker limit means editing this list and the bootstrap migration.
+schemas = ["public", "worker_1", "worker_2", "worker_3", "worker_4"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[api.tls]
+enabled = false
+
+[db]
+port = 54322
+shadow_port = 54320
+health_timeout = "2m"
+major_version = 17
+
+[db.pooler]
+enabled = false
+
+[db.migrations]
+enabled = false
+
+[db.seed]
+enabled = false
+
+[realtime]
+enabled = false
+
+[studio]
+enabled = false
+
+[local_smtp]
+enabled = true
+port = 54324
+
+[storage]
+enabled = false
+
+[auth]
+enabled = true
+site_url = "http://127.0.0.1:3000"
+additional_redirect_urls = ["http://127.0.0.1:3000"]
+jwt_expiry = 3600
+enable_refresh_token_rotation = true
+refresh_token_reuse_interval = 10
+enable_signup = true
+enable_anonymous_sign_ins = false
+minimum_password_length = 8
+
+[auth.email]
+enable_signup = true
+double_confirm_changes = true
+enable_confirmations = false
+
+[edge_runtime]
+enabled = false
+
+[analytics]
+enabled = false
