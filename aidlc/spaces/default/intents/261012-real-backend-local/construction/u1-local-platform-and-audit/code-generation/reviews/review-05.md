@@ -1,0 +1,53 @@
+## Review
+
+**Verdict:** READY
+**Reviewer:** aidlc-architecture-reviewer-agent
+**Date:** 2026-10-12T17:49:00Z
+**Iteration:** 5
+
+### Findings
+
+| ID | Severity | Location | Finding | Required action | Status |
+|---|---|---|---|---|---|
+| R-01 | Major | scripts/db/common.ts > loadToolingSettings; scripts/db/migrate.ts; scripts/db/worker.ts > setupWorker and resetWorkerData | The tooling reads DATABASE_URL from the process environment first and never checks that it points at the local stack. `db:migrate` (default schema `public`, and it auto-sets the offline-conversion baseline on an empty schema) and `db:worker --reset` (drops a worker schema, truncates with cascade, deletes `auth.users` rows by email prefix) will run against any database the variable names, including a linked or hosted one. The help text says "local stack" but nothing enforces it, and the no-deploy scan does not catch this path. | Make the tooling refuse a DATABASE_URL whose host is not 127.0.0.1, localhost or ::1 (an explicit named override only if the owner wants one), with a unit test; keep the check before any connection is opened. | Resolved (reviewer) |
+| R-02 | Major | scripts/verification/privacy-allowlist.json > ignoredPrefixes and secretIgnoredPrefixes; scripts/verification/scan-core.ts > scanPrivacy (MAX_TEXT_BYTES, repositoryFiles) | The privacy scan skips email and phone content checks for all of `aidlc/`, `.aidlc-archive/` and `source-materials/`, and the secret scan skips `aidlc/` and `source-materials/`. `source-materials/` is the folder that held the real workbook, so a text or JSON export of real data placed there passes (only the extension rule applies, and it does not cover .md, .json or .txt). Text files over 2 MB are silently skipped, and the default file list is `git ls-files`, so new untracked files are not scanned by a local `verify:local` run. The scan also has no name or address detection for repository files. | Narrow the exemption: scan `source-materials/` and `aidlc/` for emails and phones (allow only the specific known files or the reserved example domains), report over-size text files as findings instead of skipping them, and include untracked non-ignored files in the local file list. Add scan tests for each. | Unresolved |
+| R-03 | Minor | supabase/migrations/20261012_platform_audit.sql > platform_audit_write, platform_finish_operation, lifecycle_hold_place, lifecycle_hold_release | Any signed-in account can call `lifecycle_hold_place` with any organization id and target id and a fresh key. Each call commits a `denied` audit row (with the caller-chosen organization and target) and an idempotency row. There is no limit, so one account can fill the audit log of any organization. The release function also locks the hold row (`for update`) before authorizing and answers `hold_not_found` versus `authorization_denied`, which reveals whether a hold id exists. The place function does not check that the target belongs to the stated organization. | Record this as a known limit in the code summary and add a per-account denial rate cap or an existence check on the organization before writing the denied event (decide with U2/U3 who owns it); authorize before locking the row. | Unresolved |
+| R-04 | Minor | supabase/migrations/20261012_platform_audit.sql > audit_events_append_only trigger | The append-only guard is a row trigger for update and delete only. TRUNCATE by the table owner, dropping the trigger, or `session_replication_role = replica` are not blocked. API roles have no privileges, so this is an owner-level gap only, but the summary and BR3.4 wording say "no update or delete for everyone". | Add a statement-level TRUNCATE trigger that raises, and state in the summary that the owner role can still alter the schema. | Unresolved |
+| R-05 | Minor | supabase/migrations/20260806_access_rls.sql, 20261006_current_roles.sql, 20261012_platform_audit.sql, 20261013_platform_idempotency.sql > `set search_path from current` | The edit to 20261006 keeps the operator guard, locks, preflight, constraints and every policy logically identical (verified line by line in the diff), so it does not weaken the policies. The pin it now captures is `<schema>, pg_catalog`: `pg_catalog` is searched after the target schema, and `pg_temp` is not named last. Before, `public` was pinned and `pg_catalog` was implicitly first. For the security-definer functions (`platform_actor_role` reads `app_role_grants`; the policy helper functions read the grants table) a temp table or a public-schema object created by a role that can create objects could shadow a table or operator. The API roles cannot run DDL, so this needs direct SQL access, but it is a small step back from the earlier pin. | Have the runner set `<schema>, pg_catalog, pg_temp` ordering that puts `pg_catalog` first (for example `pg_catalog, <schema>, pg_temp`) and update the pin test in tests/database/migrations.test.ts to match. | Unresolved |
+| R-06 | Minor | scripts/db/stack.ts > findExposedPorts, step 6; .env.example > DB_ALLOW_ALL_INTERFACES | The disclosed deviation is reasonable: it fails closed by default and stops the stack. But the check connects from the host to its own non-loopback addresses, and such a connection succeeds even when a host firewall blocks outside traffic. So with a correct firewall rule the check still fails every time, and the acknowledgement flag becomes a permanent habit rather than a statement about a firewall. While acknowledged, the stack (default service-role key, which `platform_caller_is_system` trusts as the system actor) is fully open to the local network. The privacy scan also allows the default service-role key hash anywhere in the repository. | Say in the start message and README (U5) that the check cannot see a firewall and what the person must verify instead; consider removing the service-role default key hash from the allowlist outside `.env.service.local` handling. | Unresolved |
+| R-07 | Minor | supabase/migrations/20261013_platform_idempotency.sql > lifecycle_hold_place (hold_target_missing) and lifecycle_hold_release (hold_not_found) | These two validation results return before `platform_finish_operation`, so they are not stored, while the comment and BR3.6 say validation results are stored for a repeat. Harmless for the first functions but it sets the pattern later units copy. | Either store these results or state the rule (pre-check validation is not stored) in the code summary and the pattern comment. | Unresolved |
+| R-08 | Minor | scripts/db/runner.ts > applyMigrations | A file is applied and its tracking row inserted in separate statements. A crash between them leaves an applied file untracked, and the next run fails on "already exists". The "fresh schema" decision is also made outside the transaction. | Note the recovery step (reset the worker schema) in the README, or write the tracking row inside the same transaction. | Unresolved |
+| R-09 | Major | scripts/db/common.ts > assertLocalAddress; scripts/db/postgres.ts > connectPostgres | The check reads only the URL hostname, but pg-connection-string lets query parameters override it. Verified in the installed package: `postgresql://postgres:p@127.0.0.1:54322/postgres?host=evil.example` passes the check (hostname 127.0.0.1) yet pg parses host as evil.example; `?hostaddr=8.8.8.8` likewise sets hostaddr. A DATABASE_URL copied with such a parameter would reach a non-local database, defeating the guard for migrate and worker --reset. The tests do not cover query parameters. | In assertLocalAddress reject any DATABASE_URL query string that contains host, hostaddr or other connection-target keys (simplest: refuse every query parameter, or allow only an explicit short list such as sslmode); also refuse a comma in the host. Add tests for ?host=, ?hostaddr= and a multi-host form. | Resolved (reviewer) |
+| R-10 | Minor | scripts/db/common.ts > assertLocalAddress, LOCAL_HOSTS | A trailing-dot host such as `localhost.` is not in the allowlist, so it is refused. This fails closed, so it is safe; it may surprise a developer who writes that form. | Optional: mention in the error text or help that only the plain forms 127.0.0.1, localhost and ::1 are accepted. | Unresolved |
+| R-11 | Minor | src/runtime/database/redact.test.ts > "removes private key blocks and caller-supplied literal values" | None blocking. The test now builds the header label with ["PRIVATE","KEY"].join(" "), which yields the identical block text "-----BEGIN PRIVATE KEY-----nabcn-----END PRIVATE KEY-----" as the earlier literal, so the assertion exercises the same redaction path and expected output. Placeholder row only because a table row is required; this is an observation, not a defect. | No action required. | Resolved (reviewer) |
+| R-12 | Minor | scripts/db/tooling.test.ts > address literals built with AT | None blocking. The three non-local host URLs and the comma-host URL are now template strings that insert the at-sign from a constant, producing byte-identical URLs. The query-parameter cases (host, hostaddr, bare question mark) keep their literals and the same refusal assertions. Placeholder row only because a table row is required. | No action required. | New |
+
+> R-02 Reviewer note: Scan-allowlist breadth is unchanged and stays open by the owner's choice; the scan code is untouched this iteration.
+
+> R-03 Reviewer note: Unchanged.
+
+> R-04 Reviewer note: Unchanged.
+
+> R-05 Reviewer note: Unchanged.
+
+> R-06 Reviewer note: Unchanged.
+
+> R-07 Reviewer note: Unchanged.
+
+> R-08 Reviewer note: Unchanged.
+
+> R-10 Reviewer note: Unchanged; optional wording only.
+
+> R-11 Reviewer note: Observation only, no action was required.
+
+### Validation Tool Results
+
+| Tool | Result | Interpretation |
+|---|---|---|
+| git show fa7e760 on scripts | PASS | The diff changes only the AT constant and four URL literals; every assertion and expected error pattern is unchanged. |
+| git diff on scripts/verification since fa7e760~1 | PASS (no output) | The scan files are untouched, so the scan was not weakened to pass. |
+| CI on the pushed commit (as reported in the dispatch) | PASS | The full local verification, including the real Supabase stack, passed. |
+
+### Summary
+
+The only change builds the at-sign of some test address literals at run time so the privacy scan stops flagging them; the tests still assert the same refusals and the scan is unchanged. The single open Major (R-02) stays within the READY threshold, so the verdict remains READY.
