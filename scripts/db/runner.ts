@@ -90,6 +90,10 @@ export interface ApplyResult {
 
 const TRACKING_LOCK = "select pg_advisory_lock(hashtext('waldorf-migration-runner-tracking'))";
 const TRACKING_UNLOCK = "select pg_advisory_unlock(hashtext('waldorf-migration-runner-tracking'))";
+// Migrations that change privileges or functions across the whole database must not run while another
+// worker's migrations run, or the catalogue can change under them ("cache lookup failed for function").
+const APPLY_LOCK = "select pg_advisory_lock(hashtext('waldorf-migration-runner-apply'))";
+const APPLY_UNLOCK = "select pg_advisory_unlock(hashtext('waldorf-migration-runner-apply'))";
 
 /** Several workers may start at once; the lock keeps them from creating the tracking table together. */
 async function ensureTracking(client: SqlClient): Promise<void> {
@@ -158,6 +162,7 @@ export async function applyMigrations(options: ApplyOptions): Promise<ApplyResul
       [schema],
     );
     const fresh = appliedBefore.size === 0 && Number(tables.rows[0]?.count ?? 0) === 0;
+    await client.query(APPLY_LOCK);
     try {
       await client.query(`select set_config('search_path', $1, false)`, [
         `${quote(schema)}, pg_catalog`,
@@ -186,6 +191,7 @@ export async function applyMigrations(options: ApplyOptions): Promise<ApplyResul
     } finally {
       // Best effort: a dead connection must not hide the error that is already being thrown.
       try {
+        await client.query(APPLY_UNLOCK);
         await client.query("reset search_path");
         if (fresh && options.freshSchemaSettings) {
           for (const name of Object.keys(options.freshSchemaSettings)) {
