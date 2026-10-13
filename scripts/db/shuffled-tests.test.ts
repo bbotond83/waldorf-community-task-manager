@@ -26,9 +26,12 @@ function fakeDeps(failing?: string) {
 
 describe("shuffled database test run", () => {
   it("lists exactly the files of the database test script", () => {
-    const script = JSON.parse(readFileSync(new URL("../../package.json", import.meta.url), "utf8"))
-      .scripts["test:database:stack"] as string;
-    const listed = script.split(" ").filter((part) => part.startsWith("tests/database/"));
+    const scripts = JSON.parse(readFileSync(new URL("../../package.json", import.meta.url), "utf8"))
+      .scripts as Record<string, string>;
+    // U1's stack tests and U2's identity tests; the bundle test needs a build, so it runs after one.
+    const listed = [scripts["test:database:stack"]!, scripts["test:database:identity"]!]
+      .flatMap((script) => script.split(" "))
+      .filter((part) => part.startsWith("tests/database/"));
     assert.deepEqual([...listed].sort(), [...DATABASE_TEST_FILES].sort());
   });
 
@@ -54,7 +57,10 @@ describe("shuffled database test run", () => {
     assert.equal(await main([], fake.deps), 0);
     assert.deepEqual(fake.ran, shuffle(DATABASE_TEST_FILES, 7));
     assert.match(fake.lines[0]!, /--seed 7/);
-    assert.match(fake.lines.at(-1)!, /SHUFFLED RUN PASSED files=5 seed=7/);
+    assert.match(
+      fake.lines.at(-1)!,
+      new RegExp(`SHUFFLED RUN PASSED files=${DATABASE_TEST_FILES.length} seed=7`),
+    );
   });
 
   it("uses a given seed and stops at the first failing file, naming it", async () => {

@@ -2,9 +2,9 @@ import { expect, it } from "vitest";
 import { NextRequest } from "next/server";
 import { proxy, config } from "../../proxy.ts";
 import nextConfig from "../../next.config.ts";
-it("propagates a fresh CSP nonce to response and request headers", () => {
-  const first = proxy(new NextRequest("http://localhost/"));
-  const second = proxy(new NextRequest("http://localhost/"));
+it("propagates a fresh CSP nonce to response and request headers", async () => {
+  const first = await proxy(new NextRequest("http://localhost/"));
+  const second = await proxy(new NextRequest("http://localhost/"));
   const nonce = first.headers.get("x-middleware-request-x-nonce")!;
   expect(nonce).toBeTruthy();
   expect(first.headers.get("content-security-policy")).toContain("nonce-" + nonce);

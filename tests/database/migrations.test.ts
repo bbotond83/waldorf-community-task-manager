@@ -61,7 +61,11 @@ describe("migrations on the real local stack", () => {
     try {
       // The sign-in service owns this schema on the real stack; an empty database needs its function.
       await empty.query(
-        "create schema auth; create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid $$",
+        `create schema auth;
+         create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid $$;
+         create function auth.jwt() returns jsonb language sql stable as $$ select nullif(current_setting('request.jwt.claims', true), '')::jsonb $$;
+         create table auth.users (id uuid primary key, email text, raw_app_meta_data jsonb, created_at timestamptz);
+         create table auth.sessions (id uuid primary key, user_id uuid not null references auth.users (id) on delete cascade, created_at timestamptz, refreshed_at timestamp, not_after timestamptz)`,
       );
       const first = await run(empty, "public");
       assert.deepEqual(
@@ -185,7 +189,10 @@ describe("migrations on the real local stack", () => {
             "select has_table_privilege($1, $2::regclass, $3) as allowed",
             [role, `public.${table}`, privilege],
           );
-          assert.equal(result.rows[0].allowed, false, `${role} ${privilege} ${table}`);
+          // U2 settles U1's open item: admins read the audit events through a read policy (BR2.15).
+          const readsAudit =
+            role === "authenticated" && table === "audit_events" && privilege === "select";
+          assert.equal(result.rows[0].allowed, readsAudit, `${role} ${privilege} ${table}`);
         }
       }
       for (const fn of [
@@ -207,9 +214,13 @@ describe("migrations on the real local stack", () => {
     assert.equal(rows.rows.length, 3);
     assert.ok(rows.rows.every((row) => row.relrowsecurity === true));
     const policies = await db.query(
-      "select count(*)::int as n from pg_policies where schemaname = 'public' and tablename in ('audit_events', 'idempotency_records', 'lifecycle_holds')",
+      "select tablename, cmd, array_agg(roles::text) as roles from pg_policies where schemaname = 'public' and tablename in ('audit_events', 'idempotency_records', 'lifecycle_holds') group by tablename, cmd",
     );
-    assert.equal(policies.rows[0].n, 0);
+    // Only the audit read policy exists (U2, BR2.15): select for signed-in accounts, no write policy.
+    assert.deepEqual(
+      policies.rows.map((row) => `${row.tablename}:${row.cmd}`),
+      ["audit_events:SELECT"],
+    );
   });
 
   it("lets signed-in accounts call only the named hold functions", async () => {
@@ -225,10 +236,12 @@ describe("migrations on the real local stack", () => {
       "lifecycle_hold_release(text,uuid,integer)",
     ]) {
       assert.equal(await allowed("authenticated", fn), true);
-      assert.equal(await allowed("service_role", fn), true);
+      // U2 changes this on purpose (BR2.23): the service-role key has no execute right on them.
+      assert.equal(await allowed("service_role", fn), false);
       assert.equal(await allowed("anon", fn), false);
     }
-    assert.equal(await allowed("service_role", "platform_cleanup_expired()"), true);
+    // Cleanup runs through the owner connection (seed, reset, operator), not through the key.
+    assert.equal(await allowed("service_role", "platform_cleanup_expired()"), false);
     assert.equal(await allowed("authenticated", "platform_cleanup_expired()"), false);
   });
 

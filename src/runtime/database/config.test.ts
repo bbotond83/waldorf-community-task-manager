@@ -5,7 +5,9 @@ import {
   EXAMPLE_SESSION_SECRET,
   formatDatabaseConfigError,
   readDatabaseConfig,
+  readIdentitySettings,
   requireDatabaseConfig,
+  requireIdentitySettings,
 } from "./config.ts";
 
 // Fake values generated for the tests; none of them is a real credential.
@@ -135,5 +137,125 @@ describe("database runtime configuration", () => {
       () => requireDatabaseConfig({ ...base, SUPABASE_URL: "ftp://x" }),
       /SUPABASE_URL/,
     );
+  });
+});
+
+const identity = {
+  APP_PUBLIC_URL: "http://127.0.0.1:3000",
+  SMTP_HOST: "127.0.0.1",
+  SMTP_PORT: "54325",
+  SMTP_FROM: "sender@example.test",
+};
+const LOCAL_DATABASE = "http://127.0.0.1:54321";
+
+function identityFailure(
+  environment: Record<string, string | undefined>,
+  databaseUrl = LOCAL_DATABASE,
+) {
+  const result = readIdentitySettings(environment, databaseUrl);
+  assert.equal(result.ok, false);
+  return result.ok ? undefined : result.error;
+}
+
+describe("identity settings (BR2.10, BR2.12)", () => {
+  it("accepts the local defaults and normalizes the public address", () => {
+    const result = readIdentitySettings(
+      { ...identity, APP_PUBLIC_URL: "http://localhost:3000/" },
+      LOCAL_DATABASE,
+    );
+    assert.deepEqual(result, {
+      ok: true,
+      value: {
+        appPublicUrl: "http://localhost:3000",
+        smtp: { host: "127.0.0.1", port: 54325, from: "sender@example.test" },
+      },
+    });
+  });
+
+  it("allows http only for a loopback host and otherwise requires https", () => {
+    for (const url of [
+      "http://app.example.org",
+      "http://192.168.1.5:3000",
+      "ftp://127.0.0.1",
+      "not a url",
+      "",
+    ]) {
+      assert.equal(
+        identityFailure({ ...identity, APP_PUBLIC_URL: url })?.variable,
+        "APP_PUBLIC_URL",
+        url,
+      );
+    }
+    for (const url of ["https://app.example.org", "http://[::1]:3000", "http://127.0.0.1"]) {
+      assert.equal(
+        readIdentitySettings({ ...identity, APP_PUBLIC_URL: url }, LOCAL_DATABASE).ok,
+        true,
+        url,
+      );
+    }
+  });
+
+  it("refuses a path, a query, a fragment or credentials in the public address", () => {
+    for (const url of [
+      "https://app.example.org/app",
+      "https://app.example.org/?a=1",
+      "https://app.example.org/#x",
+      "https://user:pass@example.org",
+    ]) {
+      assert.equal(
+        identityFailure({ ...identity, APP_PUBLIC_URL: url })?.code,
+        "CONFIG_APP_PUBLIC_URL_INVALID",
+        url,
+      );
+    }
+  });
+
+  it("requires a loopback mail host in a local run and any valid host elsewhere", () => {
+    assert.equal(
+      identityFailure({ ...identity, SMTP_HOST: "mail.example.org" })?.variable,
+      "SMTP_HOST",
+    );
+    assert.equal(
+      readIdentitySettings(
+        { ...identity, APP_PUBLIC_URL: "https://app.example.org", SMTP_HOST: "mail.example.org" },
+        "https://db.example.org",
+      ).ok,
+      true,
+    );
+    for (const host of ["", "bad host", "-bad.example.org", "a..b"]) {
+      assert.equal(
+        identityFailure({ ...identity, SMTP_HOST: host }, "https://db.example.org")?.variable,
+        "SMTP_HOST",
+        host,
+      );
+    }
+    assert.equal(
+      readIdentitySettings({ ...identity, SMTP_HOST: "[::1]" }, LOCAL_DATABASE).ok,
+      true,
+    );
+  });
+
+  it("requires a numeric port and a plain sender address", () => {
+    for (const port of ["", "abc", "0", "65536", "-1", "12.5"]) {
+      assert.equal(identityFailure({ ...identity, SMTP_PORT: port })?.variable, "SMTP_PORT", port);
+    }
+    for (const from of ["", "nobody", "A <a@example.test>", "a@b", `${"a".repeat(250)}@b.test`]) {
+      assert.equal(identityFailure({ ...identity, SMTP_FROM: from })?.variable, "SMTP_FROM", from);
+    }
+  });
+
+  it("names the failing setting without printing its value, and requireIdentitySettings throws", () => {
+    const error = identityFailure({ ...identity, SMTP_FROM: "secret-looking-value" });
+    assert.equal(JSON.stringify(error).includes("secret-looking-value"), false);
+    assert.equal(requireIdentitySettings(identity, LOCAL_DATABASE).smtp.port, 54325);
+    assert.throws(
+      () => requireIdentitySettings({ ...identity, SMTP_PORT: "x" }, LOCAL_DATABASE),
+      /SMTP_PORT/,
+    );
+  });
+
+  it("still never reads a service credential: the general configuration is unchanged (U1 BR1.4)", () => {
+    const source = readFileSync(new URL("./config.ts", import.meta.url), "utf8");
+    assert.equal(/SERVICE_ROLE_KEY|SUPABASE_SERVICE|process\.env/.test(source), false);
   });
 });

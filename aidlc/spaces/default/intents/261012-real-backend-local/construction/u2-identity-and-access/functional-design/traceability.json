@@ -1,0 +1,18 @@
+{
+  "stage": "functional-design",
+  "unit": "u2-identity-and-access",
+  "upstream_ids": ["FR2.1", "FR2.2", "FR2.3", "FR2.4", "FR2.5", "FR3.3"],
+  "coverage": [
+    { "id": "FR2.1", "status": "OK", "target": "BR2.1, BR2.2, BR2.3, BR2.4" },
+    { "id": "FR2.2", "status": "OK", "target": "BR2.5, BR2.6, BR2.7, BR2.8" },
+    { "id": "FR2.3", "status": "OK", "target": "BR2.9, BR2.10, BR2.11, BR2.18, BR2.21" },
+    { "id": "FR2.4", "status": "OK", "target": "BR2.12" },
+    { "id": "FR2.5", "status": "OK", "target": "BR2.13, BR2.14" },
+    { "id": "FR3.3", "status": "OK", "target": "BR2.15, BR2.16, BR2.17, BR2.23" }
+  ],
+  "reverse": [
+    { "id": "BR2.19", "status": "N/A", "target": "construction-time coexistence rule (supports FR2.6, delivered in U5)" },
+    { "id": "BR2.20", "status": "N/A", "target": "screen quality rule (supports NFR5)" },
+    { "id": "BR2.22", "status": "N/A", "target": "clean-up rule for the superseded audit table (supports FR3.5, owned by U1)" }
+  ]
+}

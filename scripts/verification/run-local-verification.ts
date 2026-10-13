@@ -33,10 +33,15 @@ const commands = [
   // The database tests run in worker schemas and once in the default schema (BR10.4).
   { key: "database-migrate", args: ["run", "db:migrate"] },
   { key: "database-stack", args: ["run", "test:database:stack"] },
+  // The identity database stage (U2): policy matrix, catalogue and privilege tests, configuration read-back,
+  // the invitation, reset and operator-command tests that read the mail server.
+  { key: "database-identity", args: ["run", "test:database:identity"] },
   { key: "database-shuffled", args: ["run", "test:database:shuffled"] },
   { key: "coverage", args: ["run", "test:coverage"] },
   { key: "security", args: ["run", "verify:security"] },
   { key: "build", args: ["run", "build"] },
+  // The browser output never holds the sign-in service's admin key or the server-only admin modules.
+  { key: "bundle", args: ["run", "test:bundle"] },
   { key: "smoke", args: ["run", "smoke:start"] },
   { key: "browser", args: ["run", "test:browser"] },
 ] as const;

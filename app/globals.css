@@ -1293,3 +1293,20 @@ nav a:hover {
     flex-wrap: wrap;
   }
 }
+
+/* Identity forms (BR2.20): visible, announced errors and a stronger border on an invalid field. */
+
+.identity-form [role="alert"]:not([hidden]) {
+  margin: 0;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--color-primary-dark);
+  border-radius: 0.5rem;
+  color: var(--color-text);
+  background: var(--color-danger-bg);
+  font-weight: 700;
+}
+
+.identity-form input[aria-invalid="true"] {
+  border-color: var(--color-primary-dark);
+  border-width: 2px;
+}

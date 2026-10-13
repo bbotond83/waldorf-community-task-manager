@@ -1,0 +1,25 @@
+{
+  "stage": "infrastructure-design",
+  "unit": "u2-identity-and-access",
+  "upstream_ids": ["NFR1.4", "NFR1.5", "NFR1.7", "NFR1.11", "NFR1.17", "NFR1.18", "NFR1.22", "NFR2.3", "NFR2.4", "NFR2.8", "NFR2.9", "NFR3.2", "NFR6.1", "NFR6.7", "NFR4.1", "NFR4.2", "NFR6.4", "NFR6.8"],
+  "coverage": [
+    { "id": "NFR1.4", "status": "OK", "target": "infrastructure-specification.md Shared Infrastructure: service-role privilege list; cicd-pipeline.md stage 3 privilege test" },
+    { "id": "NFR1.5", "status": "OK", "target": "Application Settings: the key read only by the admin module; cicd-pipeline.md Stage to Gate Mapping scans" },
+    { "id": "NFR1.7", "status": "OK", "target": "cicd-pipeline.md Cookie Flag Check: unit test of the cookie options plus production-mode smoke (the owner's answer Q3 narrows the https-origin wording)" },
+    { "id": "NFR1.11", "status": "OK", "target": "Configuration Changes: open sign-up false in both places" },
+    { "id": "NFR1.17", "status": "OK", "target": "monitoring-design.md Logs and Tracing" },
+    { "id": "NFR1.18", "status": "OK", "target": "monitoring-design.md Logs and Tracing: keyed hash only" },
+    { "id": "NFR1.22", "status": "OK", "target": "Configuration Changes: recovery template, one-time-code lifetime, site address" },
+    { "id": "NFR2.3", "status": "OK", "target": "Deployment: Mail row; Application Settings SMTP_*" },
+    { "id": "NFR2.4", "status": "OK", "target": "Configuration Changes table" },
+    { "id": "NFR2.8", "status": "OK", "target": "cicd-pipeline.md Stages and Stage to Gate Mapping" },
+    { "id": "NFR2.9", "status": "OK", "target": "cicd-pipeline.md How the Configuration Read-Back Reads Each Value" },
+    { "id": "NFR6.1", "status": "OK", "target": "cicd-pipeline.md stage 3: migration repeatability test for U2's files" },
+    { "id": "NFR6.7", "status": "OK", "target": "cicd-pipeline.md stage 3: housekeeping test; housekeeping triggers named there" },
+    { "id": "NFR3.2", "status": "OK", "target": "Infrastructure Services: Postgres indexes created by U2's migrations" },
+    { "id": "NFR4.1", "status": "OK", "target": "monitoring-design.md Metrics: sign-in time" },
+    { "id": "NFR4.2", "status": "OK", "target": "monitoring-design.md Metrics: session and access check overhead" },
+    { "id": "NFR6.4", "status": "OK", "target": "monitoring-design.md Alerts and cicd-pipeline.md stage 3: tests with the sign-in service stopped" },
+    { "id": "NFR6.8", "status": "OK", "target": "monitoring-design.md Alerts: mail server unreachable" }
+  ]
+}

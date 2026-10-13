@@ -12,6 +12,18 @@ export const DATABASE_TEST_FILES = [
   "tests/database/idempotency.test.ts",
   "tests/database/holds.test.ts",
   "tests/database/worker.test.ts",
+  "tests/database/identity-schema.test.ts",
+  "tests/database/identity-session.test.ts",
+  "tests/database/identity-lockout.test.ts",
+  "tests/database/identity-invitation.test.ts",
+  "tests/database/identity-grants.test.ts",
+  "tests/database/identity-probe.test.ts",
+  "tests/database/identity-housekeeping.test.ts",
+  "tests/database/identity-catalogue.test.ts",
+  "tests/database/identity-operator.test.ts",
+  "tests/database/identity-server.test.ts",
+  "tests/database/identity-config.test.ts",
+  "tests/database/identity-hook.test.ts",
 ] as const;
 
 /** A small seeded generator (mulberry32), so a printed seed reproduces the order. */

@@ -1,0 +1,184 @@
+{
+  "stage": "code-generation",
+  "unit": "u2-identity-and-access",
+  "version": 1,
+  "writes": [
+    {
+      "path": ".env.example"
+    },
+    {
+      "path": ".github/workflows/ci.yml"
+    },
+    {
+      "path": "package.json"
+    },
+    {
+      "path": "package-lock.json"
+    },
+    {
+      "path": "playwright.config.ts"
+    },
+    {
+      "path": "app/globals.css"
+    },
+    {
+      "path": "app/_identity/"
+    },
+    {
+      "path": "app/bejelentkezes/"
+    },
+    {
+      "path": "app/jelszo-visszaallitas/"
+    },
+    {
+      "path": "app/meghivas/"
+    },
+    {
+      "path": "src/identity/"
+    },
+    {
+      "path": "src/runtime/database/config.ts"
+    },
+    {
+      "path": "src/runtime/database/config.test.ts"
+    },
+    {
+      "path": "scripts/db/first-super-admin.ts"
+    },
+    {
+      "path": "scripts/db/first-super-admin.test.ts"
+    },
+    {
+      "path": "scripts/db/terminal.ts"
+    },
+    {
+      "path": "scripts/db/shuffled-tests.ts"
+    },
+    {
+      "path": "scripts/db/shuffled-tests.test.ts"
+    },
+    {
+      "path": "scripts/db/stack.ts"
+    },
+    {
+      "path": "scripts/db/stack.test.ts"
+    },
+    {
+      "path": "scripts/verification/run-local-verification.ts"
+    },
+    {
+      "path": "scripts/verification/ci-config.test.ts"
+    },
+    {
+      "path": "supabase/config.toml"
+    },
+    {
+      "path": "supabase/templates/recovery.html"
+    },
+    {
+      "path": "supabase/migrations/20261014_identity_schema.sql"
+    },
+    {
+      "path": "supabase/migrations/20261015_identity_session.sql"
+    },
+    {
+      "path": "supabase/migrations/20261016_identity_signin.sql"
+    },
+    {
+      "path": "supabase/migrations/20261017_identity_invitations.sql"
+    },
+    {
+      "path": "supabase/migrations/20261018_identity_access_changes.sql"
+    },
+    {
+      "path": "supabase/migrations/20261019_identity_privileges.sql"
+    },
+    {
+      "path": "tests/support/identity-fakes.ts"
+    },
+    {
+      "path": "tests/integration/identity-actions.test.ts"
+    },
+    {
+      "path": "tests/integration/identity-runtime.test.ts"
+    },
+    {
+      "path": "tests/integration/identity-screens.test.tsx"
+    },
+    {
+      "path": "tests/coverage/production-inventory.test.ts"
+    },
+    {
+      "path": "tests/browser/identity.spec.ts"
+    },
+    {
+      "path": "tests/database/stack-support.ts"
+    },
+    {
+      "path": "tests/database/identity-support.ts"
+    },
+    {
+      "path": "tests/database/identity-bundle.test.ts"
+    },
+    {
+      "path": "tests/database/identity-catalogue.test.ts"
+    },
+    {
+      "path": "tests/database/identity-config.test.ts"
+    },
+    {
+      "path": "tests/database/identity-grants.test.ts"
+    },
+    {
+      "path": "tests/database/identity-housekeeping.test.ts"
+    },
+    {
+      "path": "tests/database/identity-invitation.test.ts"
+    },
+    {
+      "path": "tests/database/identity-lockout.test.ts"
+    },
+    {
+      "path": "tests/database/identity-operator.test.ts"
+    },
+    {
+      "path": "tests/database/identity-probe.test.ts"
+    },
+    {
+      "path": "tests/database/identity-schema.test.ts"
+    },
+    {
+      "path": "tests/database/identity-server.test.ts"
+    },
+    {
+      "path": "tests/database/identity-session.test.ts"
+    },
+    {
+      "path": "tests/database/audit.test.ts"
+    },
+    {
+      "path": "tests/database/idempotency.test.ts"
+    },
+    {
+      "path": "tests/database/migrations.test.ts"
+    },
+    {
+      "path": "tests/database/worker.test.ts"
+    },
+    {
+      "path": "proxy.ts"
+    },
+    {
+      "path": "supabase/migrations/20261020_identity_password_hook.sql"
+    },
+    {
+      "path": "tests/database/identity-hook.test.ts"
+    },
+    {
+      "path": "tests/integration/identity-proxy.test.ts"
+    },
+    {
+      "path": "tests/coverage/framework-entrypoints.test.ts"
+    }
+  ]
+}

@@ -24,6 +24,11 @@ jobs:
       APP_RUNTIME_MODE: synthetic
       APP_SYNTHETIC_FIXTURE_VERSION: waldorf-local-v1
       APP_HOST: 127.0.0.1
+      # Identity settings (names and local-only values; the session secret is generated below).
+      APP_PUBLIC_URL: http://127.0.0.1:3000
+      SMTP_HOST: 127.0.0.1
+      SMTP_PORT: "54325"
+      SMTP_FROM: no-reply@example.test
     steps:
       - name: Check out source
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -46,6 +51,12 @@ jobs:
           sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
           sudo apt-get install -y postgresql-18 postgresql-client-18
           echo '/usr/lib/postgresql/18/bin' >> "$GITHUB_PATH"
+      # A fresh secret for every run: it keys the sign-in lockout and is never written to a file or printed.
+      - name: Generate the session secret for this run
+        run: |
+          secret="$(openssl rand -hex 32)"
+          echo "::add-mask::$secret"
+          echo "APP_SESSION_SECRET=$secret" >> "$GITHUB_ENV"
       # The same command and configuration as on a developer machine (supabase/config.toml). The
       # container images are pulled on a cold runner, so the step has its own generous timeout; the
       # 90-second start target is reported only. The runner is an isolated VM, so publishing the
@@ -55,6 +66,14 @@ jobs:
         env:
           DB_ALLOW_ALL_INTERFACES: "1"
         run: npm run db:start
+      # The server-only admin module finds the sign-in service's admin key in the job environment (masked in the
+      # log; the CLI's documented local default, not a secret of ours). Never printed.
+      - name: Expose the stack's admin key to the job environment
+        run: |
+          key="$(npx supabase status -o env | sed -n 's/^SERVICE_ROLE_KEY="\(.*\)"$/\1/p')"
+          test -n "$key"
+          echo "::add-mask::$key"
+          echo "SUPABASE_SERVICE_ROLE_KEY=$key" >> "$GITHUB_ENV"
       - name: Run the complete local verification pipeline
         run: npm run verify:local
       - name: Stop the local database stack
@@ -71,6 +90,12 @@ jobs:
     env:
       APP_RUNTIME_MODE: synthetic
       APP_SYNTHETIC_FIXTURE_VERSION: waldorf-local-v1
+      # Build-only placeholders so this job's environment has the same setting names as the validate job.
+      # There is no service-role key here and no stack; the session secret is generated below.
+      APP_PUBLIC_URL: https://app.example.invalid
+      SMTP_HOST: 127.0.0.1
+      SMTP_PORT: "54325"
+      SMTP_FROM: no-reply@example.test
     steps:
       - name: Check out the validated commit
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -83,6 +108,11 @@ jobs:
           cache: npm
       - name: Install locked dependencies
         run: npm ci
+      - name: Generate a build-only session secret
+        run: |
+          secret="$(openssl rand -hex 32)"
+          echo "::add-mask::$secret"
+          echo "APP_SESSION_SECRET=$secret" >> "$GITHUB_ENV"
       - name: Rebuild the validated commit
         run: npm run build
       - name: Generate CycloneDX SBOM
