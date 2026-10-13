@@ -60,6 +60,44 @@ describe("CI workflow configuration (BR10.2, FR10.3)", () => {
     assert.match(read("tests/database/idempotency.test.ts"), /\["worker_2", "public"\]/);
   });
 
+  it("runs the identity database stage and the bundle check, and gives both jobs the identity setting names (U2)", () => {
+    const pipeline = read("scripts/verification/run-local-verification.ts");
+    assert.match(pipeline, /key: "database-identity", args: \["run", "test:database:identity"\]/);
+    assert.match(pipeline, /key: "bundle", args: \["run", "test:bundle"\]/);
+    assert.ok(pipeline.indexOf("database-stack") < pipeline.indexOf("database-identity"));
+    assert.ok(pipeline.indexOf('key: "build"') < pipeline.indexOf('key: "bundle"'));
+    const scripts = JSON.parse(read("package.json")).scripts as Record<string, string>;
+    for (const file of [
+      "schema",
+      "session",
+      "lockout",
+      "invitation",
+      "grants",
+      "probe",
+      "housekeeping",
+      "catalogue",
+      "hook",
+      "operator",
+      "server",
+      "config",
+    ]) {
+      assert.ok(
+        scripts["test:database:identity"]!.includes(`tests/database/identity-${file}.test.ts`),
+        file,
+      );
+    }
+    assert.ok(scripts["db:first-super-admin"]);
+    for (const name of ["APP_PUBLIC_URL", "SMTP_HOST", "SMTP_PORT", "SMTP_FROM"]) {
+      assert.equal([...workflow.matchAll(new RegExp(`^      ${name}:`, "gm"))].length, 2, name);
+    }
+    // The session secret is generated per run, masked, and never a literal.
+    assert.equal([...workflow.matchAll(/openssl rand -hex 32/g)].length, 2);
+    assert.equal([...workflow.matchAll(/::add-mask::/g)].length, 3);
+    assert.equal(/APP_SESSION_SECRET:\s*\S/.test(workflow), false);
+    // Only the validate job has a stack, so only it exposes the admin key (masked) to the environment.
+    assert.equal([...workflow.matchAll(/SUPABASE_SERVICE_ROLE_KEY=\$key/g)].length, 1);
+  });
+
   it("holds no database secret, runs with read-only permissions and keeps the synthetic values until U5", () => {
     assert.equal(/\$\{\{\s*secrets\./.test(workflow), false);
     assert.equal(/pull_request_target/.test(workflow), false);

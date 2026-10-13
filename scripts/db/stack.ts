@@ -21,7 +21,13 @@ import {
  * stack, pinned in package.json: Postgres, the sign-in service, the data API gateway and the mail
  * catcher. Nothing is mocked: if Docker is missing the command stops and says so.
  */
-export const PUBLISHED_PORTS = { api: 54321, database: 54322, mail: 54324 } as const;
+export const PUBLISHED_PORTS = {
+  api: 54321,
+  database: 54322,
+  mail: 54324,
+  /** The mail catcher's SMTP port, where the application sends invitation email (supabase/config.toml). */
+  smtp: 54325,
+} as const;
 /** The only services that may run; the others are switched off in supabase/config.toml. */
 export const ALLOWED_SERVICES = ["db", "kong", "auth", "rest", "inbucket", "mailpit"] as const;
 export const PROJECT_ID = "waldorf-community-task-manager";
@@ -237,6 +243,8 @@ export async function startStack(
           SUPABASE_URL: values.apiUrl,
           SUPABASE_ANON_KEY: values.publicKey,
           DATABASE_SCHEMA: DEFAULT_SCHEMA,
+          SMTP_HOST: "127.0.0.1",
+          SMTP_PORT: String(PUBLISHED_PORTS.smtp),
         },
       ),
     );

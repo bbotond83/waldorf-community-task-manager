@@ -114,6 +114,120 @@ export function readDatabaseConfig(environment: Environment): DatabaseConfigResu
   return { ok: true, value: { url, publicKey, sessionSecret, schema } };
 }
 
+/**
+ * Settings of the identity module (BR2.10, BR2.12): the address people open the app at, used in invitation
+ * links, and where invitation email is sent. The sign-in service's service-role key is not here: only the
+ * server-only admin module reads it (BR2.23).
+ */
+export type IdentitySettings = Readonly<{
+  appPublicUrl: string;
+  smtp: Readonly<{ host: string; port: number; from: string }>;
+}>;
+
+export type IdentityConfigErrorCode =
+  | "CONFIG_APP_PUBLIC_URL_INVALID"
+  | "CONFIG_SMTP_HOST_INVALID"
+  | "CONFIG_SMTP_PORT_INVALID"
+  | "CONFIG_SMTP_FROM_INVALID";
+
+export type IdentityConfigError = Readonly<{
+  code: IdentityConfigErrorCode;
+  variable: string;
+  message: string;
+}>;
+
+export type IdentityConfigResult =
+  { ok: true; value: IdentitySettings } | { ok: false; error: IdentityConfigError };
+
+const HOST_NAME =
+  /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)*$/i;
+const SENDER_ADDRESS = /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/;
+
+function identityFailure(
+  code: IdentityConfigErrorCode,
+  variable: string,
+  message: string,
+): IdentityConfigResult {
+  return { ok: false, error: { code, variable, message } };
+}
+
+/** The address: https anywhere, http only on a loopback host, and no path, query, fragment or credentials. */
+function normalizePublicUrl(raw: string): string | undefined {
+  let parsed: URL;
+  try {
+    parsed = new URL(raw);
+  } catch {
+    return undefined;
+  }
+  const secure = parsed.protocol === "https:";
+  if (!secure && !(parsed.protocol === "http:" && LOOPBACK_HOSTS.has(parsed.hostname))) {
+    return undefined;
+  }
+  if (parsed.hostname.length === 0 || parsed.username || parsed.password) return undefined;
+  if (parsed.search || parsed.hash || (parsed.pathname !== "/" && parsed.pathname !== "")) {
+    return undefined;
+  }
+  return parsed.origin;
+}
+
+/**
+ * Validates APP_PUBLIC_URL and the SMTP settings. When the database address is a local one (http on a
+ * loopback host), the mail host must be loopback too, so a local run never sends mail anywhere else.
+ */
+export function readIdentitySettings(
+  environment: Environment,
+  databaseUrl: string,
+): IdentityConfigResult {
+  const appPublicUrl = normalizePublicUrl(environment.APP_PUBLIC_URL?.trim() ?? "");
+  if (!appPublicUrl) {
+    return identityFailure(
+      "CONFIG_APP_PUBLIC_URL_INVALID",
+      "APP_PUBLIC_URL",
+      "APP_PUBLIC_URL must be an https address, or an http address on 127.0.0.1, localhost or ::1, without a path or query.",
+    );
+  }
+
+  const host = environment.SMTP_HOST?.trim() ?? "";
+  const localRun = databaseUrl.startsWith("http://");
+  if (!(HOST_NAME.test(host) || host === "[::1]") || (localRun && !LOOPBACK_HOSTS.has(host))) {
+    return identityFailure(
+      "CONFIG_SMTP_HOST_INVALID",
+      "SMTP_HOST",
+      "SMTP_HOST must be a host name; in a local run it must be 127.0.0.1, localhost or ::1.",
+    );
+  }
+
+  const portText = environment.SMTP_PORT?.trim() ?? "";
+  const port = Number(portText);
+  if (!/^[0-9]{1,5}$/.test(portText) || port < 1 || port > 65535) {
+    return identityFailure(
+      "CONFIG_SMTP_PORT_INVALID",
+      "SMTP_PORT",
+      "SMTP_PORT must be a port number.",
+    );
+  }
+
+  const from = environment.SMTP_FROM?.trim() ?? "";
+  if (from.length > 254 || !SENDER_ADDRESS.test(from)) {
+    return identityFailure(
+      "CONFIG_SMTP_FROM_INVALID",
+      "SMTP_FROM",
+      "SMTP_FROM must be a plain sender address.",
+    );
+  }
+
+  return { ok: true, value: { appPublicUrl, smtp: { host, port, from } } };
+}
+
+export function requireIdentitySettings(
+  environment: Environment,
+  databaseUrl: string,
+): IdentitySettings {
+  const result = readIdentitySettings(environment, databaseUrl);
+  if (!result.ok) throw new Error(`${result.error.code}: ${result.error.message}`);
+  return result.value;
+}
+
 export function formatDatabaseConfigError(error: DatabaseConfigError): string {
   return `${error.code}: ${error.message}`;
 }

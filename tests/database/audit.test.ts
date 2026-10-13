@@ -6,6 +6,7 @@ import {
   asActor,
   failureOf,
   lockSchemas,
+  OTHER_ADMIN,
   OUTSIDER,
   openDatabase,
   ORGANIZATION,
@@ -84,13 +85,22 @@ for (const schema of ["worker_1", "public"]) {
       }
     });
 
-    it("refuses reading the audit table to application roles until a later unit adds a policy", async () => {
-      const error = await failureOf(() =>
-        asActor(db, schema, asAuthenticated(SUPER_ADMIN), () =>
-          db.query("select * from audit_events"),
-        ),
-      );
-      assert.equal(error?.code, "42501");
+    it("lets only a super admin of the organization read events, and refuses anon and the service role (U2 policy, BR2.15)", async () => {
+      await placeHold(db, { key: "k1", targetId: uuid(1) });
+      const read = (actor: Parameters<typeof asActor>[2]) =>
+        asActor(
+          db,
+          schema,
+          actor,
+          async () => (await db.query("select id from audit_events")).rows,
+        );
+      assert.equal((await read(asAuthenticated(SUPER_ADMIN))).length, 1);
+      assert.equal((await read(asAuthenticated(OUTSIDER))).length, 0);
+      assert.equal((await read(asAuthenticated(OTHER_ADMIN))).length, 0);
+      for (const actor of [{ role: "anon" as const }, { role: "service_role" as const }]) {
+        const error = await failureOf(() => read(actor));
+        assert.equal(error?.code, "42501", actor.role);
+      }
     });
 
     it("refuses update and delete of an event to application roles and to the table owner", async () => {

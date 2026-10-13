@@ -15,6 +15,7 @@ import {
   prepareSchema,
   report,
   seedGrants,
+  sessionIdFor,
   stackSettings,
   SUPER_ADMIN,
   SYSTEM_ACCOUNT,
@@ -63,6 +64,13 @@ for (const schema of ["worker_2", "public"]) {
         await client.query(`set local search_path to "${schema}", pg_catalog`);
         await client.query("set local role authenticated");
         await client.query("select set_config('request.jwt.claim.sub', $1, true)", [account]);
+        await client.query("select set_config('request.jwt.claims', $1, true)", [
+          JSON.stringify({
+            sub: account,
+            role: "authenticated",
+            session_id: sessionIdFor(account),
+          }),
+        ]);
         const result = await client.query(
           "select lifecycle_hold_place($1, 'child', $2, $3, $4) as result",
           [key, target, ORGANIZATION, reason],
@@ -275,7 +283,9 @@ for (const schema of ["worker_2", "public"]) {
       await db.query(
         "update idempotency_records set created_at = now() - interval '2 days', expires_at = now() - interval '1 day' where idempotency_key = 'key-drop'",
       );
-      for (const role of ["anon", "authenticated"] as const) {
+      // U2 (BR2.23): the service-role key has no execute right on it either; cleanup runs through the
+      // owner connection (seed, reset, the operator), which is this test's own connection.
+      for (const role of ["anon", "authenticated", "service_role"] as const) {
         const error = await failureOf(() =>
           asActor(db, schema, { role, account: SUPER_ADMIN }, () =>
             db.query("select platform_cleanup_expired()"),
@@ -283,9 +293,7 @@ for (const schema of ["worker_2", "public"]) {
         );
         assert.equal(error?.code, "42501", role);
       }
-      const removed = await asActor(db, schema, { role: "service_role" }, () =>
-        db.query("select platform_cleanup_expired() as removed"),
-      );
+      const removed = await db.query("select platform_cleanup_expired() as removed");
       assert.equal(removed.rows[0].removed, 1);
       const left = await db.query("select idempotency_key from idempotency_records");
       assert.deepEqual(

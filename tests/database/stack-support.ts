@@ -1,3 +1,4 @@
+import { randomBytes } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import pg from "pg";
@@ -82,6 +83,59 @@ export const SYSTEM_ACCOUNT = "00000000-0000-0000-0000-000000000000";
 
 export const uuid = (n: number) => `cccccccc-0000-4000-8000-${String(n).padStart(12, "0")}`;
 
+/** The session id of an account's test session (see `ensureAccount`); derived, so every file agrees. */
+// Every test process (one per file) gets its own sessions for the shared test identities, so a test that ends
+// or ages a session never disturbs another file running at the same time.
+const SESSION_NAMESPACE = randomBytes(4).toString("hex");
+export const sessionIdFor = (account: string): string => `${SESSION_NAMESPACE}${account.slice(8)}`;
+
+export type AccountSpec = {
+  id: string;
+  organization: string;
+  email?: string;
+  status?: "active" | "deactivated";
+  /** Skip the session row: the account exists but is signed out. */
+  withoutSession?: boolean;
+};
+
+/**
+ * Creates a sign-in user, the app's Account and an active sign-in session for it, as the schema owner.
+ * The sign-in user and session are real rows of the sign-in service's tables (the same ones the
+ * database checks), created directly so database tests stay fast; the tests of the real sign-in flow
+ * use the sign-in service itself. The shared test identities use an address prefix that no worker reset
+ * removes, so files running in different schemas never delete each other's users.
+ */
+export async function ensureAccount(client: pg.Client, spec: AccountSpec): Promise<string> {
+  const email = spec.email ?? `identity.${spec.id}@example.test`;
+  await client.query(
+    `insert into auth.users (id, aud, role, email, created_at, updated_at)
+     values ($1, 'authenticated', 'authenticated', $2, now(), now()) on conflict (id) do nothing`,
+    [spec.id, email],
+  );
+  await client.query(
+    `insert into accounts (id, email, organization_id, status) values ($1, $2, $3, $4)
+     on conflict (id) do update set status = excluded.status`,
+    [spec.id, email.toLowerCase(), spec.organization, spec.status ?? "active"],
+  );
+  const session = sessionIdFor(spec.id);
+  // Sessions left by earlier runs of the shared test identities are old: remove them here.
+  await client.query(
+    "delete from auth.sessions where user_id = $1 and created_at < now() - interval '2 hours'",
+    [spec.id],
+  );
+  if (spec.withoutSession) {
+    await client.query("delete from auth.sessions where id = $1", [session]);
+  } else {
+    await client.query(
+      `insert into auth.sessions (id, user_id, created_at, updated_at, refreshed_at)
+       values ($1, $2, now(), now(), now() at time zone 'utc')
+       on conflict (id) do update set refreshed_at = now() at time zone 'utc', not_after = null`,
+      [session, spec.id],
+    );
+  }
+  return session;
+}
+
 /** Grants used by the tests. Rows are written as the schema owner (row rules do not apply). */
 export async function seedGrants(client: pg.Client): Promise<void> {
   const grant = (
@@ -95,16 +149,26 @@ export async function seedGrants(client: pg.Client): Promise<void> {
       "insert into app_role_grants (id, subject_id, role, scope_type, scope_id, organization_id) values (gen_random_uuid(), $1, $2, $3, $4, $5)",
       [subject, role, scopeType, scope, organization],
     );
+  await ensureAccount(client, { id: SUPER_ADMIN, organization: ORGANIZATION });
+  await ensureAccount(client, { id: OTHER_ADMIN, organization: OTHER_ORGANIZATION });
+  await ensureAccount(client, { id: PARENT, organization: ORGANIZATION });
+  await ensureAccount(client, { id: OUTSIDER, organization: ORGANIZATION });
   await grant(SUPER_ADMIN, "super_admin", "organization", ORGANIZATION, ORGANIZATION);
   await grant(OTHER_ADMIN, "super_admin", "organization", OTHER_ORGANIZATION, OTHER_ORGANIZATION);
   await grant(PARENT, "parent", "family", uuid(900), ORGANIZATION);
 }
 
-export type Actor = { role: "anon" | "authenticated" | "service_role"; account?: string };
+export type Actor = {
+  role: "anon" | "authenticated" | "service_role";
+  account?: string;
+  /** The token's session id: omitted means the account's test session, null means none. */
+  session?: string | null;
+};
 
 /**
  * Runs `work` inside one transaction as a database role, the way the data API runs a request: the
- * role is switched with `set local role` and the signed-in account is the `sub` claim. Commits.
+ * role is switched with `set local role` and the signed-in account and its session are the token
+ * claims. Commits.
  */
 export async function asActor<T>(
   client: pg.Client,
@@ -116,8 +180,16 @@ export async function asActor<T>(
   try {
     await client.query(`set local search_path to "${schema}", pg_catalog`);
     await client.query(`set local role ${actor.role}`);
-    if (actor.account)
+    if (actor.account) {
+      const session = actor.session === undefined ? sessionIdFor(actor.account) : actor.session;
+      const claims = JSON.stringify({
+        sub: actor.account,
+        role: actor.role,
+        ...(session ? { session_id: session } : {}),
+      });
+      await client.query("select set_config('request.jwt.claims', $1, true)", [claims]);
       await client.query("select set_config('request.jwt.claim.sub', $1, true)", [actor.account]);
+    }
     const result = await work();
     await client.query("commit");
     return result;
@@ -165,6 +237,9 @@ export async function placeHold(
 export async function useSchema(client: pg.Client, schema: string): Promise<void> {
   await client.query(`set search_path to "${schema}", pg_catalog`);
 }
+
+/** The same function under a name the React hooks lint rule does not mistake for a hook. */
+export const bindSchema = useSchema;
 
 /** Reported figures (timings against the NFR4 targets) appear as TAP comments in the run output. */
 export function report(line: string): void {

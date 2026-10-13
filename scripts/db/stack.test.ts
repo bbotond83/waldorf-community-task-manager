@@ -103,6 +103,8 @@ describe("start command", () => {
     );
     assert.match(fake.files[PUBLIC_ENV_FILE]!, /SUPABASE_URL=http:\/\/127\.0\.0\.1:54321/);
     assert.match(fake.files[PUBLIC_ENV_FILE]!, /DATABASE_SCHEMA=public/);
+    assert.match(fake.files[PUBLIC_ENV_FILE]!, /SMTP_HOST=127\.0\.0\.1/);
+    assert.match(fake.files[PUBLIC_ENV_FILE]!, new RegExp(`SMTP_PORT=${PUBLISHED_PORTS.smtp}`));
     assert.equal(fake.files[PUBLIC_ENV_FILE]!.includes(FAKE_SERVICE), false);
     assert.ok(fake.files[SERVICE_ENV_FILE]!.includes(`SUPABASE_SERVICE_ROLE_KEY=${FAKE_SERVICE}`));
   });

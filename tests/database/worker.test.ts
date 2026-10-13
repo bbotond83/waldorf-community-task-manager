@@ -3,6 +3,7 @@ import { randomBytes } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { after, before, describe, it } from "node:test";
 import type pg from "pg";
+import { readMigrationFiles } from "../../scripts/db/runner.ts";
 import { WORKER_SCHEMAS } from "../../scripts/db/common.ts";
 import {
   defaultWorkerDeps,
@@ -199,7 +200,7 @@ describe("worker schemas on the real local stack", () => {
           "select count(*)::int as n from migration_runner.applied_migrations where schema_name = 'worker_3'",
         )
       ).rows[0].n,
-      4,
+      readMigrationFiles(`${root}supabase/migrations`).length,
     );
     assert.equal(await dataApiStatus("worker_3"), 200);
   });
@@ -284,6 +285,11 @@ describe("worker schemas on the real local stack", () => {
     const parentId = await createAccount(parentEmail, password);
     await db.query("set search_path to worker_1, pg_catalog");
     await seedGrants(db);
+    // The database accepts a session only for an active Account (BR2.6): mirror the two sign-in users.
+    await db.query(
+      "insert into accounts (id, email, organization_id) values ($1, $2, $5), ($3, $4, $5)",
+      [adminId, adminEmail.toLowerCase(), parentId, parentEmail.toLowerCase(), ORGANIZATION],
+    );
     await db.query(
       "insert into app_role_grants (id, subject_id, role, scope_type, scope_id, organization_id) values (gen_random_uuid(), $1, 'super_admin', 'organization', $2, $2), (gen_random_uuid(), $3, 'parent', 'family', $4, $2)",
       [adminId, ORGANIZATION, parentId, uuid(950)],
