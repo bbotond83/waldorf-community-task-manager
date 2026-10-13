@@ -10650,3 +10650,101 @@
 **Run floor**: WORKFLOW_STARTED:2026-10-12T09:50:41Z#1
 
 ---
+
+## Artifact Updated
+**Timestamp**: 2026-10-13T12:55:26Z
+**Event**: ARTIFACT_UPDATED
+**Tool**: Edit
+**File**: <project-dir>/aidlc/spaces/default/intents/261012-real-backend-local/construction/code-generation/memory.md
+**Context**: construction > code-generation > memory.md
+
+---
+
+## Decision Recorded
+**Timestamp**: 2026-10-13T12:55:50Z
+**Event**: DECISION_RECORDED
+**Stage**: code-generation
+**Decision**: Which notes from this Unit should be kept for next time?
+**Options**: Keep none of these,Sign-in service has no password rate limit,Source manifest rejects bracket paths
+**Unit**: u2-identity-and-access
+
+---
+
+## Human Turn
+**Timestamp**: 2026-10-13T13:01:49Z
+**Event**: HUMAN_TURN
+**Session**: 1bb9e74a-ecda-46ab-ae8f-78e4d4bb6914
+**Picked**: ["Keep none of these"]
+
+---
+
+## Question Replied
+**Timestamp**: 2026-10-13T13:01:50Z
+**Event**: QUESTION_REPLIED
+**Session**: 1bb9e74a-ecda-46ab-ae8f-78e4d4bb6914
+**Question**: Which notes from U2 should be kept for the team (project rules, under Corrections)?
+**Reply**: Keep none of these
+
+---
+
+## Question Answered
+**Timestamp**: 2026-10-13T13:01:57Z
+**Event**: QUESTION_ANSWERED
+**Stage**: code-generation
+**Details**: Keep none of these
+**Unit**: u2-identity-and-access
+
+---
+
+## Decision Recorded
+**Timestamp**: 2026-10-13T13:02:02Z
+**Event**: DECISION_RECORDED
+**Checkpoint**: Construction Unit Approval
+**Unit**: u2-identity-and-access
+**Kind**: unit
+**Stage**: code-generation
+**Fingerprint**: sha256:c83171ace0489706d457a4341ad473296bb8a4d8c534bb6b9b1f68f92f7437ef
+**Session**: 1bb9e74a-ecda-46ab-ae8f-78e4d4bb6914
+**Options**: Approve,Request Changes
+**Asked Evidence**: {"functional-design":["sha256:2b627eb9d712adff3ac95f69071108a2212dc8904cc8f9627cad8af0670677ac",null],"nfr-requirements":["sha256:b1ac582321057e06ee802c7946f46ca9b980f997de5ae20348e1f8aec9ffaab4",null],"infrastructure-design":["sha256:225daa9ce320a0035ce9c4585f654359e81f8dd1744465557ea61287aa54d688",null],"code-generation":["sha256:b9da216f858c87be7521f3ee43de64fc8e0e24d75020c37a5c9e8f53490d1a84","sha256:0d714a4ac918762c7734582d797a7314ebf5177dd0b50e2335a9bccce6cbda3e"]}
+**Run floors**: {"functional-design":"WORKFLOW_STARTED:2026-10-12T09:50:41Z#1","nfr-requirements":"WORKFLOW_STARTED:2026-10-12T09:50:41Z#1","infrastructure-design":"WORKFLOW_STARTED:2026-10-12T09:50:41Z#1","code-generation":"WORKFLOW_STARTED:2026-10-12T09:50:41Z#1"}
+
+---
+
+## Human Turn
+**Timestamp**: 2026-10-13T13:03:50Z
+**Event**: HUMAN_TURN
+**Session**: 1bb9e74a-ecda-46ab-ae8f-78e4d4bb6914
+**Picked**: ["Approve"]
+
+---
+
+## Question Replied
+**Timestamp**: 2026-10-13T13:03:50Z
+**Event**: QUESTION_REPLIED
+**Session**: 1bb9e74a-ecda-46ab-ae8f-78e4d4bb6914
+**Question**: Verified with `export PATH=/opt/homebrew/opt/node@24/bin:$PATH && npm run typecheck && npm run lint && npm test` (exit 0). The developer's full local run also passed: about 400 real-stack database tests, 412 browser tests with accessibility scans, coverage 95/88/95/97%. Approve this completed u2-identity-and-access? Things to know: (1) your 8-character password rule and 30-day sessions stand, but no common-password check is configured; the lockout (5 wrong in 15 minutes) is now enforced in the database for direct calls too, in the default schema only. (2) Sign-in works, but after signing in you land on the sign-in screen's signed-in panel because no real home screen exists until later units. (3) Handed to U3: group-scope checks in invitations and grants, more scope-probe record types, and syncing the account email. (4) The developer again ran the stack with its network-exposure acknowledgement and used a few scripted file edits; nothing outside this unit changed. PR #21 is open and CI is still running.
+**Reply**: Approve
+
+---
+
+## Gate Approved
+**Timestamp**: 2026-10-13T13:03:59Z
+**Event**: GATE_APPROVED
+**Unit**: u2-identity-and-access
+**Stage**: code-generation
+**Stages**: functional-design, nfr-requirements, infrastructure-design, code-generation
+**Gate Stages**: functional-design, nfr-requirements, infrastructure-design, code-generation
+**Gate Scope**: unit-end
+**Checkpoint**: construction-unit
+**Fingerprint**: sha256:c83171ace0489706d457a4341ad473296bb8a4d8c534bb6b9b1f68f92f7437ef
+**Run floor**: WORKFLOW_STARTED:2026-10-12T09:50:41Z#1
+**Run floors**: {"functional-design":"WORKFLOW_STARTED:2026-10-12T09:50:41Z#1","nfr-requirements":"WORKFLOW_STARTED:2026-10-12T09:50:41Z#1","infrastructure-design":"WORKFLOW_STARTED:2026-10-12T09:50:41Z#1","code-generation":"WORKFLOW_STARTED:2026-10-12T09:50:41Z#1"}
+**Verification Command SHA-256**: c05243d230a8cf95c753abbe059756a42b8f032f79d0e585d8b0af6c745e1b66
+**Verification Id**: 9262ef29-9421-46fc-b118-dcad22ee0132
+**Approved Evidence**: {"functional-design":["sha256:2b627eb9d712adff3ac95f69071108a2212dc8904cc8f9627cad8af0670677ac",null],"nfr-requirements":["sha256:b1ac582321057e06ee802c7946f46ca9b980f997de5ae20348e1f8aec9ffaab4",null],"infrastructure-design":["sha256:225daa9ce320a0035ce9c4585f654359e81f8dd1744465557ea61287aa54d688",null],"code-generation":["sha256:b9da216f858c87be7521f3ee43de64fc8e0e24d75020c37a5c9e8f53490d1a84","sha256:0d714a4ac918762c7734582d797a7314ebf5177dd0b50e2335a9bccce6cbda3e"]}
+**Session**: 1bb9e74a-ecda-46ab-ae8f-78e4d4bb6914
+**User Input**: Approve
+**Person Reply**: Approve
+
+---
