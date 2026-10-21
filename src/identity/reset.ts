@@ -1,5 +1,11 @@
 import type { ApplicationResult } from "../application/contracts.ts";
-import { denied, retryableFailure, success, validation } from "../application/results.ts";
+import {
+  denied,
+  retryableFailure,
+  success,
+  terminalFailure,
+  validation,
+} from "../application/results.ts";
 import type { AdminAccess } from "./admin-client.ts";
 import type { TokenPair } from "./cookies.ts";
 import { isPlausibleEmail, keyedHash, normalizeEmail } from "./crypto.ts";
@@ -28,6 +34,10 @@ export type ResetDeps = Readonly<{
 export const RESET_NOT_VALID = "RESET_NOT_VALID";
 export const PASSWORD_RULE = "PASSWORD_RULE";
 export const PASSWORD_REJECTED = "PASSWORD_REJECTED";
+/** The one-time link was exchanged but the password was not changed (the service was unavailable or limiting). */
+export const RESET_LINK_SPENT = "RESET_LINK_SPENT";
+/** The password was changed, but the person's other sign-ins could not be ended. */
+export const RESET_SESSIONS_NOT_ENDED = "RESET_SESSIONS_NOT_ENDED";
 const RETRY = { idempotencyKey: "reset", action: "identity.reset" } as const;
 
 /** Always succeeds from the person's point of view, whatever the address is (BR2.12). */
@@ -80,9 +90,11 @@ export async function completePasswordReset(
     await deps.service.signOut(session.accessToken);
     // The one-time link is spent once it was exchanged, so a password the sign-in service refuses (the same
     // as before, or one of its own rules) needs a new link. The screen says so instead of showing the rule.
+    // An unavailable or rate-limiting service is no different for the person: the link is spent and the
+    // password is unchanged, so resubmitting the same link would only say "not valid". Say so (code review).
     return updated.kind === "rejected"
       ? validation({ password: "rejected" }, PASSWORD_REJECTED)
-      : retryableFailure(RETRY);
+      : terminalFailure(RESET_LINK_SPENT);
   }
 
   // Every other session of the account ends (BR2.12); the person's new session stays.
@@ -97,7 +109,8 @@ export async function completePasswordReset(
   if (!removed) {
     deps.events.emit("follow_up_failed", { account: session.userId }, "sessions_remove");
     await deps.service.signOut(session.accessToken);
-    return retryableFailure(RETRY);
+    // The password has changed, so the same link cannot be used again: tell the person to sign in instead.
+    return terminalFailure(RESET_SESSIONS_NOT_ENDED);
   }
   await deps.admin.callFunction("sign_in_attempt_clear", {
     p_email_hash: keyedHash(normalizeEmail(session.email), deps.emailKeySecret, "email"),

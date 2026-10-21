@@ -16,7 +16,7 @@ Every command starts from the repository root after `export PATH=/opt/homebrew/o
 | Configuration and admin module | `node --experimental-strip-types --test src/runtime/database/config.test.ts src/identity/admin-client.test.ts` |
 | Server modules (fakes) | `node --experimental-strip-types --test src/identity/*.test.ts` (accounts, admin-client, cookies, copy, crypto, events, form-state, invitations, mail, password, refresh, reset, service, session, sign-in) |
 | Operator command (fake terminal) | `node --experimental-strip-types --test scripts/db/first-super-admin.test.ts` |
-| All real-stack identity tests | `npm run test:database:identity` (schema, session, lockout, invitation, grants, probe, housekeeping, catalogue, operator, server, config, password-verification hook and, after Step 22, email-change guard) |
+| All real-stack identity tests | `npm run test:database:identity` (schema, session, lockout, invitation, grants, probe, housekeeping, catalogue, operator, server, config, password-verification hook and email-change guard) |
 | Password-verification hook only (brute-force control) | `node --experimental-strip-types --test tests/database/identity-hook.test.ts` |
 | Bundle (service-role key never reaches client output) | `npm run build && npm run test:bundle` |
 | Screen components, server actions, runtime and proxy | `npx vitest run --config vitest.config.ts tests/integration/identity-screens.test.tsx tests/integration/identity-actions.test.ts tests/integration/identity-runtime.test.ts tests/integration/identity-proxy.test.ts tests/coverage/framework-entrypoints.test.ts` |

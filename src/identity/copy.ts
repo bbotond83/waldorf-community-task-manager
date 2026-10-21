@@ -42,6 +42,10 @@ export const COPY = {
     newPending: "Mentés folyamatban…",
     notValid: "Ez a hivatkozás már nem érvényes. Kérjen újat.",
     requestNewLink: "Új hivatkozás kérése",
+    linkSpent:
+      "A jelszót most nem sikerült beállítani, és a hivatkozás már fel lett használva. Kérjen új jelszó-visszaállítási hivatkozást.",
+    sessionsNotEnded:
+      "A jelszó megváltozott, de a korábbi bejelentkezések lezárása nem sikerült. Jelentkezzen be az új jelszóval.",
   },
   invitation: {
     title: "Meghívó elfogadása",

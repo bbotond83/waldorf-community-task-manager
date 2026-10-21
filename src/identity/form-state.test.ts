@@ -11,7 +11,12 @@ import {
 import { COPY } from "./copy.ts";
 import { IDLE_FORM, passwordFormState, signInFormState } from "./form-state.ts";
 import { INVITATION_BUSY, INVITATION_NOT_VALID, PASSWORD_RULE } from "./invitations.ts";
-import { PASSWORD_REJECTED, RESET_NOT_VALID } from "./reset.ts";
+import {
+  PASSWORD_REJECTED,
+  RESET_LINK_SPENT,
+  RESET_NOT_VALID,
+  RESET_SESSIONS_NOT_ENDED,
+} from "./reset.ts";
 import { SIGN_IN_INVALID, SIGN_IN_LOCKED, SIGN_IN_RATE_LIMITED } from "./sign-in.ts";
 
 const retry = { idempotencyKey: "k", action: "a" };
@@ -59,6 +64,18 @@ describe("form states (BR2.1, BR2.20)", () => {
     );
     assert.deepEqual(refused, { status: "error", message: COPY.password.rejectedNewLink });
     assert.notEqual(COPY.password.rejectedNewLink, COPY.password.ruleError);
+  });
+
+  it("says a spent link needs a new one, and that a changed password only needs a sign-in", () => {
+    const spent = passwordFormState(terminalFailure(RESET_LINK_SPENT), COPY.reset.notValid);
+    assert.deepEqual(spent, { status: "error", message: COPY.reset.linkSpent, kind: "not-valid" });
+    const changed = passwordFormState(
+      terminalFailure(RESET_SESSIONS_NOT_ENDED),
+      COPY.reset.notValid,
+    );
+    assert.deepEqual(changed, { status: "error", message: COPY.reset.sessionsNotEnded });
+    assert.notEqual(COPY.reset.linkSpent, COPY.common.temporary);
+    assert.notEqual(COPY.reset.sessionsNotEnded, COPY.common.temporary);
   });
 
   it("explains a password that breaks the rule on its field, and links nothing else to it", () => {

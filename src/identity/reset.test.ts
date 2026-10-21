@@ -19,6 +19,8 @@ import {
   completePasswordReset,
   PASSWORD_REJECTED,
   PASSWORD_RULE,
+  RESET_LINK_SPENT,
+  RESET_SESSIONS_NOT_ENDED,
   requestPasswordReset,
   RESET_NOT_VALID,
 } from "./reset.ts";
@@ -172,16 +174,15 @@ describe("using a reset link (BR2.4, BR2.12)", () => {
     // Regression (code review Minor 7): the spent link needs its own message, not the password rule.
     assert.equal(result.code, PASSWORD_REJECTED);
     assert.deepEqual(names(refused.service.calls), ["verifyRecovery", "updatePassword", "signOut"]);
-    const limited = setup({}, { updatePassword: async () => rateLimited });
-    assert.equal(
-      (await completePasswordReset(input, limited.deps)).state,
-      "dependency-failure-retryable",
-    );
-    const down = setup({}, { updatePassword: async () => unavailable });
-    assert.equal(
-      (await completePasswordReset(input, down.deps)).state,
-      "dependency-failure-retryable",
-    );
+
+    // Regression (second review, Minor 1): the link is spent and the password unchanged, so the answer says so
+    // instead of offering a retry that would only report "not valid".
+    for (const outcome of [unavailable, rateLimited]) {
+      const down = setup({}, { updatePassword: async () => outcome });
+      const gone = await completePasswordReset(input, down.deps);
+      assert.equal(gone.state, "dependency-failure-terminal");
+      assert.equal(gone.code, RESET_LINK_SPENT);
+    }
   });
 
   it("retries ending the other sessions and fails closed when that cannot be done", async () => {
@@ -196,7 +197,9 @@ describe("using a reset link (BR2.4, BR2.12)", () => {
     assert.equal(attempts, 3);
     const broken = setup({ sessions_remove: () => envelope("denied", "admin_access_required") });
     const result = await completePasswordReset(input, broken.deps);
-    assert.equal(result.state, "dependency-failure-retryable");
+    // The password has changed by now, so the answer is not a retry: the same link would no longer work.
+    assert.equal(result.state, "dependency-failure-terminal");
+    assert.equal(result.code, RESET_SESSIONS_NOT_ENDED);
     assert.deepEqual(names(broken.service.calls), ["verifyRecovery", "updatePassword", "signOut"]);
     assert.ok(broken.events.events.some((entry) => entry.event === "follow_up_failed"));
   });

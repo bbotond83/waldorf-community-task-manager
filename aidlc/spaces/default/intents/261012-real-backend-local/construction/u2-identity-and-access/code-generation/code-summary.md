@@ -81,7 +81,7 @@ The code review of this unit (review-03) came back NOT-READY with three Major an
 | Minor 7: a refused new password burned the reset link without saying so | `PASSWORD_REJECTED` result and `COPY.password.rejectedNewLink` say that a new link is needed. The recovery session is not kept (the page holds no session), so the link is still single use | `reset.test.ts`, `form-state.test.ts` |
 | Minor 8: plan named modules that were not built | `src/identity/redact.ts` was never built (redaction lives in `events.ts`) and the server-side session helper package was replaced by `refresh.ts` and `cookies.ts` | n/a |
 
-Handoff note 7(c) above is closed by Major 2. A later unit that must change a sign-in email (an admin correcting an address) sets `app.identity_email_change` in a transaction and keeps `accounts.email` in step; the sign-in service's own connection cannot set it, so its self-service route stays closed.
+Handoff note 7(c) above is closed by Major 2. A later unit that must change a sign-in email (an admin correcting an address) sets `app.identity_email_change` in a transaction and keeps `accounts.email` in step; the sign-in service does not set it (it sends plain updates), so its self-service route stays closed. This is behaviour, not a privilege: any role that can run SQL against the database can set the setting, which is the same trust level as dropping the trigger. The guard stops the sign-in service's own routes, not someone with direct database access. (The comment in `20261022_identity_email_change_guard.sql` says "cannot set it"; a merged migration is not edited, so this note is the correction.)
 
 Design statements the repair changes (recorded here; the frozen design files are unchanged): `account_recovery_check(text)`, `invitation_release_stale()`, `identity_block_email_change()` and `identity_ban_mismatches()` belong on the elevated function list (admin access, internal, trigger and admin access respectively; the catalogue test lists them); reactivation lifts the sign-in ban through the admin access and the reconcile repeats it; the lock is five failed attempts inside a sliding 15-minute window, locked for 15 minutes from the fifth; `[auth.email] enable_signup` stays `true` (false turns the email provider off) and `supabase/config.toml` (`smtp_port = 54325`) is the one source of the SMTP port.
 
@@ -93,3 +93,11 @@ Design statements the repair changes (recorded here; the frozen design files are
 - `npm run test:coverage`: statements 95.03%, branches 88.48%, functions 94.77%, lines 96.87% (floor 80%).
 - `APP_RUNTIME_MODE=synthetic npm run build` and `npm run test:bundle`: pass.
 - `npm run test:browser` (Playwright: Chromium, Firefox and the phone profile, including the identity screens and their accessibility scans) against the real local stack: 412 passed, 2 skipped (skips that were already in the suite), 0 failed, 5.3 minutes.
+
+### Follow-up to the second code review (2026-10-21)
+
+The second review of this unit found all eight earlier findings fixed and raised three Minor points, handled on `fix/u2-minor-points`:
+
+1. **Reset after a spent link.** When the new password could not be set because the sign-in service was unavailable or rate limiting, or when ending the other sign-ins failed after the password had changed, the answer was generic "try again" advice, and resubmitting the same link only said "not valid". There are now two explicit outcomes with Hungarian messages: `RESET_LINK_SPENT` ("request a new link", with the link to do so) and `RESET_SESSIONS_NOT_ENDED` ("the password changed, sign in with it"). Tests: `reset.test.ts`, `form-state.test.ts`. In the second case the account's other sign-ins stay open until their normal expiry (30 days idle), because nothing retries the removal; this is a known limit that was already there, now stated. The person is told to sign in, and the failure is logged as `follow_up_failed`.
+2. **Email-change guard wording.** Corrected above: the bypass setting is not protected by a privilege.
+3. **Test instructions.** The reference to a plan step number was removed.

@@ -1,7 +1,12 @@
 import type { ApplicationResult } from "../application/contracts.ts";
 import { COPY } from "./copy.ts";
 import { INVITATION_BUSY, INVITATION_NOT_VALID, PASSWORD_RULE } from "./invitations.ts";
-import { PASSWORD_REJECTED, RESET_NOT_VALID } from "./reset.ts";
+import {
+  PASSWORD_REJECTED,
+  RESET_LINK_SPENT,
+  RESET_NOT_VALID,
+  RESET_SESSIONS_NOT_ENDED,
+} from "./reset.ts";
 import { SIGN_IN_LOCKED, SIGN_IN_RATE_LIMITED } from "./sign-in.ts";
 
 /**
@@ -47,6 +52,12 @@ export function passwordFormState(
   }
   if (result.state === "validation" && result.code === PASSWORD_REJECTED) {
     return { status: "error", message: COPY.password.rejectedNewLink };
+  }
+  if (result.state === "dependency-failure-terminal" && result.code === RESET_LINK_SPENT) {
+    return { status: "error", message: COPY.reset.linkSpent, kind: "not-valid" };
+  }
+  if (result.state === "dependency-failure-terminal" && result.code === RESET_SESSIONS_NOT_ENDED) {
+    return { status: "error", message: COPY.reset.sessionsNotEnded };
   }
   if (
     result.state === "denied" &&
