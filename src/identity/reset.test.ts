@@ -10,12 +10,14 @@ import {
   recordingEvents,
   rejected,
   SESSION_ID,
+  rateLimited,
   unavailable,
   type AdminHandlers,
 } from "../../tests/support/identity-fakes.ts";
 import { keyedHash } from "./crypto.ts";
 import {
   completePasswordReset,
+  PASSWORD_REJECTED,
   PASSWORD_RULE,
   requestPasswordReset,
   RESET_NOT_VALID,
@@ -167,7 +169,14 @@ describe("using a reset link (BR2.4, BR2.12)", () => {
     const refused = setup({}, { updatePassword: async () => rejected("same_password", 422) });
     const result = await completePasswordReset(input, refused.deps);
     assert.equal(result.state, "validation");
+    // Regression (code review Minor 7): the spent link needs its own message, not the password rule.
+    assert.equal(result.code, PASSWORD_REJECTED);
     assert.deepEqual(names(refused.service.calls), ["verifyRecovery", "updatePassword", "signOut"]);
+    const limited = setup({}, { updatePassword: async () => rateLimited });
+    assert.equal(
+      (await completePasswordReset(input, limited.deps)).state,
+      "dependency-failure-retryable",
+    );
     const down = setup({}, { updatePassword: async () => unavailable });
     assert.equal(
       (await completePasswordReset(input, down.deps)).state,

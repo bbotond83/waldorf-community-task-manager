@@ -6,6 +6,7 @@ import {
   fakeSession,
   ok,
   rejected,
+  rateLimited,
   unavailable,
 } from "../../tests/support/identity-fakes.ts";
 import { ACCESS_COOKIE, REFRESH_COOKIE } from "./cookies.ts";
@@ -78,15 +79,17 @@ describe("the per-request token refresh (R-04, BR2.5, BR2.7)", () => {
     if (decision.action === "clear") assert.equal(decision.options.maxAge, 0);
   });
 
-  it("changes nothing when the service cannot be reached, so the next request tries again", async () => {
-    const service = fakeService({ refresh: async () => unavailable });
-    assert.deepEqual(
-      await decideRefresh(
-        jar({ [ACCESS_COOKIE]: expiredToken(), [REFRESH_COOKIE]: "r" }),
-        deps(service),
-      ),
-      { action: "none" },
-    );
+  it("changes nothing when the service cannot be reached or rate limits the request, so the next request tries again", async () => {
+    for (const outcome of [unavailable, rateLimited]) {
+      const service = fakeService({ refresh: async () => outcome });
+      assert.deepEqual(
+        await decideRefresh(
+          jar({ [ACCESS_COOKIE]: expiredToken(), [REFRESH_COOKIE]: "r" }),
+          deps(service),
+        ),
+        { action: "none" },
+      );
+    }
     assert.ok(fakeJwt({}).length > 0);
   });
 

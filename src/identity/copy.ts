@@ -70,10 +70,14 @@ export const COPY = {
     ruleError:
       "A jelszó legalább 8 és legfeljebb 72 karakter legyen, és tartalmazzon betűt és számot.",
     hint: "A jelszó követelménye: legalább 8, legfeljebb 72 karakter, legalább egy betű és egy szám.",
+    rejectedNewLink:
+      "Ezt a jelszót a rendszer nem fogadta el. A hivatkozás egyszer használható volt, ezért kérjen új jelszó-visszaállítási hivatkozást.",
   },
   common: {
     skipLink: "Ugrás a fő tartalomra",
     temporary: "Átmeneti hiba történt. Próbálja újra.",
+    rateLimited:
+      "Túl sok próbálkozás érkezett rövid idő alatt. Kérjük, várjon néhány percet, majd próbálja újra.",
     accessDenied: "Ehhez az adathoz nincs jogosultsága.",
   },
   mail: {

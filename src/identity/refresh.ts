@@ -46,7 +46,7 @@ export async function decideRefresh(
       options: sessionCookieOptions(deps.appPublicUrl),
     };
   }
-  return outcome.kind === "unavailable"
+  return outcome.kind === "unavailable" || outcome.kind === "rate_limited"
     ? { action: "none" }
     : { action: "clear", options: clearedCookieOptions(deps.appPublicUrl) };
 }

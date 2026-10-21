@@ -22,6 +22,7 @@ export type SecurityEventCode =
   | "deactivation"
   | "reactivation"
   | "follow_up_failed"
+  | "follow_up_reconciled"
   | "housekeeping_done"
   | "housekeeping_failed";
 

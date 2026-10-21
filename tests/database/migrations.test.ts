@@ -64,7 +64,7 @@ describe("migrations on the real local stack", () => {
         `create schema auth;
          create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid $$;
          create function auth.jwt() returns jsonb language sql stable as $$ select nullif(current_setting('request.jwt.claims', true), '')::jsonb $$;
-         create table auth.users (id uuid primary key, email text, raw_app_meta_data jsonb, created_at timestamptz);
+         create table auth.users (id uuid primary key, email text, email_change text, banned_until timestamptz, raw_app_meta_data jsonb, created_at timestamptz);
          create table auth.sessions (id uuid primary key, user_id uuid not null references auth.users (id) on delete cascade, created_at timestamptz, refreshed_at timestamp, not_after timestamptz)`,
       );
       const first = await run(empty, "public");

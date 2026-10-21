@@ -59,6 +59,9 @@ export const ELEVATED: Record<
   identity_lock_super_admins: INTERNAL,
   identity_scope_group: INTERNAL,
   identity_set_account_status: INTERNAL,
+  // U2 review repair: stale reservation release, and the guard on sign-in email changes (a trigger function)
+  invitation_release_stale: INTERNAL,
+  identity_block_email_change: INTERNAL,
   // U2: signed-in admins
   invitation_create: "authenticated",
   invitation_resend: "authenticated",
@@ -79,6 +82,7 @@ export const ELEVATED: Record<
   account_recovery_check: "service_role",
   sessions_remove: "service_role",
   identity_housekeeping: "service_role",
+  identity_ban_mismatches: "service_role",
   // U2: the operator's command only (the schema owner)
   operator_first_super_admin: INTERNAL,
   // U2: the password-verification hook, executable only by the sign-in service's own database role

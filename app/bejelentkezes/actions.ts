@@ -2,6 +2,7 @@
 
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { reconcileAccountBans } from "../../src/identity/accounts.ts";
 import { COPY } from "../../src/identity/copy.ts";
 import { writeTokenPair } from "../../src/identity/cookies.ts";
 import { type FormState, signInFormState } from "../../src/identity/form-state.ts";
@@ -34,6 +35,8 @@ export async function signInAction(_previous: FormState, formData: FormData): Pr
       housekeeping: async () => {
         const done = await runtime.admin.callFunction("identity_housekeeping", {});
         runtime.events.emit(done.ok ? "housekeeping_done" : "housekeeping_failed");
+        // Repeats a ban or ban-lift that failed after a deactivation or reactivation.
+        await reconcileAccountBans({ admin: runtime.admin, events: runtime.events });
       },
     },
   );

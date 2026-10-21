@@ -50,16 +50,78 @@ for (const schema of IDENTITY_SCHEMAS) {
     };
     const userExists = async (id: string) => (await count(db, "auth.users", `id = '${id}'`)) === 1;
 
-    it("removes sign-in attempts older than 15 minutes and keeps recent ones", async () => {
+    it("removes sign-in attempts older than 30 minutes and keeps recent ones", async () => {
       const hash = emailHashFor("old@example.test");
       await db.query(
-        "insert into sign_in_attempts (email_hash, attempted_at) select $1, now() - make_interval(mins => m) from unnest(array[1, 5, 14, 16, 60]) as m",
+        "insert into sign_in_attempts (email_hash, attempted_at) select $1, now() - make_interval(mins => m) from unnest(array[1, 5, 14, 16, 29, 31, 60]) as m",
         [hash],
       );
       const result = await housekeeping();
       assert.equal(result.state, "success");
       assert.equal(result.attempts_removed, 2);
-      assert.equal(await count(db, "sign_in_attempts"), 3);
+      assert.equal(await count(db, "sign_in_attempts"), 5);
+    });
+
+    // Regression (code review Minor 4): attempts at minutes 0, 14, 14, 14, 14 lock until minute 29, but a
+    // housekeeping run at minute 15.5 used to delete the first row and end the lock early.
+    it("never shortens an active lock: a run inside the lock keeps the rows the lock needs", async () => {
+      const hash = emailHashFor("locked@example.test");
+      await db.query(
+        "insert into sign_in_attempts (email_hash, attempted_at) select $1, now() - make_interval(secs => s) from unnest(array[930, 90, 85, 80, 75]) as s",
+        [hash],
+      );
+      const before = await callAs(db, schema, asServiceRole, "sign_in_lockout_check($1)", [hash]);
+      assert.equal(before.code, "locked");
+      await housekeeping();
+      const after = await callAs(db, schema, asServiceRole, "sign_in_lockout_check($1)", [hash]);
+      assert.equal(after.code, "locked");
+      assert.equal(await count(db, "sign_in_attempts"), 5);
+    });
+
+    // Regression (code review Minor 5): a failed ban or ban-lift is found again and can be repaired.
+    it("lists the accounts whose status and sign-in ban disagree, and only those", async () => {
+      const make = async (tag: string, status: string, banned: boolean) => {
+        const id = await signInUser(tag, 5);
+        await db.query(
+          "insert into accounts (id, email, organization_id, status) values ($1, $2, $3, $4)",
+          [id, email(tag), ORGANIZATION, status],
+        );
+        if (banned)
+          await db.query(
+            "update auth.users set banned_until = now() + interval '1 year' where id = $1",
+            [id],
+          );
+        return id;
+      };
+      const consistent = [
+        await make("active-free", "active", false),
+        await make("deactivated-banned", "deactivated", true),
+      ];
+      const reactivated = await make("active-banned", "active", true);
+      const deactivated = await make("deactivated-free", "deactivated", false);
+      const listed = await callAs(db, schema, asServiceRole, "identity_ban_mismatches()");
+      assert.equal(listed.state, "success");
+      // The seeded world has accounts of its own; only the four made here are judged.
+      const mine = new Set<string>([...consistent, reactivated, deactivated]);
+      const rows = (listed.accounts as { account_id: string; status: string }[]).filter((row) =>
+        mine.has(row.account_id),
+      );
+      assert.deepEqual(
+        rows.map((row) => [row.account_id, row.status]).sort(),
+        [
+          [reactivated, "active"],
+          [deactivated, "deactivated"],
+        ].sort(),
+      );
+      const denied = await failureOf(() =>
+        callAs(
+          db,
+          schema,
+          authenticated(SUPER_ADMIN, sessionIdFor(SUPER_ADMIN)),
+          "identity_ban_mismatches()",
+        ),
+      );
+      assert.ok(denied, "a signed-in account cannot call it");
     });
 
     it("keeps at most 20 attempts per hash", async () => {

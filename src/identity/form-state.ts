@@ -1,8 +1,8 @@
 import type { ApplicationResult } from "../application/contracts.ts";
 import { COPY } from "./copy.ts";
 import { INVITATION_BUSY, INVITATION_NOT_VALID, PASSWORD_RULE } from "./invitations.ts";
-import { RESET_NOT_VALID } from "./reset.ts";
-import { SIGN_IN_LOCKED } from "./sign-in.ts";
+import { PASSWORD_REJECTED, RESET_NOT_VALID } from "./reset.ts";
+import { SIGN_IN_LOCKED, SIGN_IN_RATE_LIMITED } from "./sign-in.ts";
 
 /**
  * What a form shows after it was submitted: nothing yet, one Hungarian message with the field it belongs to,
@@ -25,6 +25,9 @@ export function signInFormState(result: ApplicationResult<unknown>, email: strin
   if (result.state === "denied" && result.code === SIGN_IN_LOCKED) {
     return { status: "error", message: COPY.signIn.locked, email };
   }
+  if (result.state === "dependency-failure-retryable" && result.code === SIGN_IN_RATE_LIMITED) {
+    return { status: "error", message: COPY.common.rateLimited, email };
+  }
   if (
     result.state === "dependency-failure-retryable" ||
     result.state === "dependency-failure-terminal"
@@ -41,6 +44,9 @@ export function passwordFormState(
   if (result.state === "success") return { status: "success", message: "" };
   if (result.state === "validation" && result.code === PASSWORD_RULE) {
     return { status: "error", message: COPY.password.ruleError, field: "password" };
+  }
+  if (result.state === "validation" && result.code === PASSWORD_REJECTED) {
+    return { status: "error", message: COPY.password.rejectedNewLink };
   }
   if (
     result.state === "denied" &&

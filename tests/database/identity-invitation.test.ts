@@ -437,6 +437,83 @@ for (const schema of IDENTITY_SCHEMAS) {
         assert.equal((await release(id, second.reserved_at as string)).code, "not_reserved");
       });
 
+      // Regression (code review Major 1): a reservation whose release was never proven used to stay
+      // `accepting` forever, so no admin could revoke, resend or replace the invitation.
+      describe("a reservation that was never released", () => {
+        const ageReservation = (id: string, minutes: number) =>
+          db.query(
+            "update invitations set reserved_at = now() - make_interval(mins => $2) where id = $1",
+            [id, minutes],
+          );
+        const revokeInvitation = (id: string) =>
+          callAs(db, schema, authenticated(SUPER_ADMIN), "invitation_revoke($1, $2)", [
+            nextKey(),
+            id,
+          ]);
+        const resendInvitation = (id: string, label: string) =>
+          callAs(db, schema, authenticated(SUPER_ADMIN), "invitation_resend($1, $2, $3)", [
+            nextKey(),
+            id,
+            tokenHashFor(label),
+          ]);
+
+        it("still blocks revoke while the reservation is fresh", async () => {
+          const id = await invite("fresh-hold");
+          await reserve("fresh-hold");
+          await ageReservation(id, 1);
+          const result = await revokeInvitation(id);
+          assert.equal(result.code, "invitation_not_pending");
+          assert.equal(await status(id), "accepting");
+        });
+
+        it("lets an admin revoke it once the reservation is older than two minutes", async () => {
+          const id = await invite("stale-revoke");
+          await reserve("stale-revoke");
+          await ageReservation(id, 3);
+          const result = await revokeInvitation(id);
+          assert.equal(result.state, "success");
+          assert.equal(await status(id), "revoked");
+        });
+
+        it("lets an admin resend it, replacing the old invitation", async () => {
+          const id = await invite("stale-resend");
+          await reserve("stale-resend");
+          await ageReservation(id, 3);
+          const result = await resendInvitation(id, "stale-resend-new");
+          assert.equal(result.state, "success");
+          assert.equal(await status(id), "replaced");
+          assert.equal(await status(result.reference!), "pending");
+        });
+
+        it("lets an admin create a new invitation after the old one expired while reserved", async () => {
+          const id = await invite("stale-expired", "stale-expired");
+          await reserve("stale-expired");
+          await db.query(
+            "update invitations set created_at = now() - interval '9 days', expires_at = now() - interval '2 days', reserved_at = now() - interval '3 days' where id = $1",
+            [id],
+          );
+          const again = await create(SUPER_ADMIN, {
+            label: "stale-expired-again",
+            email: email("stale-expired"),
+          });
+          assert.equal(again.state, "success");
+          assert.equal(await status(id), "replaced");
+          assert.equal(await status(again.reference!), "pending");
+        });
+
+        it("is released by housekeeping, which leaves a fresh reservation alone", async () => {
+          const stale = await invite("hk-stale");
+          const fresh = await invite("hk-fresh");
+          await reserve("hk-stale");
+          await reserve("hk-fresh");
+          await ageReservation(stale, 3);
+          const result = await callAs(db, schema, asServiceRole, "identity_housekeeping()");
+          assert.equal(result.reservations_released, 1);
+          assert.equal(await status(stale), "pending");
+          assert.equal(await status(fresh), "accepting");
+        });
+      });
+
       it("refuses an expired, revoked, replaced or accepted invitation, and an email that already has an Account", async () => {
         const expired = await invite("exp");
         await db.query(

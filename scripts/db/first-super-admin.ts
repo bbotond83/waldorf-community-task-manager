@@ -211,9 +211,9 @@ export async function main(
     if (!created.ok) {
       throw new ToolingError(
         "create-user",
-        created.kind === "unavailable"
-          ? "The sign-in service could not be reached."
-          : `The sign-in service refused the new user (${created.code}).`,
+        created.kind === "rejected"
+          ? `The sign-in service refused the new user (${created.code}).`
+          : "The sign-in service could not be reached.",
       );
     }
     createdUser = { id: created.value.id, admin };

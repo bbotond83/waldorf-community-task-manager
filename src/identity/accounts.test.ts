@@ -10,7 +10,12 @@ import {
   unavailable,
   type AdminHandlers,
 } from "../../tests/support/identity-fakes.ts";
-import { changeGrant, deactivateAccount, reactivateAccount } from "./accounts.ts";
+import {
+  changeGrant,
+  deactivateAccount,
+  reactivateAccount,
+  reconcileAccountBans,
+} from "./accounts.ts";
 
 const caller = { accessToken: "admin-token", accountId: "99999999-9999-4999-8999-999999999999" };
 const TARGET = "66666666-6666-4666-8666-666666666666";
@@ -176,5 +181,50 @@ describe("account changes and their follow-up calls (BR2.2, BR2.14, NFR6.5)", ()
     );
     assert.equal(refusedResult.state, "denied");
     assert.equal(refused.events.events.length, 0);
+  });
+});
+
+// Regression (code review Minor 5): a failed ban or ban-lift used to be retried only by repeating the same call.
+describe("reconciling accounts whose status and sign-in ban disagree", () => {
+  const mismatches = (accounts: { account_id: string; status: string }[]) => ({
+    identity_ban_mismatches: () => envelope("success", "done", null, { accounts }),
+  });
+
+  it("lifts the ban of a reactivated account and bans a deactivated one, ending its sessions", async () => {
+    const { deps, admin, events } = setup(
+      mismatches([
+        { account_id: TARGET, status: "active" },
+        { account_id: "77777777-7777-4777-8777-777777777777", status: "deactivated" },
+      ]),
+    );
+    const result = await reconcileAccountBans(deps);
+    assert.deepEqual(result, { checked: 2, repaired: 2, failed: 0 });
+    assert.deepEqual(
+      admin.calls.map((call) => [call.name, ...call.args.slice(0, 2)]),
+      [
+        ["identity_ban_mismatches", {}],
+        ["setBan", TARGET, false],
+        ["setBan", "77777777-7777-4777-8777-777777777777", true],
+        ["sessions_remove", { p_user_id: "77777777-7777-4777-8777-777777777777" }],
+      ],
+    );
+    assert.equal(events.events.filter((entry) => entry.event === "follow_up_reconciled").length, 2);
+  });
+
+  it("reports an account it could not repair and keeps going with the others", async () => {
+    const { deps, events } = setup(mismatches([{ account_id: TARGET, status: "active" }]), {
+      setBan: async () => unavailable,
+    });
+    const result = await reconcileAccountBans(deps);
+    assert.deepEqual(result, { checked: 1, repaired: 0, failed: 1 });
+    assert.ok(events.events.some((entry) => entry.event === "follow_up_failed"));
+  });
+
+  it("does nothing when nothing disagrees or the list cannot be read", async () => {
+    const none = setup(mismatches([]));
+    assert.deepEqual(await reconcileAccountBans(none.deps), { checked: 0, repaired: 0, failed: 0 });
+    const down = setup({ identity_ban_mismatches: () => unavailable });
+    assert.deepEqual(await reconcileAccountBans(down.deps), { checked: 0, repaired: 0, failed: 0 });
+    assert.equal(down.admin.calls.length, 1);
   });
 });

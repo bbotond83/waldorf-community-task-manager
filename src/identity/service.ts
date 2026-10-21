@@ -5,11 +5,14 @@ import type { TokenPair } from "./cookies.ts";
  * sign-in, token refresh, local sign-out, the recovery email, the one-time exchange of a reset link, and a
  * new password. Calls go over HTTP with the public key only; the service-role key never comes here (it
  * belongs to the admin module). Every outcome is explicit: accepted, rejected with the service's error
- * code, or unavailable (network failure, timeout or a server-side error, so the caller may retry).
+ * code, rate limited (the service answered 429: a burst from the server's one address, which the whole
+ * community shares), or unavailable (network failure, timeout or a server-side error, so the caller may
+ * retry).
  */
 export type ServiceOutcome<T> =
   | { ok: true; value: T }
   | { ok: false; kind: "rejected"; code: string; status: number }
+  | { ok: false; kind: "rate_limited" }
   | { ok: false; kind: "unavailable" };
 
 export type AuthSession = Readonly<
@@ -107,8 +110,8 @@ export function createSignInService(options: {
     } catch {
       return { ok: false, kind: "unavailable" };
     }
-    if (response.status >= 500 || response.status === 429)
-      return { ok: false, kind: "unavailable" };
+    if (response.status === 429) return { ok: false, kind: "rate_limited" };
+    if (response.status >= 500) return { ok: false, kind: "unavailable" };
     const body = await readJson(response);
     if (response.status >= 400) {
       const code = typeof body.error_code === "string" ? body.error_code : "rejected";

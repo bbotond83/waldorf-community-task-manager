@@ -49,9 +49,9 @@ export async function resolveSession(
     if (!options.canPersist) return { status: "signed-out", clearCookies: false };
     const refreshed = await deps.service.refresh(tokens.refreshToken);
     if (!refreshed.ok) {
-      return refreshed.kind === "unavailable"
-        ? { status: "unavailable" }
-        : { status: "signed-out", clearCookies: true };
+      return refreshed.kind === "rejected"
+        ? { status: "signed-out", clearCookies: true }
+        : { status: "unavailable" };
     }
     accessToken = refreshed.value.accessToken;
     renewed = { accessToken, refreshToken: refreshed.value.refreshToken };
@@ -90,11 +90,11 @@ export async function endSession(
   if (typeof expires !== "number" || expires - deps.now() / 1000 < REFRESH_MARGIN_SECONDS) {
     // An expired access token cannot sign out; the refresh token still can, so exchange it first.
     const refreshed = await deps.service.refresh(tokens.refreshToken);
-    if (!refreshed.ok) return refreshed.kind === "unavailable" ? "unavailable" : "ended";
+    if (!refreshed.ok) return refreshed.kind === "rejected" ? "ended" : "unavailable";
     accessToken = refreshed.value.accessToken;
   }
   const outcome = await deps.service.signOut(accessToken);
   if (outcome.ok) return "ended";
   // An expired or already-ended session answers with a rejection: the person is signed out either way.
-  return outcome.kind === "unavailable" ? "unavailable" : "ended";
+  return outcome.kind === "rejected" ? "ended" : "unavailable";
 }

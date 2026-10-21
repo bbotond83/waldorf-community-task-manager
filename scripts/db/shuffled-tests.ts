@@ -24,6 +24,7 @@ export const DATABASE_TEST_FILES = [
   "tests/database/identity-server.test.ts",
   "tests/database/identity-config.test.ts",
   "tests/database/identity-hook.test.ts",
+  "tests/database/identity-email-change.test.ts",
 ] as const;
 
 /** A small seeded generator (mulberry32), so a printed seed reproduces the order. */

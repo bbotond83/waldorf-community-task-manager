@@ -85,7 +85,7 @@ describe("the sign-in service over HTTP (NFR2.1)", () => {
       },
     });
     assert.deepEqual(await failing.refresh("r"), { ok: false, kind: "unavailable" });
-    for (const status of [500, 502, 503, 429]) {
+    for (const status of [500, 502, 503]) {
       const { service } = serviceWith(() => json(status, {}));
       assert.deepEqual(
         await service.refresh("r"),
@@ -93,6 +93,9 @@ describe("the sign-in service over HTTP (NFR2.1)", () => {
         String(status),
       );
     }
+    // Regression (code review Minor 6): rate limiting is its own outcome, not an outage.
+    const { service: limited } = serviceWith(() => json(429, {}));
+    assert.deepEqual(await limited.refresh("r"), { ok: false, kind: "rate_limited" });
     assert.ok(SERVICE_TIMEOUT_MS >= 1000);
   });
 

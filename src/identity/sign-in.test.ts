@@ -9,6 +9,7 @@ import {
   fakeSession,
   ok,
   recordingEvents,
+  rateLimited,
   rejected,
   unavailable,
 } from "../../tests/support/identity-fakes.ts";
@@ -18,6 +19,7 @@ import {
   resetHousekeepingClockForTests,
   SIGN_IN_INVALID,
   SIGN_IN_LOCKED,
+  SIGN_IN_RATE_LIMITED,
   signIn,
   validateSignInForm,
 } from "./sign-in.ts";
@@ -100,6 +102,18 @@ describe("sign-in (W1; BR2.1 to BR2.3)", () => {
         code,
       );
     }
+  });
+
+  it("answers a rate-limited service with its own retryable code and records no attempt, so a burst never counts toward a lock", async () => {
+    const { deps, admin, events } = setup({ service: { passwordSignIn: async () => rateLimited } });
+    const result = await signIn({ email: EMAIL, password: "password-1x" }, deps);
+    assert.equal(result.state, "dependency-failure-retryable");
+    assert.equal(result.code, SIGN_IN_RATE_LIMITED);
+    assert.deepEqual(names(admin.calls), ["sign_in_lockout_check"]);
+    assert.deepEqual(
+      events.events.map((entry) => entry.event),
+      ["sign_in_failure"],
+    );
   });
 
   it("refuses a session of a deactivated account that the service still issued, ends it, and answers generically", async () => {

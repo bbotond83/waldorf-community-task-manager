@@ -17,6 +17,7 @@ export type SignInData = Readonly<TokenPair & { accountId: string }>;
 
 export const SIGN_IN_INVALID = "SIGN_IN_INVALID";
 export const SIGN_IN_LOCKED = "SIGN_IN_LOCKED";
+export const SIGN_IN_RATE_LIMITED = "SIGN_IN_RATE_LIMITED";
 
 export type SignInDeps = Readonly<{
   service: SignInService;
@@ -73,6 +74,11 @@ export async function signIn(
   }
 
   const outcome = await deps.service.passwordSignIn(email, input.password);
+  if (!outcome.ok && outcome.kind === "rate_limited") {
+    // A burst from the server's one address is neither a wrong password (no attempt is recorded) nor an outage.
+    deps.events.emit("sign_in_failure", { address: email }, "rate_limited");
+    return retryableFailure<SignInData>(RETRY, SIGN_IN_RATE_LIMITED);
+  }
   if (!outcome.ok && outcome.kind === "unavailable") return retryableFailure<SignInData>(RETRY);
 
   const recordFailure = async (code: string): Promise<ApplicationResult<SignInData>> => {

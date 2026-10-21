@@ -9,18 +9,20 @@ Test strategy: Comprehensive (10 to 15 tests per component) with the 80% line, b
 
 ## Unit-Scoped Commands
 
+Every command starts from the repository root after `export PATH=/opt/homebrew/opt/node@24/bin:/Applications/Docker.app/Contents/Resources/bin:$PATH`. Commands checked against the files on disk on 2026-10-20.
+
 | Scope | Command |
 |---|---|
 | Configuration and admin module | `node --experimental-strip-types --test src/runtime/database/config.test.ts src/identity/admin-client.test.ts` |
-| Server modules (fakes) | `node --experimental-strip-types --test src/identity/cookies.test.ts src/identity/session.test.ts src/identity/sign-in.test.ts src/identity/invitations.test.ts src/identity/reset.test.ts src/identity/mail.test.ts src/identity/events.test.ts` |
+| Server modules (fakes) | `node --experimental-strip-types --test src/identity/*.test.ts` (accounts, admin-client, cookies, copy, crypto, events, form-state, invitations, mail, password, refresh, reset, service, session, sign-in) |
 | Operator command (fake terminal) | `node --experimental-strip-types --test scripts/db/first-super-admin.test.ts` |
-| Schema and policies (real stack) | `node --experimental-strip-types --test tests/database/identity-schema.test.ts` |
-| Functions (real stack) | `node --experimental-strip-types --test tests/database/identity-session.test.ts tests/database/identity-lockout.test.ts tests/database/identity-invitation.test.ts tests/database/identity-grants.test.ts tests/database/identity-probe.test.ts tests/database/identity-housekeeping.test.ts tests/database/identity-catalogue.test.ts` |
-| Server modules (real stack) | `node --experimental-strip-types --test tests/database/identity-server.test.ts tests/database/identity-config.test.ts` |
-| Screen components | `npx vitest run --config vitest.config.ts tests/unit/identity-screens.test.tsx` |
+| All real-stack identity tests | `npm run test:database:identity` (schema, session, lockout, invitation, grants, probe, housekeeping, catalogue, operator, server, config, password-verification hook and, after Step 22, email-change guard) |
+| Password-verification hook only (brute-force control) | `node --experimental-strip-types --test tests/database/identity-hook.test.ts` |
+| Bundle (service-role key never reaches client output) | `npm run build && npm run test:bundle` |
+| Screen components, server actions, runtime and proxy | `npx vitest run --config vitest.config.ts tests/integration/identity-screens.test.tsx tests/integration/identity-actions.test.ts tests/integration/identity-runtime.test.ts tests/integration/identity-proxy.test.ts tests/coverage/framework-entrypoints.test.ts` |
 | Browser and accessibility | `npx playwright test --config playwright.config.ts tests/browser/identity.spec.ts` |
 
-The first runnable command before any test is written is the configuration test command above (the runner already exists).
+The real-stack commands need the stack running (`npm run db:start`). The first runnable command before any test is written is the configuration test command above (the runner already exists).
 
 ## Coverage Targets
 

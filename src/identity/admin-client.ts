@@ -46,6 +46,7 @@ export const ADMIN_FUNCTIONS = [
   "invitation_accept",
   "sessions_remove",
   "identity_housekeeping",
+  "identity_ban_mismatches",
 ] as const;
 export type AdminFunctionName = (typeof ADMIN_FUNCTIONS)[number];
 

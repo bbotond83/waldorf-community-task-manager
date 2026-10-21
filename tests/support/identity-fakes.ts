@@ -48,6 +48,7 @@ export const rejected = (code = "rejected", status = 400): ServiceOutcome<never>
   status,
 });
 export const unavailable: ServiceOutcome<never> = { ok: false, kind: "unavailable" };
+export const rateLimited: ServiceOutcome<never> = { ok: false, kind: "rate_limited" };
 
 export type Call = { name: string; args: unknown[] };
 

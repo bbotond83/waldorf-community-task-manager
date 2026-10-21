@@ -27,6 +27,7 @@ export type ResetDeps = Readonly<{
 
 export const RESET_NOT_VALID = "RESET_NOT_VALID";
 export const PASSWORD_RULE = "PASSWORD_RULE";
+export const PASSWORD_REJECTED = "PASSWORD_REJECTED";
 const RETRY = { idempotencyKey: "reset", action: "identity.reset" } as const;
 
 /** Always succeeds from the person's point of view, whatever the address is (BR2.12). */
@@ -70,16 +71,18 @@ export async function completePasswordReset(
 
   const verified = await deps.service.verifyRecovery(input.tokenHash);
   if (!verified.ok) {
-    return verified.kind === "unavailable" ? retryableFailure(RETRY) : denied(RESET_NOT_VALID);
+    return verified.kind === "rejected" ? denied(RESET_NOT_VALID) : retryableFailure(RETRY);
   }
   const session = verified.value;
 
   const updated = await deps.service.updatePassword(session.accessToken, input.password);
   if (!updated.ok) {
     await deps.service.signOut(session.accessToken);
-    return updated.kind === "unavailable"
-      ? retryableFailure(RETRY)
-      : validation({ password: "rejected" }, PASSWORD_RULE);
+    // The one-time link is spent once it was exchanged, so a password the sign-in service refuses (the same
+    // as before, or one of its own rules) needs a new link. The screen says so instead of showing the rule.
+    return updated.kind === "rejected"
+      ? validation({ password: "rejected" }, PASSWORD_REJECTED)
+      : retryableFailure(RETRY);
   }
 
   // Every other session of the account ends (BR2.12); the person's new session stays.

@@ -235,16 +235,14 @@ export async function acceptInvitation(
     const updated = await deps.admin.setPassword(orphan, input.password);
     if (!updated.ok) {
       await release();
-      return updated.kind === "unavailable"
-        ? retryableFailure(retry)
-        : denied(INVITATION_NOT_VALID);
+      return updated.kind === "rejected" ? denied(INVITATION_NOT_VALID) : retryableFailure(retry);
     }
     userId = orphan;
   } else {
     const created = await deps.admin.createUser({ email, password: input.password, invitationId });
     if (!created.ok) {
       await release();
-      if (created.kind === "unavailable") return retryableFailure(retry);
+      if (created.kind !== "rejected") return retryableFailure(retry);
       return created.code === "weak_password"
         ? validation({ password: "rejected" }, PASSWORD_RULE)
         : denied(INVITATION_NOT_VALID);

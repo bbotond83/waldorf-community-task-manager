@@ -79,6 +79,49 @@ export async function reactivateAccount(
   return success({ accountId: input.accountId, followUp: unbanned ? "done" : "pending" });
 }
 
+/**
+ * Repeats the ban or the ban-lift of accounts whose status and sign-in ban disagree (code review of
+ * 2026-10-20, Minor 5). Deactivation and reactivation retry their follow-up call three times; if the sign-in
+ * service stayed unreachable, nothing used to try again, and a reactivated person stayed unable to sign in.
+ * Housekeeping calls this, so the gap closes within about an hour. The database refuses a deactivated account
+ * whatever the ban says, so the repair only ever makes the two agree.
+ */
+export type ReconcileResult = Readonly<{ checked: number; repaired: number; failed: number }>;
+
+export async function reconcileAccountBans(
+  deps: Pick<AccountDeps, "admin" | "events">,
+): Promise<ReconcileResult> {
+  const listed = await deps.admin.callFunction("identity_ban_mismatches", {});
+  if (!listed.ok || listed.value.state !== "success") return { checked: 0, repaired: 0, failed: 0 };
+  const accounts = Array.isArray(listed.value.fields.accounts) ? listed.value.fields.accounts : [];
+  let repaired = 0;
+  let failed = 0;
+  for (const entry of accounts) {
+    const row = entry as { account_id?: unknown; status?: unknown };
+    if (typeof row.account_id !== "string") continue;
+    const accountId = row.account_id;
+    const deactivated = row.status === "deactivated";
+    const ok = await attempt(async () => {
+      if (!(await deps.admin.setBan(accountId, deactivated)).ok) return false;
+      if (!deactivated) return true;
+      const removed = await deps.admin.callFunction("sessions_remove", { p_user_id: accountId });
+      return removed.ok && removed.value.state === "success";
+    });
+    if (ok) {
+      repaired += 1;
+      deps.events.emit(
+        "follow_up_reconciled",
+        { account: accountId },
+        deactivated ? "ban" : "unban",
+      );
+    } else {
+      failed += 1;
+      deps.events.emit("follow_up_failed", { account: accountId }, "reconcile");
+    }
+  }
+  return { checked: accounts.length, repaired, failed };
+}
+
 export async function changeGrant(
   caller: Caller,
   input: Readonly<{
