@@ -531,14 +531,34 @@ for (const schema of IDENTITY_SCHEMAS) {
         assert.ok(OTHER_ORGANIZATION);
       });
 
+      // The loser of the race below is refused when the winner has already deactivated its account: its own
+      // session is no longer active, so the function answers "denied" (session_inactive). That outcome depends
+      // on timing in the race test, so it is pinned here without any race.
+      it("refuses a super admin whose own account was just deactivated, and leaves one admin", async () => {
+        await addSecondSuper();
+        assert.equal((await deactivate(SUPER_ADMIN, SECOND_SUPER)).state, "success");
+        const refused = await deactivate(SECOND_SUPER, SUPER_ADMIN);
+        assert.equal(refused.state, "denied");
+        assert.equal(refused.code, "session_inactive");
+        assert.equal(
+          await count(
+            db,
+            "accounts",
+            `status = 'active' and id in ('${SUPER_ADMIN}', '${SECOND_SUPER}')`,
+          ),
+          1,
+        );
+      });
+
       it("never deactivates the last active super admin, even for two concurrent deactivations of each other", async () => {
         assert.equal((await deactivate(SUPER_ADMIN, SUPER_ADMIN)).code, "last_super_admin");
         await addSecondSuper();
         const second = await openDatabase();
         try {
           await bindSchema(second, schema);
-          // The loser is refused either with the conflict result or, once the winner has deactivated its
-          // account, because its own session is no longer active (insufficient privilege): both leave one admin.
+          // The loser is refused in one of three ways, depending on timing: the conflict result (it reached the
+          // last-admin check first), "denied" (the winner had already deactivated its account, so its own session
+          // was no longer active), or an insufficient-privilege error. All three leave one admin.
           const outcome = (work: Promise<{ state: string }>) =>
             work.then(
               (result) => result.state,
@@ -550,7 +570,9 @@ for (const schema of IDENTITY_SCHEMAS) {
           ]);
           assert.equal(outcomes.filter((state) => state === "success").length, 1);
           assert.ok(
-            outcomes.some((state) => state === "conflict" || state === "error 42501"),
+            outcomes.some(
+              (state) => state === "conflict" || state === "denied" || state === "error 42501",
+            ),
             outcomes.join(),
           );
           assert.equal(
