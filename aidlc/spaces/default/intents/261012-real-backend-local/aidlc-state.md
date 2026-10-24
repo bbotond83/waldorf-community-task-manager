@@ -117,6 +117,12 @@
 
 
 
+- **Active Unit**: u5-seed-and-test-migration
+
+- **Unit Stage**: nfr-requirements
+
+- **Unit State**: in-progress
+
 ## Phase Progress
 <!-- Status values: Pending, Active, Verified, Skipped -->
 
@@ -178,7 +184,7 @@ Per unit: [TBD]
 - **Current Stage**: functional-design
 - **Next Stage**: nfr-requirements
 - **Status**: Running
-- **Last Updated**: 2026-10-24T04:23:36Z
+- **Last Updated**: 2026-10-24T04:32:17Z
 
 - **Construction Autonomy Mode**: autonomous
 

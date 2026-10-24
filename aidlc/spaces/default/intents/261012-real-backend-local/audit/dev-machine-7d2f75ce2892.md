@@ -17375,3 +17375,234 @@
 **Message Id**: 3f09dabc
 
 ---
+
+## Human Turn
+**Timestamp**: 2026-10-24T04:31:22Z
+**Event**: HUMAN_TURN
+**Session**: 780de397-1469-4801-a5f1-b7b7f2bf9703
+**Origin**: person
+**Source**: typed
+**Message Id**: 6d0adc59
+
+---
+
+## Unit Started
+**Timestamp**: 2026-10-24T04:32:17Z
+**Event**: UNIT_STARTED
+**Stage**: nfr-requirements
+**Unit**: u5-seed-and-test-migration
+**Run floor**: WORKFLOW_STARTED:2026-10-12T09:50:41Z#1
+
+---
+
+## Artifact Created
+**Timestamp**: 2026-10-24T04:32:39Z
+**Event**: ARTIFACT_CREATED
+**Tool**: Write
+**File**: <project-dir>/aidlc/spaces/default/intents/261012-real-backend-local/construction/u5-seed-and-test-migration/nfr-requirements/nfr-requirements-questions.md
+**Context**: construction > u5-seed-and-test-migration > nfr-requirements > nfr-requirements-questions.md
+
+---
+
+## Decision Recorded
+**Timestamp**: 2026-10-24T04:32:41Z
+**Event**: DECISION_RECORDED
+**Stage**: nfr-requirements
+**Decision**: Q1 browser test isolation; Q2 seed and reset timing targets; Q3 which open items U5 fixes
+**Options**: Q1: A serial per-browser schema; B parallel; C reset per test | Q2: A fail above limits; B report only; C undefined | Q3: A audit purge only; B both; C neither
+**Unit**: u5-seed-and-test-migration
+
+---
+
+## Human Turn
+**Timestamp**: 2026-10-24T04:45:38Z
+**Event**: HUMAN_TURN
+**Session**: 780de397-1469-4801-a5f1-b7b7f2bf9703
+**Origin**: person
+**Source**: picker
+**Picked**: ["[User did not answer this question — they sent a message instead. Treat that message as their response; do not re-ask.]","[User did not answer this question — they sent a message instead. Treat that message as their response; do not re-ask.]","[User did not answer this question — they sent a message instead. Treat that message as their response; do not re-ask.]"]
+**Message Id**: 564b2c33
+
+---
+
+## Question Replied
+**Timestamp**: 2026-10-24T04:45:38Z
+**Event**: QUESTION_REPLIED
+**Session**: 780de397-1469-4801-a5f1-b7b7f2bf9703
+**Question**: Q1. The browser tests run in three browsers. On real data each needs its own database copy so they don't disturb each other. How should they run?
+**Reply**: [User did not answer this question — they sent a message instead. Treat that message as their response; do not re-ask.]
+
+---
+
+## Question Replied
+**Timestamp**: 2026-10-24T04:45:38Z
+**Event**: QUESTION_REPLIED
+**Session**: 780de397-1469-4801-a5f1-b7b7f2bf9703
+**Question**: Q2. How fast must the seed and reset commands be? (Requirement already says: small seed 60 s, reset 30 s; the 30-family set has no target yet.)
+**Reply**: [User did not answer this question — they sent a message instead. Treat that message as their response; do not re-ask.]
+
+---
+
+## Question Replied
+**Timestamp**: 2026-10-24T04:45:38Z
+**Event**: QUESTION_REPLIED
+**Session**: 780de397-1469-4801-a5f1-b7b7f2bf9703
+**Question**: Q3. Which open items from the earlier units should U5 fix? (1) Delete audit events after 365 days (no code does it yet). (2) Re-plan group-task reminders when a family changes group (new behaviour).
+**Reply**: [User did not answer this question — they sent a message instead. Treat that message as their response; do not re-ask.]
+
+---
+
+## Human Turn
+**Timestamp**: 2026-10-24T04:45:38Z
+**Event**: HUMAN_TURN
+**Session**: 780de397-1469-4801-a5f1-b7b7f2bf9703
+**Origin**: person
+**Source**: typed
+**Message Id**: 09bea700
+
+---
+
+## Human Turn
+**Timestamp**: 2026-10-24T05:04:38Z
+**Event**: HUMAN_TURN
+**Session**: 780de397-1469-4801-a5f1-b7b7f2bf9703
+**Origin**: person
+**Source**: picker
+**Picked**: ["[User did not answer this question — they sent a message instead. Treat that message as their response; do not re-ask.]","[User did not answer this question — they sent a message instead. Treat that message as their response; do not re-ask.]","[User did not answer this question — they sent a message instead. Treat that message as their response; do not re-ask.]"]
+**Message Id**: 87661bc8
+
+---
+
+## Question Replied
+**Timestamp**: 2026-10-24T05:04:39Z
+**Event**: QUESTION_REPLIED
+**Session**: 780de397-1469-4801-a5f1-b7b7f2bf9703
+**Question**: Q1. The browser tests run in three browsers. On real data each needs its own database copy. How should they run?
+**Reply**: [User did not answer this question — they sent a message instead. Treat that message as their response; do not re-ask.]
+
+---
+
+## Question Replied
+**Timestamp**: 2026-10-24T05:04:39Z
+**Event**: QUESTION_REPLIED
+**Session**: 780de397-1469-4801-a5f1-b7b7f2bf9703
+**Question**: Q2. Seed and reset speed: requirement says small seed 60 s, reset 30 s. What about the 30-family set?
+**Reply**: [User did not answer this question — they sent a message instead. Treat that message as their response; do not re-ask.]
+
+---
+
+## Question Replied
+**Timestamp**: 2026-10-24T05:04:39Z
+**Event**: QUESTION_REPLIED
+**Session**: 780de397-1469-4801-a5f1-b7b7f2bf9703
+**Question**: Q3. Which open items should U5 fix? (1) Delete audit events after 365 days (no code does it yet). (2) Re-plan group-task reminders when a family changes group (new behaviour).
+**Reply**: [User did not answer this question — they sent a message instead. Treat that message as their response; do not re-ask.]
+
+---
+
+## Human Turn
+**Timestamp**: 2026-10-24T05:04:39Z
+**Event**: HUMAN_TURN
+**Session**: 780de397-1469-4801-a5f1-b7b7f2bf9703
+**Origin**: person
+**Source**: typed
+**Message Id**: 180f51d0
+
+---
+
+## Human Turn
+**Timestamp**: 2026-10-24T05:05:39Z
+**Event**: HUMAN_TURN
+**Session**: 780de397-1469-4801-a5f1-b7b7f2bf9703
+**Origin**: person
+**Source**: typed
+**Message Id**: 8df6c009
+
+---
+
+## Subagent Completed
+**Timestamp**: 2026-10-24T05:05:56Z
+**Event**: SUBAGENT_COMPLETED
+**Agent Type**: unknown
+**Agent ID**: ac61eaa40faef75ef
+**Message**: check the PR again
+
+---
+
+## Human Turn
+**Timestamp**: 2026-10-24T05:37:17Z
+**Event**: HUMAN_TURN
+**Session**: 780de397-1469-4801-a5f1-b7b7f2bf9703
+**Origin**: person
+**Source**: typed
+**Message Id**: 8e6a8ecc
+
+---
+
+## Human Turn
+**Timestamp**: 2026-10-24T05:39:36Z
+**Event**: HUMAN_TURN
+**Session**: 780de397-1469-4801-a5f1-b7b7f2bf9703
+**Origin**: person
+**Source**: picker
+**Picked**: ["[User did not answer this question — they sent a message instead. Treat that message as their response; do not re-ask.]","[User did not answer this question — they sent a message instead. Treat that message as their response; do not re-ask.]","[User did not answer this question — they sent a message instead. Treat that message as their response; do not re-ask.]"]
+**Message Id**: 7ab84a4b
+
+---
+
+## Question Replied
+**Timestamp**: 2026-10-24T05:39:36Z
+**Event**: QUESTION_REPLIED
+**Session**: 780de397-1469-4801-a5f1-b7b7f2bf9703
+**Question**: Q1. The browser tests run in three browsers. On real data each needs its own database copy. How should they run?
+**Reply**: [User did not answer this question — they sent a message instead. Treat that message as their response; do not re-ask.]
+
+---
+
+## Question Replied
+**Timestamp**: 2026-10-24T05:39:36Z
+**Event**: QUESTION_REPLIED
+**Session**: 780de397-1469-4801-a5f1-b7b7f2bf9703
+**Question**: Q2. Seed and reset speed: requirement says small seed 60 s, reset 30 s. What about the 30-family set?
+**Reply**: [User did not answer this question — they sent a message instead. Treat that message as their response; do not re-ask.]
+
+---
+
+## Question Replied
+**Timestamp**: 2026-10-24T05:39:36Z
+**Event**: QUESTION_REPLIED
+**Session**: 780de397-1469-4801-a5f1-b7b7f2bf9703
+**Question**: Q3. Which open items should U5 fix? (1) Delete audit events after 365 days (no code does it yet). (2) Re-plan group-task reminders when a family changes group (new behaviour).
+**Reply**: [User did not answer this question — they sent a message instead. Treat that message as their response; do not re-ask.]
+
+---
+
+## Human Turn
+**Timestamp**: 2026-10-24T05:39:37Z
+**Event**: HUMAN_TURN
+**Session**: 780de397-1469-4801-a5f1-b7b7f2bf9703
+**Origin**: person
+**Source**: typed
+**Message Id**: 32ad744d
+
+---
+
+## Human Turn
+**Timestamp**: 2026-10-24T05:42:33Z
+**Event**: HUMAN_TURN
+**Session**: 780de397-1469-4801-a5f1-b7b7f2bf9703
+**Origin**: person
+**Source**: picker
+**Picked**: ["Yes, separate PR (Recommended)"]
+**Message Id**: 24bab5b0
+
+---
+
+## Question Replied
+**Timestamp**: 2026-10-24T05:42:33Z
+**Event**: QUESTION_REPLIED
+**Session**: 780de397-1469-4801-a5f1-b7b7f2bf9703
+**Question**: Should I commit the framework update and the newer workflow records in a separate PR now?
+**Reply**: Yes, separate PR (Recommended)
+
+---
