@@ -61,10 +61,15 @@ describe("runtime shell", () => {
       "href",
       "/szulo/ertesitesek",
     );
-    expect(navigation.getAllByRole("link")).toHaveLength(2);
+    expect(navigation.getByRole("link", { name: "Cserék" })).toHaveAttribute(
+      "href",
+      "/szulo/cserek",
+    );
+    expect(navigation.getAllByRole("link")).toHaveLength(3);
     expect(navigation.getAllByRole("link").map((link) => link.textContent)).toEqual([
       "Értesítések",
       "Feladatok",
+      "Cserék",
     ]);
     expect(navigation.queryByRole("link", { name: "Importálás" })).not.toBeInTheDocument();
   });

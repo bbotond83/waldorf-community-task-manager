@@ -3,7 +3,10 @@ import { readFileSync } from "node:fs";
 import { expect, it } from "vitest";
 import { validateManifests, REQUIRED_NFR08_SCENARIOS } from "../../scripts/verification/core.ts";
 import { SYNTHETIC_PROFILES } from "../../src/runtime/synthetic/profiles.ts";
-import { LEGACY_DESTINATIONS, REQUIRED_SHEETS } from "../../src/import-migration/import-service.ts";
+import {
+  LEGACY_DESTINATIONS,
+  REQUIRED_SHEETS,
+} from "../../src/admin-experience/legacy-destinations.ts";
 const read = (path: string) => readFileSync(path, "utf8");
 const json = (path: string) => JSON.parse(read(path));
 it("current fixtures exactly match four runtime profiles role and home contracts", () => {
@@ -38,7 +41,7 @@ it("current owned executable references have no fifth role or obsolete teacher m
     "verification/RUNBOOK.md",
     "src/admin-experience/admin-service.ts",
     "src/application/admin-facade.ts",
-    "src/import-migration/import-service.ts",
+    "src/admin-experience/legacy-destinations.ts",
     "src/runtime/synthetic/profiles.ts",
     "tests/browser/admin-core.spec.ts",
     "tests/browser/admin-advanced.spec.ts",

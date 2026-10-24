@@ -36,6 +36,12 @@ const commands = [
   // The identity database stage (U2): policy matrix, catalogue and privilege tests, configuration read-back,
   // the invitation, reset and operator-command tests that read the mail server.
   { key: "database-identity", args: ["run", "test:database:identity"] },
+  // The directory and coordination database stage (U3): tables, policies, role matrix and the change
+  // functions of people, structure, settings, events, tasks and notes, on the real stack.
+  { key: "database-directory", args: ["run", "test:database:directory"] },
+  // The notifications and import database stage (U4): notification records, reminder jobs and the
+  // notice writes inside U3's use cases, and the import tables and functions, on the real stack.
+  { key: "database-notifications-import", args: ["run", "test:database:notifications-import"] },
   { key: "database-shuffled", args: ["run", "test:database:shuffled"] },
   { key: "coverage", args: ["run", "test:coverage"] },
   { key: "security", args: ["run", "verify:security"] },

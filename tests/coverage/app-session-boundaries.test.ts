@@ -61,7 +61,7 @@ it("resolves signed-out, granted, forbidden and invalid configuration sessions",
   for (const resolver of [resolveAdminFacade, resolveParentFacade, resolveTeacherFacade])
     expect(await resolver()).toBeUndefined();
 });
-it("returns real synthetic facades and refuses production-unlinked mode", async () => {
+it("returns real synthetic facades and, in production mode without a real sign-in, no session and no facade", async () => {
   expect(await resolveAdminFacade()).toBeDefined();
   expect(await resolveParentFacade()).toBeDefined();
   expect(await resolveTeacherFacade()).toBeDefined();
@@ -69,8 +69,10 @@ it("returns real synthetic facades and refuses production-unlinked mode", async 
   vi.stubEnv("APP_SESSION_SECRET", "invented".repeat(6));
   vi.stubEnv("SUPABASE_URL", "https://invented.invalid");
   vi.stubEnv("SUPABASE_ANON_KEY", "invented".repeat(6));
+  // Production mode reads the real sign-in session (U2). The invented session cookie is not one, and the
+  // identity settings are not configured here, so nobody is signed in: no session, no facade.
   for (const resolver of [resolveAdminSession, resolveParentSession, resolveTeacherSession])
-    expect((await resolver()).state).toBe("denied");
+    expect((await resolver()).state).toBe("signed-out");
   for (const resolver of [resolveAdminFacade, resolveParentFacade, resolveTeacherFacade])
     expect(await resolver()).toBeUndefined();
 });

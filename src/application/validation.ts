@@ -26,6 +26,16 @@ export function normalizeRequiredText(
     : success(normalized, "INPUT_VALID");
 }
 
+/** The check for a command that carries no version (answering or withdrawing a request). */
+export function validateIdempotencyKey(
+  idempotencyKey: unknown,
+): Extract<ApplicationResult<never>, { state: "validation" }> | undefined {
+  return typeof idempotencyKey === "string" &&
+    /^[A-Za-z0-9][A-Za-z0-9:_-]{7,127}$/.test(idempotencyKey)
+    ? undefined
+    : validation({ idempotencyKey: "VAL-IDEMPOTENCY-KEY" });
+}
+
 export function validateMutationContext(input: {
   idempotencyKey: unknown;
   expectedVersion: unknown;

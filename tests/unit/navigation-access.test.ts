@@ -6,6 +6,7 @@ import { SYNTHETIC_PROFILES, type SyntheticProfile } from "../../src/runtime/syn
 // The authorization resource each page needs (the page guards use the same resources).
 const RESOURCE_BY_ROUTE: Readonly<Record<string, string>> = {
   "/szulo/feladatok": "assignment",
+  "/szulo/cserek": "swap_request",
   "/szulo/ertesitesek": "notification",
   "/teacher/schedule": "schedule",
   "/admin": "dashboard",
@@ -83,7 +84,7 @@ describe("navigation and default pages follow the access rules", () => {
   });
 
   it("lists the agreed items in the agreed order", () => {
-    expect(labels("parent-local")).toEqual(["Értesítések", "Feladatok"]);
+    expect(labels("parent-local")).toEqual(["Értesítések", "Feladatok", "Cserék"]);
     expect(labels("kindergarten-teacher-local")).toEqual([]);
     expect(labels("group-admin-local")).toEqual([
       "Áttekintés",

@@ -23,6 +23,7 @@ import {
   type ReminderListModel,
   type ReminderOutcome,
 } from "../application/index.ts";
+import { UnavailableInterimAdvancedPort } from "./interim-port.ts";
 
 export class RetryableAdvancedDependencyError extends Error {}
 export class TerminalAdvancedDependencyError extends Error {}
@@ -468,6 +469,18 @@ export function resetSyntheticAdvancedFixtures(): void {
     idempotency: new InMemoryIdempotencyStore(),
   };
 }
+
+/**
+ * The adapter for the operations that stay with U4 (import and reminders, BR32.9). The production composition
+ * routes exactly those operations here and every other one to the database. It is no longer the demo store:
+ * it answers the empty state to a read and denied to a change, so a real admin never sees fixture data, never
+ * shares a preview with another admin and never gets a success for an import that changed nothing.
+ */
+export function getInterimAdvancedPort(): AdminApplicationPort {
+  return INTERIM_PORT;
+}
+
+const INTERIM_PORT: AdminApplicationPort = new UnavailableInterimAdvancedPort();
 
 export function isSyntheticAdvancedSubjectRevoked(subjectId: string): boolean {
   return container().store.isRevoked(subjectId);

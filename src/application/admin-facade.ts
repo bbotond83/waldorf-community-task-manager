@@ -8,6 +8,7 @@ import type {
   DashboardModel,
   GrantOutcome,
   GrantListModel,
+  ImportCancelOutcome,
   ImportOutcome,
   ImportPreviewModel,
   LifecycleOutcomeModel,
@@ -31,6 +32,7 @@ export type AdminOperation =
   | "tasks.list"
   | "tasks.save"
   | "assignments.assign"
+  | "assignments.remove"
   | "approvals.list"
   | "approvals.decide"
   | "notes.save"
@@ -39,6 +41,7 @@ export type AdminOperation =
   | "import.resolve"
   | "import.commit"
   | "import.recover"
+  | "import.cancel"
   | "reminders.list"
   | "reminders.retry"
   | "governance.update"
@@ -54,6 +57,8 @@ export interface AdminApplicationPort {
     operation: AdminOperation;
     scope: Scope;
     payload: Readonly<Record<string, unknown>>;
+    /** Present on commands; a database adapter passes it on so a retry is recognised (BR32.1). */
+    idempotencyKey?: string;
   }): Promise<DomainOutcome<T>>;
 }
 
@@ -146,6 +151,14 @@ export class AdminApplicationFacade {
     input: AdminCommandInput,
   ): Promise<ApplicationResult<AdminItemModel>> {
     return this.command(session, "assignment", "assignments.assign", input);
+  }
+
+  /** Removes a family's place (BR31.7); `id` is the assignment and `expectedVersion` its version. */
+  removeAssignment(
+    session: SessionContext,
+    input: AdminCommandInput,
+  ): Promise<ApplicationResult<AdminItemModel>> {
+    return this.command(session, "assignment", "assignments.remove", input);
   }
 
   listApprovals(
@@ -270,6 +283,20 @@ export class AdminImportApplication {
       session,
       "import",
       "import.recover",
+      input,
+    );
+  }
+
+  cancel(
+    session: SessionContext,
+    input: AdminCommandInput,
+  ): Promise<ApplicationResult<ImportCancelOutcome>> {
+    return invokeAdminCommand(
+      this.pipeline,
+      this.domain,
+      session,
+      "import",
+      "import.cancel",
       input,
     );
   }
@@ -450,6 +477,7 @@ function invokeAdmin<T>(
         operation: input.operation,
         scope: input.scope,
         payload: input.payload,
+        ...(input.idempotencyKey !== undefined ? { idempotencyKey: input.idempotencyKey } : {}),
       }),
     project: freezeModel,
   });

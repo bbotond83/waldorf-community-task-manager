@@ -1,7 +1,15 @@
 "use client";
 
-import { useActionState, useEffect, useRef, type ReactNode } from "react";
+import {
+  startTransition,
+  useActionState,
+  useEffect,
+  useRef,
+  type FormEvent,
+  type ReactNode,
+} from "react";
 import type { ParentActionState } from "../_lib/action-state.ts";
+import { freshKey, keyPrefix } from "./fresh-key.ts";
 
 export type ParentAction = (
   state: ParentActionState,
@@ -14,6 +22,9 @@ export type ParentAction = (
  * cannot be sent twice (the swap and cancellation request pages use it for their pending notice).
  * `alreadyDone` shows that content from the start, for a request that was sent earlier; keeping
  * the same form mounted lets the confirmation survive the refresh that follows a success.
+ * With `freshIdempotencyKey` every attempt sends a new key made from the form's own key prefix, because
+ * the real database refuses a key that is used again with different content; the page-made key stays in
+ * the form as the fallback for a send that does not run in the browser.
  */
 export function ParentMutationForm({
   action,
@@ -22,6 +33,7 @@ export function ParentMutationForm({
   children,
   afterSuccess,
   alreadyDone = false,
+  freshIdempotencyKey = false,
 }: Readonly<{
   action: ParentAction;
   submitLabel: string;
@@ -29,8 +41,22 @@ export function ParentMutationForm({
   children?: ReactNode;
   afterSuccess?: ReactNode;
   alreadyDone?: boolean;
+  freshIdempotencyKey?: boolean;
 }>) {
-  const [state, formAction, isPending] = useActionState(action, { state: "initial" });
+  const [state, dispatch, isPending] = useActionState(action, { state: "initial" });
+  // A React form action empties the fields once it has run, which would drop a typed reason and a chosen
+  // partner after a refused attempt. A form with fresh keys is therefore sent from its submit handler, which
+  // leaves the fields as they are.
+  function send(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const formData = new FormData(
+      event.currentTarget,
+      (event.nativeEvent as SubmitEvent).submitter,
+    );
+    const current = formData.get("idempotencyKey");
+    formData.set("idempotencyKey", freshKey(keyPrefix(typeof current === "string" ? current : "")));
+    startTransition(() => dispatch(formData));
+  }
   const stateRef = useRef<HTMLDivElement>(null);
   const replaced = (state.state === "success" || alreadyDone) && afterSuccess !== undefined;
 
@@ -41,7 +67,12 @@ export function ParentMutationForm({
   }, [state.state]);
 
   return (
-    <form action={formAction} className="parent-form" data-testid={testId}>
+    <form
+      action={freshIdempotencyKey ? undefined : dispatch}
+      onSubmit={freshIdempotencyKey ? send : undefined}
+      className="parent-form"
+      data-testid={testId}
+    >
       {state.state !== "initial" && (
         <div
           ref={stateRef}

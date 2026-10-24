@@ -245,6 +245,68 @@ describe("migrations on the real local stack", () => {
     assert.equal(await allowed("authenticated", "platform_cleanup_expired()"), false);
   });
 
+  it("applies U3's files in the default and in a worker schema, in order, and a second run changes nothing (NFR6.9)", async () => {
+    // U3's files are the ones from 20261024 up to the 20261035 group; U4's files start at 20261036.
+    const u3 = migrations
+      .map((file) => file.name)
+      .filter((name) => name >= "20261024" && name < "20261036");
+    assert.ok(u3.length >= 11, "U3's files are numbered after U2's last file and sort in order");
+    assert.deepEqual([...u3].sort(), u3);
+    assert.equal(
+      u3[u3.length - 1],
+      "20261035_placeholder_drop.sql",
+      "the placeholder drop sorts last",
+    );
+    for (const schema of ["public", "worker_4"]) {
+      const tracked = (
+        await db.query(
+          `select filename from ${TRACKING_SCHEMA}.applied_migrations where schema_name = $1 and filename >= '20261024' and filename < '20261036' order by filename`,
+          [schema],
+        )
+      ).rows
+        .map((row) => row.filename as string)
+        // A schema migrated while the drop file still had its earlier name keeps that record.
+        .filter((name) => u3.includes(name));
+      assert.deepEqual(tracked, u3, schema);
+      const again = await run(db, schema);
+      assert.deepEqual(again.applied, [], schema);
+      const objects = await db.query(
+        `select (select count(*)::int from pg_tables where schemaname = $1 and tablename in ('families','assignments','tasks','change_requests')) as tables,
+                (select count(*)::int from pg_tables where schemaname = $1 and tablename in ('app_families','app_assignments')) as placeholders`,
+        [schema],
+      );
+      assert.deepEqual(objects.rows[0], { tables: 4, placeholders: 0 }, schema);
+    }
+  });
+
+  it("applies U4's files (20261036 and later) in the default and in a worker schema, in order, after U3's, and a second run changes nothing (NFR6.17)", async () => {
+    const u3Last = "20261035_placeholder_drop.sql";
+    const u4 = migrations.map((file) => file.name).filter((name) => name >= "20261036");
+    assert.ok(u4.length >= 3, "U4's notification files are numbered after U3's last file");
+    assert.deepEqual([...u4].sort(), u4);
+    assert.ok(
+      u4.every((name) => name > u3Last),
+      "every U4 file sorts after U3's placeholder drop",
+    );
+    for (const schema of ["public", "worker_4"]) {
+      const tracked = (
+        await db.query(
+          `select filename from ${TRACKING_SCHEMA}.applied_migrations where schema_name = $1 and filename >= '20261036' order by filename`,
+          [schema],
+        )
+      ).rows.map((row) => row.filename as string);
+      assert.deepEqual(tracked, u4, schema);
+      const again = await run(db, schema);
+      assert.deepEqual(again.applied, [], schema);
+      const objects = await db.query(
+        `select (select count(*)::int from pg_tables where schemaname = $1 and tablename in ('notifications','reminder_jobs','reminder_recipients','reminder_attempts','sheet_registry','import_runs','import_rows','import_staged_rows','import_conflicts')) as tables,
+                (select count(*)::int from pg_proc p where p.pronamespace = $1::regnamespace and p.proname in ('duty_sign_up', 'duty_sign_up_core', 'reminder_plan', 'notification_list', 'import_preview_create', 'import_match', 'import_apply', 'import_commit', 'import_after_lifecycle')) as functions`,
+        [schema],
+      );
+      assert.deepEqual(objects.rows[0], { tables: 9, functions: 9 }, schema);
+    }
+  });
+
   it("refuses a file with a hard-coded schema name, names it, and applies nothing", async () => {
     const before = (
       await db.query(`select count(*)::int as n from ${TRACKING_SCHEMA}.applied_migrations`)

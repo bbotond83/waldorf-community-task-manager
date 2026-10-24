@@ -1,0 +1,25 @@
+{
+  "stage": "functional-design",
+  "unit": "u3-directory-and-coordination",
+  "upstream_ids": ["FR2.3", "FR2.8", "FR3.3", "FR3.4", "FR3.5", "FR4.1", "FR4.3", "FR4.4", "FR5.1", "FR5.2", "FR5.3", "FR5.4", "FR5.5", "FR6.1"],
+  "coverage": [
+    { "id": "FR2.3", "status": "OK", "target": "BR30.3, BR32.3" },
+    { "id": "FR2.8", "status": "OK", "target": "BR32.2, BR30.8" },
+    { "id": "FR3.3", "status": "OK", "target": "BR30.1, BR32.6" },
+    { "id": "FR3.4", "status": "OK", "target": "BR30.5, BR30.4, BR30.8" },
+    { "id": "FR3.5", "status": "OK", "target": "BR31.5, BR35.2" },
+    { "id": "FR4.1", "status": "OK", "target": "BR32.1, BR32.7, BR32.8, BR31.11 (changed by answers Q6 and Q7: new swap and admin form screens)" },
+    { "id": "FR4.3", "status": "OK", "target": "BR34.1, BR30.6, BR30.10, BR35.1" },
+    { "id": "FR4.4", "status": "OK", "target": "BR31.7, BR31.8, BR31.10, BR32.5" },
+    { "id": "FR5.1", "status": "OK", "target": "BR31.2, BR31.3, BR31.11" },
+    { "id": "FR5.2", "status": "OK", "target": "BR31.4, BR31.5, BR31.6, BR32.7" },
+    { "id": "FR5.3", "status": "OK", "target": "BR30.1, BR30.9, BR31.1, BR31.9, BR33.1" },
+    { "id": "FR5.4", "status": "OK", "target": "BR32.3, BR30.3" },
+    { "id": "FR5.5", "status": "OK", "target": "BR30.2, BR30.7, BR30.10, BR31.1, BR31.7, BR31.8, BR32.10" },
+    { "id": "FR6.1", "status": "OK", "target": "BR33.1, BR33.2, BR33.3" }
+  ],
+  "reverse": [
+    { "id": "BR32.4", "status": "N/A", "target": "technical rule: failure mapping (supports FR4.2, delivered with U1's result states)" },
+    { "id": "BR32.9", "status": "N/A", "target": "interim behaviour rule: notification screens until U4 (supports FR4.1, FR4.4)" }
+  ]
+}

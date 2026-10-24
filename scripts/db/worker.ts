@@ -120,12 +120,19 @@ export interface WorkerSetupResult {
   durationMs: number;
 }
 
-/** Empties every table of the worker schema and removes the worker's accounts. */
+/**
+ * Tables that hold reference data seeded by a migration (the fixed list of the 17 workbook sheets): a reset
+ * keeps them, because nothing else would put the rows back and the import could not run.
+ */
+const REFERENCE_TABLES: ReadonlySet<string> = new Set(["sheet_registry"]);
+
+/** Empties every table of the worker schema (reference tables stay) and removes the worker's accounts. */
 export async function resetWorkerData(client: SqlClient, worker: string): Promise<void> {
-  const tables = await client.query(
+  const found = await client.query(
     "select tablename from pg_tables where schemaname = $1 order by tablename",
     [worker],
   );
+  const tables = { rows: found.rows.filter((row) => !REFERENCE_TABLES.has(String(row.tablename))) };
   if (tables.rows.length > 0) {
     const list = tables.rows
       .map((row) => `${quote(worker)}.${quote(String(row.tablename))}`)

@@ -16,6 +16,7 @@ import {
   OUTSIDER,
   PARENT_F1,
   PARENT_F2,
+  seedGroupAssignment,
   seedIdentityWorld,
   SIGNED_OUT,
   SUPER_ADMIN,
@@ -83,6 +84,7 @@ for (const schema of IDENTITY_SCHEMAS) {
     });
 
     it("supports assignments (group admins and super admins) and import runs (super admins only)", async () => {
+      await seedGroupAssignment(db);
       assert.equal(await probe(ADMIN_G1, "assignment", ASSIGNMENT_1), "allowed");
       assert.equal(await probe(SUPER_ADMIN, "assignment", ASSIGNMENT_1), "allowed");
       assert.equal(await probe(ADMIN_G2, "assignment", ASSIGNMENT_1), "denied");

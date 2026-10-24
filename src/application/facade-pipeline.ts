@@ -5,7 +5,7 @@ import type {
   SessionContext,
 } from "./contracts.ts";
 import type { ApplicationAction, AuthorizationContract } from "./authorization.ts";
-import { mapUnexpectedFailure } from "./results.ts";
+import { mapUnexpectedFailure, validation } from "./results.ts";
 import type { Scope } from "../access/index.ts";
 import type { IdempotencyCoordinator } from "./idempotency.ts";
 
@@ -13,6 +13,7 @@ export type DomainOutcome<T> =
   | { state: "success"; data: T }
   | { state: "empty" }
   | { state: "denied" }
+  | { state: "validation"; fieldErrors: Readonly<Record<string, string>>; code?: string }
   | { state: "conflict"; code?: string }
   | { state: "invalidated"; code?: string }
   | { state: "recovery"; data: T };
@@ -124,6 +125,8 @@ export class FacadePipeline {
             focusTarget: "#hozzaferes-megtagadva",
             announcement: "assertive",
           };
+        case "validation":
+          return validation(outcome.fieldErrors, outcome.code);
         case "conflict":
           return {
             state: "conflict",

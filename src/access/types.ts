@@ -27,8 +27,14 @@ export interface AccessResource {
   scope: Scope;
   field?: string;
 }
+/**
+ * What a request does. "respond" (answer a swap request addressed to your family) and "withdraw" (take back
+ * your own open request) were added with the real backend (U3, BR32.7); only the parent role holds them.
+ */
+export type AuthorizationAction =
+  "read" | "create" | "update" | "delete" | "manage" | "respond" | "withdraw";
 export interface AuthorizationRequest {
-  action: "read" | "create" | "update" | "delete" | "manage";
+  action: AuthorizationAction;
   resource: AccessResource;
 }
 export type AuthorizationCode =

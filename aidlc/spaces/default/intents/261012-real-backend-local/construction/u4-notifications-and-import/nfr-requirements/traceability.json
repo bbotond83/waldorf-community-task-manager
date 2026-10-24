@@ -1,0 +1,56 @@
+{
+  "stage": "nfr-requirements",
+  "unit": "u4-notifications-and-import",
+  "upstream_ids": [
+    "NFR1",
+    "NFR2",
+    "NFR3",
+    "NFR4",
+    "NFR5",
+    "NFR6",
+    "NFR7",
+    "NFR8"
+  ],
+  "coverage": [
+    {
+      "id": "NFR1",
+      "status": "OK",
+      "target": "NFR1.43, NFR1.44, NFR1.45, NFR1.46, NFR1.47, NFR1.48, NFR1.49, NFR1.50, NFR1.51, NFR1.52, NFR1.53, NFR1.54, NFR1.55, NFR1.56, NFR1.57, NFR1.58, NFR1.59, NFR1.60, NFR1.61, NFR1.62"
+    },
+    {
+      "id": "NFR2",
+      "status": "OK",
+      "target": "NFR2.18, NFR2.19, NFR2.20, NFR2.21, NFR2.22, NFR2.23, NFR2.24, NFR2.25, NFR2.26, NFR2.27"
+    },
+    {
+      "id": "NFR3",
+      "status": "OK",
+      "target": "NFR3.12, NFR3.13, NFR3.14, NFR3.15, NFR3.16, NFR3.17"
+    },
+    {
+      "id": "NFR4",
+      "status": "OK",
+      "target": "NFR4.10, NFR4.11, NFR4.12, NFR4.13, NFR4.14, NFR4.15, NFR4.16"
+    },
+    {
+      "id": "NFR5",
+      "status": "OK",
+      "target": "NFR5.6, NFR5.7"
+    },
+    {
+      "id": "NFR6",
+      "status": "OK",
+      "target": "NFR6.17, NFR6.18, NFR6.19, NFR6.20, NFR6.21, NFR6.22, NFR6.23, NFR6.24, NFR6.25, NFR6.26"
+    },
+    {
+      "id": "NFR7",
+      "status": "OK",
+      "target": "NFR7.4"
+    },
+    {
+      "id": "NFR8",
+      "status": "OK",
+      "target": "NFR8.3"
+    }
+  ]
+}

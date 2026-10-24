@@ -65,10 +65,22 @@ describe("AppNav", () => {
 describe("AppNav for a parent", () => {
   const parentItems = getSyntheticProfile("parent-local")!.navigation;
 
-  it("lists Értesítések before Feladatok", () => {
+  it("lists Értesítések before Feladatok and ends with Cserék", () => {
     render(<AppNav items={parentItems} />);
     const links = screen.getAllByRole("link");
-    expect(links.map((link) => link.textContent)).toEqual(["Értesítések", "Feladatok"]);
+    expect(links.map((link) => link.textContent)).toEqual(["Értesítések", "Feladatok", "Cserék"]);
+  });
+
+  it("marks Cserék current on the incoming swaps page and not Feladatok", () => {
+    navigation.pathname = "/szulo/cserek";
+    render(<AppNav items={parentItems} />);
+    expect(screen.getByTestId("app-shell-navigation-parent-swaps")).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    expect(screen.getByTestId("app-shell-navigation-parent-duties")).not.toHaveAttribute(
+      "aria-current",
+    );
   });
 
   it("keeps Feladatok current on a task page opened from the task list", () => {

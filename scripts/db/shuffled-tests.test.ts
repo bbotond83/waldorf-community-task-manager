@@ -28,8 +28,14 @@ describe("shuffled database test run", () => {
   it("lists exactly the files of the database test script", () => {
     const scripts = JSON.parse(readFileSync(new URL("../../package.json", import.meta.url), "utf8"))
       .scripts as Record<string, string>;
-    // U1's stack tests and U2's identity tests; the bundle test needs a build, so it runs after one.
-    const listed = [scripts["test:database:stack"]!, scripts["test:database:identity"]!]
+    // U1's stack tests, U2's identity tests, U3's directory and coordination tests and U4's notification
+    // and import tests; the bundle test needs a build, so it runs after one.
+    const listed = [
+      scripts["test:database:stack"]!,
+      scripts["test:database:identity"]!,
+      scripts["test:database:directory"]!,
+      scripts["test:database:notifications-import"]!,
+    ]
       .flatMap((script) => script.split(" "))
       .filter((part) => part.startsWith("tests/database/"));
     assert.deepEqual([...listed].sort(), [...DATABASE_TEST_FILES].sort());

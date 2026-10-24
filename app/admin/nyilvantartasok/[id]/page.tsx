@@ -3,6 +3,8 @@ import { AdminBackLink } from "../../_components/AdminBackLink.tsx";
 import { AdminMutationForm, AdminTextField } from "../../_components/AdminMutationForm.tsx";
 import { AsyncStatePanel } from "../../_components/AsyncStatePanel.tsx";
 import { DeveloperDetails } from "../../_components/DeveloperDetails.tsx";
+import { RecordFields } from "../../_components/RecordFields.tsx";
+import { resolveAdminLookups } from "../../_lib/request-lookups.ts";
 import { archiveRecordAction, saveRecordAction } from "../../actions.ts";
 import { resolveAdminFacade } from "../../_lib/facade.ts";
 import { resolveAdminSession } from "../../_lib/session.ts";
@@ -21,6 +23,7 @@ export default async function RecordDetailPage({
   const query = await searchParams;
   const session = await resolveAdminSession();
   const facade = await resolveAdminFacade();
+  const lookups = await resolveAdminLookups();
   const result =
     session.state === "success" && facade
       ? await facade.getRecord(session.data.applicationSession, session.data.scope, "record", id)
@@ -52,6 +55,7 @@ export default async function RecordDetailPage({
               action={saveRecordAction}
               submitLabel="Módosítás mentése"
               testId="admin-record-edit-form"
+              longForm={record.kind !== undefined}
             >
               <input type="hidden" name="id" value={record.id} />
               <input type="hidden" name="expectedVersion" value={record.version ?? 1} />
@@ -60,15 +64,27 @@ export default async function RecordDetailPage({
                 name="idempotencyKey"
                 value={`record:save:${record.id}:${randomUUID()}`}
               />
-              <input type="hidden" name="kind" value="record" />
-              <AdminTextField
-                id="title"
-                name="title"
-                label="Megnevezés"
-                defaultValue={record.title}
-                required
-                testId="admin-record-title-input"
-              />
+              {record.kind !== undefined && record.kind !== "event" && record.kind !== "task" ? (
+                <RecordFields
+                  mode="edit"
+                  kind={record.kind}
+                  title={record.title}
+                  details={record.details}
+                  lookups={lookups}
+                />
+              ) : (
+                <>
+                  <input type="hidden" name="kind" value="record" />
+                  <AdminTextField
+                    id="title"
+                    name="title"
+                    label="Megnevezés"
+                    defaultValue={record.title}
+                    required
+                    testId="admin-record-title-input"
+                  />
+                </>
+              )}
             </AdminMutationForm>
             <AdminMutationForm
               action={archiveRecordAction}

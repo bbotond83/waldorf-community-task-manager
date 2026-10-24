@@ -1,5 +1,6 @@
 export { AdminApplicationFacade } from "./admin-facade.ts";
 export type { AdminApplicationPort, AdminOperation } from "./admin-facade.ts";
+export type * from "./admin-payloads.ts";
 export {
   AUTHORIZATION_MATRIX,
   AUTHORIZATION_MATRIX_VERSION,
@@ -30,5 +31,11 @@ export type { TeacherApplicationPort } from "./teacher-facade.ts";
 export { SessionApplicationFacade } from "./session-facade.ts";
 export type { SessionGateway } from "./session-facade.ts";
 export type * from "./contracts.ts";
-export { normalizeRequiredText, validateDateRange, validateMutationContext } from "./validation.ts";
+export {
+  normalizeRequiredText,
+  validateDateRange,
+  validateIdempotencyKey,
+  validateMutationContext,
+} from "./validation.ts";
 export type { ValidationCode } from "./validation.ts";
+export { WorkbookUpload } from "./import-upload.ts";

@@ -54,6 +54,27 @@ describe("synthetic Parent façade", () => {
     }
   });
 
+  it("has no swap requests for the demo family, so the page for them shows its empty state", async () => {
+    const app = facade();
+    const result = await app.listSwapRequests(session, {
+      familyScope: PARENT_FAMILY_SCOPE,
+      familyId: PARENT_FAMILY_ID,
+    });
+    assert.equal(result.state, "empty");
+    // Another family's id is answered like an unknown one, and the partner list is not offered at all.
+    const other = await app.listSwapRequests(session, {
+      familyScope: PARENT_FAMILY_SCOPE,
+      familyId: "family-other",
+    });
+    assert.equal(other.state, "denied");
+    const candidates = await app.listSwapCandidates(session, {
+      familyScope: PARENT_FAMILY_SCOPE,
+      familyId: PARENT_FAMILY_ID,
+      assignmentId: "assignment-lampas",
+    });
+    assert.equal(candidates.state, "denied");
+  });
+
   it("generically denies unrelated and unknown duty detail", async () => {
     const app = facade();
     const unrelated = await app.getDuty(session, {

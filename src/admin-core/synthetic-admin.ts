@@ -263,6 +263,7 @@ export class SyntheticAdminPort implements AdminApplicationPort {
         return { state: "success", data: { completed: true } };
       case "empty":
       case "denied":
+      case "validation":
       case "conflict":
       case "invalidated":
         return result;

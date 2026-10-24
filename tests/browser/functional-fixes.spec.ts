@@ -29,7 +29,7 @@ test.describe("parent: notifications stay under Értesítések", () => {
   test("the menu lists Értesítések first and the parent lands there", async ({ page }) => {
     await expect(page).toHaveURL(/\/szulo\/ertesitesek$/);
     const links = page.getByTestId("app-shell-navigation").getByRole("link");
-    await expect(links).toHaveText(["Értesítések", "Feladatok"]);
+    await expect(links).toHaveText(["Értesítések", "Feladatok", "Cserék"]);
     await expect(page.getByTestId("app-shell-navigation-parent-notifications")).toHaveAttribute(
       "aria-current",
       "page",

@@ -1,15 +1,21 @@
 import type { ReactNode } from "react";
 import { AppNav } from "./AppNav.tsx";
 import { BrandMark } from "./BrandMark.tsx";
-import type { SyntheticProfile } from "./synthetic/profiles.ts";
+import type { ShellProfile } from "./shell-profile.ts";
 
 type AppShellProps = {
-  profile: SyntheticProfile;
+  profile: ShellProfile;
   children: ReactNode;
   statusMessage?: string;
+  /**
+   * What the header offers in place of the test-profile switcher. The synthetic mode passes nothing and
+   * keeps the switcher; a real person's session passes its own control (the sign-out button), because a
+   * real person never switches to a test profile.
+   */
+  headerAction?: ReactNode;
 };
 
-export function AppShell({ profile, children, statusMessage }: AppShellProps) {
+export function AppShell({ profile, children, statusMessage, headerAction }: AppShellProps) {
   return (
     <div className="app-shell" data-testid="app-shell">
       <a className="skip-link" href="#fo-tartalom" data-testid="app-shell-skip-link">
@@ -26,25 +32,27 @@ export function AppShell({ profile, children, statusMessage }: AppShellProps) {
             </p>
           </div>
         </div>
-        <form
-          action="/api/synthetic/session"
-          method="post"
-          data-testid="app-shell-switch-profile-form"
-        >
-          <input
-            type="hidden"
-            name="profileId"
-            value=""
-            data-testid="app-shell-switch-profile-input"
-          />
-          <button
-            className="secondary-button"
-            type="submit"
-            data-testid="app-shell-switch-profile-button"
+        {headerAction ?? (
+          <form
+            action="/api/synthetic/session"
+            method="post"
+            data-testid="app-shell-switch-profile-form"
           >
-            Tesztprofil váltása
-          </button>
-        </form>
+            <input
+              type="hidden"
+              name="profileId"
+              value=""
+              data-testid="app-shell-switch-profile-input"
+            />
+            <button
+              className="secondary-button"
+              type="submit"
+              data-testid="app-shell-switch-profile-button"
+            >
+              Tesztprofil váltása
+            </button>
+          </form>
+        )}
       </header>
 
       {profile.navigation.length > 0 && <AppNav items={profile.navigation} />}

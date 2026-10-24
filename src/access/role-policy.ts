@@ -1,4 +1,4 @@
-import type { AuthorizationRequest, Role, RoleGrant, Scope } from "./types.ts";
+import type { AuthorizationAction, AuthorizationRequest, Role, RoleGrant, Scope } from "./types.ts";
 
 export const CURRENT_ROLES = Object.freeze([
   "parent",
@@ -70,6 +70,16 @@ const TRACKING_FIELDS = new Set([
   "assignee_display_names",
   "current_status",
 ]);
+const ACTIONS: readonly AuthorizationAction[] = Object.freeze([
+  "read",
+  "create",
+  "update",
+  "delete",
+  "manage",
+  "respond",
+  "withdraw",
+]);
+const FAMILY_ONLY_ACTIONS: readonly AuthorizationAction[] = Object.freeze(["respond", "withdraw"]);
 export function grantAllows(
   grant: Pick<RoleGrant, "role" | "scope" | "revokedAt">,
   request: AuthorizationRequest,
@@ -80,7 +90,9 @@ export function grantAllows(
     !scopeContains(grant.scope, request.resource.scope)
   )
     return false;
-  if (!["read", "create", "update", "delete", "manage"].includes(request.action)) return false;
+  if (!ACTIONS.includes(request.action)) return false;
+  // Answering and withdrawing a request belong to the parents of the family involved, nobody else.
+  if (FAMILY_ONLY_ACTIONS.includes(request.action) && grant.role !== "parent") return false;
   switch (grant.role) {
     case "super_admin":
       return true;
@@ -114,8 +126,11 @@ function parentCan({ action, resource }: AuthorizationRequest): boolean {
     case "notification":
       return action === "read" || action === "update";
     case "swap_request":
+      return (
+        action === "create" || action === "read" || action === "respond" || action === "withdraw"
+      );
     case "cancellation_request":
-      return action === "create" || action === "read";
+      return action === "create" || action === "read" || action === "withdraw";
     default:
       return false;
   }

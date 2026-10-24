@@ -134,6 +134,21 @@ for (const schema of IDENTITY_SCHEMAS) {
       resetHousekeepingClockForTests();
     });
 
+    /**
+     * What the signed-in person's grants allow for a family, asked through the data API with their own token:
+     * the scope probe reads the grants (the family table follows the parent's link instead, U3 BR30.8).
+     */
+    async function probeFamily(token: string, family: string): Promise<string> {
+      const answer = (await database
+        .forSession(token)
+        .read<string>(
+          (client) =>
+            client.rpc("scope_probe", { p_record_type: "family", p_record_id: family }) as never,
+          { idempotencyKey: "x", action: "read" },
+        )) as { state: string; data: string };
+      return answer.data;
+    }
+
     /** A person with a real sign-in user, an Account and a grant. */
     async function person(
       tag: string,
@@ -284,22 +299,19 @@ for (const schema of IDENTITY_SCHEMAS) {
           scopeType: "family",
           scope: FAMILY_2,
         });
-        const families = async (token: string) =>
-          (await database
-            .forSession(token)
-            .read<{ id: string }[]>((client) => client.from("app_families").select("id") as never, {
-              idempotencyKey: "x",
-              action: "read",
-            })) as { state: string; data: { id: string }[] };
-        const first = await families(parent.tokens.accessToken);
-        const second = await families(other.tokens.accessToken);
         assert.deepEqual(
-          first.data.map((row) => row.id),
-          [FAMILY_1],
+          [
+            await probeFamily(parent.tokens.accessToken, FAMILY_1),
+            await probeFamily(parent.tokens.accessToken, FAMILY_2),
+          ],
+          ["allowed", "denied"],
         );
         assert.deepEqual(
-          second.data.map((row) => row.id),
-          [FAMILY_2],
+          [
+            await probeFamily(other.tokens.accessToken, FAMILY_1),
+            await probeFamily(other.tokens.accessToken, FAMILY_2),
+          ],
+          ["denied", "allowed"],
         );
       });
 
@@ -501,14 +513,7 @@ for (const schema of IDENTITY_SCHEMAS) {
         const boss = await signedIn("boss3", superGrant);
         const parent = await signedIn("parent3");
         const families = async () =>
-          (
-            (await database
-              .forSession(parent.tokens.accessToken)
-              .read<{ id: string }[]>(
-                (client) => client.from("app_families").select("id") as never,
-                { idempotencyKey: "x", action: "read" },
-              )) as { data: { id: string }[] }
-          ).data.length;
+          (await probeFamily(parent.tokens.accessToken, FAMILY_1)) === "allowed" ? 1 : 0;
         assert.equal(await families(), 0);
         const added = await changeGrant(
           boss.caller,
@@ -604,15 +609,12 @@ for (const schema of IDENTITY_SCHEMAS) {
           { service, database, now },
         );
         assert.equal(session.status, "signed-in");
-        const families = (await database
-          .forSession(accepted.state === "success" ? accepted.data.tokens!.accessToken : "")
-          .read<{ id: string }[]>((client) => client.from("app_families").select("id") as never, {
-            idempotencyKey: "x",
-            action: "read",
-          })) as { data: { id: string }[] };
-        assert.deepEqual(
-          families.data.map((row) => row.id),
-          [FAMILY_1],
+        assert.equal(
+          await probeFamily(
+            accepted.state === "success" ? accepted.data.tokens!.accessToken : "",
+            FAMILY_1,
+          ),
+          "allowed",
         );
         const again = await acceptInvitation(
           { token, password, idempotencyKey: randomUUID() },

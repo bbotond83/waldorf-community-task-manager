@@ -32,18 +32,105 @@ export async function requestSwapAction(
   if (!context.ok) return context.state;
   const reason = validateProtectedReason(formData);
   if (reason) return reason;
+  const counterpart = parseCounterpart(formData);
+  if (!counterpart.ok) return counterpart.state;
   const boundary = await resolveBoundary();
   if (!boundary.ok) return boundary.state;
   const result = await boundary.facade.requestSwap(boundary.session.applicationSession, {
     familyScope: boundary.session.familyScope,
     familyId: boundary.session.familyId,
     assignmentId: stringValue(formData, "assignmentId"),
-    counterpartId: stringValue(formData, "counterpartId"),
+    counterpartId: counterpart.value.id,
+    ...(counterpart.value.version !== undefined
+      ? { counterpartVersion: counterpart.value.version }
+      : {}),
     expectedVersion: context.value.expectedVersion,
     idempotencyKey: context.value.idempotencyKey,
   });
-  if (result.state === "success") revalidateParentDuty(context.value.id);
+  if (result.state === "success") {
+    revalidateParentDuty(context.value.id);
+    revalidatePath("/szulo/cserek");
+  }
   return mapParentResult(result, "A cserekérelem függő állapotba került.");
+}
+
+/**
+ * The partner a parent chose for a swap. The partner list sends one radio value, `<assignment>:<version>`
+ * (the version of the partner's place that was on screen); the old form sends a fixed `counterpartId`.
+ * No choice is a field error on the list, so the message is linked to it.
+ */
+function parseCounterpart(
+  formData: FormData,
+): { ok: true; value: { id: string; version?: number } } | { ok: false; state: ParentActionState } {
+  const chosen = stringValue(formData, "counterpart");
+  // `partnerList` is sent by the partner list only; an unselected radio sends nothing at all.
+  if (chosen === "" && stringValue(formData, "partnerList") === "1") {
+    return { ok: false, state: validationState({ counterpart: "Válasszon egy cseretársat." }) };
+  }
+  if (chosen !== "") {
+    const [id = "", versionText = ""] = chosen.split(":");
+    const version = Number(versionText);
+    if (!isIdentifier(id) || !Number.isInteger(version) || version < 1) {
+      return { ok: false, state: validationState({ counterpart: "Érvénytelen cseretárs." }) };
+    }
+    return { ok: true, value: { id, version } };
+  }
+  return { ok: true, value: { id: stringValue(formData, "counterpartId") } };
+}
+
+/** The other family answers a swap request addressed to it: `decision` is `accept` or `decline`. */
+export async function respondToSwapAction(
+  _state: ParentActionState,
+  formData: FormData,
+): Promise<ParentActionState> {
+  const context = parseMutationContext(formData);
+  if (!context.ok) return context.state;
+  const decision = stringValue(formData, "decision");
+  if (decision !== "accept" && decision !== "decline") {
+    return validationState({ decision: "Válasszon: megerősítés vagy elutasítás." });
+  }
+  const boundary = await resolveBoundary();
+  if (!boundary.ok) return boundary.state;
+  const result = await boundary.facade.respondToSwap(boundary.session.applicationSession, {
+    familyScope: boundary.session.familyScope,
+    familyId: boundary.session.familyId,
+    requestId: context.value.id,
+    accept: decision === "accept",
+    expectedVersion: context.value.expectedVersion,
+    idempotencyKey: context.value.idempotencyKey,
+  });
+  if (result.state === "success") revalidateSwapPages();
+  return mapParentResult(
+    result,
+    result.state === "success" && result.data.outcome === "declined"
+      ? "A cserekérelmet elutasította."
+      : "A csere megtörtént: a két család feladata felcserélődött.",
+  );
+}
+
+/** The requesting family takes back its own open swap or cancellation request. */
+export async function withdrawRequestAction(
+  _state: ParentActionState,
+  formData: FormData,
+): Promise<ParentActionState> {
+  const context = parseMutationContext(formData);
+  if (!context.ok) return context.state;
+  const boundary = await resolveBoundary();
+  if (!boundary.ok) return boundary.state;
+  const result = await boundary.facade.withdrawRequest(boundary.session.applicationSession, {
+    familyScope: boundary.session.familyScope,
+    familyId: boundary.session.familyId,
+    requestId: context.value.id,
+    kind: stringValue(formData, "kind") === "cancellation" ? "cancellation" : "swap",
+    idempotencyKey: context.value.idempotencyKey,
+  });
+  if (result.state === "success") revalidateSwapPages();
+  return mapParentResult(result, "A kérelmet visszavonta.");
+}
+
+function revalidateSwapPages(): void {
+  revalidatePath("/szulo/cserek");
+  revalidatePath("/szulo/feladatok");
 }
 
 export async function requestCancellationAction(

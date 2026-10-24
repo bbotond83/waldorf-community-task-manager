@@ -84,8 +84,21 @@ describe("honest executable denominator", () => {
     // 164 earlier files plus the 13 production files U1 adds (scripts/db, src/runtime/database, scan-core),
     // plus the 31 U2 adds: 13 under app/ (the four screens, their actions and the sign-out control),
     // 16 under src/identity and the operator command with its terminal (scripts/db), plus src/identity/refresh.ts
-    // (the request refresh, review follow-up).
-    expect(inventory.length).toBe(209);
+    // (the request refresh, review follow-up), plus the 20 U3 adds so far: the 15 database adapter files under
+    // src/data, admin-payloads.ts and shell-profile.ts, access.ts and services.ts under src/runtime/production,
+    // and app/_identity/production-request.ts, plus the 11 the screen changes add (step 28): the incoming
+    // swaps page and its board, the fresh-key helper, the sign-out shell action and the production home,
+    // the record and task field sets with their payload reader and lookups, and budapest-time.ts; minus the
+    // 13 production files of the four replaced modules that step 31 deletes (src/directory 4,
+    // src/coordination 4, src/parent-experience 3, src/privacy-audit 2), plus the one file of the repair
+    // pass (src/admin-advanced/interim-port.ts, the empty-state port for the operations that stay with U4),
+    // plus the 3 files U4's skeleton adds under src/import-parser (limits, template, index), plus the 7 the
+    // parser and adapter steps add: types, zip, workbook and server under src/import-parser, imports.ts and
+    // notifications.ts under src/data, and import-upload.ts under src/application; minus the 7 production files
+    // of the two modules step 26 deletes (src/notifications 4, src/import-migration 3), plus the one file that
+    // keeps the synthetic archive presentation's sheet table (src/admin-experience/legacy-destinations.ts), plus
+    // the one file of the import screen (app/admin/_lib/import-messages.ts, the Hungarian import messages).
+    expect(inventory.length).toBe(233);
     for (const path of [
       "src/runtime/AppNav.tsx",
       "src/runtime/StatusBadge.tsx",

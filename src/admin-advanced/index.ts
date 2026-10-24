@@ -1,5 +1,6 @@
 export {
   createSyntheticAdvancedAdminFacade,
+  getInterimAdvancedPort,
   isSyntheticAdvancedSubjectRevoked,
   resetSyntheticAdvancedFixtures,
   RetryableAdvancedDependencyError,

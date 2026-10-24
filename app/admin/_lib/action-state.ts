@@ -49,6 +49,12 @@ const VALIDATION_CODE_MESSAGES: Readonly<Record<string, string>> = Object.freeze
   "VAL-IDEMPOTENCY-KEY": "Érvénytelen műveleti kulcs.",
   "VAL-EXPECTED-VERSION": "Érvénytelen verzió.",
   "VAL-DATE-RANGE": "Érvénytelen időszak.",
+  // The codes the database adapters return for a refused field (src/data/results.ts).
+  "VAL-INVALID": "Érvénytelen érték.",
+  "VAL-NOT-FOUND": "A hivatkozott elem nem található.",
+  "VAL-ARCHIVED": "A hivatkozott elem archivált.",
+  "VAL-LOCKED": "Ez az érték már nem módosítható.",
+  "VAL-TAKEN": "Ez a név már foglalt.",
 });
 
 /** A validation code never reaches the screen as such; readable messages pass through. */
@@ -64,13 +70,20 @@ function translateFieldErrors(
   );
 }
 
+/** One Hungarian message for each business conflict an admin screen can meet (BR32.8). */
+export const ADMIN_CONFLICT_MESSAGES: Readonly<Record<string, string>> = Object.freeze({
+  RESTORE_CONFLICT: "Az elem nem állítható vissza, mert ütköző aktív elem létezik.",
+  VERSION_CONFLICT: "Az adatok időközben megváltoztak. Töltse újra az oldalt.",
+  ASSIGNMENT_INELIGIBLE: "A kiválasztott résztvevő nem jogosult erre a feladatra.",
+  ASSIGNMENT_CAPACITY_FULL: "A feladat vagy esemény elérte a kapacitását.",
+  MEMBERSHIP_DUPLICATE: "A család már tagja ennek a csoportnak.",
+  ACCOUNT_ALREADY_LINKED: "Ez a fiók már egy másik szülőhöz tartozik.",
+  SCHOOL_YEAR_HAS_ACTIVE_GROUPS:
+    "A nevelési év nem archiválható, amíg aktív csoportjai vannak. Előbb archiválja a csoportokat.",
+});
+
 function conflictMessage(code: string): string {
-  if (code === "RESTORE_CONFLICT")
-    return "Az elem nem állítható vissza, mert ütköző aktív elem létezik.";
-  if (code === "VERSION_CONFLICT")
-    return "Az adatok időközben megváltoztak. Töltse újra az oldalt.";
-  if (code === "ASSIGNMENT_INELIGIBLE")
-    return "A kiválasztott résztvevő nem jogosult erre a feladatra.";
-  if (code === "ASSIGNMENT_CAPACITY_FULL") return "A feladat vagy esemény elérte a kapacitását.";
-  return "A művelet ütközés miatt nem hajtható végre.";
+  return Object.hasOwn(ADMIN_CONFLICT_MESSAGES, code)
+    ? ADMIN_CONFLICT_MESSAGES[code]!
+    : "A művelet ütközés miatt nem hajtható végre.";
 }

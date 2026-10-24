@@ -1,6 +1,13 @@
 import { randomUUID } from "node:crypto";
 import { AdminBackLink } from "../../_components/AdminBackLink.tsx";
-import { AdminMutationForm, AdminTextField } from "../../_components/AdminMutationForm.tsx";
+import {
+  AdminMutationForm,
+  AdminSelectField,
+  AdminTextareaField,
+  AdminTextField,
+} from "../../_components/AdminMutationForm.tsx";
+import { TaskFields } from "../../_components/TaskFields.tsx";
+import { resolveAdminLookups } from "../../_lib/request-lookups.ts";
 import { AsyncStatePanel } from "../../_components/AsyncStatePanel.tsx";
 import { DeveloperDetails } from "../../_components/DeveloperDetails.tsx";
 import { assignTaskAction, saveEventNotesAction, saveTaskAction } from "../../actions.ts";
@@ -10,6 +17,11 @@ import type { AdminItemModel, ApplicationResult } from "../../../../src/applicat
 import { denied, terminalFailure } from "../../../../src/application/results.ts";
 import { statusDisplay } from "../../../../src/application/status-labels.ts";
 import { StatusBadge } from "../../../../src/runtime/StatusBadge.tsx";
+
+/** The real-data form is used when the data source says what the item is; the synthetic one never does. */
+function isTaskKind(kind: AdminItemModel["kind"]): kind is "task" | "event" {
+  return kind === "task" || kind === "event";
+}
 
 export default async function TaskDetailPage({
   params,
@@ -22,6 +34,7 @@ export default async function TaskDetailPage({
   const query = await searchParams;
   const session = await resolveAdminSession();
   const facade = await resolveAdminFacade();
+  const lookups = await resolveAdminLookups();
   let result: ApplicationResult<AdminItemModel> = terminalFailure();
   if (session.state === "success" && facade) {
     const list = await facade.listTasks(session.data.applicationSession, session.data.scope);
@@ -59,6 +72,7 @@ export default async function TaskDetailPage({
               action={saveTaskAction}
               submitLabel="Módosítás mentése"
               testId="admin-task-edit-form"
+              longForm={isTaskKind(task.kind)}
             >
               <input type="hidden" name="id" value={task.id} />
               <input type="hidden" name="expectedVersion" value={task.version ?? 1} />
@@ -67,38 +81,70 @@ export default async function TaskDetailPage({
                 name="idempotencyKey"
                 value={`task:save:${task.id}:${randomUUID()}`}
               />
-              <input
-                type="hidden"
-                name="kind"
-                value={task.state === "scheduled" ? "event" : "task"}
-              />
-              <AdminTextField
-                id="title"
-                name="title"
-                label="Megnevezés"
-                defaultValue={task.title}
-                required
-                testId="admin-task-title-input"
-              />
+              {isTaskKind(task.kind) ? (
+                <TaskFields
+                  mode="edit"
+                  kind={task.kind}
+                  title={task.title}
+                  state={task.state}
+                  details={task.details}
+                  lookups={lookups}
+                />
+              ) : (
+                <>
+                  <input
+                    type="hidden"
+                    name="kind"
+                    value={task.state === "scheduled" ? "event" : "task"}
+                  />
+                  <AdminTextField
+                    id="title"
+                    name="title"
+                    label="Megnevezés"
+                    defaultValue={task.title}
+                    required
+                    testId="admin-task-title-input"
+                  />
+                </>
+              )}
             </AdminMutationForm>
-            <AdminMutationForm
-              action={assignTaskAction}
-              submitLabel="Hozzárendelés"
-              testId="admin-assignment-form"
-            >
-              <input type="hidden" name="id" value={task.id} />
-              <input type="hidden" name="expectedVersion" value={task.version ?? 1} />
-              <input
-                type="hidden"
-                name="idempotencyKey"
-                value={`assignment:${task.id}:${randomUUID()}`}
-              />
-            </AdminMutationForm>
+            {task.kind !== "event" && (
+              <AdminMutationForm
+                action={assignTaskAction}
+                submitLabel="Hozzárendelés"
+                testId="admin-assignment-form"
+                longForm={task.kind === "task"}
+              >
+                <input type="hidden" name="id" value={task.id} />
+                <input type="hidden" name="expectedVersion" value={task.version ?? 1} />
+                <input
+                  type="hidden"
+                  name="idempotencyKey"
+                  value={`assignment:${task.id}:${randomUUID()}`}
+                />
+                {task.kind === "task" && (
+                  <>
+                    <input type="hidden" name="familySelector" value="1" />
+                    <AdminSelectField
+                      id="familyId"
+                      name="familyId"
+                      label="Család"
+                      options={lookups.families}
+                      placeholder="Válasszon családot"
+                      required
+                      hint="A család csak akkor kaphatja meg a feladatot, ha tagja a feladat csoportjának, és van szabad hely."
+                      testId="admin-assignment-family-select"
+                    />
+                  </>
+                )}
+              </AdminMutationForm>
+            )}
             {task.state === "scheduled" && (
               <AdminMutationForm
                 action={saveEventNotesAction}
                 submitLabel="Megjegyzések mentése"
                 testId="admin-event-notes-form"
+                longForm={task.kind === "event"}
               >
                 <input type="hidden" name="id" value={task.id} />
                 <input type="hidden" name="expectedVersion" value={task.version ?? 1} />
@@ -109,28 +155,29 @@ export default async function TaskDetailPage({
                 />
                 <fieldset>
                   <legend>Engedélyezett eseménymegjegyzések</legend>
-                  <label htmlFor="allergenNote">
-                    Allergénnel kapcsolatos adminisztrátori megjegyzés
-                  </label>
-                  <textarea
+                  <AdminTextareaField
                     id="allergenNote"
                     name="allergenNote"
+                    label="Allergénnel kapcsolatos adminisztrátori megjegyzés"
+                    defaultValue={task.details?.allergenNote}
                     maxLength={300}
-                    data-testid="admin-event-allergen-note-input"
+                    testId="admin-event-allergen-note-input"
                   />
-                  <label htmlFor="supplyNote">Eszközigény</label>
-                  <textarea
+                  <AdminTextareaField
                     id="supplyNote"
                     name="supplyNote"
+                    label="Eszközigény"
+                    defaultValue={task.details?.supplyNote}
                     maxLength={300}
-                    data-testid="admin-event-supply-note-input"
+                    testId="admin-event-supply-note-input"
                   />
-                  <label htmlFor="foodNote">Ételhez kapcsolódó megjegyzés</label>
-                  <textarea
+                  <AdminTextareaField
                     id="foodNote"
                     name="foodNote"
+                    label="Ételhez kapcsolódó megjegyzés"
+                    defaultValue={task.details?.foodNote}
                     maxLength={300}
-                    data-testid="admin-event-food-note-input"
+                    testId="admin-event-food-note-input"
                   />
                 </fieldset>
               </AdminMutationForm>

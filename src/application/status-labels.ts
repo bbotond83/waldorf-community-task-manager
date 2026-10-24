@@ -9,6 +9,7 @@
  * - privacy candidates (`eligibility`): eligible-delete, eligible-anonymize, blocked
  * - import runs and outcomes: selected, validated, preview, conflicts, confirmed, committed,
  *   rolled-back, interrupted, recovered
+ * - tasks closed for new sign-ups by an admin: closed
  * - duty states: available, full, ineligible, assigned, swap-pending, cancellation-pending
  *
  * Only the displayed words are translated; the raw values in page addresses, filters and form
@@ -31,6 +32,7 @@ export const STATUS_LABELS = Object.freeze({
   "retry-scheduled": "Újrapróbálás ütemezve",
   stale: "Elavult",
   cancelled: "Törölve",
+  closed: "Lezárva",
   terminal: "Végleges hiba",
   "eligible-delete": "Törölhető",
   "eligible-anonymize": "Anonimizálható",
@@ -167,6 +169,7 @@ const STATUS_ICONS = {
   "retry-scheduled": "clock",
   stale: "warning",
   cancelled: "block",
+  closed: "block",
   terminal: "cross",
   "eligible-delete": "check",
   "eligible-anonymize": "check",

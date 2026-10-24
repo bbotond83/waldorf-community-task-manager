@@ -23,6 +23,7 @@ import {
   OUTSIDER,
   PARENT_F1,
   PARENT_F2,
+  seedGroupAssignment,
   seedIdentityWorld,
   sessionIdFor,
   SIGNED_OUT,
@@ -146,7 +147,7 @@ for (const schema of IDENTITY_SCHEMAS) {
         deactivated: 0,
         signedOut: 0,
       },
-      app_families: {
+      families: {
         parent: 1,
         teacher: 0,
         adminSame: 1,
@@ -156,7 +157,7 @@ for (const schema of IDENTITY_SCHEMAS) {
         deactivated: 0,
         signedOut: 0,
       },
-      app_assignments: {
+      assignments: {
         parent: 0,
         teacher: 0,
         adminSame: 1,
@@ -219,6 +220,7 @@ for (const schema of IDENTITY_SCHEMAS) {
     };
 
     async function seedInvitationsAndEvents() {
+      await seedGroupAssignment(db);
       const invite = (
         email: string,
         role: string,
@@ -281,23 +283,37 @@ for (const schema of IDENTITY_SCHEMAS) {
       }
     });
 
-    it("refuses writes to the family, assignment and import tables to a token without an active session", async () => {
-      const attempts = [
-        "insert into app_families (id, organization_id, scope_id) values (gen_random_uuid(), $1, $2)",
-        "insert into app_assignments (id, organization_id, scope_id) values (gen_random_uuid(), $1, $2)",
-        "insert into app_import_runs (id, organization_id, scope_id) values (gen_random_uuid(), $1, $1)",
-      ];
-      for (const sql of attempts) {
-        const live = await asActor(db, schema, authenticated(SUPER_ADMIN), () =>
-          db.query(sql, sql.includes("$2") ? [ORGANIZATION, GROUP_1] : [ORGANIZATION]),
-        );
-        assert.equal(live.rowCount, 1, sql);
-        const dead = await failureOf(() =>
-          asActor(db, schema, authenticated(SUPER_ADMIN, uuid(9997)), () =>
-            db.query(sql, sql.includes("$2") ? [ORGANIZATION, GROUP_1] : [ORGANIZATION]),
-          ),
-        );
-        assert.equal(dead?.code, "42501", sql);
+    it("refuses writes to the import table to a token without an active session, and every direct write to the family and assignment tables to anyone", async () => {
+      const importRun =
+        "insert into app_import_runs (id, organization_id, scope_id) values (gen_random_uuid(), $1, $1)";
+      const live = await asActor(db, schema, authenticated(SUPER_ADMIN), () =>
+        db.query(importRun, [ORGANIZATION]),
+      );
+      assert.equal(live.rowCount, 1, importRun);
+      const dead = await failureOf(() =>
+        asActor(db, schema, authenticated(SUPER_ADMIN, uuid(9997)), () =>
+          db.query(importRun, [ORGANIZATION]),
+        ),
+      );
+      assert.equal(dead?.code, "42501", importRun);
+      // Directory and Coordination tables are changed by their named functions only (U3 BR30.1).
+      for (const sql of [
+        "insert into families (organization_id, display_name) values ($1, 'Közvetlen család')",
+        "update families set display_name = 'Közvetlen család'",
+        "delete from assignments",
+      ]) {
+        for (const session of [undefined, uuid(9997)]) {
+          const refused = await failureOf(() =>
+            asActor(db, schema, authenticated(SUPER_ADMIN, session), () =>
+              db.query(sql, sql.includes("$1") ? [ORGANIZATION] : []),
+            ),
+          );
+          assert.equal(
+            refused?.code,
+            "42501",
+            `${sql} with ${session ? "a dead" : "a live"} token`,
+          );
+        }
       }
     });
 
@@ -348,7 +364,7 @@ for (const schema of IDENTITY_SCHEMAS) {
     it("keeps the version row and grants of another organization's admin out of reach", async () => {
       const own = await asActor(db, schema, authenticated(OTHER_ADMIN), async () => ({
         grants: (await db.query("select id from app_role_grants")).rows.length,
-        families: (await db.query("select id from app_families")).rows.length,
+        families: (await db.query("select id from families")).rows.length,
       }));
       assert.deepEqual(own, { grants: 1, families: 0 });
       assert.ok(FAMILY_2 && PARENT_F2 && IMPORT_RUN_1 && ASSIGNMENT_1);
@@ -365,9 +381,9 @@ for (const schema of IDENTITY_SCHEMAS) {
         }
         return times.sort((a, b) => a - b)[Math.floor(runs / 2)]!;
       };
-      const plain = await measure("select count(*) from app_families");
+      const plain = await measure("select count(*) from families");
       const checked = await measure(
-        "select count(*) from app_families where current_session_is_active() and has_core_scope(organization_id, scope_id)",
+        "select count(*) from families where current_session_is_active() and directory_reaches_family(organization_id, id)",
       );
       const overhead = checked - plain;
       report(

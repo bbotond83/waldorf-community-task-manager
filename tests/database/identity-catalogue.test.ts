@@ -87,6 +87,141 @@ export const ELEVATED: Record<
   operator_first_super_admin: INTERNAL,
   // U2: the password-verification hook, executable only by the sign-in service's own database role
   password_verification_hook: "auth_admin",
+  // U3 Directory and Settings: the reach helpers the policies call, the actor's family (internal), the
+  // optional profile read, and the checked change functions of signed-in admins (BR32.6)
+  directory_actor_family: INTERNAL,
+  directory_is_family_parent: "authenticated",
+  directory_in_organization: "authenticated",
+  directory_is_admin: "authenticated",
+  directory_reaches_family: "authenticated",
+  directory_group_visible: "authenticated",
+  directory_school_year_visible: "authenticated",
+  directory_can_read_contact: "authenticated",
+  directory_parent_profile: "authenticated",
+  directory_save: "authenticated",
+  structure_save: "authenticated",
+  directory_archive_item: "authenticated",
+  directory_restore_item: "authenticated",
+  settings_get: "authenticated",
+  settings_save: "authenticated",
+  // U3 Coordination: the reach helpers of its policies, the capacity trigger (a deferred trigger that
+  // runs at commit as the owner), and the event, task and note functions
+  coordination_task_reached: "authenticated",
+  coordination_assignment_reached: "authenticated",
+  coordination_assignment_family_parent: "authenticated",
+  assignments_check_capacity: INTERNAL,
+  event_save: "authenticated",
+  event_save_notes: "authenticated",
+  task_save: "authenticated",
+  contribution_save: "authenticated",
+  // U3 kernel use cases (BR32.6). Why each is elevated:
+  //  duty_list, duty_get, duty_sign_up: a parent reads no task or event table, so the list, detail and
+  //    sign-up read Directory memberships and Coordination tasks for the parent's own family only;
+  //  assignment_assign, assignment_remove: admin placements that read memberships by typed id;
+  //  swap_candidates, swap_incoming: show another family's task title, date and display name;
+  //  swap_request, swap_respond, swap_withdraw, cancellation_request: change two families' assignments;
+  //  swap_decide, cancellation_decide: an admin's decision, with the approval audit event;
+  //  family_archive, family_restore: Directory records plus Coordination assignments and requests;
+  //  dashboard_get: counts across Coordination for an admin's reach;
+  //  governance_revoke: U2's grant functions plus the self-lockout check;
+  //  schedule_get: the teacher schedule shows several families' display names to a teacher, who reads
+  //    none of the tables;
+  //  lifecycle_list, lifecycle_run: delete or anonymize a family across both blocks.
+  coordination_reach_groups: "authenticated",
+  coordination_reach_task_ids: "authenticated",
+  coordination_my_family: "authenticated",
+  coordination_duty_view: INTERNAL,
+  duty_list: "authenticated",
+  duty_get: "authenticated",
+  duty_sign_up: "authenticated",
+  assignment_assign: "authenticated",
+  assignment_remove: "authenticated",
+  coordination_decide: INTERNAL,
+  swap_candidates: "authenticated",
+  swap_request: "authenticated",
+  swap_respond: "authenticated",
+  swap_incoming: "authenticated",
+  swap_withdraw: "authenticated",
+  cancellation_request: "authenticated",
+  swap_decide: "authenticated",
+  cancellation_decide: "authenticated",
+  family_archive: "authenticated",
+  family_restore: "authenticated",
+  invitation_accept_parent: INTERNAL,
+  dashboard_import_conflicts: INTERNAL,
+  dashboard_get: "authenticated",
+  governance_revoke: "authenticated",
+  //  governance_list: shows other accounts' authorization versions (their only reader is the account
+  //    itself), which the revoke needs; super admins only (added by the database adapters, step 24);
+  governance_list: "authenticated",
+  lifecycle_blockers: INTERNAL,
+  lifecycle_list: "authenticated",
+  lifecycle_run: "authenticated",
+  schedule_get: "authenticated",
+  // U4 Notifications (BR42.4). Why each is elevated:
+  //  notification_actor_parent: the reader of the notification policies (the parent row linked to the account);
+  //  notification_list, notification_mark_read: a parent reads only their own notices, and the title and link are
+  //    built from the task and the request, which the parent reads through no table;
+  //  reminder_list, reminder_retry: an admin sees and retries reminder jobs, which no role reads as a table;
+  //  reminder_run_due: the lazy simulated tick, callable by any member of the organization for their own
+  //    organization; reminder_run_due_system is the same tick for the system caller (service-role key);
+  //  reminder_plan and the helpers around it: the planner that the U3 use cases call inside their transaction.
+  notification_actor_parent: "authenticated",
+  notification_list: "authenticated",
+  notification_mark_read: "authenticated",
+  reminder_list: "authenticated",
+  reminder_retry: "authenticated",
+  reminder_run_due: "authenticated",
+  reminder_run_due_system: "service_role",
+  reminder_setting_for: INTERNAL,
+  reminder_plan: INTERNAL,
+  reminder_plan_tasks: INTERNAL,
+  reminder_plan_organization: INTERNAL,
+  reminder_family_tasks: INTERNAL,
+  reminder_run_jobs: INTERNAL,
+  //  the notice and job writes inside the use cases of U3's hand-off list (BR40.9): each use case keeps its name
+  //    and signature and calls its renamed core (internal, the unchanged function of U3) and then the helper that
+  //    writes the notices and re-plans the reminders, all in the caller's transaction.
+  notification_notify_family: INTERNAL,
+  notification_after_place_added: INTERNAL,
+  notification_after_place_removed: INTERNAL,
+  notification_after_swap_request: INTERNAL,
+  notification_after_swap_response: INTERNAL,
+  notification_after_decision: INTERNAL,
+  notification_after_lifecycle: INTERNAL,
+  duty_sign_up_core: INTERNAL,
+  assignment_assign_core: INTERNAL,
+  assignment_remove_core: INTERNAL,
+  swap_request_core: INTERNAL,
+  swap_respond_core: INTERNAL,
+  coordination_decide_core: INTERNAL,
+  family_archive_core: INTERNAL,
+  task_save_core: INTERNAL,
+  event_save_core: INTERNAL,
+  settings_save_core: INTERNAL,
+  lifecycle_run_core: INTERNAL,
+  // U4 Import (BR42.4). Why each is elevated:
+  //  import_run_reached: the reader of the import policies (the super admin who started the run), called by the
+  //    policies of the run's rows, staged rows and conflicts;
+  //  import_preview_create, import_conflict_resolve, import_commit, import_recover, import_status, import_cancel,
+  //    import_mark_interrupted: the super admin's import use cases. They read and write the staged workbook rows
+  //    (personal data no role reads as a table except the starting super admin), match them against Directory and
+  //    Coordination by typed ids and contact e-mail addresses, and apply them through U3's save functions;
+  //  import_expire: a super admin of the organization marks runs older than seven days expired and deletes their
+  //    staged rows; import_expire_system is the same sweep for the system caller (seed, reset, housekeeping,
+  //    through the service-role key);
+  //  the other import_* functions (match, apply, model, helpers) are plain internal functions of the owner that only
+  //  these call; they are not security definer and no application role executes them.
+  import_run_reached: "authenticated",
+  import_preview_create: "authenticated",
+  import_conflict_resolve: "authenticated",
+  import_commit: "authenticated",
+  import_recover: "authenticated",
+  import_status: "authenticated",
+  import_cancel: "authenticated",
+  import_mark_interrupted: "authenticated",
+  import_expire: "authenticated",
+  import_expire_system: "service_role",
 };
 
 /** Tables with row-level security and the test that covers each (NFR1.2): fails when one has no entry. */
@@ -95,14 +230,37 @@ const POLICY_TEST_COVERAGE: Record<string, string> = {
   invitations: "identity-session.test.ts (policy matrix)",
   app_role_grants: "identity-session.test.ts (policy matrix)",
   app_authorization_versions: "identity-session.test.ts (policy matrix)",
-  app_families: "identity-session.test.ts (policy matrix)",
-  app_assignments: "identity-session.test.ts (policy matrix)",
   app_import_runs: "identity-session.test.ts (policy matrix)",
   audit_events: "identity-session.test.ts (policy matrix)",
   app_role_conversion_evidence: "identity-catalogue.test.ts (this file)",
   sign_in_attempts: "identity-lockout.test.ts (no access for any role)",
   idempotency_records: "migrations.test.ts (no access for any role)",
   lifecycle_holds: "migrations.test.ts (no access for any role)",
+  organizations: "directory-schema.test.ts (role matrix)",
+  school_years: "directory-schema.test.ts (role matrix)",
+  groups: "directory-schema.test.ts (role matrix)",
+  families: "directory-schema.test.ts (role matrix) and identity-session.test.ts (policy matrix)",
+  group_memberships: "directory-schema.test.ts (role matrix)",
+  parents: "directory-schema.test.ts (role matrix)",
+  parent_contacts: "directory-schema.test.ts (role matrix)",
+  children: "directory-schema.test.ts (role matrix)",
+  organization_settings: "directory-schema.test.ts (settings matrix)",
+  reminder_settings: "directory-schema.test.ts (settings matrix)",
+  events: "coordination-schema.test.ts (role matrix)",
+  tasks: "coordination-schema.test.ts (role matrix)",
+  assignments:
+    "coordination-schema.test.ts (role matrix) and identity-session.test.ts (policy matrix)",
+  change_requests: "coordination-schema.test.ts (role matrix)",
+  contribution_notes: "coordination-schema.test.ts (role matrix)",
+  notifications: "notifications-schema.test.ts (role matrix)",
+  reminder_jobs: "notifications-schema.test.ts (no policy: no direct access for any role)",
+  reminder_recipients: "notifications-schema.test.ts (no policy: no direct access for any role)",
+  reminder_attempts: "notifications-schema.test.ts (no policy: no direct access for any role)",
+  sheet_registry: "import-schema.test.ts (role matrix)",
+  import_runs: "import-schema.test.ts (role matrix)",
+  import_rows: "import-schema.test.ts (role matrix)",
+  import_staged_rows: "import-schema.test.ts (role matrix: only the starting super admin)",
+  import_conflicts: "import-schema.test.ts (role matrix)",
 };
 
 /**
@@ -111,8 +269,8 @@ const POLICY_TEST_COVERAGE: Record<string, string> = {
  * Still to register by their units: parent, task, event, change request, notification.
  */
 const PROBE_DECISION: Record<string, string> = {
-  app_families: "family",
-  app_assignments: "assignment",
+  families: "family",
+  assignments: "assignment",
   app_import_runs: "import_run",
   accounts: "none: identity record, never a detail screen of the probe",
   invitations: "none: managed through the admin functions",
@@ -123,6 +281,31 @@ const PROBE_DECISION: Record<string, string> = {
   sign_in_attempts: "none: no application access",
   idempotency_records: "none: no application access",
   lifecycle_holds: "none: no application access",
+  // U3 tables: the family and assignment branches of scope_probe read families and assignments (step 21).
+  organizations: "none: U3 table, no probe branch needed",
+  school_years: "none: U3 table, no probe branch needed",
+  groups: "none: U3 table, no probe branch needed",
+  group_memberships: "none: U3 table, never a detail screen",
+  parents: "none: U3 table, never a detail screen",
+  parent_contacts: "none: U3 table, never a detail screen",
+  children: "none: U3 table, probe branch comes with the rewrite of scope_probe",
+  organization_settings: "none: U3 table, never a detail screen",
+  reminder_settings: "none: U3 table, never a detail screen",
+  events: "none: U3 table, probe branch comes with the rewrite of scope_probe",
+  tasks: "none: U3 table, probe branch comes with the rewrite of scope_probe",
+  change_requests: "none: U3 table, probe branch comes with the rewrite of scope_probe",
+  contribution_notes: "none: U3 table, never a detail screen",
+  // U4 tables: a notification, a reminder job and its rows are never a detail screen of the probe.
+  notifications: "none: U4 table, never a detail screen",
+  reminder_jobs: "none: U4 table, never a detail screen",
+  reminder_recipients: "none: U4 table, never a detail screen",
+  reminder_attempts: "none: U4 table, never a detail screen",
+  // U4 import tables: a run, its rows, staged rows and conflicts are read through the import functions only.
+  sheet_registry: "none: U4 table, a fixed list, never a detail screen",
+  import_runs: "none: U4 table, read through import_status, never a detail screen of the probe",
+  import_rows: "none: U4 table, never a detail screen",
+  import_staged_rows: "none: U4 table, personal data, never a detail screen",
+  import_conflicts: "none: U4 table, never a detail screen",
 };
 
 for (const schema of IDENTITY_SCHEMAS) {

@@ -9,10 +9,26 @@ const syntheticConfigSchema = z.object({
     .default("waldorf-local-v1"),
 });
 
+const LOOPBACK_HOSTS: ReadonlySet<string> = new Set(["127.0.0.1", "localhost", "[::1]"]);
+
+/**
+ * The database address: https anywhere, or http only on the machine itself (FR1.3), so the production
+ * build can run against the local database stack and never sends traffic unencrypted over a network.
+ */
+function isAcceptableDatabaseAddress(value: string): boolean {
+  try {
+    const parsed = new URL(value);
+    if (parsed.protocol === "https:") return parsed.hostname.length > 0;
+    return parsed.protocol === "http:" && LOOPBACK_HOSTS.has(parsed.hostname);
+  } catch {
+    return false;
+  }
+}
+
 const productionConfigSchema = z.object({
   APP_RUNTIME_MODE: z.literal("production"),
   APP_SESSION_SECRET: z.string().min(32),
-  SUPABASE_URL: z.string().url().startsWith("https://"),
+  SUPABASE_URL: z.string().url().refine(isAcceptableDatabaseAddress),
   SUPABASE_ANON_KEY: z.string().min(20),
 });
 

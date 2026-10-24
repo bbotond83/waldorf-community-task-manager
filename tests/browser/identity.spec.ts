@@ -53,11 +53,26 @@ test.beforeAll(async () => {
   await lockSchemas(db, [SCHEMA]);
   await prepareSchema(db, SCHEMA);
   await db.query(`set search_path to "${SCHEMA}", pg_catalog`);
-  await db.query("insert into app_families (id, organization_id, scope_id) values ($1, $2, $3)", [
-    FAMILY,
+  const YEAR = "cccccccc-0000-4000-8000-000000000501";
+  await db.query("insert into organizations (id, name) values ($1, 'Teszt iskola')", [
     ORGANIZATION,
-    GROUP,
   ]);
+  await db.query(
+    "insert into school_years (id, organization_id, name, starts_on, ends_on) values ($1, $2, '2026/2027', '2026-09-01', '2027-06-30')",
+    [YEAR, ORGANIZATION],
+  );
+  await db.query(
+    "insert into groups (id, organization_id, school_year_id, name) values ($1, $2, $3, 'Boróka')",
+    [GROUP, ORGANIZATION, YEAR],
+  );
+  await db.query(
+    "insert into families (id, organization_id, display_name) values ($1, $2, 'Fenyő család')",
+    [FAMILY, ORGANIZATION],
+  );
+  await db.query(
+    "insert into group_memberships (organization_id, family_id, group_id) values ($1, $2, $3)",
+    [ORGANIZATION, FAMILY, GROUP],
+  );
 });
 test.afterAll(async () => {
   await db.end();

@@ -51,7 +51,8 @@ export class TeacherApplicationFacade {
           if (
             outcome.state === "empty" ||
             outcome.state === "denied" ||
-            outcome.state === "invalidated"
+            outcome.state === "invalidated" ||
+            outcome.state === "validation"
           )
             return outcome;
           throw new Error("Unsupported tracking outcome");

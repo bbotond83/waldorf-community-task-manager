@@ -33,6 +33,7 @@ describe("profile login measurement boundary", () => {
     expect([...permittedNavigationIds(SYNTHETIC_PROFILES[0])]).toEqual([
       "parent-notifications",
       "parent-duties",
+      "parent-swaps",
     ]);
     expect([...permittedNavigationIds(SYNTHETIC_PROFILES[1])]).toEqual([]);
   });
@@ -153,6 +154,32 @@ describe("runtime configuration", () => {
     });
     expect(result.ok).toBe(true);
     if (result.ok) expect(result.value.mode).toBe("production");
+  });
+
+  it("accepts an http database address only on the machine itself", () => {
+    const base = {
+      APP_RUNTIME_MODE: "production",
+      APP_SESSION_SECRET: "a-production-only-secret-with-32-chars",
+      SUPABASE_ANON_KEY: "placeholder-anon-key-value",
+    };
+    for (const address of [
+      "http://127.0.0.1:54321",
+      "http://localhost:54321",
+      "http://[::1]:54321",
+    ]) {
+      expect(validateRuntimeConfig({ ...base, SUPABASE_URL: address }).ok).toBe(true);
+    }
+    for (const address of [
+      "http://example.supabase.co",
+      "http://192.168.1.20:54321",
+      "http://localhost.evil.example",
+      "ftp://127.0.0.1",
+      "not a url",
+    ]) {
+      const result = validateRuntimeConfig({ ...base, SUPABASE_URL: address });
+      expect(result.ok).toBe(false);
+      if (!result.ok) expect(result.error.variable).toBe("SUPABASE_URL");
+    }
   });
 
   it("names only the first invalid production variable", () => {

@@ -50,7 +50,7 @@ const coreCases = [
   ["restoreRecordAction", { id: "family-napraforgo" }, "success"],
   ["saveTaskAction", { id: "task-kert" }, "success"],
   ["assignTaskAction", { id: "task-kert" }, "success"],
-  ["decideApprovalAction", { id: "approval-csere" }, "success"],
+  ["decideApprovalAction", { id: "approval-csere", decision: "approved" }, "success"],
   [
     "saveEventNotesAction",
     { id: "event-lampa", expectedVersion: "2", allergenNote: " Invented note " },
@@ -131,9 +131,31 @@ it.each([
   ["terminal", "terminal"],
 ])("maps approval %s to a distinct outcome", async (scenario, state) => {
   signIn("super-admin-local");
-  const result = await core.decideApprovalAction(initial, form({ id: "approval-csere", scenario }));
+  const result = await core.decideApprovalAction(
+    initial,
+    form({ id: "approval-csere", decision: "approved", scenario }),
+  );
   expect(result.state).toBe(state);
   expect(result.outcome).toBe(state);
+});
+it("refuses a missing or unknown approval decision before anything is decided (fail closed)", async () => {
+  signIn("super-admin-local");
+  for (const values of [
+    { id: "approval-csere" } as Record<string, string>,
+    { id: "approval-csere", decision: "" },
+    { id: "approval-csere", decision: "approve" },
+    { id: "approval-csere", decision: "Rejected" },
+  ]) {
+    const result = await core.decideApprovalAction(initial, form(values));
+    expect(result.state).toBe("validation");
+    expect(result.fieldErrors?.decision).toBeTruthy();
+  }
+  expect(boundary.revalidate).not.toHaveBeenCalled();
+  // The request is still open: a valid decision afterwards works.
+  expect(
+    (await core.decideApprovalAction(initial, form({ id: "approval-csere", decision: "approved" })))
+      .state,
+  ).toBe("success");
 });
 it("distinguishes rejected and already-decided approvals", async () => {
   signIn("super-admin-local");
@@ -147,6 +169,7 @@ it("distinguishes rejected and already-decided approvals", async () => {
         initial,
         form({
           id: "approval-lezart",
+          decision: "approved",
           expectedVersion: "2",
           idempotencyKey: "coverage:closed:0001",
         }),

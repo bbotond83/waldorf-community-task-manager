@@ -1,5 +1,5 @@
 import { grantAllows, isAuthorizationVersion, isRoleScope } from "../access/role-policy.ts";
-import type { Role, Scope } from "../access/index.ts";
+import type { AuthorizationAction, Role, Scope } from "../access/index.ts";
 import type {
   ApplicationResult,
   AuthorizationMatrixRowId,
@@ -11,7 +11,7 @@ import type {
 } from "./contracts.ts";
 import { denied, invalidated, success } from "./results.ts";
 
-export type ApplicationAction = "read" | "create" | "update" | "delete" | "manage";
+export type ApplicationAction = AuthorizationAction;
 
 export type AuthorizationRequest = Readonly<{
   matrixRowId: AuthorizationMatrixRowId;
@@ -44,7 +44,7 @@ export const AUTHORIZATION_MATRIX: readonly MatrixRow[] = Object.freeze([
   {
     id: "AUTH-PARENT-DUTIES",
     roles: ["parent"],
-    actions: ["read", "create", "update"],
+    actions: ["read", "create", "update", "respond", "withdraw"],
     resources: ["family", "assignment", "swap_request", "cancellation_request", "contribution"],
     fields: DISPLAY_NAME_FIELDS,
     navigation: { id: "parent-duties", label: "Feladatok", href: "/szulo/feladatok" },

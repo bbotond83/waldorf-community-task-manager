@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { AppShell } from "../../src/runtime/AppShell.tsx";
+import { shellHeaderAction } from "../_identity/shell-action.tsx";
 import { ParentAccessState } from "./_components/ParentAccessState.tsx";
 import { resolveParentSession } from "./_lib/session.ts";
 
@@ -15,5 +16,9 @@ export default async function ParentLayout({ children }: Readonly<{ children: Re
       />
     );
   }
-  return <AppShell profile={session.data.profile}>{children}</AppShell>;
+  return (
+    <AppShell profile={session.data.profile} headerAction={await shellHeaderAction()}>
+      {children}
+    </AppShell>
+  );
 }

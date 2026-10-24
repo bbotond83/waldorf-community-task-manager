@@ -1,0 +1,350 @@
+{
+  "stage": "infrastructure-design",
+  "unit": "u4-notifications-and-import",
+  "upstream_ids": [
+    "NFR1.43",
+    "NFR1.44",
+    "NFR1.45",
+    "NFR1.46",
+    "NFR1.47",
+    "NFR1.48",
+    "NFR1.49",
+    "NFR1.50",
+    "NFR1.51",
+    "NFR1.52",
+    "NFR1.53",
+    "NFR1.54",
+    "NFR1.55",
+    "NFR1.56",
+    "NFR1.57",
+    "NFR1.58",
+    "NFR1.59",
+    "NFR1.60",
+    "NFR1.61",
+    "NFR1.62",
+    "NFR2.18",
+    "NFR2.19",
+    "NFR2.20",
+    "NFR2.21",
+    "NFR2.22",
+    "NFR2.23",
+    "NFR2.24",
+    "NFR2.25",
+    "NFR2.26",
+    "NFR2.27",
+    "NFR3.12",
+    "NFR3.13",
+    "NFR3.14",
+    "NFR3.15",
+    "NFR3.16",
+    "NFR3.17",
+    "NFR4.10",
+    "NFR4.11",
+    "NFR4.12",
+    "NFR4.13",
+    "NFR4.14",
+    "NFR4.15",
+    "NFR4.16",
+    "NFR5.6",
+    "NFR5.7",
+    "NFR6.17",
+    "NFR6.18",
+    "NFR6.19",
+    "NFR6.20",
+    "NFR6.21",
+    "NFR6.22",
+    "NFR6.23",
+    "NFR6.24",
+    "NFR6.25",
+    "NFR6.26",
+    "NFR7.4",
+    "NFR8.3"
+  ],
+  "coverage": [
+    {
+      "id": "NFR1.43",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 3 (database tests): role matrix"
+    },
+    {
+      "id": "NFR1.44",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 3 (database tests): staged-row privacy"
+    },
+    {
+      "id": "NFR1.45",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 3 (database tests): role tests per function"
+    },
+    {
+      "id": "NFR1.46",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 3 (database tests): history-leak search"
+    },
+    {
+      "id": "NFR1.47",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 3 (database tests): expiry test"
+    },
+    {
+      "id": "NFR1.48",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 4 (parser and adapter tests): hostile workbook cases"
+    },
+    {
+      "id": "NFR1.49",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 1 (dependency audit) and stage 5 (bundle scan after the build)"
+    },
+    {
+      "id": "NFR1.50",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 4 (parser and adapter tests): path guard"
+    },
+    {
+      "id": "NFR1.51",
+      "status": "OK",
+      "target": "infrastructure-specification.md Database Changes: functions and catalogue; cicd-pipeline.md stage 3 (database tests)"
+    },
+    {
+      "id": "NFR1.52",
+      "status": "OK",
+      "target": "infrastructure-specification.md Database Changes: privilege revokes"
+    },
+    {
+      "id": "NFR1.53",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 3 (database tests): cross-organization isolation"
+    },
+    {
+      "id": "NFR1.54",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 3 (database tests): commit re-match tests"
+    },
+    {
+      "id": "NFR1.55",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 3: audit-details shape test; stage 4: output scan"
+    },
+    {
+      "id": "NFR1.56",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 3 (database tests): lifecycle cleanup"
+    },
+    {
+      "id": "NFR1.57",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 4 (parser and adapter tests): markup-injection test"
+    },
+    {
+      "id": "NFR1.58",
+      "status": "OK",
+      "target": "monitoring-design.md Alerts and Logs and Tracing"
+    },
+    {
+      "id": "NFR1.59",
+      "status": "OK",
+      "target": "monitoring-design.md Logs and Tracing; cicd-pipeline.md stage 4 (parser and adapter tests): output scan"
+    },
+    {
+      "id": "NFR1.60",
+      "status": "OK",
+      "target": "monitoring-design.md Logs and Tracing: audit only the import commit"
+    },
+    {
+      "id": "NFR1.61",
+      "status": "OK",
+      "target": "monitoring-design.md Alerts"
+    },
+    {
+      "id": "NFR1.62",
+      "status": "OK",
+      "target": "monitoring-design.md Logs and Tracing: reminders screen"
+    },
+    {
+      "id": "NFR2.18",
+      "status": "OK",
+      "target": "infrastructure-specification.md Deployment: infrastructure as code"
+    },
+    {
+      "id": "NFR2.19",
+      "status": "OK",
+      "target": "infrastructure-specification.md Application Configuration: package.json"
+    },
+    {
+      "id": "NFR2.20",
+      "status": "OK",
+      "target": "infrastructure-specification.md Application Configuration: next.config.ts; cicd-pipeline.md stage 4 (parser and adapter tests): upload size tests"
+    },
+    {
+      "id": "NFR2.21",
+      "status": "OK",
+      "target": "infrastructure-specification.md Database Changes: the named functions"
+    },
+    {
+      "id": "NFR2.22",
+      "status": "OK",
+      "target": "infrastructure-specification.md Deployment: Scheduler"
+    },
+    {
+      "id": "NFR2.23",
+      "status": "OK",
+      "target": "covered by the code-generation plan (adapters in src/data/); cicd-pipeline.md stage 4 (parser and adapter tests)"
+    },
+    {
+      "id": "NFR2.24",
+      "status": "OK",
+      "target": "infrastructure-specification.md Test Data"
+    },
+    {
+      "id": "NFR2.25",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 7 (coverage) and Stage to Gate Mapping"
+    },
+    {
+      "id": "NFR2.26",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 3 (database tests): contract and deletion proofs"
+    },
+    {
+      "id": "NFR2.27",
+      "status": "OK",
+      "target": "infrastructure-specification.md Application Configuration: lint lists; cicd-pipeline.md Files That Change"
+    },
+    {
+      "id": "NFR3.12",
+      "status": "OK",
+      "target": "infrastructure-specification.md Test Data; cicd-pipeline.md stage 3: data-set load test"
+    },
+    {
+      "id": "NFR3.13",
+      "status": "OK",
+      "target": "infrastructure-specification.md Database Changes: indexes; cicd-pipeline.md stage 3: index catalogue test"
+    },
+    {
+      "id": "NFR3.14",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 3 (database tests): races"
+    },
+    {
+      "id": "NFR3.15",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 3 (database tests): lock-order test"
+    },
+    {
+      "id": "NFR3.16",
+      "status": "OK",
+      "target": "cicd-pipeline.md Files That Change: shuffled-tests list; stage 3 shuffled run"
+    },
+    {
+      "id": "NFR3.17",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 3 (database tests): expiry and lifecycle tests"
+    },
+    {
+      "id": "NFR4.10",
+      "status": "OK",
+      "target": "monitoring-design.md Metrics"
+    },
+    {
+      "id": "NFR4.11",
+      "status": "OK",
+      "target": "monitoring-design.md Metrics"
+    },
+    {
+      "id": "NFR4.12",
+      "status": "OK",
+      "target": "monitoring-design.md Metrics"
+    },
+    {
+      "id": "NFR4.13",
+      "status": "OK",
+      "target": "monitoring-design.md Metrics"
+    },
+    {
+      "id": "NFR4.14",
+      "status": "OK",
+      "target": "monitoring-design.md Metrics: U3 timings re-run"
+    },
+    {
+      "id": "NFR4.15",
+      "status": "OK",
+      "target": "monitoring-design.md Metrics: U2 access-check overhead"
+    },
+    {
+      "id": "NFR4.16",
+      "status": "OK",
+      "target": "monitoring-design.md Metrics: maximum workbook"
+    },
+    {
+      "id": "NFR5.6",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 6 (browser and accessibility): accessibility scan on every import step"
+    },
+    {
+      "id": "NFR5.7",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 6: Hungarian copy and label checks"
+    },
+    {
+      "id": "NFR6.17",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 3 (database tests): migration repeatability"
+    },
+    {
+      "id": "NFR6.18",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 3 (database tests): per-use-case failure-injection tests"
+    },
+    {
+      "id": "NFR6.19",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 3 (database tests): atomicity and recovery"
+    },
+    {
+      "id": "NFR6.20",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 3 (database tests): idempotency tests"
+    },
+    {
+      "id": "NFR6.21",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 3 (database tests): stale-version tests"
+    },
+    {
+      "id": "NFR6.22",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 3 (database tests): tick tests"
+    },
+    {
+      "id": "NFR6.23",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 4 (parser and adapter tests): fake-client adapter tests"
+    },
+    {
+      "id": "NFR6.24",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 6 (browser and accessibility): real parent and admin"
+    },
+    {
+      "id": "NFR6.25",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 3 (database tests): hand-off completeness"
+    },
+    {
+      "id": "NFR6.26",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 3 (database tests): commit tests (no notices, jobs planned)"
+    },
+    {
+      "id": "NFR7.4",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 6 (browser and accessibility) and the existing browser tests staying unchanged"
+    },
+    {
+      "id": "NFR8.3",
+      "status": "OK",
+      "target": "covered by the code-generation plan (English identifiers, Hungarian copy)"
+    }
+  ]
+}

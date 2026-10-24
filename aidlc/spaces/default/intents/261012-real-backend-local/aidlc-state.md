@@ -25,7 +25,7 @@
 - **Sensors**: on (from scope classic)
 - **Learnings**: on (from scope classic)
 - **Summary Confirmation**: on (set by a command)
-- **Plan Approval**: on (from scope classic)
+- **Plan Approval**: off (set by you)
 - **Collaborators**: on (set by a command)
 
 ## Workspace State
@@ -50,6 +50,48 @@
 - **Unit Ownership**: solo
 
 - **Skeleton Stance**: scope-dependent
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -136,7 +178,9 @@ Per unit: [TBD]
 - **Current Stage**: functional-design
 - **Next Stage**: nfr-requirements
 - **Status**: Running
-- **Last Updated**: 2026-10-13T12:53:47Z
+- **Last Updated**: 2026-10-24T04:23:36Z
+
+- **Construction Autonomy Mode**: autonomous
 
 ## Session Resume Point
 - **Last Completed Stage**: delivery-planning

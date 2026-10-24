@@ -1,4 +1,5 @@
 import { ParentMutationForm } from "../../../_components/ParentMutationForm.tsx";
+import { isProductionMode } from "../../../../_identity/production-request.ts";
 import { pendingRequests } from "../../../../../src/parent-web/notification-context.ts";
 import { PendingRequestPanel } from "../../../_components/PendingRequestNotice.tsx";
 import { ParentStatePanel } from "../../../_components/ParentStatePanel.tsx";
@@ -18,6 +19,7 @@ export default async function CancellationRequestPage({
   const session = await resolveParentSession();
   const facade = await resolveParentFacade();
   if (session.state !== "success" || !facade) return null;
+  const production = await isProductionMode();
   const result = await facade.getDuty(session.data.applicationSession, {
     familyScope: session.data.familyScope,
     familyId: session.data.familyId,
@@ -41,6 +43,7 @@ export default async function CancellationRequestPage({
               submitLabel="Lemondási kérelem elküldése"
               testId="cancellation-request-form"
               alreadyDone={pendingRequests(duty).any}
+              freshIdempotencyKey={production}
               afterSuccess={
                 <PendingRequestPanel
                   pending={

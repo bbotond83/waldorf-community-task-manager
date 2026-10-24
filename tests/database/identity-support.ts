@@ -41,7 +41,11 @@ export const GROUP_2 = uuid(102);
 export const FAMILY_1 = uuid(201);
 export const FAMILY_2 = uuid(202);
 export const ASSIGNMENT_1 = uuid(301);
+export const TASK_OF_ASSIGNMENT_1 = uuid(302);
 export const IMPORT_RUN_1 = uuid(401);
+export const YEAR_1 = uuid(501);
+export const PARENT_ROW_F1 = uuid(601);
+export const PARENT_ROW_F2 = uuid(603);
 
 export const ADMIN_G1 = "bbbbbbbb-0000-4000-8000-000000000011";
 export const ADMIN_G2 = "bbbbbbbb-0000-4000-8000-000000000012";
@@ -63,8 +67,15 @@ export type IdentityContext = {
 /** Opens a connection bound to a schema, migrated and emptied, with the identity world seeded. */
 export async function openIdentityDatabase(schema: string): Promise<pg.Client> {
   const db = await openDatabase();
-  await lockSchemas(db, [schema]);
-  await prepareSchema(db, schema);
+  try {
+    await lockSchemas(db, [schema]);
+    await prepareSchema(db, schema);
+  } catch (error) {
+    // A connection that holds the schema lock must never outlive a failed start: nothing else would release
+    // it (the caller has no client to end), and every other test file waiting for the schema would hang.
+    await db.end().catch(() => undefined);
+    throw error;
+  }
   return db;
 }
 
@@ -84,13 +95,31 @@ export async function seedIdentityWorld(db: pg.Client, schema: string): Promise<
   await ensureAccount(db, { id: PARENT_F2, organization: ORGANIZATION });
   await ensureAccount(db, { id: DEACTIVATED, organization: ORGANIZATION, status: "deactivated" });
   await ensureAccount(db, { id: SIGNED_OUT, organization: ORGANIZATION, withoutSession: true });
+  // The structure the access rules read (U3 step 21): the two organizations, a school year, the two groups, a
+  // family in each group and the parents linked to the two parent accounts.
   await db.query(
-    "insert into app_families (id, organization_id, scope_id) values ($1, $3, $4), ($2, $3, $5)",
-    [FAMILY_1, FAMILY_2, ORGANIZATION, GROUP_1, GROUP_2],
+    "insert into organizations (id, name) values ($1, 'Test iskola'), ($2, 'Másik iskola')",
+    [ORGANIZATION, OTHER_ORGANIZATION],
   );
   await db.query(
-    "insert into app_assignments (id, organization_id, scope_id) values ($1, $2, $3)",
-    [ASSIGNMENT_1, ORGANIZATION, GROUP_1],
+    "insert into school_years (id, organization_id, name, starts_on, ends_on) values ($1, $2, '2026/2027', '2026-09-01', '2027-06-30')",
+    [YEAR_1, ORGANIZATION],
+  );
+  await db.query(
+    "insert into groups (id, organization_id, school_year_id, name) values ($1, $3, $4, 'Boróka'), ($2, $3, $4, 'Napraforgó')",
+    [GROUP_1, GROUP_2, ORGANIZATION, YEAR_1],
+  );
+  await db.query(
+    "insert into families (id, organization_id, display_name) values ($1, $3, 'Fenyő család'), ($2, $3, 'Napraforgó család')",
+    [FAMILY_1, FAMILY_2, ORGANIZATION],
+  );
+  await db.query(
+    "insert into group_memberships (organization_id, family_id, group_id) values ($1, $2, $3), ($1, $4, $5)",
+    [ORGANIZATION, FAMILY_1, GROUP_1, FAMILY_2, GROUP_2],
+  );
+  await db.query(
+    "insert into parents (id, organization_id, family_id, display_name, account_id, optional_profile, optional_profile_consent) values ($1, $3, $4, 'Fenyő Anna', $5, 'Szívesen főzök.', true), ($2, $3, $6, 'Napraforgó Csilla', $7, null, false)",
+    [PARENT_ROW_F1, PARENT_ROW_F2, ORGANIZATION, FAMILY_1, PARENT_F1, FAMILY_2, PARENT_F2],
   );
   await db.query(
     "insert into app_import_runs (id, organization_id, scope_id) values ($1, $2, $2)",
@@ -110,6 +139,23 @@ export async function seedIdentityWorld(db: pg.Client, schema: string): Promise<
   await grant(SIGNED_OUT, "parent", "family", FAMILY_1);
   await db.query(
     "insert into app_authorization_versions (subject_id, authorization_version) select subject_id, 1 from app_role_grants on conflict do nothing",
+  );
+}
+
+/**
+ * One assignment on a task of the first group, held by the second family (a place whose group reach is its
+ * task's group, entities.md): the access tests that used the placeholder assignment table read it. Not part
+ * of the shared world, so the directory tests that count assignments are unaffected.
+ */
+export async function seedGroupAssignment(db: pg.Client): Promise<void> {
+  await db.query(
+    `insert into tasks (id, organization_id, group_id, title, capacity, starts_at, ends_at, location)
+     values ($1, $2, $3, 'Hozzáférési próba', 2, now() + interval '10 days', now() + interval '10 days 2 hours', 'Terem')`,
+    [TASK_OF_ASSIGNMENT_1, ORGANIZATION, GROUP_1],
+  );
+  await db.query(
+    "insert into assignments (id, organization_id, task_id, family_id, source) values ($1, $2, $3, $4, 'admin_assign')",
+    [ASSIGNMENT_1, ORGANIZATION, TASK_OF_ASSIGNMENT_1, FAMILY_2],
   );
 }
 

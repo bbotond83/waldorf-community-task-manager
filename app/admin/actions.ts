@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { normalizeRequiredText, validation } from "../../src/application/index.ts";
 import { mapApplicationResult } from "./_lib/action-state.ts";
+import { parseRecordExtras, parseTaskExtras } from "./_lib/record-payload.ts";
 import { resolveAdminFacade } from "./_lib/facade.ts";
 import { resolveAdminSession } from "./_lib/session.ts";
 
@@ -50,14 +51,20 @@ export async function saveRecordAction(
   if (title.state === "validation") return titleValidationState(title.fieldErrors?.title);
   const context = parseMutationContext(formData);
   if (!context.ok) return context.state;
+  const kind = stringValue(formData, "kind");
+  const extras = parseRecordExtras(kind, formData, context.value.id === "new");
+  if (Object.keys(extras.errors).length > 0) return mapApplicationResult(validation(extras.errors));
   const boundary = await resolveBoundary();
   if (!boundary.ok) return boundary.state;
   const result = await boundary.facade.saveRecord(boundary.session.applicationSession, {
     scope: boundary.session.scope,
     ...context.value,
-    payload: { title: title.data, kind: stringValue(formData, "kind") },
+    payload: { title: title.data, kind, ...extras.payload },
   });
-  if (result.state === "success") revalidatePath("/admin/nyilvantartasok");
+  if (result.state === "success") {
+    revalidatePath("/admin/nyilvantartasok");
+    if (context.value.id !== "new") revalidatePath(`/admin/nyilvantartasok/${context.value.id}`);
+  }
   return mapApplicationResult(result, "A nyilvántartás mentése sikerült.");
 }
 
@@ -83,6 +90,9 @@ export async function saveTaskAction(
   if (title.state === "validation") return titleValidationState(title.fieldErrors?.title);
   const context = parseMutationContext(formData);
   if (!context.ok) return context.state;
+  const kind = stringValue(formData, "kind") === "event" ? "event" : "task";
+  const extras = parseTaskExtras(kind, formData, context.value.id === "new");
+  if (Object.keys(extras.errors).length > 0) return mapApplicationResult(validation(extras.errors));
   const boundary = await resolveBoundary();
   if (!boundary.ok) return boundary.state;
   const result = await boundary.facade.saveTaskOrEvent(boundary.session.applicationSession, {
@@ -90,11 +100,15 @@ export async function saveTaskAction(
     ...context.value,
     payload: {
       title: title.data,
-      kind: stringValue(formData, "kind") === "event" ? "event" : "task",
+      kind,
       scenario: stringValue(formData, "scenario"),
+      ...extras.payload,
     },
   });
-  if (result.state === "success") revalidatePath("/admin/feladatok");
+  if (result.state === "success") {
+    revalidatePath("/admin/feladatok");
+    if (context.value.id !== "new") revalidatePath(`/admin/feladatok/${context.value.id}`);
+  }
   return mapApplicationResult(result, "A feladat vagy esemény mentése sikerült.");
 }
 
@@ -104,12 +118,17 @@ export async function assignTaskAction(
 ): Promise<AdminActionState> {
   const context = parseMutationContext(formData);
   if (!context.ok) return context.state;
+  // The family selector exists on the real-data form only; the synthetic form assigns the demo family.
+  const familyId = stringValue(formData, "familyId");
+  if (formData.has("familySelector") && familyId === "") {
+    return mapApplicationResult(validation({ familyId: "Válassza ki a családot." }));
+  }
   const boundary = await resolveBoundary();
   if (!boundary.ok) return boundary.state;
   const result = await boundary.facade.assign(boundary.session.applicationSession, {
     scope: boundary.session.scope,
     ...context.value,
-    payload: { scenario: stringValue(formData, "scenario") },
+    payload: { scenario: stringValue(formData, "scenario"), ...(familyId ? { familyId } : {}) },
   });
   if (result.state === "success") revalidatePath(`/admin/feladatok/${context.value.id}`);
   return mapApplicationResult(result, "A hozzárendelés sikerült.");
@@ -121,9 +140,14 @@ export async function decideApprovalAction(
 ): Promise<AdminActionState> {
   const context = parseMutationContext(formData);
   if (!context.ok) return context.state;
+  // An approval cannot be undone: only the two known words count, anything else (a missing field, a typo)
+  // is refused before anything is sent.
+  const decision = stringValue(formData, "decision");
+  if (decision !== "approved" && decision !== "rejected") {
+    return mapApplicationResult(validation({ decision: "Válasszon: jóváhagyás vagy elutasítás." }));
+  }
   const boundary = await resolveBoundary();
   if (!boundary.ok) return boundary.state;
-  const decision = stringValue(formData, "decision") === "rejected" ? "rejected" : "approved";
   const result = await boundary.facade.decideApproval(boundary.session.applicationSession, {
     scope: boundary.session.scope,
     ...context.value,

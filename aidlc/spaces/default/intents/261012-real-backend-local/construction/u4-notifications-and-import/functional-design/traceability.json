@@ -1,0 +1,21 @@
+{
+  "stage": "functional-design",
+  "unit": "u4-notifications-and-import",
+  "upstream_ids": ["FR4.4", "FR5.2", "FR7.1", "FR7.2", "FR7.3", "FR8.1", "FR11.1"],
+  "coverage": [
+    { "id": "FR4.4", "status": "OK", "target": "BR40.1, BR40.7, BR40.8, BR40.9, BR41.12, BR42.1" },
+    { "id": "FR5.2", "status": "OK", "target": "BR40.1, BR40.2, BR40.9, BR42.5" },
+    { "id": "FR7.1", "status": "OK", "target": "BR41.1, BR41.2, BR41.3, BR41.4, BR41.5, BR41.6, BR41.10, BR41.13, BR42.2" },
+    { "id": "FR7.2", "status": "OK", "target": "BR41.11" },
+    { "id": "FR7.3", "status": "OK", "target": "BR41.6, BR41.9" },
+    { "id": "FR8.1", "status": "OK", "target": "BR40.2, BR40.3, BR40.4, BR40.5, BR40.6, BR40.8" },
+    { "id": "FR11.1", "status": "OK", "target": "BR41.11" }
+  ],
+  "reverse": [
+    { "id": "BR41.7", "status": "N/A", "target": "privacy rule for the staged payload (supports FR7.1, NFR1; settles the design-review item)" },
+    { "id": "BR41.8", "status": "N/A", "target": "retention rule for staged rows (supports FR7.1, NFR1)" },
+    { "id": "BR42.3", "status": "N/A", "target": "technical rule: result codes (supports FR4.2)" },
+    { "id": "BR42.4", "status": "N/A", "target": "technical rule: policy tests per role (supports FR3.3, NFR1)" },
+    { "id": "BR43.1", "status": "N/A", "target": "carry-over rule for the old modules (supports FR4.3)" }
+  ]
+}

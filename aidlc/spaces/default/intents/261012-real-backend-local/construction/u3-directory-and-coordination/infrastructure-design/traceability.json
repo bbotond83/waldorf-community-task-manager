@@ -1,0 +1,302 @@
+{
+  "stage": "infrastructure-design",
+  "unit": "u3-directory-and-coordination",
+  "upstream_ids": [
+    "NFR1.25",
+    "NFR1.26",
+    "NFR1.27",
+    "NFR1.28",
+    "NFR1.29",
+    "NFR1.30",
+    "NFR1.31",
+    "NFR1.32",
+    "NFR1.33",
+    "NFR1.34",
+    "NFR1.35",
+    "NFR1.36",
+    "NFR1.37",
+    "NFR1.38",
+    "NFR1.39",
+    "NFR1.40",
+    "NFR1.41",
+    "NFR1.42",
+    "NFR2.10",
+    "NFR2.11",
+    "NFR2.12",
+    "NFR2.13",
+    "NFR2.14",
+    "NFR2.15",
+    "NFR2.16",
+    "NFR2.17",
+    "NFR3.5",
+    "NFR3.6",
+    "NFR3.7",
+    "NFR3.8",
+    "NFR3.9",
+    "NFR3.10",
+    "NFR3.11",
+    "NFR4.6",
+    "NFR4.7",
+    "NFR4.8",
+    "NFR4.9",
+    "NFR5.4",
+    "NFR5.5",
+    "NFR6.9",
+    "NFR6.10",
+    "NFR6.11",
+    "NFR6.12",
+    "NFR6.13",
+    "NFR6.14",
+    "NFR6.15",
+    "NFR6.16",
+    "NFR7.3",
+    "NFR8.2"
+  ],
+  "coverage": [
+    {
+      "id": "NFR1.25",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 3: policy matrix incl. co-parent over table and functions"
+    },
+    {
+      "id": "NFR1.26",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 3: policy matrix"
+    },
+    {
+      "id": "NFR1.27",
+      "status": "OK",
+      "target": "infrastructure-specification.md Database Changes: functions and catalogue entries"
+    },
+    {
+      "id": "NFR1.28",
+      "status": "OK",
+      "target": "infrastructure-specification.md Database Changes: privilege revokes"
+    },
+    {
+      "id": "NFR1.29",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 3: policy matrix per read path incl. schedule"
+    },
+    {
+      "id": "NFR1.30",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 3: schedule privacy shape test"
+    },
+    {
+      "id": "NFR1.31",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 3: cross-organization isolation test"
+    },
+    {
+      "id": "NFR1.32",
+      "status": "OK",
+      "target": "infrastructure-specification.md Database Changes: rewritten U2 functions; cicd-pipeline.md stage 3 existing database-identity step"
+    },
+    {
+      "id": "NFR1.33",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 3: swap and decision tests"
+    },
+    {
+      "id": "NFR1.34",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 3: validation and injection tests"
+    },
+    {
+      "id": "NFR1.35",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 3: output scan for personal data"
+    },
+    {
+      "id": "NFR1.36",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 3: lifecycle completeness test"
+    },
+    {
+      "id": "NFR1.37",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 1: scans and dependency audit"
+    },
+    {
+      "id": "NFR1.38",
+      "status": "OK",
+      "target": "monitoring-design.md Alerts and Logs and Tracing"
+    },
+    {
+      "id": "NFR1.39",
+      "status": "OK",
+      "target": "monitoring-design.md Logs and Tracing; cicd-pipeline.md stage 3 output scan"
+    },
+    {
+      "id": "NFR1.40",
+      "status": "OK",
+      "target": "monitoring-design.md Logs and Tracing: audit only for decisions and lifecycle"
+    },
+    {
+      "id": "NFR1.41",
+      "status": "OK",
+      "target": "covered by the code-generation tests (failing step and Hungarian message per action)"
+    },
+    {
+      "id": "NFR1.42",
+      "status": "OK",
+      "target": "monitoring-design.md Logs and Tracing: no files, dashboards or tracing added"
+    },
+    {
+      "id": "NFR2.10",
+      "status": "OK",
+      "target": "infrastructure-specification.md Deployment: infrastructure as code"
+    },
+    {
+      "id": "NFR2.11",
+      "status": "OK",
+      "target": "covered by the code-generation plan (kernel functions only, checked by the catalogue test)"
+    },
+    {
+      "id": "NFR2.12",
+      "status": "OK",
+      "target": "covered by the code-generation plan and the race tests in cicd-pipeline.md stage 3"
+    },
+    {
+      "id": "NFR2.13",
+      "status": "OK",
+      "target": "covered by the code-generation plan (schedule function, no table)"
+    },
+    {
+      "id": "NFR2.14",
+      "status": "OK",
+      "target": "covered by the code-generation plan (ports keep their shapes; contract test)"
+    },
+    {
+      "id": "NFR2.15",
+      "status": "OK",
+      "target": "covered by the code-generation plan (server components and copy modules)"
+    },
+    {
+      "id": "NFR2.16",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 6 coverage and Stage to Gate Mapping"
+    },
+    {
+      "id": "NFR2.17",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 3: contract and old-constants tests"
+    },
+    {
+      "id": "NFR3.5",
+      "status": "OK",
+      "target": "infrastructure-specification.md Test Data"
+    },
+    {
+      "id": "NFR3.6",
+      "status": "OK",
+      "target": "infrastructure-specification.md Database Changes: indexes"
+    },
+    {
+      "id": "NFR3.7",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 3 and monitoring-design.md Metrics: race outcome"
+    },
+    {
+      "id": "NFR3.8",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 3: races and crossing locks"
+    },
+    {
+      "id": "NFR3.9",
+      "status": "OK",
+      "target": "cicd-pipeline.md Files That Change: shuffled-tests list; stage 3 shuffled-order run"
+    },
+    {
+      "id": "NFR3.10",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 3: lifecycle-only-removal test"
+    },
+    {
+      "id": "NFR3.11",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 3: races (parent-link race)"
+    },
+    {
+      "id": "NFR4.6",
+      "status": "OK",
+      "target": "monitoring-design.md Metrics; cicd-pipeline.md stage 5 browser timing"
+    },
+    {
+      "id": "NFR4.7",
+      "status": "OK",
+      "target": "monitoring-design.md Metrics"
+    },
+    {
+      "id": "NFR4.8",
+      "status": "OK",
+      "target": "monitoring-design.md Metrics"
+    },
+    {
+      "id": "NFR4.9",
+      "status": "OK",
+      "target": "monitoring-design.md Metrics: U2 access-check overhead"
+    },
+    {
+      "id": "NFR5.4",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 5: accessibility scan on the changed screens"
+    },
+    {
+      "id": "NFR5.5",
+      "status": "OK",
+      "target": "covered by the code-generation tests (Hungarian copy test, accessible labels)"
+    },
+    {
+      "id": "NFR6.9",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 3: migration repeatability for U3's files"
+    },
+    {
+      "id": "NFR6.10",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 3: injected-failure atomicity test"
+    },
+    {
+      "id": "NFR6.11",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 3: idempotency replay test"
+    },
+    {
+      "id": "NFR6.12",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 3: stale-version test per operation"
+    },
+    {
+      "id": "NFR6.13",
+      "status": "OK",
+      "target": "covered by the code-generation tests (injected database error at the adapter boundary); monitoring-design.md Alerts"
+    },
+    {
+      "id": "NFR6.14",
+      "status": "OK",
+      "target": "infrastructure-specification.md Database Changes; cicd-pipeline.md stage 3: skip test"
+    },
+    {
+      "id": "NFR6.15",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 5: notification page for a real parent"
+    },
+    {
+      "id": "NFR6.16",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 3: exported U4 hand-off list test"
+    },
+    {
+      "id": "NFR7.3",
+      "status": "OK",
+      "target": "cicd-pipeline.md stage 5 and the existing browser tests staying unchanged"
+    },
+    {
+      "id": "NFR8.2",
+      "status": "OK",
+      "target": "covered by the code-generation plan (English identifiers, Hungarian copy)"
+    }
+  ]
+}

@@ -55,9 +55,21 @@ export function mapParentResult<T>(
   }
 }
 
+/** One Hungarian message for each business conflict a parent screen can meet (BR32.8). */
+export const PARENT_CONFLICT_MESSAGES: Readonly<Record<string, string>> = Object.freeze({
+  DUTY_FULL: "A feladat időközben betelt.",
+  DUTY_INELIGIBLE: "Ehhez a feladathoz most nem lehet jelentkezni.",
+  DUTY_CLOSED: "Erre a feladatra már nem lehet jelentkezni, mert lezárták vagy elkezdődött.",
+  DUTY_ALREADY_ASSIGNED: "A család már jelentkezett erre a feladatra.",
+  REQUEST_DUPLICATE: "Ehhez a megbízáshoz már van függő kérelem.",
+  REQUEST_CONFLICT: "A kérelem a feladatok jelenlegi állapota miatt nem küldhető el.",
+  SWAP_CANNOT_BE_APPLIED:
+    "A csere már nem hajtható végre, mert a feladatok időközben megváltoztak. A kérelem nyitva marad, az adminisztrátor dönthet róla, vagy a kérelmező visszavonhatja.",
+  SWAP_REQUEST_NOT_OPEN: "Ez a kérelem már nem nyitott: időközben visszavonták vagy elbírálták.",
+});
+
 function conflictMessage(code: string): string {
-  if (code === "DUTY_FULL") return "A feladat időközben betelt.";
-  if (code === "DUTY_INELIGIBLE") return "Ehhez a feladathoz most nem lehet jelentkezni.";
-  if (code === "REQUEST_DUPLICATE") return "Ehhez a megbízáshoz már van függő kérelem.";
-  return "A művelet ütközik az aktuális állapottal.";
+  return Object.hasOwn(PARENT_CONFLICT_MESSAGES, code)
+    ? PARENT_CONFLICT_MESSAGES[code]!
+    : "A művelet ütközik az aktuális állapottal.";
 }

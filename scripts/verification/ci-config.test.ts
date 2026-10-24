@@ -98,6 +98,78 @@ describe("CI workflow configuration (BR10.2, FR10.3)", () => {
     assert.equal([...workflow.matchAll(/SUPABASE_SERVICE_ROLE_KEY=\$key/g)].length, 1);
   });
 
+  it("runs the directory and coordination database stage after the identity stage and keeps its files in the shuffled run (U3)", () => {
+    const pipeline = read("scripts/verification/run-local-verification.ts");
+    assert.match(pipeline, /key: "database-directory", args: \["run", "test:database:directory"\]/);
+    assert.ok(pipeline.indexOf("database-identity") < pipeline.indexOf("database-directory"));
+    assert.ok(pipeline.indexOf("database-directory") < pipeline.indexOf('key: "coverage"'));
+    const scripts = JSON.parse(read("package.json")).scripts as Record<string, string>;
+    const shuffled = read("scripts/db/shuffled-tests.ts");
+    for (const file of [
+      "directory-schema",
+      "directory-functions",
+      "coordination-schema",
+      "coordination-functions",
+      "kernel-signup",
+      "kernel-race",
+      "kernel-swaps",
+      "kernel-family",
+      "directory-link",
+      "schedule",
+      "lifecycle",
+      "placeholder-drop",
+      "directory-timing",
+      "data-adapters",
+    ]) {
+      assert.ok(
+        scripts["test:database:directory"]!.includes(`tests/database/${file}.test.ts`),
+        file,
+      );
+      assert.ok(shuffled.includes(`tests/database/${file}.test.ts`), `${file} in the shuffled run`);
+    }
+    // The adapters folder is inside the lint and format scope (NFR2.10).
+    for (const name of ["lint", "format", "format:check"]) {
+      assert.ok(scripts[name]!.split(" ").includes("src/data"), name);
+    }
+  });
+
+  it("runs the notifications and import database stage after the directory stage and keeps its files in the shuffled run (U4)", () => {
+    const pipeline = read("scripts/verification/run-local-verification.ts");
+    assert.match(
+      pipeline,
+      /key: "database-notifications-import", args: \["run", "test:database:notifications-import"\]/,
+    );
+    assert.ok(
+      pipeline.indexOf("database-directory") < pipeline.indexOf("database-notifications-import"),
+    );
+    assert.ok(
+      pipeline.indexOf("database-notifications-import") < pipeline.indexOf("database-shuffled"),
+    );
+    assert.ok(
+      pipeline.indexOf("database-notifications-import") < pipeline.indexOf('key: "coverage"'),
+    );
+    const scripts = JSON.parse(read("package.json")).scripts as Record<string, string>;
+    const shuffled = read("scripts/db/shuffled-tests.ts");
+    const files = scripts["test:database:notifications-import"]!.split(" ").filter((part) =>
+      part.startsWith("tests/database/"),
+    );
+    assert.ok(files.length >= 3, "the script names the notification test files");
+    for (const file of files) {
+      assert.ok(shuffled.includes(`"${file}"`), `${file} in the shuffled run`);
+    }
+    for (const file of [
+      "notifications-schema",
+      "notifications-functions",
+      "notifications-handoff",
+    ]) {
+      assert.ok(files.includes(`tests/database/${file}.test.ts`), file);
+    }
+    // The server-only parser folder is inside the lint and format scope (NFR2.27).
+    for (const name of ["lint", "format", "format:check"]) {
+      assert.ok(scripts[name]!.split(" ").includes("src/import-parser"), name);
+    }
+  });
+
   it("holds no database secret, runs with read-only permissions and keeps the synthetic values until U5", () => {
     assert.equal(/\$\{\{\s*secrets\./.test(workflow), false);
     assert.equal(/pull_request_target/.test(workflow), false);

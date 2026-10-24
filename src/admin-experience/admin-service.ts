@@ -1,5 +1,5 @@
 import type { AuthorizationDecision, Scope } from "../access/types.ts";
-import { LEGACY_DESTINATIONS, type LegacyDestination, type REQUIRED_SHEETS } from "../import-migration/import-service.ts";
+import { LEGACY_DESTINATIONS, type LegacyDestination, type REQUIRED_SHEETS } from "./legacy-destinations.ts";
 export interface Session { subjectId: string; authorizationVersion: number; }
 export interface Authorizer { authorize(session: Session, request: { action: "read" | "manage"; resource: { kind: "admin_queue" | "school_year" | "record" | "approval" | "archive" | "role_grant" | "import" | "lifecycle"; scope: Scope } }): AuthorizationDecision; }
 export interface QueueItem { id: string; scopeId: string; kind: "approval" | "import_conflict"; status: "open" | "resolved"; title: string; }

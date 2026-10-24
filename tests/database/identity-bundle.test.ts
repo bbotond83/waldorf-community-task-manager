@@ -64,6 +64,38 @@ describe("the production bundle (NFR1.5)", () => {
     );
   });
 
+  it("keeps the spreadsheet library and the workbook parser out of every browser file, and finds them on the server (NFR2.21, U4)", () => {
+    // The library's own texts and the parser's codes: the workbook is read on the server only.
+    const markers = [
+      "SheetJS",
+      "xl/workbook.xml",
+      "[Content_Types].xml",
+      "@e965/xlsx",
+      "IMPORT_MALFORMED",
+      "IMPORT_UNSAFE_CELL",
+      "import_preview_create",
+    ];
+    const offenders: string[] = [];
+    for (const path of filesUnder(CLIENT_OUTPUT)) {
+      if (!/\.(js|css|map|html|json|txt)$/.test(path)) continue;
+      const text = readFileSync(path, "utf8");
+      for (const marker of markers) {
+        if (text.includes(marker)) offenders.push(`${path.slice(root.length)} contains ${marker}`);
+      }
+    }
+    assert.deepEqual(offenders, []);
+    const server = filesUnder(SERVER_OUTPUT)
+      .filter((path) => path.endsWith(".js"))
+      .map((path) => readFileSync(path, "utf8"));
+    // The package name itself is only named in the build's manifests, not in the script files.
+    for (const marker of markers.filter((item) => item !== "@e965/xlsx")) {
+      assert.ok(
+        server.some((text) => text.includes(marker)),
+        `the server build holds ${marker}, so the scan is meaningful`,
+      );
+    }
+  });
+
   it("never writes the key value into the server output either (it is read at run time, never inlined)", () => {
     const key = serviceKey();
     const inlined = filesUnder(`${root}.next`)

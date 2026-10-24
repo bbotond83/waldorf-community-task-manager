@@ -33,6 +33,7 @@ const TYPE_STATUS_VALUES: readonly string[] = [
   "retry-scheduled",
   "stale",
   "cancelled",
+  "closed",
   "terminal",
   "eligible-delete",
   "eligible-anonymize",
@@ -111,6 +112,12 @@ describe("statusLabel", () => {
     assert.equal(statusLabel("archived"), "Archivált");
     assert.equal(statusLabel("open"), "Nyitott");
     assert.equal(statusLabel("scheduled"), "Ütemezve");
+  });
+
+  it("has its own word for a task closed for new sign-ups instead of reading as blocked", () => {
+    assert.equal(statusLabel("closed"), "Lezárva");
+    assert.notEqual(statusLabel("closed"), statusLabel("blocked"));
+    assert.notEqual(statusLabel("closed"), UNKNOWN_STATUS_LABEL);
   });
 
   it("never returns a raw English value or an English word", () => {

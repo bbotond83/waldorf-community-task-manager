@@ -696,6 +696,34 @@ nav a:hover {
 .admin-form fieldset input {
   min-height: auto;
 }
+/* A parent block of the family form: its text fields keep the full touch height of the other forms. */
+.admin-form fieldset.admin-parent-block {
+  padding: 0.75rem 1rem 1rem;
+}
+.admin-form fieldset.admin-parent-block input:not([type="checkbox"]) {
+  min-height: 44px;
+}
+.admin-form fieldset.admin-parent-block label {
+  display: block;
+  min-height: auto;
+}
+.admin-form .admin-checkbox-field {
+  display: grid;
+  gap: 0.25rem;
+}
+.admin-form .admin-checkbox-field .admin-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 44px;
+  font-weight: 700;
+}
+.admin-form .admin-checkbox-field input[type="checkbox"] {
+  width: 1.5rem;
+  height: 1.5rem;
+  min-height: 1.5rem;
+  flex: none;
+}
 .form-hint,
 .admin-safe-reason {
   color: var(--color-muted);
@@ -945,6 +973,69 @@ nav a:hover {
   flex-wrap: wrap;
   gap: 0.75rem;
   margin-block: 1rem;
+}
+
+/* The swap partner list and the open requests of a family (BR32.7). */
+.swap-partner-list {
+  display: grid;
+  gap: 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+}
+
+.swap-partner-list legend {
+  font-weight: 700;
+  padding-inline: 0.25rem;
+}
+
+.swap-partner-list .parent-card {
+  justify-content: flex-start;
+  padding: 0.5rem 0.75rem;
+}
+
+.parent-form .swap-partner-list input[type="radio"] {
+  width: 1.5rem;
+  min-height: 1.5rem;
+  flex: none;
+}
+
+.swap-partner-list label {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 44px;
+  flex: 1;
+  cursor: pointer;
+}
+
+.swap-request-card {
+  padding: 1rem;
+}
+
+.swap-request-form {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.swap-request-text {
+  flex: 1 1 18rem;
+}
+
+.swap-request-text h3,
+.swap-request-text p {
+  margin-block: 0.25rem;
+}
+
+.swap-request-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
 }
 
 /*

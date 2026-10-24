@@ -235,16 +235,19 @@ for (const schema of IDENTITY_SCHEMAS) {
       });
 
       it("makes a revoked grant stop working on the very next request", async () => {
+        // The grant is what the access probe reads; the family table follows the parent's link, not the grant.
         const read = () =>
           asActor(
             db,
             schema,
             authenticated(PARENT_F1),
-            async () => (await db.query("select id from app_families")).rows.length,
+            async () =>
+              (await db.query("select scope_probe('family', $1) as answer", [FAMILY_1])).rows[0]
+                .answer as string,
           );
-        assert.equal(await read(), 1);
+        assert.equal(await read(), "allowed");
         await change(SUPER_ADMIN, "revoke", PARENT_F1, "parent", "family", FAMILY_1);
-        assert.equal(await read(), 0);
+        assert.equal(await read(), "denied");
       });
 
       it("never removes the last active super admin, and refuses a removal that only looks like one", async () => {
@@ -474,7 +477,7 @@ for (const schema of IDENTITY_SCHEMAS) {
           ["account.deactivate", SUPER_ADMIN, PARENT_F1, ORGANIZATION, "success"],
         );
         const read = await asActor(db, schema, authenticated(PARENT_F1), async () => ({
-          families: (await db.query("select id from app_families")).rows.length,
+          families: (await db.query("select id from families")).rows.length,
           active: (await db.query("select current_session_is_active() as a")).rows[0].a,
         }));
         assert.deepEqual(read, { families: 0, active: false });
@@ -503,9 +506,9 @@ for (const schema of IDENTITY_SCHEMAS) {
           db,
           schema,
           authenticated(PARENT_F1),
-          async () => (await db.query("select id from app_families")).rows.length,
+          async () => (await db.query("select id from families")).rows.length,
         );
-        assert.equal(families, 1, "the grants work again");
+        assert.equal(families, 1, "the account works again");
       });
 
       it("is for super admins only: group admins, parents and teachers are denied with an event", async () => {

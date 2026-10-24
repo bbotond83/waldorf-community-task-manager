@@ -18,6 +18,7 @@ import {
   type RequestModel,
   type SessionContext,
   type SessionGateway,
+  type SwapRequestListModel,
 } from "../application/index.ts";
 import { getSyntheticProfile } from "../runtime/synthetic/profiles.ts";
 
@@ -322,6 +323,15 @@ class SyntheticParentPort implements ParentApplicationPort {
       input.assignmentId.replace("assignment-", ""),
       input.expectedVersion,
     );
+  }
+
+  /** The demo family has no other family to swap with, so the page for incoming requests is empty. */
+  async listSwapRequests(input: {
+    actorId: string;
+    familyId: string;
+  }): Promise<DomainOutcome<SwapRequestListModel>> {
+    if (!ownsFamily(input)) return { state: "denied" };
+    return { state: "empty" };
   }
 
   async listNotifications(input: {
