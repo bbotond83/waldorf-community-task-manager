@@ -33,8 +33,7 @@ const NEW_FAMILY_PARENT_BLOCKS = 2;
 /**
  * The fields of the record form for one kind of record (BR32.7). On the create page the kind is chosen from
  * a dropdown and the fields follow it; on the edit page the kind is the stored record's and fixed. A
- * hidden `extended` field tells the action that these are the real-data fields, so the synthetic one-field
- * form keeps working unchanged.
+ * hidden `extended` field tells the action that these are the record's own fields.
  */
 export function RecordFields({
   mode,

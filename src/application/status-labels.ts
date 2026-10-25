@@ -2,7 +2,7 @@
  * Hungarian display labels for every status value that can reach the screen.
  *
  * Sources of the values:
- * - admin items (`AdminItemModel.state`, src/admin-core/synthetic-admin.ts): active, archived,
+ * - admin items (`AdminItemModel.state`, src/data/admin-port.ts): active, archived,
  *   open, scheduled, pending, approved, rejected, assigned, notes-saved
  * - reminder jobs (`ReminderJobModel.status`): queued, sent, retryable, retrying, stale,
  *   cancelled, terminal; reminder outcomes: retry-scheduled

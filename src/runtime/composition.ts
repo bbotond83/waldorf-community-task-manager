@@ -13,11 +13,6 @@ export async function composeRuntime(
     return config;
   }
 
-  if (config.value.mode === "synthetic") {
-    const { createSyntheticComposition } = await import("./synthetic/composition.ts");
-    return { ok: true, value: createSyntheticComposition(config.value) };
-  }
-
   const { createProductionComposition } = await import("./production/composition.ts");
   return { ok: true, value: createProductionComposition(config.value) };
 }

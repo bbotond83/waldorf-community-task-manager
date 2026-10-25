@@ -8,7 +8,7 @@ import { mapParentResult, PARENT_CONFLICT_MESSAGES } from "../../app/szulo/_lib/
 import { conflict, invalidated, success } from "../../src/application/index.ts";
 import { statusLabel } from "../../src/application/status-labels.ts";
 import { BUSINESS_CODE_STATES } from "../../src/data/results.ts";
-import { getSyntheticProfile } from "../../src/runtime/synthetic/profiles.ts";
+import { roleProfile } from "../support/role-profiles.ts";
 
 /** Words that would show an English message on a Hungarian screen. */
 const ENGLISH = /\b(the|and|error|failed|not|full|closed|swap|request|cannot|already|open)\b/i;
@@ -156,7 +156,7 @@ describe("the other new words of the screens", () => {
   });
 
   it("puts the new page into the parent menu after the tasks", () => {
-    const items = getSyntheticProfile("parent-local")!.navigation;
+    const items = roleProfile("parent").navigation;
     expect(items.map((item) => [item.id, item.label, item.href])).toEqual([
       ["parent-notifications", "Értesítések", "/szulo/ertesitesek"],
       ["parent-duties", "Feladatok", "/szulo/feladatok"],

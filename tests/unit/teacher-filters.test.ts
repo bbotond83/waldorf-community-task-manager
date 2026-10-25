@@ -1,7 +1,7 @@
 import { expect, it } from "vitest";
 import { sessionGrantBindings } from "../../src/access/session-grants.ts";
 import type { SessionContext } from "../../src/application/index.ts";
-import { TEACHER_GROUPS } from "../../src/teacher-web/index.ts";
+import { TEACHER_GROUPS } from "../support/port-doubles.ts";
 import {
   parseTeacherFilters,
   teacherDetailQuery,
@@ -19,8 +19,6 @@ const session: SessionContext = {
   ),
   roles: ["kindergarten_teacher"] as const,
   scopes: TEACHER_GROUPS.map((group) => group.scope),
-  runtimeMode: "synthetic",
-  isSynthetic: true,
 };
 it("Teacher first visit is unfiltered: every granted group and no date limit", () => {
   const filters = parseTeacherFilters({}, session);
@@ -107,19 +105,18 @@ it("Teacher no-grant context has no global fallback", () => {
   expect(filters.groups).toEqual([]);
   expect(filters.groupId).toBe("no-current-group");
 });
-it("Teacher fixture selector is synthetic-only bounded and not business context", () => {
-  expect(parseTeacherFilters({ fixture: "retryable" }, session).scenario).toBe("retryable");
-  expect(parseTeacherFilters({ fixture: "unknown" }, session).scenario).toBe("ready");
-  expect(parseTeacherFilters({ scenario: "terminal" }, session).scenario).toBe("ready");
-  expect(
-    parseTeacherFilters(
-      { fixture: "terminal" },
-      { ...session, isSynthetic: false, runtimeMode: "production" },
-    ).scenario,
-  ).toBe("ready");
-  expect(teacherFilterQuery(parseTeacherFilters({ fixture: "terminal" }, session))).not.toMatch(
-    /fixture|scenario/,
-  );
+it("Teacher address carries no test selector: fixture and scenario words change nothing", () => {
+  const plain = parseTeacherFilters({}, session);
+  for (const params of [
+    { fixture: "retryable" },
+    { fixture: "unknown" },
+    { scenario: "terminal" },
+  ]) {
+    const filters = parseTeacherFilters(params, session);
+    expect("scenario" in filters).toBe(false);
+    expect(filters).toEqual(plain);
+    expect(teacherFilterQuery(filters)).not.toMatch(/fixture|scenario/);
+  }
 });
 it("Teacher current labels require matching org and deduplicate grants", () => {
   expect(

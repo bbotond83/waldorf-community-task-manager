@@ -1,7 +1,6 @@
 {
   "version": "waldorf-scenarios-v1",
-  "fixtureVersion": "waldorf-local-v1",
-  "runtimeMode": "synthetic",
+  "runtimeMode": "database",
   "scenarios": [
     {
       "id": "LOCAL-AUTH-CONTRACT",

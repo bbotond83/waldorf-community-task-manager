@@ -8,9 +8,14 @@ afterEach(() => {
   vi.resetModules();
   loader.load.mockReset();
 });
+function stubValidSettings() {
+  vi.stubEnv("APP_SESSION_SECRET", "a-production-only-secret-with-32-chars");
+  vi.stubEnv("SUPABASE_URL", "http://127.0.0.1:54321");
+  vi.stubEnv("SUPABASE_ANON_KEY", "placeholder-anon-key-value");
+}
 async function runtime(mode: string | undefined, failure?: "throw" | "diagnostic") {
   vi.resetModules();
-  vi.stubEnv("APP_RUNTIME_MODE", "synthetic");
+  stubValidSettings();
   vi.stubEnv("NODE_ENV", "");
   const argv = vi
     .spyOn(process, "argv", "get")
@@ -39,7 +44,7 @@ it.each([
 ])("uses default/explicit %s Next mode", async (mode, development) => {
   const { log } = await runtime(mode);
   expect(loader.load).toHaveBeenCalledWith(process.cwd(), development, expect.any(Object));
-  expect(log).toHaveBeenCalledWith("RUNTIME_CONFIG_VALID: synthetic");
+  expect(log).toHaveBeenCalledWith("RUNTIME_CONFIG_VALID");
 });
 it.each(["throw", "diagnostic"] as const)("redacts %s loader failure", async (failure) => {
   const { error } = await runtime("production", failure);
@@ -49,7 +54,8 @@ it.each(["throw", "diagnostic"] as const)("redacts %s loader failure", async (fa
 it("retains explicit test NODE_ENV and variable-only schema failure", async () => {
   vi.resetModules();
   vi.stubEnv("NODE_ENV", "test");
-  vi.stubEnv("APP_RUNTIME_MODE", "invented-invalid");
+  stubValidSettings();
+  vi.stubEnv("SUPABASE_URL", "http://invented.example");
   loader.load.mockImplementation(() => {});
   const error = vi.spyOn(console, "error").mockImplementation(() => {});
   vi.spyOn(process, "exit").mockImplementation(() => {
@@ -59,7 +65,8 @@ it("retains explicit test NODE_ENV and variable-only schema failure", async () =
     "SIMULATED_EXIT",
   );
   expect(process.env.NODE_ENV).toBe("test");
-  expect(error).toHaveBeenCalledWith("CONFIG_RUNTIME_MODE_INVALID: invalid APP_RUNTIME_MODE");
+  expect(error).toHaveBeenCalledWith("CONFIG_PRODUCTION_INVALID: invalid SUPABASE_URL");
+  expect(JSON.stringify(error.mock.calls)).not.toContain("invented.example");
 });
 it("checks the actual toolchain entrypoint and rejects unsupported npm", async () => {
   const log = vi.spyOn(console, "log").mockImplementation(() => {});

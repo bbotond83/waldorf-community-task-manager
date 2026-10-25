@@ -29,4 +29,4 @@ if (!result.ok) {
   process.exit(1);
 }
 
-console.log(`RUNTIME_CONFIG_VALID: ${result.value.mode}`);
+console.log("RUNTIME_CONFIG_VALID");

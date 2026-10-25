@@ -28,8 +28,6 @@ export {
 export * from "./results.ts";
 export { TeacherApplicationFacade } from "./teacher-facade.ts";
 export type { TeacherApplicationPort } from "./teacher-facade.ts";
-export { SessionApplicationFacade } from "./session-facade.ts";
-export type { SessionGateway } from "./session-facade.ts";
 export type * from "./contracts.ts";
 export {
   normalizeRequiredText,

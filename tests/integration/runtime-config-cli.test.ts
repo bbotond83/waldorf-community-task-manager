@@ -11,7 +11,9 @@ const manifest = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
 const npmCli = process.env.npm_execpath;
 const directories: string[] = [];
 const secretMarker = "dummy-private-startup-marker";
-const synthetic = "APP_RUNTIME_MODE=synthetic\n";
+const synthetic =
+  "APP_SESSION_SECRET=a-test-only-secret-with-32-chars-ok\nSUPABASE_URL=http://127.0.0.1:54321\nSUPABASE_ANON_KEY=a-local-anon-key-of-20plus\n";
+const invalidFile = "APP_SESSION_SECRET=short\n";
 const modes = ["development", "production", "test"] as const;
 const prehooks = ["predev", "prebuild", "prestart"] as const;
 
@@ -72,7 +74,7 @@ function run(
 
 function expectSuccess(result: ReturnType<typeof run>) {
   expect(result.status).toBe(0);
-  expect(result.output.includes("RUNTIME_CONFIG_VALID: synthetic")).toBe(true);
+  expect(result.output.includes("RUNTIME_CONFIG_VALID")).toBe(true);
 }
 
 function expectFailure(result: ReturnType<typeof run>, diagnostic: string) {
@@ -83,7 +85,7 @@ function expectFailure(result: ReturnType<typeof run>, diagnostic: string) {
 }
 
 describe("runtime configuration prehooks", () => {
-  it.each(prehooks)("%s loads local configuration without a runtime-mode export", (command) => {
+  it.each(prehooks)("%s loads local configuration without any mode export", (command) => {
     expectSuccess(run(fixture({ ".env.local": synthetic }), { command }));
   });
 
@@ -92,7 +94,7 @@ describe("runtime configuration prehooks", () => {
     const other = intended === "development" ? "production" : "development";
     const directory = fixture({
       [`.env.${intended}`]: synthetic,
-      [`.env.${other}`]: "APP_RUNTIME_MODE=invalid\n",
+      [`.env.${other}`]: invalidFile,
     });
     expectSuccess(run(directory, { command }));
   });
@@ -100,26 +102,25 @@ describe("runtime configuration prehooks", () => {
   it.each(prehooks)("%s rejects missing configuration", (command) => {
     expectFailure(
       run(fixture(), { command }),
-      "CONFIG_RUNTIME_MODE_INVALID: invalid APP_RUNTIME_MODE",
+      "CONFIG_PRODUCTION_INVALID: invalid APP_SESSION_SECRET",
     );
   });
 
-  it.each(prehooks)("%s preserves inherited invalid mode over valid file values", (command) => {
-    const result = run(fixture({ ".env.local": synthetic }), {
-      command,
-      environment: { APP_RUNTIME_MODE: secretMarker },
-    });
-    expectFailure(result, "CONFIG_RUNTIME_MODE_INVALID: invalid APP_RUNTIME_MODE");
-  });
+  it.each(prehooks)(
+    "%s preserves an inherited invalid secret over valid file values",
+    (command) => {
+      const result = run(fixture({ ".env.local": synthetic }), {
+        command,
+        environment: { APP_SESSION_SECRET: secretMarker },
+      });
+      expectFailure(result, "CONFIG_PRODUCTION_INVALID: invalid APP_SESSION_SECRET");
+    },
+  );
 });
 
 describe("Next environment selection and precedence", () => {
   it("defaults standalone validation to production", () => {
-    expectSuccess(
-      run(
-        fixture({ ".env.production": synthetic, ".env.development": "APP_RUNTIME_MODE=invalid\n" }),
-      ),
-    );
+    expectSuccess(run(fixture({ ".env.production": synthetic, ".env.development": invalidFile })));
   });
 
   it.each(modes)("honors explicit NODE_ENV=%s over either command default", (mode) => {
@@ -127,7 +128,7 @@ describe("Next environment selection and precedence", () => {
       const files = Object.fromEntries(
         modes.map((candidate) => [
           `.env.${candidate}`,
-          candidate === mode ? synthetic : "APP_RUNTIME_MODE=invalid\n",
+          candidate === mode ? synthetic : invalidFile,
         ]),
       );
       expectSuccess(run(fixture(files), { command, environment: { NODE_ENV: mode } }));
@@ -138,9 +139,7 @@ describe("Next environment selection and precedence", () => {
     const order = [`.env.${mode}.local`, ".env.local", `.env.${mode}`, ".env"];
     for (let tier = 0; tier < order.length; tier++) {
       const files = Object.fromEntries(
-        order
-          .slice(tier)
-          .map((name, index) => [name, index === 0 ? synthetic : "APP_RUNTIME_MODE=invalid\n"]),
+        order.slice(tier).map((name, index) => [name, index === 0 ? synthetic : invalidFile]),
       );
       expectSuccess(run(fixture(files), { command: mode }));
     }
@@ -148,17 +147,21 @@ describe("Next environment selection and precedence", () => {
 
   it("preserves a valid inherited value over conflicting files", () => {
     expectSuccess(
-      run(fixture({ ".env.local": "APP_RUNTIME_MODE=invalid\n" }), {
-        environment: { APP_RUNTIME_MODE: "synthetic" },
+      run(fixture({ ".env.local": invalidFile }), {
+        environment: {
+          APP_SESSION_SECRET: "an-inherited-secret-with-32-chars-ok",
+          SUPABASE_URL: "http://127.0.0.1:54321",
+          SUPABASE_ANON_KEY: "a-local-anon-key-of-20plus",
+        },
       }),
     );
   });
 
   it("excludes local and non-test mode files in test mode", () => {
     const ignored = {
-      ".env.local": "APP_RUNTIME_MODE=invalid\n",
-      ".env.development": "APP_RUNTIME_MODE=invalid\n",
-      ".env.production": "APP_RUNTIME_MODE=invalid\n",
+      ".env.local": invalidFile,
+      ".env.development": invalidFile,
+      ".env.production": invalidFile,
     };
     for (const name of [".env.test.local", ".env.test", ".env"]) {
       expectSuccess(
@@ -167,7 +170,7 @@ describe("Next environment selection and precedence", () => {
     }
     expectFailure(
       run(fixture({ ".env.local": synthetic }), { environment: { NODE_ENV: "test" } }),
-      "CONFIG_RUNTIME_MODE_INVALID: invalid APP_RUNTIME_MODE",
+      "CONFIG_PRODUCTION_INVALID: invalid APP_SESSION_SECRET",
     );
   });
 
@@ -176,8 +179,8 @@ describe("Next environment selection and precedence", () => {
       run(
         fixture({
           ".env.test.local": synthetic,
-          ".env.test": "APP_RUNTIME_MODE=invalid\n",
-          ".env": "APP_RUNTIME_MODE=invalid\n",
+          ".env.test": invalidFile,
+          ".env": invalidFile,
         }),
         { environment: { NODE_ENV: "test" } },
       ),
@@ -189,7 +192,7 @@ describe("Next environment selection and precedence", () => {
       run(
         fixture({
           ".env.local":
-            "LOCAL_MODE=synthetic\nAPP_RUNTIME_MODE=$LOCAL_MODE\nLOCAL_FIXTURE=waldorf-local-v1\nAPP_SYNTHETIC_FIXTURE_VERSION=${LOCAL_FIXTURE}\n",
+            "LOCAL_SECRET=a-test-only-secret-with-32-chars-ok\nAPP_SESSION_SECRET=$LOCAL_SECRET\nLOCAL_URL=http://127.0.0.1:54321\nSUPABASE_URL=${LOCAL_URL}\nSUPABASE_ANON_KEY=a-local-anon-key-of-20plus\n",
         }),
       ),
     );
@@ -198,25 +201,24 @@ describe("Next environment selection and precedence", () => {
 
 describe("redacted fail-closed diagnostics", () => {
   it.each([
-    ["APP_RUNTIME_MODE=invalid\n", "CONFIG_RUNTIME_MODE_INVALID: invalid APP_RUNTIME_MODE"],
+    [invalidFile, "CONFIG_PRODUCTION_INVALID: invalid APP_SESSION_SECRET"],
     [
-      synthetic + `APP_SYNTHETIC_FIXTURE_VERSION=${secretMarker}/invalid\n`,
-      "CONFIG_SYNTHETIC_INVALID: invalid APP_SYNTHETIC_FIXTURE_VERSION",
+      synthetic.replace("http://127.0.0.1:54321", "http://example.test:54321"),
+      "CONFIG_PRODUCTION_INVALID: invalid SUPABASE_URL",
     ],
-    ["APP_RUNTIME_MODE=production\n", "CONFIG_PRODUCTION_INVALID: invalid APP_SESSION_SECRET"],
+    [
+      synthetic.replace(/SUPABASE_ANON_KEY=.*\n/, "SUPABASE_ANON_KEY=short\n"),
+      "CONFIG_PRODUCTION_INVALID: invalid SUPABASE_ANON_KEY",
+    ],
   ])("rejects invalid effective fields safely (%s)", (contents, diagnostic) => {
-    expectFailure(
-      run(fixture({ ".env.local": contents + `SUPABASE_ANON_KEY=${secretMarker}\n` })),
-      diagnostic,
-    );
+    expectFailure(run(fixture({ ".env.local": contents + `OTHER=${secretMarker}\n` })), diagnostic);
   });
 
-  it("rejects an inherited invalid fixture identifier over a valid file", () => {
-    expectFailure(
+  it("ignores the removed mode settings: they neither enable nor break startup", () => {
+    expectSuccess(
       run(fixture({ ".env.local": synthetic }), {
-        environment: { APP_SYNTHETIC_FIXTURE_VERSION: `${secretMarker}/invalid` },
+        environment: { APP_RUNTIME_MODE: "synthetic", APP_SYNTHETIC_FIXTURE_VERSION: "x" },
       }),
-      "CONFIG_SYNTHETIC_INVALID: invalid APP_SYNTHETIC_FIXTURE_VERSION",
     );
   });
 

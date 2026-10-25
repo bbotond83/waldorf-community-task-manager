@@ -4,9 +4,6 @@ import {
   FacadePipeline,
   ParentApplicationFacade,
   TeacherApplicationFacade,
-  type AdminApplicationPort,
-  type AdminOperation,
-  type DomainOutcome,
 } from "../../application/index.ts";
 import {
   classifyDataFailure,
@@ -14,7 +11,6 @@ import {
   createParentPort,
   createTeacherPort,
   createVersionPort,
-  DATABASE_ADMIN_OPERATIONS,
 } from "../../data/index.ts";
 import type { WorkbookParser } from "../../import-parser/types.ts";
 import type { DatabaseClient } from "../database/client.ts";
@@ -36,31 +32,6 @@ export type RequestServices = Readonly<{
 
 export interface ProductionServices {
   forRequest(accessToken: string): RequestServices;
-}
-
-/**
- * Routes an admin operation either to the database or to another port, by the list the database adapter
- * publishes. Since U4 the database answers every admin operation, so the production services no longer use it;
- * it stays as the tested routing rule for an operation a later change may add that the database does not answer.
- */
-export class RoutedAdminPort implements AdminApplicationPort {
-  private readonly database: AdminApplicationPort;
-  private readonly interim: AdminApplicationPort;
-
-  constructor(database: AdminApplicationPort, interim: AdminApplicationPort) {
-    this.database = database;
-    this.interim = interim;
-  }
-
-  execute<T>(input: Parameters<AdminApplicationPort["execute"]>[0]): Promise<DomainOutcome<T>> {
-    return isDatabaseOperation(input.operation)
-      ? this.database.execute<T>(input)
-      : this.interim.execute<T>(input);
-  }
-}
-
-function isDatabaseOperation(operation: AdminOperation): boolean {
-  return DATABASE_ADMIN_OPERATIONS.includes(operation);
 }
 
 /**

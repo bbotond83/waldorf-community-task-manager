@@ -11,7 +11,6 @@ import {
 import type { ParentActionState } from "../../app/szulo/_lib/action-state.ts";
 
 const world = vi.hoisted(() => ({
-  production: true,
   facade: undefined as Record<string, (...args: unknown[]) => unknown> | undefined,
   sessionState: "success" as "success" | "signed-out",
   submitted: [] as { action: string; data: FormData }[],
@@ -24,10 +23,6 @@ vi.mock("next/navigation", () => ({
   redirect: vi.fn(),
   usePathname: () => "/szulo/cserek",
   useSearchParams: () => new URLSearchParams(),
-}));
-vi.mock("../../app/_identity/production-request.ts", () => ({
-  isProductionMode: async () => world.production,
-  productionRequest: async () => ({ state: "not-production" }),
 }));
 vi.mock("../../app/szulo/_lib/facade.ts", () => ({
   resolveParentFacade: async () => world.facade,
@@ -104,16 +99,12 @@ function useFacade(overrides: Record<string, unknown> = {}) {
   } as typeof world.facade;
 }
 
-async function renderSwapPage(query: { scenario?: string } = {}) {
-  const page = await SwapRequestPage({
-    params: Promise.resolve({ id: "duty-1" }),
-    searchParams: Promise.resolve(query),
-  });
+async function renderSwapPage() {
+  const page = await SwapRequestPage({ params: Promise.resolve({ id: "duty-1" }) });
   return render(<>{page}</>);
 }
 
 beforeEach(() => {
-  world.production = true;
   world.sessionState = "success";
   world.submitted = [];
   world.answer = { state: "success", message: "Rendben." };
@@ -190,25 +181,13 @@ describe("the swap request page with a partner list", () => {
     expect(screen.queryByTestId("swap-candidates-empty")).not.toBeInTheDocument();
   });
 
-  it("keeps the fixed partner of the demo in the synthetic mode and asks for no list", async () => {
-    world.production = false;
-    const listCandidates = vi.fn(async () => empty());
+  it("always asks the database for the partner list and has no fixed partner field", async () => {
+    const listCandidates = vi.fn(async () => success({ candidates: [CANDIDATE_A] }));
     useFacade({ listSwapCandidates: listCandidates });
     await renderSwapPage();
-    expect(listCandidates).not.toHaveBeenCalled();
-    expect(document.querySelector('input[name="counterpartId"]')).toHaveValue(
-      "assignment-counterpart",
-    );
-    expect(screen.queryByRole("radio")).not.toBeInTheDocument();
-    fireEvent.submit(screen.getByTestId("swap-request-form"));
-    await waitFor(() => expect(world.submitted).toHaveLength(1));
-    expect(world.submitted[0]!.data.get("idempotencyKey")).toBe("swap:duty-1:v4");
-  });
-
-  it("takes the scenario of the demo as the partner in the synthetic mode", async () => {
-    world.production = false;
-    await renderSwapPage({ scenario: "conflict" });
-    expect(document.querySelector('input[name="counterpartId"]')).toHaveValue("conflict");
+    expect(listCandidates).toHaveBeenCalledTimes(1);
+    expect(document.querySelector('input[name="counterpartId"]')).toBeNull();
+    expect(screen.getAllByRole("radio")).toHaveLength(1);
   });
 
   it("says there is nothing to swap for a task the family has no place on", async () => {

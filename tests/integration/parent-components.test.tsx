@@ -172,7 +172,7 @@ describe("ParentMutationForm", () => {
 describe("ParentAccessState", () => {
   it("offers login from signed-out state", () => {
     render(<ParentAccessState kind="signed-out" />);
-    expect(screen.getByTestId("parent-login-link")).toHaveAttribute("href", "/belepes");
+    expect(screen.getByTestId("parent-login-link")).toHaveAttribute("href", "/bejelentkezes");
   });
 
   it("renders generic denial without unrelated identifiers", () => {

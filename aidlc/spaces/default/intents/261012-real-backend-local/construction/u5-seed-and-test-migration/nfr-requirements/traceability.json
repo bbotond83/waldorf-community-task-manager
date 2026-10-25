@@ -1,0 +1,47 @@
+{
+  "stage": "nfr-requirements",
+  "unit": "u5-seed-and-test-migration",
+  "upstream_ids": ["NFR1", "NFR2", "NFR3", "NFR4", "NFR5", "NFR6", "NFR7", "NFR8"],
+  "coverage": [
+    {
+      "id": "NFR1",
+      "status": "OK",
+      "target": "NFR1.63, NFR1.64, NFR1.65, NFR1.66, NFR1.67, NFR1.68, NFR1.69, NFR1.70"
+    },
+    {
+      "id": "NFR2",
+      "status": "OK",
+      "target": "NFR2.28, NFR2.29, NFR2.30, NFR2.31, NFR2.32, NFR2.33, NFR2.34, NFR2.35, NFR2.36, NFR2.37, NFR2.38"
+    },
+    {
+      "id": "NFR3",
+      "status": "OK",
+      "target": "NFR3.18, NFR3.19, NFR3.20, NFR3.21"
+    },
+    {
+      "id": "NFR4",
+      "status": "OK",
+      "target": "NFR4.17, NFR4.18, NFR4.19, NFR4.20"
+    },
+    {
+      "id": "NFR5",
+      "status": "OK",
+      "target": "NFR5.8"
+    },
+    {
+      "id": "NFR6",
+      "status": "OK",
+      "target": "NFR6.27, NFR6.28, NFR6.29, NFR6.30"
+    },
+    {
+      "id": "NFR7",
+      "status": "OK",
+      "target": "NFR7.5"
+    },
+    {
+      "id": "NFR8",
+      "status": "OK",
+      "target": "NFR8.4"
+    }
+  ]
+}

@@ -1,21 +1,34 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
-import { SYNTHETIC_PROFILES, type SyntheticProfile } from "../../src/runtime/synthetic/profiles.ts";
+import { ROLE_PROFILES, shellProfile } from "../support/role-profiles.ts";
+import {
+  addCleaningNotice,
+  requestCancellation,
+  signUpForDecorating,
+  withOtherPage,
+} from "./support/scenarios.ts";
+import { SERIOUS, signInAs, bindSeededSchema } from "./support/seeded-schema.ts";
 
-async function chooseProfile(page: Page, profileId: string) {
+const world = bindSeededSchema();
+
+/** The role profiles the specs loop over, each with the seeded account that signs in as that role. */
+const ROLES = ROLE_PROFILES.map((profile) => ({
+  ...profile,
+  label: shellProfile(profile.id).label,
+  tag: {
+    parent: "parent-1",
+    teacher: "teacher-1",
+    "group-admin": "group-admin-1",
+    "super-admin": "super-admin",
+  }[profile.id],
+}));
+type RoleEntry = (typeof ROLES)[number];
+
+/** Signs in as the account of a role and opens the page its role starts on. */
+async function signInRole(page: Page, tag: string) {
+  await world().reseed();
+  await signInAs(page, world().account(tag));
   await page.goto("/");
-  await page.request.post("/api/synthetic/reset", {
-    headers: { origin: new URL(page.url()).origin },
-  });
-  if (
-    await page
-      .getByTestId("app-shell-switch-profile-button")
-      .isVisible()
-      .catch(() => false)
-  ) {
-    await page.getByTestId("app-shell-switch-profile-button").click();
-  }
-  await page.getByTestId(`profile-selector-${profileId}-button`).click();
 }
 
 async function horizontalOverflow(page: Page) {
@@ -26,15 +39,15 @@ async function horizontalOverflow(page: Page) {
 
 const ENGLISH_STATUS_WORDS = /\b(pending|approved|rejected|active|archived|open|scheduled)\b/i;
 
-function menuPages(profile: SyntheticProfile): string[] {
+function menuPages(profile: RoleEntry): string[] {
   return profile.navigation.map((item) => item.href);
 }
 
-for (const profile of SYNTHETIC_PROFILES) {
+for (const profile of ROLES) {
   test(`${profile.id} opens its default page with no welcome page and no heading box`, async ({
     page,
   }) => {
-    await chooseProfile(page, profile.id);
+    await signInRole(page, profile.tag);
     await expect(page).toHaveURL(new RegExp(`${profile.homePath}$`));
     await expect(page.getByText("Üdvözlünk")).toHaveCount(0);
     await expect(page.getByTestId("app-shell-profile-summary")).toContainText(profile.label);
@@ -47,12 +60,13 @@ for (const profile of SYNTHETIC_PROFILES) {
     await page.goto("/");
     await expect(page).toHaveURL(new RegExp(`${profile.homePath}$`));
     await expect(page.getByTestId("profile-selector")).toHaveCount(0);
+    await expect(page.getByTestId("app-shell-switch-profile-button")).toHaveCount(0);
   });
 
   test(`${profile.id} sees the same menu on every page and the current page is marked`, async ({
     page,
   }) => {
-    await chooseProfile(page, profile.id);
+    await signInRole(page, profile.tag);
     const expectedLabels = profile.navigation.map((item) => item.label);
     if (expectedLabels.length === 0) {
       // The teacher has a single page: no menu, no menu toggle.
@@ -79,19 +93,18 @@ for (const profile of SYNTHETIC_PROFILES) {
   test(`@a11y ${profile.id} default page has no serious or critical accessibility violations`, async ({
     page,
   }) => {
-    await chooseProfile(page, profile.id);
+    await signInRole(page, profile.tag);
     await expect(page).toHaveURL(new RegExp(`${profile.homePath}$`));
     const results = await new AxeBuilder({ page }).analyze();
-    expect(
-      results.violations.filter(({ impact }) => impact === "serious" || impact === "critical"),
-    ).toEqual([]);
+    expect(results.violations.filter(SERIOUS)).toEqual([]);
   });
 
   test(`${profile.id} default page and menu fit 320 px without horizontal scrolling`, async ({
     page,
   }) => {
     await page.setViewportSize({ width: 320, height: 800 });
-    await chooseProfile(page, profile.id);
+    await signInRole(page, profile.tag);
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
     expect(await horizontalOverflow(page)).toBeLessThanOrEqual(0);
     for (const path of menuPages(profile)) {
       await page.goto(path);
@@ -104,7 +117,7 @@ test("the teacher gets back to Beosztás from a detail page and from a denied pa
   page,
 }, testInfo) => {
   const isMobile = testInfo.project.name === "mobile-chrome";
-  await chooseProfile(page, "kindergarten-teacher-local");
+  await signInRole(page, "teacher-1");
   await page
     .locator(
       isMobile
@@ -132,8 +145,17 @@ test("the teacher gets back to Beosztás from a detail page and from a denied pa
 
 test("admin list items open on a click anywhere on the item and show Hungarian states", async ({
   page,
-}) => {
-  await chooseProfile(page, "super-admin-local");
+  browser,
+}, testInfo) => {
+  await signInRole(page, "super-admin");
+  // One open request for the approvals list and one archived family for the archive.
+  await withOtherPage(browser, testInfo.project.use.baseURL, (other) =>
+    requestCancellation(other, world()),
+  );
+  await page.goto(`/admin/nyilvantartasok/${world().id("family:5")}`);
+  await page.waitForLoadState("networkidle");
+  await page.getByTestId("admin-record-archive-form-submit-button").click();
+  await expect(page.getByTestId("admin-record-archive-form-state-success")).toBeVisible();
   for (const basePath of [
     "/admin/jovahagyasok",
     "/admin/nyilvantartasok",
@@ -148,7 +170,7 @@ test("admin list items open on a click anywhere on the item and show Hungarian s
     await expect(first.getByRole("link")).toHaveCount(1);
     await expect(first).not.toContainText("Részletek");
     // The state word is not the title; clicking it still opens the item.
-    await first.locator(".admin-state-badge").click();
+    await first.locator(".status-badge").click();
     await expect(page).toHaveURL(new RegExp(`${basePath}/[^/?]+`));
     await expect(page.locator("main")).not.toContainText(
       /Állapot: (pending|approved|active|archived|open|scheduled)/,
@@ -156,8 +178,14 @@ test("admin list items open on a click anywhere on the item and show Hungarian s
   }
 });
 
-test("admin filters keep their values and show Hungarian words", async ({ page }) => {
-  await chooseProfile(page, "group-admin-local");
+test("admin filters keep their values and show Hungarian words", async ({
+  page,
+  browser,
+}, testInfo) => {
+  await signInRole(page, "group-admin-1");
+  await withOtherPage(browser, testInfo.project.use.baseURL, (other) =>
+    requestCancellation(other, world()),
+  );
   await page.goto("/admin/jovahagyasok?state=pending");
   const select = page.getByTestId("admin-filter-state-select");
   await expect(select).toHaveValue("pending");
@@ -170,8 +198,16 @@ test("admin filters keep their values and show Hungarian words", async ({ page }
   expect(await page.locator(".admin-collection").innerText()).toContain("Függőben");
 });
 
+/** Two notifications for the first parent: a sign-up confirmation and one for the cleaning task. */
+async function parentWithNotices(page: Page) {
+  await world().reseed();
+  await signUpForDecorating(page, world());
+  await addCleaningNotice(world());
+  await page.goto("/");
+}
+
 test("a notification card opens its target and the checkbox marks it as read", async ({ page }) => {
-  await chooseProfile(page, "parent-local");
+  await parentWithNotices(page);
   await expect(page).toHaveURL(/\/szulo\/ertesitesek$/);
   const cards = page.locator('li[data-testid^="notification-card-"]');
   await expect(cards.first()).toBeVisible();
@@ -185,27 +221,28 @@ test("a notification card opens its target and the checkbox marks it as read", a
     expect(box?.height ?? 0).toBeGreaterThanOrEqual(44);
   }
 
-  // The checkbox marks the notification as read at once and stays ticked and disabled. The
-  // synthetic parent state is shared by the whole server run, so this test uses the notification
-  // that no other spec reads (the parent spec reads the per-browser "7-day" ones).
-  const checkbox = page.getByTestId("notification-read-checkbox-notice-24-hour");
+  // The checkbox marks the notification as read at once and stays ticked and disabled.
+  const card = page.locator('li[data-testid^="notification-card-"]', { hasText: "Takarítás" });
+  const noticeId = (await card.getAttribute("data-testid"))!.replace("notification-card-", "");
+  const checkbox = page.getByTestId(`notification-read-checkbox-${noticeId}`);
   // The tick submits through the hydrated form, so wait for the page scripts to finish loading.
   await page.waitForLoadState("networkidle");
   await checkbox.check();
-  await expect(page.getByTestId("notification-state-notice-24-hour-success")).toBeVisible();
+  await expect(page.getByTestId(`notification-state-${noticeId}-success`)).toBeVisible();
   await expect(checkbox).toBeChecked();
   await expect(checkbox).toBeDisabled();
   // Keyboard focus moves to the card link instead of falling to the page body.
-  await expect(page.getByTestId("notification-link-notice-24-hour")).toBeFocused();
+  await expect(page.getByTestId(`notification-link-${noticeId}`)).toBeFocused();
 
   // A click anywhere on the card text opens the notification.
-  await page.getByTestId("notification-card-notice-24-hour").locator("p").first().click();
-  await expect(page).toHaveURL(/\/szulo\/feladatok\/duty-garden/);
+  await page.getByTestId(`notification-card-${noticeId}`).locator("p").first().click();
+  await expect(page).toHaveURL(new RegExp(`/szulo/feladatok/${world().id("task:1:3")}`));
 });
 
 test("the notification cards keep their padding and fit 320 px", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 800 });
-  await chooseProfile(page, "parent-local");
+  await parentWithNotices(page);
+  await expect(page.locator('li[data-testid^="notification-card-"]').first()).toBeVisible();
   expect(await horizontalOverflow(page)).toBeLessThanOrEqual(0);
   const card = page.locator('li[data-testid^="notification-card-"]').first();
   const cardBox = await card.boundingBox();
@@ -226,14 +263,12 @@ test("the notification cards keep their padding and fit 320 px", async ({ page }
 test("@a11y whole-card lists have no serious or critical accessibility violations", async ({
   page,
 }) => {
-  await chooseProfile(page, "super-admin-local");
+  await signInRole(page, "super-admin");
   for (const path of ["/admin/jovahagyasok", "/admin/nyilvantartasok"]) {
     await page.goto(path);
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
     const results = await new AxeBuilder({ page }).analyze();
-    expect(
-      results.violations.filter(({ impact }) => impact === "serious" || impact === "critical"),
-      path,
-    ).toEqual([]);
+    expect(results.violations.filter(SERIOUS), path).toEqual([]);
   }
 });
 
@@ -241,7 +276,7 @@ test("keyboard users see a ring on menu buttons and cards but not on the focused
   page,
 }, testInfo) => {
   test.skip(testInfo.project.name === "mobile-chrome", "keyboard focus ring is checked on desktop");
-  await chooseProfile(page, "group-admin-local");
+  await signInRole(page, "group-admin-1");
   await page.keyboard.press("Tab");
   await page.keyboard.press("Tab");
   await page.keyboard.press("Tab");

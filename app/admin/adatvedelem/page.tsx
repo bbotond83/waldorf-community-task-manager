@@ -1,6 +1,5 @@
 import { AdminAccessState } from "../_components/AdminAccessState.tsx";
 import { AdminMutationForm } from "../_components/AdminMutationForm.tsx";
-import { DeveloperDetails } from "../_components/DeveloperDetails.tsx";
 import { runLifecycleAction } from "../advanced-actions.ts";
 import { resolveAdminFacade } from "../_lib/facade.ts";
 import { resolveAdminSession } from "../_lib/session.ts";
@@ -75,27 +74,6 @@ export default async function PrivacyLifecyclePage({
         <p>Nincs életciklus-jelölt.</p>
       ) : (
         <p role="alert">Hiba történt.</p>
-      )}
-      {result.state === "success" && (
-        <DeveloperDetails>
-          {result.data.candidates
-            .filter((candidate) => candidate.eligibility !== "blocked")
-            .map((candidate) => (
-              <div key={candidate.id}>
-                <label htmlFor={`scenario-${candidate.id}`}>Forgatókönyv – {candidate.label}</label>
-                <select
-                  id={`scenario-${candidate.id}`}
-                  name="scenario"
-                  form={`admin-lifecycle-run-${candidate.id}`}
-                  defaultValue="success"
-                >
-                  <option value="success">Sikeres</option>
-                  <option value="retryable">Átmeneti hiba</option>
-                  <option value="terminal">Végleges hiba</option>
-                </select>
-              </div>
-            ))}
-        </DeveloperDetails>
       )}
     </section>
   );

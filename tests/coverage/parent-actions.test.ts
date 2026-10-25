@@ -1,34 +1,20 @@
-import { beforeEach, afterEach, expect, it, vi } from "vitest";
-import { createSyntheticSessionToken } from "../../src/runtime/session/session.ts";
-import { getSyntheticProfile } from "../../src/runtime/synthetic/profiles.ts";
-import { resetSyntheticAdminFixtures } from "../../src/admin-core/synthetic-admin.ts";
-import { resetSyntheticAdvancedFixtures } from "../../src/admin-advanced/index.ts";
-import { resetSyntheticParentState } from "../../src/parent-web/index.ts";
-const boundary = vi.hoisted(() => ({
-  token: undefined as string | undefined,
-  set: vi.fn(),
-  revalidate: vi.fn(),
-}));
+import { beforeEach, expect, it, vi } from "vitest";
+import { requestWorld } from "../support/request-world.ts";
+
+const boundary = vi.hoisted(() => ({ revalidate: vi.fn() }));
 vi.mock("server-only", () => ({}));
-vi.mock("next/headers", () => ({
-  cookies: async () => ({
-    get: () => (boundary.token ? { value: boundary.token } : undefined),
-    set: boundary.set,
-  }),
-}));
+vi.mock("../../app/_identity/production-request.ts", async () =>
+  (await import("../support/request-world.ts")).requestWorldModule(),
+);
 vi.mock("next/cache", () => ({ revalidatePath: boundary.revalidate }));
+import * as actions from "../../app/szulo/actions.ts";
+
 beforeEach(() => {
-  vi.stubEnv("APP_RUNTIME_MODE", "synthetic");
-  boundary.token = undefined;
   vi.clearAllMocks();
-  resetSyntheticAdminFixtures();
-  resetSyntheticAdvancedFixtures();
-  resetSyntheticParentState();
-  resetParentFacadeCache();
+  requestWorld.reset();
 });
-afterEach(() => vi.unstubAllEnvs());
-function signIn(id: string) {
-  boundary.token = createSyntheticSessionToken(getSyntheticProfile(id)!);
+function signIn() {
+  requestWorld.signIn("parent");
 }
 function form(values: Record<string, string> = {}) {
   const result = new FormData();
@@ -42,13 +28,6 @@ function form(values: Record<string, string> = {}) {
     result.set(key, value);
   return result;
 }
-import { resetParentFacadeCache } from "../../app/szulo/_lib/facade.ts";
-import * as actions from "../../app/szulo/actions.ts";
-import { authenticateParentAction } from "../../app/belepes/actions.ts";
-import {
-  acceptInvitationAction,
-  resendInvitationAction,
-} from "../../app/meghivas/[token]/actions.ts";
 const initial = { state: "initial" } as const;
 const cases = [
   ["signUpAction", { id: "duty-garden" }],
@@ -57,7 +36,7 @@ const cases = [
     {
       id: "duty-assigned",
       assignmentId: "assignment-lampas",
-      counterpartId: "valid-counterpart",
+      counterpart: "valid-counterpart:1",
       expectedVersion: "4",
       reason: "Invented reason",
     },
@@ -87,6 +66,7 @@ for (const [name, values] of cases) {
             expectedVersion: "-1",
             note: "",
             reason: "",
+            counterpart: "",
           }),
         )
       ).state,
@@ -94,7 +74,7 @@ for (const [name, values] of cases) {
     expect((await actions[name](initial, form(values))).state).toBe("denied");
   });
   it(name + " returns authorized real success and safe presentation", async () => {
-    signIn("parent-local");
+    signIn();
     const result = await actions[name](initial, form(values));
     expect(result.state).toBe("success");
     expect(result.message).toBeTruthy();
@@ -102,7 +82,7 @@ for (const [name, values] of cases) {
   });
 }
 it("marks a notification read twice without a change or an error and refreshes the list", async () => {
-  signIn("parent-local");
+  signIn();
   const first = await actions.markNotificationReadAction(
     initial,
     form({ id: "notice-7-day", idempotencyKey: "notice:notice-7-day:open:aaaa1111" }),
@@ -128,7 +108,7 @@ it("does not refresh the list when marking read is denied or invalid", async () 
   expect(boundary.revalidate).not.toHaveBeenCalled();
 });
 it("preserves signup idempotency and reports full/ineligible conflicts", async () => {
-  signIn("parent-local");
+  signIn();
   const input = form({ id: "duty-garden" });
   const first = await actions.signUpAction(initial, input);
   expect(await actions.signUpAction(initial, input)).toEqual(first);
@@ -158,14 +138,14 @@ it.each([
   ["terminal", "terminal"],
   ["invalidated", "invalidated"],
   ["conflict", "conflict"],
-])("maps request %s with no protected reason", async (scenario, state) => {
-  signIn("parent-local");
+])("maps request %s with no protected reason", async (partner, state) => {
+  signIn();
   const result = await actions.requestSwapAction(
     initial,
     form({
       id: "duty-assigned",
       assignmentId: "assignment-lampas",
-      counterpartId: scenario,
+      counterpart: `${partner}:1`,
       expectedVersion: "4",
       reason: "Invented reason",
     }),
@@ -173,60 +153,21 @@ it.each([
   expect(result.state).toBe(state);
   expect(JSON.stringify(result)).not.toContain("Invented reason");
 });
-it("returns validation and denied authentication then safe destination/cookie", async () => {
-  expect((await authenticateParentAction(initial, form({ identifier: "" }))).state).toBe(
-    "validation",
-  );
-  expect((await authenticateParentAction(initial, form({ identifier: "unknown" }))).state).toBe(
-    "denied",
-  );
-  expect(
-    (
-      await authenticateParentAction(
-        initial,
-        form({ identifier: "parent-local", intendedPath: "https://invented.invalid" }),
-      )
-    ).destination,
-  ).toBe("/szulo/ertesitesek");
-  expect(
-    (await authenticateParentAction(initial, form({ identifier: "parent-local" }))).destination,
-  ).toBe("/szulo/ertesitesek");
-  expect(
-    (
-      await authenticateParentAction(
-        initial,
-        form({ identifier: "parent-local", intendedPath: "/szulo/feladatok/duty-garden" }),
-      )
-    ).destination,
-  ).toBe("/szulo/feladatok/duty-garden");
-  expect(boundary.set).toHaveBeenCalledWith(
-    "waldorf_local_session",
-    expect.any(String),
-    expect.objectContaining({ httpOnly: true, sameSite: "lax", secure: false }),
-  );
-  expect(
-    (
-      await authenticateParentAction(
-        initial,
-        form({ identifier: "parent-local", intendedPath: "/szulo/ertesitesek" }),
-      )
-    ).destination,
-  ).toBe("/szulo/ertesitesek");
-});
-it("accepts valid invitations, generically denies invalid and simulates resend", async () => {
-  expect((await acceptInvitationAction("parent-valid-invitation", initial)).destination).toBe(
-    "/szulo/feladatok",
-  );
-  expect((await acceptInvitationAction("parent-expired-invitation", initial)).state).toBe("denied");
-  expect(
-    (await resendInvitationAction(initial, form({ identifier: "invented@example.invalid" }))).state,
-  ).toBe("success");
-});
-it("fails safely when runtime is invalid", async () => {
-  vi.stubEnv("APP_RUNTIME_MODE", "invalid");
-  expect(
-    (await authenticateParentAction(initial, form({ identifier: "parent-local" }))).state,
-  ).toBe("terminal");
-  expect((await acceptInvitationAction("parent-valid-invitation", initial)).state).toBe("terminal");
-  expect((await resendInvitationAction(initial, new FormData())).state).toBe("terminal");
+it("asks for a chosen swap partner and refuses a malformed choice before anything is sent", async () => {
+  signIn();
+  const base = {
+    id: "duty-assigned",
+    assignmentId: "assignment-lampas",
+    expectedVersion: "4",
+    reason: "Invented reason",
+  };
+  const none = await actions.requestSwapAction(initial, form(base));
+  expect(none.state).toBe("validation");
+  expect(none.fieldErrors?.counterpart).toBe("Válasszon egy cseretársat.");
+  for (const counterpart of ["no-version", "partner:0", "partner:x", "!:1"]) {
+    const bad = await actions.requestSwapAction(initial, form({ ...base, counterpart }));
+    expect(bad.state, counterpart).toBe("validation");
+    expect(bad.fieldErrors?.counterpart).toBe("Érvénytelen cseretárs.");
+  }
+  expect(requestWorld.ports.parent.requests.size).toBe(0);
 });

@@ -20,6 +20,7 @@ import {
   stackSettings,
   uuid,
 } from "../database/stack-support.ts";
+import { bindSeededSchema } from "./support/seeded-schema.ts";
 
 /**
  * Notifications and the Excel import on a production build against the real local stack (U4, step 25).
@@ -35,7 +36,9 @@ import {
  * It is the same honest seam the database tests use, and it needs no code path of its own in the application.
  * The production server is started here on its own port, over the schema named below.
  */
-const SCHEMA = process.env.IDENTITY_BROWSER_SCHEMA ?? "worker_4";
+// The schema of the running browser project (tests/browser/support/projects.ts); known once the first hook has run.
+let SCHEMA = "";
+const world = bindSeededSchema({ seed: false });
 const PORT = Number(process.env.NOTIFICATIONS_IMPORT_BROWSER_PORT ?? 3141);
 const ORIGIN = `http://127.0.0.1:${PORT}`;
 
@@ -61,7 +64,7 @@ const TASK_SHEET = SHEET_REGISTRY.find(
 
 const settings = stackSettings();
 const apiUrl = settings.apiUrl.replace(/\/$/, "");
-const admin = createAdminAccess({ url: apiUrl, serviceKey: serviceKey(), schema: SCHEMA });
+let admin: ReturnType<typeof createAdminAccess>;
 
 let db: pg.Client;
 let server: ChildProcess | undefined;
@@ -82,7 +85,6 @@ async function startServer(): Promise<void> {
         SUPABASE_URL: apiUrl,
         SUPABASE_ANON_KEY: settings.publicKey,
         SUPABASE_SERVICE_ROLE_KEY: serviceKey(),
-        APP_RUNTIME_MODE: "production",
         APP_SESSION_SECRET: randomBytes(32).toString("hex"),
         DATABASE_SCHEMA: SCHEMA,
         APP_PUBLIC_URL: ORIGIN,
@@ -101,7 +103,7 @@ async function startServer(): Promise<void> {
         signal: AbortSignal.timeout(2000),
       });
       if (response.ok) {
-        expect((await response.json()).mode).toBe("production");
+        expect((await response.json()).status).toBe("ready");
         return;
       }
     } catch {
@@ -123,6 +125,8 @@ function stopServer(): void {
 }
 
 test.beforeAll(async () => {
+  SCHEMA = world().schema;
+  admin = createAdminAccess({ url: apiUrl, serviceKey: serviceKey(), schema: SCHEMA });
   db = await openDatabase();
   await lockSchemas(db, [SCHEMA]);
   await prepareSchema(db, SCHEMA);

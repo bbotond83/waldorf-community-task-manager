@@ -1,309 +1,292 @@
-# Használati útmutató és kézi tesztforgatókönyv
+# Használati útmutató és kézi tesztlista
 
-Ez az útmutató végigvezet a Waldorf közösségi feladatkezelő jelenlegi helyi
-próbaalkalmazásán. A leírás a szülői, munkatársi és adminisztrátori
-felületeket, valamint a főbb sikeres és elutasított műveleteket mutatja be.
+Ez az útmutató végigvezet a Waldorf közösségi feladatkezelő helyi próbaváltozatán. A program már valódi
+adatbázissal működik: mindenki e-mail-címmel és jelszóval jelentkezik be, nincs többé „tesztprofil” kiválasztása. A
+próbához **kitalált** adatokat töltünk be; valódi családok, gyerekek vagy elérhetőségek soha nem kerülnek ide.
 
-## 1. A próbakörnyezet indítása
+Az útmutatót úgy írtuk, hogy programozói tudás nélkül is követhető legyen. Ahol parancsot kell begépelni, a
+parancsot keretes blokkban találod: másold be a terminálba (Mac-en a „Terminál” alkalmazás), és nyomj Entert.
 
-A fejlesztői kiszolgáló címe:
+## 1. Előkészületek (egyszer kell)
 
-**http://127.0.0.1:3000**
+1. Telepítsd a **Docker Desktop** programot, és indítsd el. Ez futtatja a helyi adatbázist. A programot a cégek
+   mérettől függően csak fizetéssel használhatják: a telepítés előtt nézd meg, melyik díjszabás vonatkozik ránk.
+2. Telepítsd a **Node.js 24**-et (az npm 11 vele jön). A pontos lépések az angol `README.md`-ben vannak.
+3. A projekt mappájában futtasd egyszer: `npm ci`
 
-Ha a kiszolgáló nem fut, a projekt könyvtárában indítsd el:
+## 2. A próbakörnyezet indítása
+
+Minden próbanap elején, a projekt mappájában, **ebben a sorrendben**:
 
 ```bash
+npm run db:start
+set -a; . ./.env.database.local; set +a
+export APP_SESSION_SECRET="$(openssl rand -hex 32)"
+export APP_PUBLIC_URL="http://127.0.0.1:3000"
+export SMTP_FROM="no-reply@example.test"
+npm run db:seed
 npm run dev
 ```
 
-Elvárt kezdőképernyő: **Helyi tesztprofil kiválasztása**. A helyi futás
-kizárólag kitalált adatokat használ; nem csatlakozik valódi Supabase,
-e-mail-, Vercel- vagy más külső szolgáltatáshoz. A műveletek ezért csak
-a helyi, memóriában tárolt tesztadatokra hatnak.
+- `npm run db:start` elindítja a helyi adatbázist. Ha a program tűzfalról panaszkodik, kérd a fejlesztő segítségét;
+  ezt a figyelmeztetést nem szabad megkerülni.
+- `npm run db:seed` feltölti az adatbázist **kitalált** adatokkal (2 csoport, 6 család, az ő szüleik és gyerekeik,
+  feladatok és események) és létrehozza a próbafiókokat. Ha már fel van töltve, nem változtat semmin.
+- `npm run dev` elindítja a programot. A címe: **http://127.0.0.1:3000**. A terminált hagyd nyitva.
 
-## 2. Tesztprofil kiválasztása és váltása
+Az első oldal a **Biztonságos bejelentkezés**; innen a **Bejelentkezés** hivatkozás visz a belépéshez.
 
-Válassz egy profilt a kezdőképernyőn: kattints a profil kártyájára (bárhol a
-kártyán). A profil határozza meg, mely oldalakat látod és milyen műveleteket
-végezhetsz.
+A kimenő leveleket (meghívó, jelszó-visszaállítás) a próbakörnyezet nem küldi el senkinek: a helyi „postafiókban”
+olvashatod őket a **http://127.0.0.1:54324** címen.
 
-| Profil | Mit ellenőrizhetsz? |
-|---|---|
-| **Szülő** | Egy kitalált család feladatai, jelentkezések és értesítések |
-| **Óvónő (csak olvasás)** | A kijelölt csoport beosztása; módosítási művelet nélkül |
-| **Csoportadminisztrátor** | A Boróka csoport áttekintése, nyilvántartásai, feladatai, jóváhagyásai és archívuma |
-| **Szuperadminisztrátor** | Óvodai adminisztráció (importálás, emlékeztetők, adatvédelem, beállítások) és jogosultságkezelés |
+## 3. Fiókok
 
-A profil kiválasztása után nincs külön üdvözlő oldal: a program rögtön az
-adott profil alapértelmezett oldalát nyitja meg.
+Minden próbafiók címe `public.` kezdetű és `@example.test` végű. A jelszó szerepkörönként egy, kitalált próbajelszó;
+a program nem írja ki őket. A négy jelszó a `scripts/db/seed/data.ts` fájlban van (a `SEED_PASSWORDS` részben):
+nyisd meg egy szövegszerkesztővel, és keresd a szerepkör nevét.
 
-| Profil | Alapértelmezett oldal | Menü (minden oldalon ugyanaz) |
-|---|---|---|
-| **Szülő** | Értesítések | Értesítések, Feladatok |
-| **Óvónő** | Beosztás | nincs menü, mert a Beosztás az egyetlen oldal |
-| **Csoportadminisztrátor** | Áttekintés | Áttekintés, Nyilvántartások, Feladatok és események, Jóváhagyások, Archívum |
-| **Szuperadminisztrátor** | Áttekintés | az előbbi öt, majd Importálás, Emlékeztetők, Adatvédelem, Beállítások |
+| Fiók (e-mail-cím)                           | Szerepkör             | Mit lát?                                  |
+| ------------------------------------------- | --------------------- | ----------------------------------------- |
+| `public.parent-1@example.test` … `parent-6` | Szülő                 | A saját családja feladatai és értesítései |
+| `public.teacher-1@example.test`             | Óvónő (csak olvasás)  | A Katica csoport beosztása                |
+| `public.group-admin-1@example.test`         | Csoportadminisztrátor | A Katica csoport                          |
+| `public.group-admin-2@example.test`         | Csoportadminisztrátor | A Süni csoport                            |
+| `public.super-admin@example.test`           | Szuperadminisztrátor  | A teljes óvoda, import, beállítások       |
 
-A menüpontok gombként jelennek meg; az éppen megnyitott oldal kiemelt
-(sötétebb) gomb. Telefonon a **Navigáció** felirattal összecsukható a menü.
-A fejléc logójára kattintva mindig a profil alapértelmezett oldalára jutsz
-vissza.
+A családok: Szabó, Kiss, Horváth, Varga, Molnár, Németh. A Katica csoportba az 1., 3. és 5. család (Szabó, Horváth,
+Molnár) tartozik, a Süni csoportba a 2., 4. és 6. A `parent-N` fiók az N-edik család szülője.
 
-Másik szerepkör kipróbálásához kattints a felső sávban a
-**Tesztprofil váltása** gombra, majd válassz új profilt. Ez a munkamenetet
-váltja; a módosított szintetikus adatokat külön kell alaphelyzetbe állítani.
+## 4. Bejelentkezés és kijelentkezés
 
-## 3. Szülői felület
+1. Nyisd meg a **Bejelentkezés** oldalt, írd be az e-mail-címet és a jelszót, majd kattints a **Bejelentkezés**
+   gombra. A sikeres belépés után a **Be van jelentkezve** üzenet jelenik meg. Ha a főoldalt nyitod meg, a program
+   rögtön a szerepköröd kezdőoldalára visz: szülőnél **Értesítések**, óvónőnél **Beosztás**, adminisztrátornál
+   **Áttekintés**. Nincs külön üdvözlő oldal.
+2. Próbálj hibás jelszót beírni: **Hibás e-mail-cím vagy jelszó.** üzenetet kapsz. Öt egymás utáni hibás próbálkozás
+   után a belépés egy időre zárolódik (**Túl sok sikertelen próbálkozás. Próbálja újra 15 perc múlva.**). A zárolás
+   magától megszűnik.
+3. A fejléc jobb oldalán lévő **Kijelentkezés** gombbal fejezheted be a munkamenetet. Kijelentkezés után a böngésző
+   „Vissza” gombja sem mutat már védett tartalmat.
+4. Ha olyan oldalt nyitsz meg, amelyhez a szerepkörödnek nincs joga (például szülőként az `/admin` címet),
+   **Nincs jogosultság** üzenetet látsz, és egy hivatkozás visz a saját kezdőoldalra.
 
-Válaszd a **Szülő** profilt. A program az **Értesítések** oldalt nyitja meg;
-a menüben az **Értesítések** és a **Feladatok** gomb jelenik meg (ebben a sorrendben).
+A menü minden oldalon ugyanaz, az éppen megnyitott oldal kiemelt gomb. A fejléc logójára kattintva mindig a
+kezdőoldalra jutsz. Telefonon a **Navigáció** felirattal összecsukható a menü.
 
-### 3.1 Feladatok böngészése és jelentkezés
+| Szerepkör             | Kezdőoldal  | Menü                                                                        |
+| --------------------- | ----------- | --------------------------------------------------------------------------- |
+| Szülő                 | Értesítések | Értesítések, Feladatok, Cserék                                              |
+| Óvónő                 | Beosztás    | nincs menü, mert a Beosztás az egyetlen oldal                               |
+| Csoportadminisztrátor | Áttekintés  | Áttekintés, Nyilvántartások, Feladatok és események, Jóváhagyások, Archívum |
+| Szuperadminisztrátor  | Áttekintés  | az előbbi öt, majd Importálás, Emlékeztetők, Adatvédelem, Beállítások       |
 
-1. Nyisd meg a **Feladatok** oldalt.
-2. Ellenőrizd a tesztlistában a különböző állapotokat:
-   - **Kerti előkészítés** – nyitott jelentkezés.
-   - **Őszi vásár előkészítése** – betelt.
-   - **Hétköznapi udvarrendezés** – ehhez a család nem jogosult.
-   - **Lámpás ünnep előkészítése** – már vállalt feladat.
-3. Nyisd meg a **Kerti előkészítés** részleteit, majd kattints a
-   **Jelentkezem** gombra.
-4. Ellenőrizd a sikeres visszajelzést. Frissítés után a feladat már vállalt
-   állapotú; megjelenik a lemondási kérelem lehetősége.
-5. Nyisd meg a betelt és a nem jogosult feladatot is. Mindkettőnél jelenjen
-   meg az állapot magyarázata, jelentkezési gomb nélkül.
+## 5. Elfelejtett jelszó
 
-### 3.2 Vállalt feladat, csere és lemondás
+1. A bejelentkezési oldalon kattints az **Elfelejtett jelszó** hivatkozásra.
+2. Írd be egy próbafiók címét (például `public.parent-1@example.test`), majd kattints a **Hivatkozás kérése**
+   gombra. A válasz mindig ugyanaz: **Ha az e-mail-cím ismert, elküldtük a jelszó-visszaállítási levelet.** Ez
+   szándékos: ismeretlen címnél sem derül ki, hogy létezik-e a fiók. Próbáld ki egy nem létező címmel is.
+3. Nyisd meg a helyi postafiókot (**http://127.0.0.1:54324**), és kattints a levélben lévő hivatkozásra.
+4. Add meg az **Új jelszó**-t (legalább 8 karakter, legyen benne betű és szám), és mentsd el. Ezután az új jelszóval
+   tudsz belépeni.
+5. A hivatkozás **csak egyszer** használható. Ha másodszor nyitod meg, az oldal jelzi, hogy a hivatkozás már nem
+   érvényes, és újat kérhetsz.
 
-1. Nyisd meg a **Lámpás ünnep előkészítése** feladatot.
-2. A **Saját hozzájárulási megjegyzés** mezőben módosítsd például az
-   „Almalevet viszünk.” szöveget, majd mentsd el.
-3. Próbáld ki a **Cserekérelem** oldalt: írj be egy kitalált indoklást, és
-   küldd el a kérelmet.
-4. Ellenőrizd a sikeres, függő állapotú visszajelzést. Az indoklás a
-   visszaigazolásban és a többi család számára nem jelenik meg.
-5. Térj vissza a feladathoz: a feladat oldalán megjelenik a **Cserekérelem
-   folyamatban** jelzés, a **Cserekérelem** és a **Lemondási kérelem**
-   hivatkozás pedig eltűnik, amíg a kérelem függőben van. Ugyanazt a kérelmet
-   nem lehet újra elküldeni; a kérelem oldala a jelzést és a feladathoz
-   visszavivő hivatkozást mutatja az űrlap helyett.
-6. Egy másik, még nem kérelmezett feladaton próbáld ki a **Lemondási
-   kérelem** oldalt is. Az indoklás legyen tesztszöveg, ne valódi személyes
-   adat.
+Figyelem: ha egy próbafiók jelszavát átállítod, az eredeti próbajelszó többé nem érvényes. Alaphelyzetbe állítás
+(lásd a 10. pontot) után a fiókok újra az eredeti jelszóval jönnek létre.
 
-### 3.3 Értesítések és meghívóállapotok
+## 6. Meghívó
 
-1. Nyisd meg az **Értesítések** oldalt (ez a szülő alapértelmezett oldala).
-2. Kattints egy értesítés kártyájára, bárhová a kártyán: megnyílik a
-   hozzá tartozó feladat, és az értesítés olvasottnak jelölődik. Külön
-   „Megnyitás” hivatkozás nincs. A menüben az **Értesítések** marad kiemelt,
-   a visszalépő hivatkozás pedig **Vissza az értesítésekhez** feliratú, és az
-   értesítések listájára visz. A listán az olvasott értesítés kártyája
-   szürkített (halványabb szöveg és háttér), az „Olvasott” felirattal.
-3. A kártya jobb oldalán lévő **Olvasottnak jelölöm** jelölőnégyzet
-   bejelölése azonnal olvasottnak jelöli az értesítést. Az olvasott
-   értesítés négyzete bejelölt és nem módosítható. Hiba esetén a négyzet
-   visszaáll, és rövid magyar hibaüzenet jelenik meg a kártyán.
-   JavaScript nélkül a négyzet mellett megjelenő **Mentés** gombbal
-   küldhető el a jelölés.
-4. A következő címekkel kipróbálhatod a meghívóoldal különböző állapotait:
-   - `/meghivas/parent-valid-invitation`
-   - `/meghivas/parent-expired-invitation`
-   - `/meghivas/parent-used-invitation`
-   - `/meghivas/not-a-known-token`
-5. A belépési oldal biztonságos folytatási útvonallal:
-   `/belepes?tovabb=/szulo/ertesitesek`
+A meghívóval egy új szülő vagy munkatárs hozza létre a saját fiókját: levelet kap egy hivatkozással, amely **7 napig
+érvényes és csak egyszer használható**; a megnyíló **Meghívó elfogadása** oldalon megadja a nevét és a jelszavát.
 
-## 4. Munkatársi, csak olvasási felület
+Amit most kézzel ki lehet próbálni:
 
-Válaszd a **Óvónő** profilt. A program a **Beosztás** oldalt nyitja meg.
-Menü nincs, mert ez az egyetlen oldal; a részletek oldalon és a tiltott
-oldalak üzenetén a **Vissza a beosztáshoz** hivatkozás, valamint a fejléc
-logója visszavisz ide.
+- Nyisd meg a `http://127.0.0.1:3000/meghivas/ismeretlen-hivatkozas` címet: a program általános üzenetet ad, hogy a
+  hivatkozás nem érvényes, és nem árul el semmit arról, hogy létezett-e. Ugyanezt látod lejárt vagy már felhasznált
+  hivatkozásnál.
+- A hivatkozás oldalán a **Bejelentkezés** hivatkozás a belépéshez visz.
 
-1. Az oldal első megnyitásakor a szűrők üresek: a **Csoport** mezőben
-   **Minden csoport** áll, a dátumok üresek, és a lista az összes, neked
-   engedélyezett csoport összes beosztási tételét mutatja. A mezők feliratai
-   a mezők fölött állnak.
-2. Válaszd a **Tölgyfa csoport** értéket, állítsd a kezdő és záró dátumot
-   egyaránt **2026-08-14** értékre, majd kattints a **Szűrés** gombra. A
-   találatok között meg kell jelennie a **Kézműves előkészítés**
-   tevékenységnek. Csak az egyik dátum megadása is működik (egyoldali
-   korlát); ha a kezdő dátum későbbi a záró dátumnál, magyar hibaüzenetet
-   kapsz.
-3. Kattints egy beosztási tétel sorára vagy kártyájára (bárhová rajta) a
-   részletek megnyitásához. A **Vissza a beosztáshoz** hivatkozás a teljes,
-   szűretlen listára visz vissza. Az állapotszó előtt jelzőszimbólum áll
-   (például ▦ az **Ütemezve** előtt); a szimbólum csak díszítés, a szó
-   mindig ott van.
-4. Próbálj olyan dátumtartományt megadni, amelyre nincs találat; ellenőrizd
-   az üres állapotot és a **Szűrők törlése** linket.
-5. Kattints a **Szűrők törlése** gombra: minden mező kiürül (az olyan, még el
-   nem küldött beírt érték is, mint a félig kitöltött dátum), a csoport
-   **Minden csoport** lesz, és a teljes lista látszik. Ezután nyiss meg egy
-   részletet, és a **Vissza** gombbal (böngészőgomb is) térj vissza: a
-   mezők üresek maradnak. A törlés után a fókusz az oldal címére kerül.
-6. Ellenőrizd, hogy az oldalon nincs feladatmódosító vagy jóváhagyó művelet,
-   és a profilváltón kívül nem jelenik meg szerkesztési lehetőség.
+Fontos tudnivaló: **a meghívók elküldésére még nincs képernyő vagy parancs** az alkalmazásban; a meghívó létrehozása
+és elfogadása a háttérben (programkódban) működik, és az automatikus tesztek végigpróbálják. Ezért egy teljes,
+kézzel végigvihető meghívós próba most nem lehetséges; erről a hiányról külön jelentés szól (lásd
+`verification/reports/u5-workbook-and-known-limits.md`).
 
-Opcionális jogosultsági próba: nyisd meg közvetlenül ezt a címet:
+## 7. Szülői felület
 
-```text
-/munkatars/beosztas?csoport=group-ungranted&kezdet=2026-08-12&veg=2026-08-20
-```
+Jelentkezz be a `public.parent-1@example.test` fiókkal (a Szabó család). A kezdőoldal az **Értesítések**; az első
+bejelentkezéskor még nincs értesítés (**Nincs értesítés.**).
 
-A nem engedélyezett csoport adatai helyett általános hozzáférés-megtagadást
-kell kapnod.
+### 7.1 Feladatok böngészése és jelentkezés
 
-## 5. Csoportadminisztrátori felület
+1. Nyisd meg a **Feladatok** oldalt. A Szabó családnak három feladat látszik: **Takarítás** és **Sütés** (ezeket a
+   család már vállalta: **Vállalt feladat**), valamint a **Díszítés**, amelyre még lehet jelentkezni (**Jelentkezésre
+   nyitott**; két helyből egy szabad). A **Takarítás** körülbelül egy hét múlva, a másik két feladat körülbelül tíz nap
+   múlva van; a dátumokat a próbaadat a betöltés napjától számolja.
+2. A **Szűrés** gomb melletti **Állapot** listával állapot szerint szűrhetsz. Az állapotszavak előtt kis jel áll (●
+   Jelentkezésre nyitott, ■ Betelt, ⊘ Nem jogosult, ✓ Vállalt feladat, ◔ kérelem folyamatban); a jel csak
+   díszítés, a szó mindig ott van.
+3. Nyisd meg a **Díszítés** részleteit, és kattints a **Jelentkezem** gombra. Siker esetén visszajelzést kapsz;
+   frissítés után a feladat már vállalt, és megjelenik a lemondási kérelem lehetősége.
+4. Nyisd meg az **Értesítések** oldalt: a jelentkezésről értesítés érkezett (**Jelentkezés megerősítve: Díszítés**).
 
-Válaszd a **Csoportadminisztrátor** profilt. A program az **Áttekintés**
-oldalt nyitja meg; a menüben az **Áttekintés**, **Nyilvántartások**,
-**Feladatok és események**, **Jóváhagyások** és **Archívum** gomb látszik.
-A listák elemei egyetlen kattintható kártyák (nincs külön „Részletek”
-hivatkozás), az állapotok magyarul jelennek meg (Függőben, Jóváhagyva,
-Aktív, Archivált, Nyitott, Ütemezve). Minden listának a saját állapotait
-kínáló szűrője van (jóváhagyásoknál Függőben, Jóváhagyva, Elutasítva;
-nyilvántartásoknál Aktív, Archivált; feladatoknál Nyitott, Ütemezve). Minden
-állapotszó előtt kis szimbólum áll (✓ Jóváhagyva, ✕ Elutasítva, ◔ Függőben,
-● Aktív, ○ Archivált, ◐ Nyitott, ▦ Ütemezve), a szűrő legördülő listájában
-is; a szimbólum csak díszítés, a szó mindig ott van. A **Keresés** és az
-**Állapot** felirata a mezője fölött áll, a **Szűrők törlése** gomb pedig
-minden mezőt kiürít és a szűretlen listát mutatja (az Archívum listán nincs
-szűrő). Az **Új elem** és az **Új feladat vagy esemény** a lista tetején
-gombként jelenik meg. Minden részletes oldalon és az **Új elem**, valamint
-az **Új feladat vagy esemény** űrlapon **Vissza a …** hivatkozás visz a
-megfelelő listához, a szűrő megtartásával. Az üres kötelező mező
-beküldésekor magyar hibaüzenet jelenik meg a mező mellett.
+### 7.2 Értesítések
 
-A technikai részletek (a kapacitási és egyéb forgatókönyv-választók, a
-„Verzió” és a „Korreláció” sor) az oldalak alján az alapból összecsukott
-**Fejlesztői részletek** szakaszban találhatók; a próbákhoz nyisd ki.
+1. Kattints egy értesítés kártyájára, bárhová a kártyán: megnyílik a hozzá tartozó feladat, és az értesítés
+   olvasottnak jelölődik. A menüben az **Értesítések** marad kiemelt, a visszalépő hivatkozás **Vissza az
+   értesítésekhez** feliratú.
+2. A kártyán lévő **Olvasottnak jelölöm** jelölőnégyzet bejelölése azonnal olvasottnak jelöli az értesítést; az
+   olvasott kártya halványabb, az „Olvasott” felirattal, és a négyzete nem módosítható.
+3. Az értesítések szövege magyar; a szolgáltatói állapotok helyben szimuláltak, valós kézbesítést nem igazolnak.
 
-1. Az áttekintő oldalon jegyezd fel a függő jóváhagyások számát.
-2. Nyisd meg a feladatokat, szűrj vagy keress rá a
-   **Kerti előkészületek** feladatra.
-3. A részleteknél próbáld ki a hozzárendelést. A **Fejlesztői részletek**
-   alatt a **Betelt kapacitás** forgatókönyvvel ellenőrizd az ütközési
-   visszajelzést; ezután próbáld ki a jogosult, szabad kapacitású
-   forgatókönyvet.
-4. Nyisd meg a **Jóváhagyások** listát. Válassz egy függő feladatcsere- vagy
-   lemondási kérelmet, jelöld meg a döntést, majd rögzítsd.
-5. Opcionális: közvetlenül próbáld megnyitni az `/admin/import`,
-   `/admin/emlekeztetok`, `/admin/adatvedelem` vagy `/admin/beallitasok`
-   címet. A csoportadminisztrátor ezekhez nem férhet hozzá, és a menüjében
-   sem szerepelnek.
+### 7.3 Csere és lemondás
 
-## 6. Szuperadminisztrátori felület
+1. Nyisd meg a **Sütés** feladatot (ezt a család már vállalta), és kattints a **Cserekérelem** hivatkozásra.
+2. Válaszd ki a listából, melyik másik családi feladatra cserélnél, írj be egy kitalált indoklást, és küldd el
+   (**Cserekérelem elküldése**). Választás nélkül a program nem küld el semmit, és kéri a választást.
+3. A kérelem függő állapotú: a feladat oldalán **Cserekérelem folyamatban** jelzés áll, a **Cserekérelem** és a
+   **Lemondási kérelem** hivatkozás eltűnik, ugyanaz a kérelem nem küldhető el újra. Az indoklás más családnak nem
+   jelenik meg.
+4. A **Cserék** oldalon látod a rád váró és az általad kért cseréket. A másik család a saját fiókjával **Megerősítés**
+   vagy **Elutasítás** gombbal válaszol; a saját kérelmedet **Visszavonás** gombbal vonhatod vissza.
+5. A **Lemondási kérelem** ugyanígy működik; ezt az adminisztrátor bírálja el (lásd 9. pont).
+6. A **Saját megjegyzés mentése** mezőben a saját hozzájárulásodhoz írhatsz megjegyzést (például „Almalevet
+   viszünk.”). Más család megjegyzését nem látod és nem módosíthatod.
 
-Válaszd a **Szuperadminisztrátor** profilt. A csoportadminisztrátori
-menüpontokon felül a következők jelennek meg: **Importálás**,
-**Emlékeztetők**, **Adatvédelem** és **Beállítások**.
+### 7.4 Ami nem a tiéd
 
-### 6.1 Nyilvántartás és feladat
+A másik csoport feladatát (például a Süni csoport Sütés feladatát) a szülő nem éri el: az oldal általános „nem
+érhető el” üzenetet ad, és nem árul el róla semmit.
 
-- A **Nyilvántartások** oldalon keress rá a **Fenyő család** vagy a
-  **Boróka csoport** elemre. Nyiss meg egy elemet, módosítsd a
-  megnevezését, majd mentsd el. Elemet archiválni, illetve az archívumból
-  visszaállítani is lehet. Új elemet az **Új elem** gombbal hozhatsz létre
-  (az űrlapon az **Elem típusa** mező és az **Elem létrehozása** gomb áll).
-- A **Feladatok** oldalon nyiss meg egy feladatot. Módosítsd a
-  megnevezését, próbáld ki a hozzárendelést, majd teszteld a betelt vagy
-  nem jogosult állapotot.
+## 8. Óvónői, csak olvasási felület
 
-### 6.2 Szintetikus Excel-import
+Jelentkezz be a `public.teacher-1@example.test` fiókkal. A kezdőoldal a **Beosztás**; menü nincs, a részletek
+oldalon és a tiltott oldalak üzenetén a **Vissza a beosztáshoz** hivatkozás, valamint a fejléc logója visszavisz.
 
-1. Nyisd meg az **Importálás** oldalt.
-2. Hagyd kiválasztva a **Waldorf 30 család — v1** szintetikus munkafüzetet
-   és az **Érvényes** forgatókönyvet (a forgatókönyv-választók az oldal alján,
-   a **Fejlesztői részletek** szakaszban vannak; a mentési forgatókönyv
-   ugyanott módosítható).
-3. Kattints az **Ellenőrzés és előnézet** gombra. Ellenőrizd a sorok számát,
-   az ujjlenyomatot és a változásösszesítőt.
-4. Az ütközésnél válaszd a **Meglévő adat megtartása** vagy az
-   **Importált adat használata** lehetőséget, majd kattints az
-   **Ütközés feloldása** gombra.
-5. Jelöld be a következmények megerősítését, hagyd a mentési forgatókönyvet
-   **Sikeres** értéken, és kattints az **Import véglegesítése** gombra.
-6. Elvárt eredmény: **3 elem módosult, 1 sor változatlan maradt**.
+1. Az oldal első megnyitásakor a szűrők üresek: a **Csoport** mezőben **Minden csoport** áll, a dátumok üresek, és a
+   lista a három beosztási tételt mutatja. Az óvónő csak a neki kijelölt csoportot látja; a csoport neve a
+   listában általános **Engedélyezett csoport** felirattal jelenik meg.
+2. Adj meg kezdő és záró dátumot (például a mai naptól számított tizedik napot), és kattints a **Szűrés** gombra:
+   csak az aznapi tételek maradnak. Csak az egyik dátum megadása is működik; ha a kezdő dátum későbbi a záró
+   dátumnál, magyar hibaüzenetet kapsz.
+3. Kattints egy tétel sorára vagy kártyájára (bárhová rajta): megnyílik a részletek oldal a felelős és a beosztott
+   családokkal és az állapottal (**Nyitott**).
+4. A **Szűrők törlése** gomb minden mezőt kiürít (a be nem küldött beírt értéket is), és a teljes listát mutatja.
+5. Ellenőrizd, hogy az oldalon nincs módosító vagy jóváhagyó művelet, csak a **Kijelentkezés** gomb.
 
-Ez a próba nem tölt fel valódi munkafüzetet és nem ír éles adatbázisba.
-Külön próbához választható a hibás fájl, túl nagy fájl, hiányzó munkalap,
-hiányzó oszlop vagy megszakított mentés forgatókönyve. Megszakítás után
-használd a **Helyreállítás folytatása** gombot.
+## 9. Adminisztrátori felületek
 
-### 6.3 Emlékeztetők és adatvédelem
+### 9.1 Csoportadminisztrátor
 
-- Az **Emlékeztetők felügyelete** oldalon keresd meg a Lámpás ünnep
-  újrapróbálható értesítését. Kattints az **Újrapróbálás** gombra, majd
-  ellenőrizd az állapotot. Az elküldött vagy elavult emlékeztető nem
-  újrapróbálható.
-- Az **Adat-életciklus** oldalon ellenőrizd a távozott családok
-  jelöltjeit. A megőrzési kötelezettséggel blokkolt elemnél ne legyen
-  végrehajtható törlési művelet. A többi művelet csak helyi próbaadatot érint.
-- A **Beállítások és jogosultságok** oldalon válassz másik engedélyezett
-  címzetti kört, majd mentsd el az emlékeztető-beállítást. A képernyőn
-  szereplő kézbesítés szimulált.
+Jelentkezz be a `public.group-admin-1@example.test` fiókkal (Katica csoport). Az **Áttekintés** a függő jóváhagyások,
+a nyilvántartások és a feladatok számát mutatja; a számokra kattintva a megfelelő listára jutsz.
 
-## 7. Szuperadminisztrátori próba
+1. A **Nyilvántartások** oldalon csak a Katica csoport családjai, gyerekei és a csoport látszik; a másik csoport
+   (például a Kiss család) nem. Ha a másik csoport egy elemének címét közvetlenül próbálod megnyitni, **Nincs
+   jogosultság** üzenetet kapsz.
+2. Az **Új elem** gombbal új családot hozhatsz létre: válaszd ki a csoportot, add meg a család és a szülők nevét,
+   e-mail-címét. Üres kötelező mezőnél magyar hibaüzenet jelenik meg a mező mellett.
+3. A **Feladatok és események** oldalon nyisd meg a **Díszítés** feladatot. A **Hozzárendelés** résznél válassz
+   családot és kattints a **Hozzárendelés** gombra. Ha a feladat betelt, a program a kapacitás elérését jelzi.
+4. A **Jóváhagyások** lista akkor kap elemet, ha egy szülő lemondást vagy cserét kér (lásd 7.3). Nyisd meg a
+   kérelmet, jelöld meg a **Döntés**-t, és kattints a **Döntés rögzítése** gombra; a szülő értesítést kap a
+   döntésről.
+5. A listák elemei egyetlen kattintható kártyák, az állapotok magyarul jelennek meg (Függőben, Jóváhagyva, Aktív,
+   Archivált, Nyitott, Ütemezve). Minden listának a saját állapotait kínáló szűrője van; a **Szűrők törlése** gomb
+   minden mezőt kiürít. Minden részletes oldalról **Vissza a …** hivatkozás visz a listához, a szűrő megtartásával.
+6. A technikai részletek (verziószám) az oldalak alján az alapból összecsukott **Fejlesztői részletek** szakaszban
+   vannak.
+7. Az `/admin/import`, `/admin/emlekeztetok`, `/admin/adatvedelem` és `/admin/beallitasok` címet a csoportadminisztrátor
+   nem érheti el, és a menüjében sem szerepelnek.
 
-Válaszd a **Szuperadminisztrátor** profilt, majd nyisd meg a
-**Beállítások és jogosultságok** oldalt. A szuperadminisztrátori
-jogosultságok szakaszban:
+### 9.2 Szuperadminisztrátor
 
-1. Próbáld meg visszavonni a saját hozzáférést; a rendszernek ezt meg kell
-   akadályoznia.
-2. Válaszd a kijelölt csoportadminisztrátori jogosultság szabályos
-   visszavonását.
-3. Válts át a **Csoportadminisztrátor** profilra. A következő kérésnél
-   hozzáférés-megtagadást kell kapnod.
+Jelentkezz be a `public.super-admin@example.test` fiókkal. A csoportadminisztrátori menüpontokon felül megjelenik az
+**Importálás**, az **Emlékeztetők**, az **Adatvédelem** és a **Beállítások**.
 
-Ez szándékosan módosítja a helyi tesztadatot. Alaphelyzetbe állítás után
-az eredeti szerepkörök visszaállnak.
+- **Nyilvántartások és archívum.** Egy család az **Archiválás** gombbal az **Archívum**ba kerül, onnan a
+  **Visszaállítás** gombbal hozható vissza.
+- **Beállítások és jogosultságok.** Az **Emlékeztető-beállítások** résznél válassz másik engedélyezett **Címzetti kör**t,
+  és mentsd el (**Beállítások mentése**). A **Szuperadminisztrátori jogosultságok** szakaszban minden fiók
+  jogosultsága mellett ott a **Jogosultság visszavonása** gomb. Próbáld ki a `group-admin-1` jogosultságának
+  visszavonását: az érintett személy a **következő kérésénél** már megtagadást kap (lásd 11. pont). Ezzel a próba
+  adatot módosítottad; az alaphelyzetbe állítás visszahozza.
+- **Emlékeztetők** és **Adatvédelem.** A két oldal az emlékeztetők állapotát és az adat-életciklus jelöltjeit
+  mutatja; frissen betöltött adatnál üresek (**Nincs a szűrésnek megfelelő feladat.**, **Nincs életciklus-jelölt.**).
+- **Importálás.** Az import egy Excel-munkafüzet (.xlsx) feltöltésével indul, majd hét lépésben halad: kiválasztás,
+  ellenőrzés, előnézet, ütközések, megerősítés, mentés, eredmény. **Csak kitalált adatokat tartalmazó munkafüzetet
+  tölts fel; a valódi szülői táblázatot soha.** Kitalált próbamunkafüzetet a fejlesztőtől kérhetsz; az automatikus
+  tesztek az egész folyamatot (ütközések, megszakadt mentés, helyreállítás) végigpróbálják. A **Fejlesztői
+  részletek** nem tartalmaznak választót: az import mindig a valódi feltöltött fájllal dolgozik.
 
-## 8. Billentyűzetes és mobilpróba
+## 10. Tesztadatok alaphelyzetbe állítása
 
-- A **Tab** billentyűvel keresd meg az **Ugrás a fő tartalomra** linket;
-  az **Enter** vigyen a fő tartalomra.
-- Próbáld ki az oldalakat 200%-os nagyítással. Ne jelenjen meg levágott
-  vagy vízszintes görgetésre kényszerülő tartalom.
-- Mobilnézetben ellenőrizd a kártyás beosztáslistát és a fő műveleti
-  gombok kényelmes érintési méretét.
-
-## 9. Tesztadatok alaphelyzetbe állítása
-
-Ha a próbák során módosítottad a feladatokat, értesítéseket, importot vagy
-jogosultságokat, az alábbi parancs visszaállítja a szintetikus
-memóriaállapotot:
+Ha a próbák során módosítottál adatokat, a terminálban (a program futása közben egy másik ablakban) add ki:
 
 ```bash
-curl -X POST http://127.0.0.1:3000/api/synthetic/reset \
-  -H 'Origin: http://127.0.0.1:3000'
+npm run db:reset -- --yes
+npm run db:seed
 ```
 
-Siker esetén a válaszban `SYNTHETIC_FIXTURE_RESET` és
-`waldorf-local-v1` szerepel. A kiválasztott profil munkamenete megmarad;
-szerepkörváltáshoz használd a **Tesztprofil váltása** gombot. A fejlesztői
-kiszolgálót a terminálban **Ctrl+C** billentyűkombinációval állíthatod le.
+A `db:reset` kiüríti az adatbázist (a `--yes` kapcsoló kell hozzá: így nem törlődhet véletlenül a munkaadatod) és törli a próbafiókokat, a `db:seed` pedig újra létrehozza őket az eredeti
+jelszóval. Ha a böngészőben közben be voltál jelentkezve, a korábbi munkamenet már nem érvényes: jelentkezz be
+újra. A két parancs alapból azt az adatbázis-részt kezeli, amelyet az `npm run dev` is használ.
+
+A nagy, 30 családos próbaadatot a `npm run db:seed:large` tölti be (előtte `npm run db:reset -- --yes`).
+
+## 11. Több emberrel egyszerre
+
+Egy böngésző egyszerre egy fiókot tud, mert a belépés süti a böngészőben él. Több ember (vagy több szerepkör) egy
+időben történő próbájához minden szereplőnek **külön böngésző** vagy **külön privát ablak** kell (például Chrome,
+Firefox és egy privát ablak). Ha ugyanabban a böngészőben másik fiókkal lépsz be, az előző kijelentkezik.
+
+Ajánlott próbák:
+
+1. **Két szülő ugyanarra az utolsó helyre jelentkezik.** A **Díszítés** feladatnak két helye van, ebből egy szabad.
+   Az egyik böngészőben a `parent-1`, a másikban a `parent-3` fiókkal nyisd meg a **Díszítés** feladatot, és mindketten
+   kattintsatok a **Jelentkezem** gombra körülbelül egy időben. Pontosan az egyiküké lesz a hely; a másik
+   azt látja, hogy a feladat betelt, jelentkezési gomb nélkül.
+2. **Csere két családdal.** A `parent-1` cserét kér a **Sütés** feladatra, a másik családé a választott partnerfeladat.
+   A másik család fiókjával a **Cserék** oldalon **Megerősítés** vagy **Elutasítás** a válasz; mindkét család
+   értesítést kap a döntésről.
+3. **Lemondás és jóváhagyás.** A `parent-1` lemondási kérelmet küld; közben a `group-admin-1` böngészőjében a
+   **Jóváhagyások** oldal frissítés után megmutatja a kérelmet. A **Döntés rögzítése** után a szülő értesítést kap.
+4. **Jogosultság visszavonása közben.** A `group-admin-1` az egyik böngészőben az **Áttekintés** oldalon van. A
+   szuperadminisztrátor egy másik böngészőben visszavonja a jogosultságát. Az első böngészőben a következő
+   oldalbetöltésnél **Nincs jogosultság** jelenik meg, és a menü eltűnik.
+5. **Jelszó-visszaállítás párhuzamosan.** Két böngészőben két különböző fiók kér visszaállítást: mindegyik a saját
+   levelét kapja a helyi postafiókban, és a másik fiók belépése közben is működik.
+
+## 12. Billentyűzetes és mobilpróba
+
+- A **Tab** billentyűvel keresd meg az **Ugrás a fő tartalomra** hivatkozást; az **Enter** vigyen a fő tartalomra.
+- Próbáld ki az oldalakat 200%-os nagyítással. Ne jelenjen meg levágott vagy vízszintes görgetésre kényszerítő
+  tartalom. Keskeny (320 képpontos) képernyőn sem.
+- Mobilnézetben (a böngésző fejlesztői eszközeiben telefon-méretre állítva) ellenőrizd a kártyás beosztáslistát és
+  a fő gombok kényelmes érintési méretét (legalább 44 képpont).
+
+## 13. Leállítás
+
+A programot a terminálban **Ctrl+C**-vel állíthatod le. Az adatbázist a `npm run db:stop` állítja le; az adatok a
+következő indításig megmaradnak.
 
 ## Tesztjegyzetek
 
-| Próba | Elvárt eredmény | Eredmény / megjegyzés |
-|---|---|---|
-| Profilok és navigáció | Minden profil az alapértelmezett oldalát nyitja; a menü minden oldalon ugyanaz, az aktuális oldal kiemelt; az óvónőnek nincs menüje | |
-| Listaelemek és állapotok | Minden listaelem egyetlen kattintható kártya; az állapotok magyarul látszanak | |
-| Értesítés olvasottnak jelölése | A négyzet bejelölése azonnal olvasottá teszi; az olvasott négyzet bejelölt és nem módosítható; az olvasott kártya szürkített | |
-| Értesítés megnyitása | A kártya megnyitja a feladatot, a menüben az Értesítések marad kiemelt, a „Vissza az értesítésekhez” hivatkozás a listára visz, és az értesítés olvasott lesz | |
-| Függő kérelem | Elküldés után megjelenik a függő jelzés; a kérelem hivatkozásai eltűnnek, ugyanaz nem küldhető újra | |
-| Admin visszalépés és szűrők | Minden részletes oldalon és űrlapon van Vissza hivatkozás; a szűrők csak az adott listára érvényes állapotokat kínálják | |
-| Technikai szövegek | Verzió, Korreláció és forgatókönyv-választók csak a Fejlesztői részletek szakaszban látszanak | |
-| Szülői jelentkezés | Nyitott feladat vállalható; betelt/nem jogosult feladat nem | |
-| Csere és lemondás | Kérelem elküldése sikeres, az indoklás nem jelenik meg más nézetben | |
-| Munkatársi beosztás | Szűrés és részletek működnek; nincs módosító művelet; az első megnyitás szűretlen (Minden csoport, üres dátumok); az állapot „Ütemezve” szóval és szimbólummal látszik | |
-| Szűrők törlése | A teljes beosztáson és mindhárom admin listán minden mezőt kiürít (a be nem küldött beírt értéket is), a szűretlen lista látszik, a fókusz a címre kerül | |
-| Mezők elrendezése | A feliratok minden szűrőn és űrlapon a mezőjük fölött állnak 320 px-en és asztali nézetben is, vízszintes görgetés nélkül | |
-| Gombok és szimbólumok | Az Új elem és az Új feladat vagy esemény gomb; minden állapotszó előtt szimbólum áll, a legördülő listában is | |
-| Adminisztrátori jogosultságok | Korlátozott profilnál a tiltott oldal megtagadott | |
-| Import és helyreállítás | Előnézet, ütközésfeloldás és eredmény vagy helyreállítás látható | |
-| Emlékeztető és beállítás | Újrapróbálás és címzetti beállítás szimulált állapotot mutat | |
-| Billentyűzet / mobil | Fókusz, nagyítás és mobil elrendezés használható | |
+| Próba                             | Elvárt eredmény                                                                                                | Eredmény / megjegyzés |
+| --------------------------------- | -------------------------------------------------------------------------------------------------------------- | --------------------- |
+| Bejelentkezés és kijelentkezés    | Helyes jelszóval belép, hibással magyar hibaüzenet; kijelentkezés után a védett oldal nem látszik              |                       |
+| Zárolás                           | Öt hibás próbálkozás után a zárolás üzenete, később újra lehet próbálni                                        |                       |
+| Elfelejtett jelszó                | Mindig ugyanaz a válasz; a levél a helyi postafiókban van; a hivatkozás csak egyszer használható               |                       |
+| Meghívó                           | Érvénytelen hivatkozásnál általános üzenet; a teljes folyamatot az automatikus tesztek végzik (nincs képernyő) |                       |
+| Kezdőoldalak és menük             | Minden szerepkör a saját kezdőoldalát nyitja; a menü minden oldalon ugyanaz, az óvónőnek nincs menüje          |                       |
+| Szülői jelentkezés                | A nyitott feladat vállalható, értesítés érkezik; a betelt feladat nem                                          |                       |
+| Értesítések                       | A kártya megnyitja a feladatot és olvasottá teszi; a jelölőnégyzet azonnal olvasottá teszi                     |                       |
+| Csere és lemondás                 | A kérelem függő, ugyanaz nem küldhető újra; a másik család megerősíthet vagy elutasíthat                       |                       |
+| Óvónői beosztás                   | Szűrés és részletek működnek; nincs módosító művelet; az első megnyitás szűretlen                              |                       |
+| Admin listák és szűrők            | Minden lista a saját állapotait kínálja; a Szűrők törlése mindent kiürít; a részletes oldalról van Vissza      |                       |
+| Admin hozzárendelés és jóváhagyás | Betelt feladatnál kapacitásüzenet; a kérelem elbírálása értesítést ad a szülőnek                               |                       |
+| Jogosultságok                     | Szülő, óvónő és csoportadmin nem éri el az importot, a beállításokat és az adatvédelmet; megtagadás üzenet     |                       |
+| Jogosultság visszavonása          | A visszavont fiók a következő kérésnél megtagadást kap                                                         |                       |
+| Több ember egyszerre              | Két szülő az utolsó helyre: egyiküké a hely; a másik a betelt állapotot látja                                  |                       |
+| Alaphelyzet                       | A `db:reset` és `db:seed` után minden próbafiók az eredeti jelszóval és adatokkal újra elérhető                |                       |
+| Billentyűzet / mobil              | Fókusz, nagyítás és mobil elrendezés használható, vízszintes görgetés nélkül                                   |                       |

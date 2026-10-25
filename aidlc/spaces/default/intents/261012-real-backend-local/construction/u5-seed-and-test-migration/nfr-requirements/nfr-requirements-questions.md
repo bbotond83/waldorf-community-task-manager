@@ -11,7 +11,7 @@ B. Same isolation, but the three browsers run at the same time. About one third 
 C. Reset before every single test. The strongest isolation and by far the slowest.
 X. Other (please specify)
 
-[Answer]:
+[Answer]: A. Each browser gets its own schema and its own server; the schema is reset to the small seed before every test file; the browsers run one after another.
 
 ## Q2. [Owner] How fast must the seed and reset commands be on your machine?
 
@@ -22,7 +22,7 @@ B. Same numbers, but reported only; a slow run never fails the build.
 C. Not yet defined for the 30-family set.
 X. Other (please specify)
 
-[Answer]:
+[Answer]: A. Keep the two targets and add one for the 30-family seed: within 120 seconds. A command that goes over its limit is reported as failed by the timing test.
 
 ## Q3. [Owner] Which of the open items from the earlier units should U5 fix?
 
@@ -33,7 +33,7 @@ B. Fix both.
 C. Fix neither; list both as open items in the final report.
 X. Other (please specify)
 
-[Answer]:
+[Answer]: A. Fix (1) only; list (2) as a known limit in the final report.
 
 ## Assumptions (no answer needed; tell me if one is wrong)
 
@@ -45,3 +45,17 @@ X. Other (please specify)
 6. Dependencies: the first task of this unit updates `zod` and the packages behind `undici` so `npm audit` with high and critical blocking passes again.
 7. The import screen's header "Adminisztráció · szintetikus folyamat" becomes "Adminisztráció · Import", since no synthetic mode remains.
 8. Reliability and observability follow U2 to U4: expected failures are result codes, unexpected ones are logged once with an event code and no personal data.
+
+## Consolidated Summary Confirmation
+
+- Browser tests: each of the three browsers has its own schema and server, reset to the small seed before every test file, running one after another.
+- Timing: small seed within 60 s, reset within 30 s, 30-family seed within 120 s; a timing test fails the build above a limit.
+- Open items: the 365-day audit purge is built in this unit; reminder re-planning on a group change stays a known limit.
+- The eight assumptions at the top of the file stand (local-only guard, fictitious fixed-id seed, deletions proven by tests, 80% coverage, documents, dependency fix first, import header "Adminisztráció · Import", result-code error handling).
+
+Does this all look correct before I generate the artifacts?
+
+- Looks correct
+- Request changes
+
+[Answer]: Looks correct

@@ -24,8 +24,6 @@ const session: SessionContext = {
   ]),
   roles: ["parent"],
   scopes: [{ id: "family-1", type: "family", organizationId: "org-1" }],
-  runtimeMode: "synthetic",
-  isSynthetic: true,
 };
 
 const authorized: AuthorizedContext = {
@@ -99,7 +97,7 @@ describe("application contracts", () => {
     );
   });
 
-  it("records synthetic PASS but keeps linked targets OUTSTANDING", async () => {
+  it("records database PASS but keeps linked targets OUTSTANDING", async () => {
     const journal = new InMemoryApplicationJournal();
     const clock: Clock = { now: () => new Date("2026-08-12T10:00:00.000Z") };
     let sequence = 0;
@@ -114,10 +112,7 @@ describe("application contracts", () => {
       outcome: "passed" as const,
     };
 
-    assert.equal(
-      (await recorder.record({ ...base, executionTarget: "synthetic-local" })).status,
-      "PASS",
-    );
+    assert.equal((await recorder.record({ ...base, executionTarget: "database" })).status, "PASS");
     assert.equal(
       (await recorder.record({ ...base, executionTarget: "linked-target" })).status,
       "OUTSTANDING",

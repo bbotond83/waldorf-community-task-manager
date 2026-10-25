@@ -264,8 +264,11 @@ describe("assignTaskAction with the family selector", () => {
     });
   });
 
-  it("assigns without a selector like the old form", async () => {
-    await assignTaskAction(initial, form({ idempotencyKey: "assignment:0123456789" }));
-    expect(world.facade.assign.mock.calls[0]![1].payload).toEqual({ scenario: "" });
+  it("assigns without a family selector with an empty payload, and sends no scenario word even when asked", async () => {
+    await assignTaskAction(
+      initial,
+      form({ idempotencyKey: "assignment:0123456789", scenario: "full" }),
+    );
+    expect(world.facade.assign.mock.calls[0]![1].payload).toEqual({});
   });
 });

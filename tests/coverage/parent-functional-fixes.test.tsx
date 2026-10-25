@@ -1,17 +1,13 @@
-import { beforeEach, afterEach, expect, it, vi } from "vitest";
+import { beforeEach, expect, it, vi } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import type { ReactNode } from "react";
-import { createSyntheticSessionToken } from "../../src/runtime/session/session.ts";
-import { getSyntheticProfile } from "../../src/runtime/synthetic/profiles.ts";
-import { resetSyntheticParentState } from "../../src/parent-web/index.ts";
-import { resetParentFacadeCache } from "../../app/szulo/_lib/facade.ts";
 import * as actions from "../../app/szulo/actions.ts";
+import { requestWorld } from "../support/request-world.ts";
 
-const boundary = vi.hoisted(() => ({ token: undefined as string | undefined }));
 vi.mock("server-only", () => ({}));
-vi.mock("next/headers", () => ({
-  cookies: async () => ({ get: () => (boundary.token ? { value: boundary.token } : undefined) }),
-}));
+vi.mock("../../app/_identity/production-request.ts", async () =>
+  (await import("../support/request-world.ts")).requestWorldModule(),
+);
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 vi.mock("next/navigation", () => ({
   redirect: (path: string) => {
@@ -23,12 +19,9 @@ vi.mock("next/navigation", () => ({
 }));
 
 beforeEach(() => {
-  vi.stubEnv("APP_RUNTIME_MODE", "synthetic");
-  boundary.token = createSyntheticSessionToken(getSyntheticProfile("parent-local")!);
-  resetSyntheticParentState();
-  resetParentFacadeCache();
+  requestWorld.reset();
+  requestWorld.signIn("parent");
 });
-afterEach(() => vi.unstubAllEnvs());
 
 type Page = (input: {
   params: Promise<{ id: string }>;
@@ -59,7 +52,7 @@ async function requestSwap() {
     form({
       id: "duty-assigned",
       assignmentId: "assignment-lampas",
-      counterpartId: "assignment-counterpart",
+      counterpart: "assignment-counterpart:1",
       expectedVersion: "4",
       idempotencyKey: "swap:duty-assigned:v4",
       reason: "Invented reason",

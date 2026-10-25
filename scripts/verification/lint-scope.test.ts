@@ -11,21 +11,13 @@ const scripts = JSON.parse(readFileSync(new URL("package.json", root), "utf8")).
 /**
  * Source folders that are deliberately outside the lint and format scope: the demo-era modules that the
  * replacement units remove (BR34.1: U3 deleted src/directory, src/coordination, src/parent-experience
- * and src/privacy-audit, U4 deleted src/notifications and src/import-migration; U5 removes the running
- * synthetic adapters) and the modules U5 still owns. The list only shrinks: a folder in it that no longer exists fails the test, so deleting a
+ * and src/privacy-audit, U4 deleted src/notifications and src/import-migration, U5 deleted the five synthetic
+ * adapter modules) and two older folders that stay outside the scope. The list only shrinks: a folder in it that no longer exists fails the test, so deleting a
  * module forces the line out of this list, and a new folder that is in neither the scope nor this list
  * fails too, so new code cannot silently skip the blocking checks (NFR2.10, team practice: Prettier and
  * ESLint are blocking checks).
  */
-const LEGACY_OUTSIDE_SCOPE = [
-  "src/access",
-  "src/admin-advanced",
-  "src/admin-core",
-  "src/admin-experience",
-  "src/parent-web",
-  "src/teacher-tracking",
-  "src/teacher-web",
-] as const;
+const LEGACY_OUTSIDE_SCOPE = ["src/access"] as const;
 
 const SCOPED_SCRIPTS = ["lint", "format", "format:check"] as const;
 

@@ -1,10 +1,5 @@
 import type { Scope } from "../../../src/access/index.ts";
 import type { SessionContext } from "../../../src/application/index.ts";
-import {
-  TEACHER_FIXTURE_SCENARIOS,
-  TEACHER_GROUPS,
-  type TeacherFixtureScenario,
-} from "../../../src/teacher-web/index.ts";
 import { safeFilterValues, type SearchParams } from "./compatibility.ts";
 /**
  * The schedule starts unfiltered: no group chosen means every group the teacher is granted, and
@@ -14,7 +9,6 @@ export const DEFAULT_TEACHER_FILTERS = Object.freeze({
   groupId: "",
   from: "",
   to: "",
-  scenario: "ready" as TeacherFixtureScenario,
 });
 export type TeacherSearchParams = SearchParams;
 export type TeacherGroupOption = Readonly<{ scope: Scope; label: string }>;
@@ -31,7 +25,6 @@ export type TeacherFilters = Readonly<{
   from: string;
   /** Empty means no limit. */
   to: string;
-  scenario: TeacherFixtureScenario;
   groups: readonly TeacherGroupOption[];
 }>;
 export function teacherGroupOptions(session: SessionContext): readonly TeacherGroupOption[] {
@@ -50,13 +43,7 @@ export function teacherGroupOptions(session: SessionContext): readonly TeacherGr
         const key = `${grant.scope.organizationId}:${grant.scope.id}`;
         if (seen.has(key)) return [];
         seen.add(key);
-        const label =
-          TEACHER_GROUPS.find(
-            (group) =>
-              group.scope.id === grant.scope.id &&
-              group.scope.organizationId === grant.scope.organizationId,
-          )?.label ?? "Engedélyezett csoport";
-        return [Object.freeze({ scope: grant.scope, label })];
+        return [Object.freeze({ scope: grant.scope, label: "Engedélyezett csoport" })];
       }),
   );
 }
@@ -86,14 +73,6 @@ export function parseTeacherFilters(
       ? Object.freeze(groups.map((group) => group.scope))
       : Object.freeze([groupScope]);
   const returnToAllGroups = groupId !== "" && params.allGroups === "1";
-  const fixture = params.fixture;
-  const scenario =
-    session.runtimeMode === "synthetic" &&
-    session.isSynthetic &&
-    typeof fixture === "string" &&
-    TEACHER_FIXTURE_SCENARIOS.includes(fixture as TeacherFixtureScenario)
-      ? (fixture as TeacherFixtureScenario)
-      : "ready";
   return Object.freeze({
     groups,
     groupId,
@@ -102,7 +81,6 @@ export function parseTeacherFilters(
     returnToAllGroups,
     from: values.from ?? DEFAULT_TEACHER_FILTERS.from,
     to: values.to ?? DEFAULT_TEACHER_FILTERS.to,
-    scenario,
   });
 }
 /** The address query of the schedule list: only filled values, so a cleared filter stays bare. */

@@ -20,8 +20,6 @@ function actor(role: Role, scope: Scope): SessionContext {
     ...sessionGrantBindings("actor", role, [scope]),
     roles: [role],
     scopes: [scope],
-    runtimeMode: "synthetic",
-    isSynthetic: true,
   };
 }
 function setup() {

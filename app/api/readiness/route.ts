@@ -14,7 +14,6 @@ export async function GET() {
 
   return NextResponse.json({
     status: "ready",
-    mode: composition.value.mode,
     marker: "waldorf-local-ready",
   });
 }

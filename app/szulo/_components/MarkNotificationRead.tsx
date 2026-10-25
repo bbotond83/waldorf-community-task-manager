@@ -13,8 +13,8 @@ export function MarkNotificationRead({ notificationId }: Readonly<{ notification
   useEffect(() => {
     const formData = new FormData();
     formData.set("id", notificationId);
-    // A fresh key per opening: the result of an earlier opening is never replayed, so the state
-    // is written again after a fixture reset. Marking read itself is idempotent.
+    // A fresh key per opening: the result of an earlier opening is never replayed. Marking read itself
+    // is idempotent.
     formData.set("idempotencyKey", `notice:${notificationId}:open:${crypto.randomUUID()}`);
     markNotificationReadAction({ state: "initial" }, formData).catch(() => undefined);
   }, [notificationId]);

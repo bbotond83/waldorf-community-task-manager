@@ -184,8 +184,8 @@ test("the application session lists the roles and scopes of the grants it was bu
   });
   assert.equal(session.subjectId, ACCOUNT);
   assert.equal(session.authorizationVersion, 5);
-  assert.equal(session.runtimeMode, "production");
-  assert.equal(session.isSynthetic, false);
+  assert.equal("runtimeMode" in session, false);
+  assert.equal("isSynthetic" in session, false);
   assert.equal(session.isActive, true);
   assert.deepEqual(session.roles, ["group_admin"]);
   assert.equal(session.scopes.length, 2);

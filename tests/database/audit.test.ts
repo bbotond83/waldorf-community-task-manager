@@ -127,6 +127,27 @@ for (const schema of ["worker_1", "public"]) {
       assert.equal((await events()).length, 1);
     });
 
+    // U5: the purge relaxes the delete rule for one case only (aged rows, inside the purge); everything else holds.
+    it("still refuses an update and a delete of a recent event, and a delete of an aged event outside the purge", async () => {
+      await db.query(
+        `insert into audit_events (actor_account_id, actor_role, action, target_type, target_id, organization_id, outcome, occurred_at)
+         values ($1, 'system', 'role.grant', 'account', $2, $4, 'success', now() - interval '1 day'),
+                ($1, 'system', 'role.grant', 'account', $3, $4, 'success', now() - interval '400 days')`,
+        [SYSTEM_ACCOUNT, uuid(1), uuid(2), ORGANIZATION],
+      );
+      for (const statement of [
+        "update audit_events set details = 'changed' where target_id = '" + uuid(1) + "'",
+        "update audit_events set details = 'changed' where target_id = '" + uuid(2) + "'",
+        "delete from audit_events where target_id = '" + uuid(1) + "'",
+        "delete from audit_events where target_id = '" + uuid(2) + "'",
+      ]) {
+        const error = await failureOf(() => db.query(statement));
+        assert.equal(error?.code, "42501", statement);
+        assert.match(error?.message ?? "", /append-only/);
+      }
+      assert.equal((await events()).length, 2);
+    });
+
     it("writes one event with the actor taken from the session, for a super administrator", async () => {
       const result = await asActor(db, schema, asAuthenticated(SUPER_ADMIN), () =>
         db.query(

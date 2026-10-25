@@ -1,7 +1,7 @@
 import type { Scope } from "../access/index.ts";
 import type { DomainOutcome, TeacherApplicationPort } from "../application/index.ts";
 import type { DatabaseClient } from "../runtime/database/client.ts";
-import type { TrackingSourceRecord } from "../teacher-tracking/tracking-model.ts";
+import type { TrackingSourceRecord } from "../application/tracking-model.ts";
 import { DataGateway } from "./gateway.ts";
 import { toItemsOutcome } from "./results.ts";
 import { toScheduleEntry } from "./schedule.ts";

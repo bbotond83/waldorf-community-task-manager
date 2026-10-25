@@ -1,0 +1,727 @@
+{
+  "stage": "code-generation",
+  "unit": "u5-seed-and-test-migration",
+  "version": 1,
+  "writes": [
+    {
+      "path": ".env.example"
+    },
+    {
+      "path": ".github/workflows/ci.yml"
+    },
+    {
+      "path": "HASZNALATI_UTMUTATO_HU.md"
+    },
+    {
+      "path": "README.md"
+    },
+    {
+      "path": "app/_identity/current-session.ts"
+    },
+    {
+      "path": "app/_identity/production-request.ts"
+    },
+    {
+      "path": "app/_identity/shell-action.tsx"
+    },
+    {
+      "path": "app/admin/_components/DeveloperDetails.tsx"
+    },
+    {
+      "path": "app/admin/_components/ImportWorkflow.tsx"
+    },
+    {
+      "path": "app/admin/_components/RecordFields.tsx"
+    },
+    {
+      "path": "app/admin/_lib/facade.ts"
+    },
+    {
+      "path": "app/admin/_lib/request-lookups.ts"
+    },
+    {
+      "path": "app/admin/_lib/session.ts"
+    },
+    {
+      "path": "app/admin/actions.ts"
+    },
+    {
+      "path": "app/admin/adatvedelem/page.tsx"
+    },
+    {
+      "path": "app/admin/advanced-actions.ts"
+    },
+    {
+      "path": "app/admin/archivum/[id]/page.tsx"
+    },
+    {
+      "path": "app/admin/beallitasok/page.tsx"
+    },
+    {
+      "path": "app/admin/emlekeztetok/page.tsx"
+    },
+    {
+      "path": "app/admin/feladatok/[id]/page.tsx"
+    },
+    {
+      "path": "app/admin/feladatok/uj/page.tsx"
+    },
+    {
+      "path": "app/admin/import/page.tsx"
+    },
+    {
+      "path": "app/admin/jovahagyasok/[id]/page.tsx"
+    },
+    {
+      "path": "app/admin/nyilvantartasok/uj/page.tsx"
+    },
+    {
+      "path": "app/api/readiness/route.ts"
+    },
+    {
+      "path": "app/api/synthetic/reset/route.ts"
+    },
+    {
+      "path": "app/api/synthetic/session/route.ts"
+    },
+    {
+      "path": "app/belepes/AuthenticationEntry.tsx"
+    },
+    {
+      "path": "app/belepes/actions.ts"
+    },
+    {
+      "path": "app/belepes/page.tsx"
+    },
+    {
+      "path": "app/globals.css"
+    },
+    {
+      "path": "app/meghivas/[token]/InvitationActions.tsx"
+    },
+    {
+      "path": "app/meghivas/[token]/actions.ts"
+    },
+    {
+      "path": "app/meghivas/[token]/page.tsx"
+    },
+    {
+      "path": "app/page.tsx"
+    },
+    {
+      "path": "app/szulo/_components/MarkNotificationRead.tsx"
+    },
+    {
+      "path": "app/szulo/_components/ParentAccessState.tsx"
+    },
+    {
+      "path": "app/szulo/_components/PendingRequestNotice.tsx"
+    },
+    {
+      "path": "app/szulo/_lib/facade.ts"
+    },
+    {
+      "path": "app/szulo/_lib/session.ts"
+    },
+    {
+      "path": "app/szulo/actions.ts"
+    },
+    {
+      "path": "app/szulo/ertesitesek/page.tsx"
+    },
+    {
+      "path": "app/szulo/feladatok/[id]/csere/page.tsx"
+    },
+    {
+      "path": "app/szulo/feladatok/[id]/lemondas/page.tsx"
+    },
+    {
+      "path": "app/szulo/feladatok/[id]/page.tsx"
+    },
+    {
+      "path": "app/teacher/_lib/compatibility.ts"
+    },
+    {
+      "path": "app/teacher/_lib/facade.ts"
+    },
+    {
+      "path": "app/teacher/_lib/filters.ts"
+    },
+    {
+      "path": "app/teacher/_lib/session.ts"
+    },
+    {
+      "path": "app/teacher/schedule/[id]/page.tsx"
+    },
+    {
+      "path": "app/teacher/schedule/_components/ScheduleFilter.tsx"
+    },
+    {
+      "path": "app/teacher/schedule/page.tsx"
+    },
+    {
+      "path": "next.config.ts"
+    },
+    {
+      "path": "package.json"
+    },
+    {
+      "path": "playwright.config.ts"
+    },
+    {
+      "path": "playwright.login-existing.config.ts"
+    },
+    {
+      "path": "playwright.login-performance.config.ts"
+    },
+    {
+      "path": "proxy.ts"
+    },
+    {
+      "path": "scripts/db/local-guard.test.ts"
+    },
+    {
+      "path": "scripts/db/local-guard.ts"
+    },
+    {
+      "path": "scripts/db/reset.ts"
+    },
+    {
+      "path": "scripts/db/seed-support.ts"
+    },
+    {
+      "path": "scripts/db/seed.ts"
+    },
+    {
+      "path": "scripts/db/seed/accounts.test.ts"
+    },
+    {
+      "path": "scripts/db/seed/accounts.ts"
+    },
+    {
+      "path": "scripts/db/seed/commands.test.ts"
+    },
+    {
+      "path": "scripts/db/seed/data.test.ts"
+    },
+    {
+      "path": "scripts/db/seed/data.ts"
+    },
+    {
+      "path": "scripts/db/seed/ids.test.ts"
+    },
+    {
+      "path": "scripts/db/seed/ids.ts"
+    },
+    {
+      "path": "scripts/db/seed/index.ts"
+    },
+    {
+      "path": "scripts/db/seed/owner-connection.test.ts"
+    },
+    {
+      "path": "scripts/db/seed/write.test.ts"
+    },
+    {
+      "path": "scripts/db/seed/write.ts"
+    },
+    {
+      "path": "scripts/db/shuffled-tests.test.ts"
+    },
+    {
+      "path": "scripts/db/shuffled-tests.ts"
+    },
+    {
+      "path": "scripts/start-smoke.mjs"
+    },
+    {
+      "path": "scripts/validate-runtime-config.ts"
+    },
+    {
+      "path": "scripts/verification/ci-config.test.ts"
+    },
+    {
+      "path": "scripts/verification/core.ts"
+    },
+    {
+      "path": "scripts/verification/lint-scope.test.ts"
+    },
+    {
+      "path": "scripts/verification/replaced-modules.test.ts"
+    },
+    {
+      "path": "scripts/verification/run-local-verification.ts"
+    },
+    {
+      "path": "src/access/access-matrix.test.ts"
+    },
+    {
+      "path": "src/access/request-actions.test.ts"
+    },
+    {
+      "path": "src/admin-advanced/index.ts"
+    },
+    {
+      "path": "src/admin-advanced/interim-port.test.ts"
+    },
+    {
+      "path": "src/admin-advanced/interim-port.ts"
+    },
+    {
+      "path": "src/admin-advanced/synthetic-advanced.test.ts"
+    },
+    {
+      "path": "src/admin-advanced/synthetic-advanced.ts"
+    },
+    {
+      "path": "src/admin-core/synthetic-admin.test.ts"
+    },
+    {
+      "path": "src/admin-core/synthetic-admin.ts"
+    },
+    {
+      "path": "src/admin-experience/admin-service.test.ts"
+    },
+    {
+      "path": "src/admin-experience/admin-service.ts"
+    },
+    {
+      "path": "src/admin-experience/index.ts"
+    },
+    {
+      "path": "src/admin-experience/legacy-destinations.ts"
+    },
+    {
+      "path": "src/application/admin-facade.test.ts"
+    },
+    {
+      "path": "src/application/authorization.test.ts"
+    },
+    {
+      "path": "src/application/authorization.ts"
+    },
+    {
+      "path": "src/application/contracts.test.ts"
+    },
+    {
+      "path": "src/application/contracts.ts"
+    },
+    {
+      "path": "src/application/facades.test.ts"
+    },
+    {
+      "path": "src/application/index.ts"
+    },
+    {
+      "path": "src/application/isolation.test.ts"
+    },
+    {
+      "path": "src/application/notification-context.test.ts"
+    },
+    {
+      "path": "src/application/notification-context.ts"
+    },
+    {
+      "path": "src/application/parent-facade.ts"
+    },
+    {
+      "path": "src/application/session-facade.ts"
+    },
+    {
+      "path": "src/application/status-labels.test.ts"
+    },
+    {
+      "path": "src/application/status-labels.ts"
+    },
+    {
+      "path": "src/application/swap-facade.test.ts"
+    },
+    {
+      "path": "src/application/teacher-facade.test.ts"
+    },
+    {
+      "path": "src/application/teacher-facade.ts"
+    },
+    {
+      "path": "src/application/tracking-model.test.ts"
+    },
+    {
+      "path": "src/application/tracking-model.ts"
+    },
+    {
+      "path": "src/data/imports.test.ts"
+    },
+    {
+      "path": "src/data/imports.ts"
+    },
+    {
+      "path": "src/data/schedule.ts"
+    },
+    {
+      "path": "src/data/session.test.ts"
+    },
+    {
+      "path": "src/data/session.ts"
+    },
+    {
+      "path": "src/data/teacher-port.ts"
+    },
+    {
+      "path": "src/parent-web/index.ts"
+    },
+    {
+      "path": "src/parent-web/notification-context.test.ts"
+    },
+    {
+      "path": "src/parent-web/notification-context.ts"
+    },
+    {
+      "path": "src/parent-web/synthetic-parent.test.ts"
+    },
+    {
+      "path": "src/parent-web/synthetic-parent.ts"
+    },
+    {
+      "path": "src/runtime/AppShell.tsx"
+    },
+    {
+      "path": "src/runtime/ProfileSelector.tsx"
+    },
+    {
+      "path": "src/runtime/composition.ts"
+    },
+    {
+      "path": "src/runtime/config.ts"
+    },
+    {
+      "path": "src/runtime/database/config.ts"
+    },
+    {
+      "path": "src/runtime/navigation.ts"
+    },
+    {
+      "path": "src/runtime/production/access.test.ts"
+    },
+    {
+      "path": "src/runtime/production/access.ts"
+    },
+    {
+      "path": "src/runtime/production/composition.ts"
+    },
+    {
+      "path": "src/runtime/production/services.ts"
+    },
+    {
+      "path": "src/runtime/security/origin.ts"
+    },
+    {
+      "path": "src/runtime/session/session.ts"
+    },
+    {
+      "path": "src/runtime/shell-profile.ts"
+    },
+    {
+      "path": "src/runtime/synthetic/access-state.ts"
+    },
+    {
+      "path": "src/runtime/synthetic/composition.ts"
+    },
+    {
+      "path": "src/runtime/synthetic/profiles.ts"
+    },
+    {
+      "path": "src/runtime/types.ts"
+    },
+    {
+      "path": "src/teacher-tracking/index.ts"
+    },
+    {
+      "path": "src/teacher-tracking/schedule-service.test.ts"
+    },
+    {
+      "path": "src/teacher-tracking/schedule-service.ts"
+    },
+    {
+      "path": "src/teacher-tracking/tracking-model.test.ts"
+    },
+    {
+      "path": "src/teacher-tracking/tracking-model.ts"
+    },
+    {
+      "path": "src/teacher-web/index.ts"
+    },
+    {
+      "path": "src/teacher-web/synthetic-teacher-repository.test.ts"
+    },
+    {
+      "path": "src/teacher-web/synthetic-teacher-repository.ts"
+    },
+    {
+      "path": "src/teacher-web/synthetic-teacher.test.ts"
+    },
+    {
+      "path": "src/teacher-web/synthetic-teacher.ts"
+    },
+    {
+      "path": "supabase/migrations/20261044_audit_purge.sql"
+    },
+    {
+      "path": "tests/browser/admin-advanced.spec.ts"
+    },
+    {
+      "path": "tests/browser/admin-core.spec.ts"
+    },
+    {
+      "path": "tests/browser/directory-coordination.spec.ts"
+    },
+    {
+      "path": "tests/browser/functional-fixes.spec.ts"
+    },
+    {
+      "path": "tests/browser/identity.spec.ts"
+    },
+    {
+      "path": "tests/browser/list-polish.spec.ts"
+    },
+    {
+      "path": "tests/browser/navigation-polish.spec.ts"
+    },
+    {
+      "path": "tests/browser/notifications-import.spec.ts"
+    },
+    {
+      "path": "tests/browser/parent-web.spec.ts"
+    },
+    {
+      "path": "tests/browser/profile-login-existing.spec.ts"
+    },
+    {
+      "path": "tests/browser/profile-login-performance.spec.ts"
+    },
+    {
+      "path": "tests/browser/runtime-foundation.spec.ts"
+    },
+    {
+      "path": "tests/browser/sign-in-timing.spec.ts"
+    },
+    {
+      "path": "tests/browser/support/dates.ts"
+    },
+    {
+      "path": "tests/browser/support/profile-login-measurement.ts"
+    },
+    {
+      "path": "tests/browser/support/profile-login-server.ts"
+    },
+    {
+      "path": "tests/browser/support/projects.ts"
+    },
+    {
+      "path": "tests/browser/support/scenarios.ts"
+    },
+    {
+      "path": "tests/browser/support/seeded-schema.ts"
+    },
+    {
+      "path": "tests/browser/teacher-web.spec.ts"
+    },
+    {
+      "path": "tests/browser/visual-overhaul.spec.ts"
+    },
+    {
+      "path": "tests/coverage/admin-actions.test.ts"
+    },
+    {
+      "path": "tests/coverage/admin-dashboard.test.tsx"
+    },
+    {
+      "path": "tests/coverage/admin-functional-fixes.test.tsx"
+    },
+    {
+      "path": "tests/coverage/admin-pages.test.tsx"
+    },
+    {
+      "path": "tests/coverage/app-entrypoints.test.tsx"
+    },
+    {
+      "path": "tests/coverage/app-session-boundaries.test.ts"
+    },
+    {
+      "path": "tests/coverage/parent-actions.test.ts"
+    },
+    {
+      "path": "tests/coverage/parent-functional-fixes.test.tsx"
+    },
+    {
+      "path": "tests/coverage/parent-pages.test.tsx"
+    },
+    {
+      "path": "tests/coverage/production-inventory.test.ts"
+    },
+    {
+      "path": "tests/coverage/runtime-cli-instrumentation.test.ts"
+    },
+    {
+      "path": "tests/coverage/smoke-entrypoint.test.ts"
+    },
+    {
+      "path": "tests/coverage/teacher-pages.test.tsx"
+    },
+    {
+      "path": "tests/coverage/verification-entrypoints.test.ts"
+    },
+    {
+      "path": "tests/database/audit-purge.test.ts"
+    },
+    {
+      "path": "tests/database/audit.test.ts"
+    },
+    {
+      "path": "tests/database/identity-bundle.test.ts"
+    },
+    {
+      "path": "tests/database/identity-catalogue.test.ts"
+    },
+    {
+      "path": "tests/database/identity-housekeeping.test.ts"
+    },
+    {
+      "path": "tests/database/migrations.test.ts"
+    },
+    {
+      "path": "tests/database/reset.test.ts"
+    },
+    {
+      "path": "tests/database/seed-support.ts"
+    },
+    {
+      "path": "tests/database/seed-timing.test.ts"
+    },
+    {
+      "path": "tests/database/seed.test.ts"
+    },
+    {
+      "path": "tests/integration/admin-advanced-components.test.tsx"
+    },
+    {
+      "path": "tests/integration/admin-extended-actions.test.ts"
+    },
+    {
+      "path": "tests/integration/admin-forms.test.tsx"
+    },
+    {
+      "path": "tests/integration/app-nav.test.tsx"
+    },
+    {
+      "path": "tests/integration/copy.test.ts"
+    },
+    {
+      "path": "tests/integration/identity-actions.test.ts"
+    },
+    {
+      "path": "tests/integration/identity-screens.test.tsx"
+    },
+    {
+      "path": "tests/integration/import-actions.test.ts"
+    },
+    {
+      "path": "tests/integration/import-screens.test.tsx"
+    },
+    {
+      "path": "tests/integration/notifications-wiring.test.ts"
+    },
+    {
+      "path": "tests/integration/parent-components.test.tsx"
+    },
+    {
+      "path": "tests/integration/production-home.test.tsx"
+    },
+    {
+      "path": "tests/integration/production-wiring.test.ts"
+    },
+    {
+      "path": "tests/integration/retained-workflows.test.ts"
+    },
+    {
+      "path": "tests/integration/runtime-config-cli.test.ts"
+    },
+    {
+      "path": "tests/integration/runtime-shell.test.tsx"
+    },
+    {
+      "path": "tests/integration/swap-actions.test.ts"
+    },
+    {
+      "path": "tests/integration/swap-screens.test.tsx"
+    },
+    {
+      "path": "tests/integration/synthetic-route.test.ts"
+    },
+    {
+      "path": "tests/integration/teacher-boundaries.test.ts"
+    },
+    {
+      "path": "tests/integration/teacher-components.test.tsx"
+    },
+    {
+      "path": "tests/integration/teacher-routes.test.ts"
+    },
+    {
+      "path": "tests/support/port-doubles.ts"
+    },
+    {
+      "path": "tests/support/request-world.ts"
+    },
+    {
+      "path": "tests/support/role-profiles.ts"
+    },
+    {
+      "path": "tests/unit/browser-harness.test.ts"
+    },
+    {
+      "path": "tests/unit/current-role-references.test.ts"
+    },
+    {
+      "path": "tests/unit/current-role-session.test.ts"
+    },
+    {
+      "path": "tests/unit/navigation-access.test.ts"
+    },
+    {
+      "path": "tests/unit/readme-commands.test.ts"
+    },
+    {
+      "path": "tests/unit/removed-synthetic-mode.test.ts"
+    },
+    {
+      "path": "tests/unit/runtime-boundaries.test.ts"
+    },
+    {
+      "path": "tests/unit/teacher-filters.test.ts"
+    },
+    {
+      "path": "tests/unit/teacher-schedule.test.ts"
+    },
+    {
+      "path": "tests/unit/verification-core.test.ts"
+    },
+    {
+      "path": "verification/evidence.schema.json"
+    },
+    {
+      "path": "verification/reports/local-acceptance.json"
+    },
+    {
+      "path": "verification/reports/local-acceptance.md"
+    },
+    {
+      "path": "verification/reports/outstanding-targets.md"
+    },
+    {
+      "path": "verification/reports/u5-workbook-and-known-limits.md"
+    },
+    {
+      "path": "verification/scenarios.json"
+    }
+  ]
+}

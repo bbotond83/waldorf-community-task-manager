@@ -9,15 +9,13 @@ import {
   InMemoryAuthorizationVersions,
   type SessionContext,
 } from "../../src/application/index.ts";
-import { createSyntheticTeacherFacade, TEACHER_GROUPS } from "../../src/teacher-web/index.ts";
+import { createTeacherFacadeDouble, TEACHER_GROUPS } from "../support/port-doubles.ts";
 const session: SessionContext = {
   subjectId: "teacher",
   authorizationVersion: 1,
   ...sessionGrantBindings("teacher", "kindergarten_teacher", [TEACHER_GROUPS[0]!.scope]),
   roles: ["kindergarten_teacher"] as const,
   scopes: TEACHER_GROUPS.map((group) => group.scope),
-  runtimeMode: "synthetic",
-  isSynthetic: true,
 };
 it("Teacher compatibility GET responds307 no data or cookie", async () => {
   const response = listRedirect(
@@ -68,7 +66,7 @@ it("Teacher compatibility detail ids are one fixed encoded segment", async () =>
 });
 it("Teacher destination authorizes before invalid sentinel and does no source calls", async () => {
   let reads = 0;
-  const facade = createSyntheticTeacherFacade(
+  const facade = createTeacherFacadeDouble(
     new AuthorizationContract(new InMemoryAuthorizationVersions({ teacher: 1 })),
     "ready",
     {
@@ -89,7 +87,7 @@ it("Teacher destination authorizes before invalid sentinel and does no source ca
 });
 it("Teacher malformed group gets grantderived validation only, no protected read", async () => {
   let reads = 0;
-  const facade = createSyntheticTeacherFacade(
+  const facade = createTeacherFacadeDouble(
     new AuthorizationContract(new InMemoryAuthorizationVersions({ teacher: 1 })),
     "ready",
     {
@@ -106,12 +104,12 @@ it("Teacher malformed group gets grantderived validation only, no protected read
   expect((await facade.getSchedule(session, filters)).state).toBe("validation");
   expect(reads).toBe(0);
 });
-it("Teacher retry drops fixture without widening valid business context", () => {
+it("Teacher retry carries no fixture word and does not widen valid business context", () => {
   const filters = parseTeacherFilters(
     { groupId: "group-oak", from: "2026-08-14", to: "2026-08-14", fixture: "retryable" },
     session,
   );
-  expect(filters.scenario).toBe("retryable");
+  expect("scenario" in filters).toBe(false);
   expect(
     compatibilityLocation({ groupId: filters.groupId, from: filters.from, to: filters.to }),
   ).toBe("/teacher/schedule?groupId=group-oak&from=2026-08-14&to=2026-08-14");

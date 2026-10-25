@@ -2,19 +2,15 @@ import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { expect, it } from "vitest";
 import { validateManifests, REQUIRED_NFR08_SCENARIOS } from "../../scripts/verification/core.ts";
-import { SYNTHETIC_PROFILES } from "../../src/runtime/synthetic/profiles.ts";
-import {
-  LEGACY_DESTINATIONS,
-  REQUIRED_SHEETS,
-} from "../../src/admin-experience/legacy-destinations.ts";
+import { ROLE_PROFILES } from "../support/role-profiles.ts";
 const read = (path: string) => readFileSync(path, "utf8");
 const json = (path: string) => JSON.parse(read(path));
-it("current fixtures exactly match four runtime profiles role and home contracts", () => {
+it("current fixtures exactly match the four role and home contracts", () => {
   const profiles = json("verification/fixtures.json").profiles;
   expect(profiles).toHaveLength(4);
-  for (const runtime of SYNTHETIC_PROFILES)
-    expect(profiles.find((p: { id: string }) => p.id === runtime.id)).toMatchObject({
-      role: runtime.role.replaceAll("-", "_"),
+  for (const runtime of ROLE_PROFILES)
+    expect(profiles.find((p: { role: string }) => p.role === runtime.role)).toMatchObject({
+      role: runtime.role,
       home: runtime.homePath,
     });
 });
@@ -39,10 +35,8 @@ it("current owned executable references have no fifth role or obsolete teacher m
     "verification/sensitive-fields.json",
     "verification/AUTHORIZATION.md",
     "verification/RUNBOOK.md",
-    "src/admin-experience/admin-service.ts",
     "src/application/admin-facade.ts",
-    "src/admin-experience/legacy-destinations.ts",
-    "src/runtime/synthetic/profiles.ts",
+    "src/runtime/navigation.ts",
     "tests/browser/admin-core.spec.ts",
     "tests/browser/admin-advanced.spec.ts",
     "tests/browser/runtime-foundation.spec.ts",
@@ -55,30 +49,11 @@ it("current owned executable references have no fifth role or obsolete teacher m
 it("explicit conversion and removed-profile rejection fixtures retain documented legacy inputs", () => {
   expect(read("src/access/legacy-role-conversion.ts")).toContain('"kindergarten_admin"');
   expect(read("src/access/types.ts")).toContain('"read_only_staff"');
-  for (const path of [
-    "tests/unit/current-role-session.test.ts",
-    "tests/integration/synthetic-route.test.ts",
-  ])
-    expect(read(path)).toContain('"staff-local"');
+  // The removed fifth role's sign-in profiles ("staff-local") no longer exist at all; the session test keeps
+  // the removed role itself as an input that must not become authority.
+  expect(read("tests/unit/current-role-session.test.ts")).toContain('"read_only_staff"');
   expect(read("tests/integration/teacher-boundaries.test.ts")).toContain('"read_only_staff"');
   expect(read("tests/integration/teacher-routes.test.ts")).toContain("munkatars/beosztas");
-});
-it("archive coverage preserves all sheets and current administrator ownership", () => {
-  expect(Object.keys(LEGACY_DESTINATIONS)).toEqual([...REQUIRED_SHEETS]);
-  expect(REQUIRED_SHEETS).toHaveLength(17);
-  const adminArchives = [
-    "ÁLLATOK",
-    "Állatok etetése info",
-    "Nagytakarítás szervezés",
-    "Hajó javítás",
-    "Kertfejlesztés",
-  ] as const;
-  for (const sheet of adminArchives)
-    expect(LEGACY_DESTINATIONS[sheet]).toMatchObject({
-      owner: "super-admin",
-      mode: "read_only_archive",
-    });
-  expect(LEGACY_DESTINATIONS["Munkacsoportok"].owner).toBe("workgroup-organizer");
 });
 it("Super governance allow is paired with an explicit non-Super advanced denial", () => {
   const rows = json("verification/authorization-matrix.json").rows;

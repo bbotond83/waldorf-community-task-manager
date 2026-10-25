@@ -1,16 +1,11 @@
-import { beforeEach, afterEach, expect, it, vi } from "vitest";
+import { beforeEach, expect, it, vi } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import type { ReactNode } from "react";
-import { createSyntheticSessionToken } from "../../src/runtime/session/session.ts";
-import { getSyntheticProfile } from "../../src/runtime/synthetic/profiles.ts";
-import { resetSyntheticAdminFixtures } from "../../src/admin-core/synthetic-admin.ts";
-import { resetSyntheticAdvancedFixtures } from "../../src/admin-advanced/index.ts";
-import { resetSyntheticParentState } from "../../src/parent-web/index.ts";
-const boundary = vi.hoisted(() => ({ token: undefined as string | undefined }));
+import { requestWorld, type RoleKey } from "../support/request-world.ts";
 vi.mock("server-only", () => ({}));
-vi.mock("next/headers", () => ({
-  cookies: async () => ({ get: () => (boundary.token ? { value: boundary.token } : undefined) }),
-}));
+vi.mock("../../app/_identity/production-request.ts", async () =>
+  (await import("../support/request-world.ts")).requestWorldModule(),
+);
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 vi.mock("next/navigation", () => ({
   redirect: (path: string) => {
@@ -20,16 +15,9 @@ vi.mock("next/navigation", () => ({
   usePathname: () => "/",
   useSearchParams: () => new URLSearchParams(),
 }));
-beforeEach(() => {
-  vi.stubEnv("APP_RUNTIME_MODE", "synthetic");
-  boundary.token = undefined;
-  resetSyntheticAdminFixtures();
-  resetSyntheticAdvancedFixtures();
-  resetSyntheticParentState();
-});
-afterEach(() => vi.unstubAllEnvs());
-function signIn(id: string) {
-  boundary.token = createSyntheticSessionToken(getSyntheticProfile(id)!);
+beforeEach(() => requestWorld.reset());
+function signIn(role: RoleKey) {
+  requestWorld.signIn(role);
 }
 const props = (id: string, query = {}) => ({
   params: Promise.resolve({ id }),
@@ -40,7 +28,7 @@ function html(node: ReactNode) {
   return renderToStaticMarkup(node);
 }
 it("renders permitted duties with real projections", async () => {
-  signIn("parent-local");
+  signIn("parent");
   const page = (await import("../../app/szulo/feladatok/page.tsx")).default as (
     input: ReturnType<typeof props>,
   ) => ReactNode | Promise<ReactNode>;
@@ -49,7 +37,7 @@ it("renders permitted duties with real projections", async () => {
   expect(output).not.toContain("protectedReason");
 });
 it("renders each duty as one whole-card link without a separate details link", async () => {
-  signIn("parent-local");
+  signIn("parent");
   const page = (await import("../../app/szulo/feladatok/page.tsx")).default as (
     input: ReturnType<typeof props>,
   ) => ReactNode | Promise<ReactNode>;
@@ -68,7 +56,7 @@ it("renders each duty as one whole-card link without a separate details link", a
   expect(output).not.toContain("Részletek");
 });
 it("shows a symbol before each duty state word, in the list, the filter and the detail", async () => {
-  signIn("parent-local");
+  signIn("parent");
   const list = (await import("../../app/szulo/feladatok/page.tsx")).default as (
     input: ReturnType<typeof props>,
   ) => ReactNode | Promise<ReactNode>;
@@ -101,7 +89,7 @@ it("withholds duties content without session", async () => {
   expect(output).not.toContain("protectedReason");
 });
 it("renders permitted available duty with real projections", async () => {
-  signIn("parent-local");
+  signIn("parent");
   const page = (await import("../../app/szulo/feladatok/[id]/page.tsx")).default as (
     input: ReturnType<typeof props>,
   ) => ReactNode | Promise<ReactNode>;
@@ -118,7 +106,7 @@ it("withholds available duty content without session", async () => {
   expect(output).not.toContain("protectedReason");
 });
 it("renders permitted full duty with real projections", async () => {
-  signIn("parent-local");
+  signIn("parent");
   const page = (await import("../../app/szulo/feladatok/[id]/page.tsx")).default as (
     input: ReturnType<typeof props>,
   ) => ReactNode | Promise<ReactNode>;
@@ -135,7 +123,7 @@ it("withholds full duty content without session", async () => {
   expect(output).not.toContain("protectedReason");
 });
 it("renders permitted ineligible duty with real projections", async () => {
-  signIn("parent-local");
+  signIn("parent");
   const page = (await import("../../app/szulo/feladatok/[id]/page.tsx")).default as (
     input: ReturnType<typeof props>,
   ) => ReactNode | Promise<ReactNode>;
@@ -152,7 +140,7 @@ it("withholds ineligible duty content without session", async () => {
   expect(output).not.toContain("protectedReason");
 });
 it("renders permitted assigned duty with real projections", async () => {
-  signIn("parent-local");
+  signIn("parent");
   const page = (await import("../../app/szulo/feladatok/[id]/page.tsx")).default as (
     input: ReturnType<typeof props>,
   ) => ReactNode | Promise<ReactNode>;
@@ -169,7 +157,7 @@ it("withholds assigned duty content without session", async () => {
   expect(output).not.toContain("protectedReason");
 });
 it("renders permitted swap with real projections", async () => {
-  signIn("parent-local");
+  signIn("parent");
   const page = (await import("../../app/szulo/feladatok/[id]/csere/page.tsx")).default as (
     input: ReturnType<typeof props>,
   ) => ReactNode | Promise<ReactNode>;
@@ -186,7 +174,7 @@ it("withholds swap content without session", async () => {
   expect(output).not.toContain("protectedReason");
 });
 it("renders permitted cancellation with real projections", async () => {
-  signIn("parent-local");
+  signIn("parent");
   const page = (await import("../../app/szulo/feladatok/[id]/lemondas/page.tsx")).default as (
     input: ReturnType<typeof props>,
   ) => ReactNode | Promise<ReactNode>;
@@ -203,7 +191,7 @@ it("withholds cancellation content without session", async () => {
   expect(output).not.toContain("protectedReason");
 });
 it("renders permitted notifications with real projections", async () => {
-  signIn("parent-local");
+  signIn("parent");
   const page = (await import("../../app/szulo/ertesitesek/page.tsx")).default as (
     input: ReturnType<typeof props>,
   ) => ReactNode | Promise<ReactNode>;
@@ -212,7 +200,7 @@ it("renders permitted notifications with real projections", async () => {
   expect(output).not.toContain("protectedReason");
 });
 it("renders each notification as one whole-card link plus one read checkbox beside it", async () => {
-  signIn("parent-local");
+  signIn("parent");
   const page = (await import("../../app/szulo/ertesitesek/page.tsx")).default as (
     input: ReturnType<typeof props>,
   ) => ReactNode | Promise<ReactNode>;
@@ -248,10 +236,10 @@ it("withholds notifications content without session", async () => {
 });
 it("renders role layout, denial and configuration error", async () => {
   const Layout = (await import("../../app/szulo/layout.tsx")).default;
-  signIn("parent-local");
+  signIn("parent");
   expect(html(await Layout({ children: "Owned child" }))).toContain("Owned child");
-  signIn("kindergarten-teacher-local");
+  signIn("teacher");
   expect(html(await Layout({ children: "Owned child" }))).not.toContain("Owned child");
-  vi.stubEnv("APP_RUNTIME_MODE", "invalid");
+  requestWorld.setUnavailable(true);
   expect(html(await Layout({ children: "Owned child" }))).not.toContain("Owned child");
 });

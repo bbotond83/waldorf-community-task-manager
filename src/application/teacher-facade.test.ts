@@ -10,11 +10,13 @@ import {
   type TeacherApplicationPort,
 } from "./index.ts";
 import {
-  createSyntheticTeacherFacade,
-  createSyntheticTeacherRepository,
+  classifyDoubleFailure,
+  createTeacherRepositoryDouble,
   TEACHER_GROUPS,
-  SYNTHETIC_SCHEDULE,
-} from "../teacher-web/index.ts";
+  TEACHER_SCHEDULE as SCHEDULE,
+  TeacherPortDouble,
+  type TeacherScenario,
+} from "../../tests/support/port-doubles.ts";
 const scope = TEACHER_GROUPS[0]!.scope;
 const session: SessionContext = {
   subjectId: "teacher",
@@ -22,16 +24,24 @@ const session: SessionContext = {
   ...sessionGrantBindings("teacher", "kindergarten_teacher", [scope]),
   roles: ["kindergarten_teacher"] as const,
   scopes: TEACHER_GROUPS.map((group) => group.scope),
-  runtimeMode: "synthetic",
-  isSynthetic: true,
 };
 const query = { groupScope: scope, from: "2026-08-12", to: "2026-08-20" };
+function facadeOn(
+  authorization: AuthorizationContract,
+  scenario: TeacherScenario = "ready",
+  repository = createTeacherRepositoryDouble().repository,
+) {
+  return new TeacherApplicationFacade(
+    new FacadePipeline(authorization, classifyDoubleFailure),
+    new TeacherPortDouble(repository, scenario),
+  );
+}
 function setup(port?: TeacherApplicationPort) {
   const versions = new InMemoryAuthorizationVersions({ teacher: 1 });
   const authorization = new AuthorizationContract(versions);
   const facade = port
     ? new TeacherApplicationFacade(new FacadePipeline(authorization), port)
-    : createSyntheticTeacherFacade(authorization);
+    : facadeOn(authorization);
   return { facade, versions, authorization };
 }
 it("Teacher facade projects explicit allowlist and exact list/detail envelopes", async () => {
@@ -67,7 +77,7 @@ it("Teacher facade authorizes before validation and source", async () => {
   const { facade, versions } = setup({
     getSchedule: async () => {
       reads++;
-      return { state: "success", data: { entries: SYNTHETIC_SCHEDULE.slice(0, 2) } };
+      return { state: "success", data: { entries: SCHEDULE.slice(0, 2) } };
     },
   });
   assert.equal((await facade.getSchedule(session, { ...query, from: "bad" })).state, "validation");
@@ -85,12 +95,11 @@ it("Teacher facade authorizes before validation and source", async () => {
   assert.equal((await facade.getSchedule(session, { ...query, from: "bad" })).state, "invalidated");
   assert.equal(reads, 0);
 });
-it("Teacher facade current inactive revoked invalid-mode grants deny", async () => {
+it("Teacher facade current inactive revoked and missing grants deny", async () => {
   const { facade } = setup();
   for (const context of [
     { ...session, isActive: false },
     { ...session, grants: session.grants.map((grant) => ({ ...grant, revokedAt: "now" })) },
-    { ...session, isSynthetic: false },
     { ...session, grants: [] },
   ]) {
     const result = await facade.getSchedule(context, query);
@@ -100,8 +109,8 @@ it("Teacher facade current inactive revoked invalid-mode grants deny", async () 
 });
 it("Teacher facade rejects every mixed scope and malformed source without partial data", async () => {
   for (const rows of [
-    [...SYNTHETIC_SCHEDULE.slice(0, 2), { ...SYNTHETIC_SCHEDULE[0]!, organizationId: "other" }],
-    [{ ...SYNTHETIC_SCHEDULE[0]!, currentStatusLabel: undefined }],
+    [...SCHEDULE.slice(0, 2), { ...SCHEDULE[0]!, organizationId: "other" }],
+    [{ ...SCHEDULE[0]!, currentStatusLabel: undefined }],
   ]) {
     const { facade } = setup({
       getSchedule: async () => ({ state: "success", data: { entries: rows as never } }),
@@ -123,9 +132,9 @@ it("Teacher facade normalizes zero success to empty and absent detail to denial"
 });
 it("Teacher facade fresh reads cannot reuse prior source projection", async () => {
   const { authorization } = setup();
-  const { repository, operator } = createSyntheticTeacherRepository();
+  const { repository, operator } = createTeacherRepositoryDouble();
   let reads = 0;
-  const facade = createSyntheticTeacherFacade(authorization, "ready", {
+  const facade = facadeOn(authorization, "ready", {
     readCurrent: (input) => {
       reads++;
       return repository.readCurrent(input);
@@ -149,10 +158,7 @@ it("Teacher facade preserves error classification and source invalidation", asyn
     ["terminal", "dependency-failure-terminal", "UNEXPECTED_DEPENDENCY_FAILURE"],
     ["denied", "denied", "AUTHORIZATION_DENIED"],
   ] as const) {
-    const result = await createSyntheticTeacherFacade(authorization, scenario).getSchedule(
-      session,
-      query,
-    );
+    const result = await facadeOn(authorization, scenario).getSchedule(session, query);
     assert.equal(result.state, state);
     assert.equal(result.code, code);
     assert.equal("data" in result, false);
@@ -162,7 +168,7 @@ it("Teacher facade preserves error classification and source invalidation", asyn
 });
 it("Teacher facade removes sensitive sentinels and unsupported recovery detail", async () => {
   const row = {
-    ...SYNTHETIC_SCHEDULE[0]!,
+    ...SCHEDULE[0]!,
     finance: "private-sentinel",
     email: "private-sentinel",
     allergen: "private-sentinel",
@@ -185,7 +191,7 @@ it("Teacher facade removes sensitive sentinels and unsupported recovery detail",
 
 it("Teacher facade duplicate source IDs and unsupported states fail terminal", async () => {
   for (const outcome of [
-    { state: "success", data: { entries: [SYNTHETIC_SCHEDULE[0], SYNTHETIC_SCHEDULE[0]] } },
+    { state: "success", data: { entries: [SCHEDULE[0], SCHEDULE[0]] } },
     { state: "conflict" },
     undefined,
   ]) {

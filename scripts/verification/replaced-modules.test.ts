@@ -9,9 +9,10 @@ const root = fileURLToPath(new URL("../../", import.meta.url));
 /**
  * The demo-era modules that were replaced with database functions and adapters: four by U3 (BR34.1, ledger
  * rows D1 to D22, D30, D31) and two by U4 (BR43.1, ledger rows N1 to N27: `notifications` by the notification
- * and reminder functions, `import-migration` by the import functions and the server-only parser). The test
- * keeps them gone: the folders must not come back and nothing may import them again. The running adapters and
- * `src/teacher-tracking` stay until U5 and are not listed.
+ * and reminder functions, `import-migration` by the import functions and the server-only parser) and five by
+ * U5 (the synthetic adapters `parent-web`, `admin-core`, `admin-advanced`, `teacher-web` and `teacher-tracking`,
+ * removed with the demo mode, ledger in the U5 code summary). The test keeps them gone: the folders must not
+ * come back and nothing may import them again.
  */
 const REPLACED = [
   "directory",
@@ -20,6 +21,15 @@ const REPLACED = [
   "privacy-audit",
   "notifications",
   "import-migration",
+  // U5 removed the synthetic mode: the demo adapters of parents, admins and teachers and the teacher tracking
+  // module (its date and projection model moved to src/application/tracking-model.ts).
+  "parent-web",
+  "admin-core",
+  "admin-advanced",
+  "teacher-web",
+  "teacher-tracking",
+  // The archive presentation of the old workbook sheets, which no screen used any more.
+  "admin-experience",
 ] as const;
 
 const SCANNED_ROOTS = ["app", "src", "tests", "scripts", "proxy.ts"];

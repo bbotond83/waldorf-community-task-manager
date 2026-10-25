@@ -1,8 +1,15 @@
-import { SYNTHETIC_PROFILES } from "../../src/runtime/synthetic/profiles.ts";
 import { isCurrentRole } from "../../src/access/role-policy.ts";
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
+
+/** The home page of each current role (the same paths the application sends a signed-in person to). */
+const ROLE_HOME_PATHS: Readonly<Record<string, string>> = {
+  parent: "/szulo/ertesitesek",
+  kindergarten_teacher: "/teacher/schedule",
+  group_admin: "/admin",
+  super_admin: "/admin",
+};
 
 export const REQUIRED_LOCAL_STORIES = [
   "US-LR-00",
@@ -69,9 +76,9 @@ export type Evidence = {
   storyIds: string[];
   requirementIds: string[];
   matrixRows: string[];
-  fixtureVersion: "waldorf-local-v1";
   manifestVersion: "waldorf-scenarios-v1";
-  runtimeMode: "synthetic" | "linked-target";
+  /** `database` for evidence made against the local database stack; `linked-target` for a hosted target. */
+  runtimeMode: "database" | "linked-target";
   target: "local" | "linked-target";
   tool: string;
   toolVersion: string;
@@ -138,16 +145,12 @@ export function validateManifests(root = process.cwd()): Scenario[] {
     scenarios.map(({ id }) => id),
     "scenario IDs",
   );
-  // Bind current executable fixtures to the runtime catalog, never removed aliases.
-  if (profiles.length !== SYNTHETIC_PROFILES.length)
+  // Bind the fixture profiles to the four current roles and the home page each role lands on, never removed aliases.
+  if (profiles.length !== Object.keys(ROLE_HOME_PATHS).length)
     throw new Error("current profile catalog must contain exactly four roles");
-  for (const runtime of SYNTHETIC_PROFILES) {
-    const profile = profiles.find((candidate) => candidate.id === runtime.id);
-    if (
-      !profile ||
-      profile.role !== runtime.role.replaceAll("-", "_") ||
-      profile.home !== runtime.homePath
-    )
+  for (const [role, home] of Object.entries(ROLE_HOME_PATHS)) {
+    const profile = profiles.find((candidate) => candidate.role === role);
+    if (!profile || profile.home !== home)
       throw new Error("current profile catalog role/home mismatch");
   }
   const knownRows = new Set(rowIds);
@@ -220,7 +223,6 @@ export function validateEvidence(
   const record = asObject(value, "evidence") as Evidence;
   const requiredStrings: (keyof Evidence)[] = [
     "scenarioId",
-    "fixtureVersion",
     "manifestVersion",
     "runtimeMode",
     "target",
@@ -258,14 +260,11 @@ export function validateEvidence(
     throw new Error(`${record.scenarioId} evidence is stale or future-dated`);
   const scenario = scenarios.find(({ id }) => id === record.scenarioId);
   if (!scenario) throw new Error(`unknown evidence scenario ${record.scenarioId}`);
-  if (
-    record.fixtureVersion !== "waldorf-local-v1" ||
-    record.manifestVersion !== "waldorf-scenarios-v1"
-  )
+  if (record.manifestVersion !== "waldorf-scenarios-v1")
     throw new Error(`${record.scenarioId} metadata mismatch`);
   if (record.target !== scenario.target) throw new Error(`${record.scenarioId} target mismatch`);
-  if (record.target === "local" && record.runtimeMode !== "synthetic")
-    throw new Error(`${record.scenarioId} local evidence is not synthetic`);
+  if (record.target === "local" && record.runtimeMode !== "database")
+    throw new Error(`${record.scenarioId} local evidence is not from the database`);
   if (record.target === "linked-target" && record.result !== "OUTSTANDING")
     throw new Error(`${record.scenarioId} linked-target status cannot upgrade from OUTSTANDING`);
   if (record.target === "local" && record.result === "OUTSTANDING")
@@ -336,7 +335,6 @@ export function aggregateEvidence(input: {
   const report = {
     schemaVersion: "waldorf-acceptance-report-v1",
     gitSha: gitShas[0],
-    fixtureVersion: "waldorf-local-v1",
     manifestVersion: "waldorf-scenarios-v1",
     manifestSha256: manifestHash(root),
     generatedAt: finishedAt,
@@ -351,7 +349,6 @@ export function aggregateEvidence(input: {
     "# Local Acceptance Report",
     "",
     `- Git SHA: \`${report.gitSha}\``,
-    `- Fixture: \`${report.fixtureVersion}\``,
     `- Manifest: \`${report.manifestVersion}\` (SHA-256 \`${report.manifestSha256}\`)`,
     `- Generated from evidence completed at: \`${report.generatedAt}\``,
     `- Results: ${counts.pass} PASS, ${counts.fail} FAIL, ${counts.outstanding} OUTSTANDING`,
@@ -368,7 +365,7 @@ export function aggregateEvidence(input: {
   const outstandingLines = [
     "# Outstanding Target Evidence",
     "",
-    `Bound to local tested Git SHA \`${report.gitSha}\`, fixture \`${report.fixtureVersion}\`, and manifest \`${report.manifestVersion}\`. Synthetic success does not satisfy any row below.`,
+    `Bound to local tested Git SHA \`${report.gitSha}\` and manifest \`${report.manifestVersion}\`. Synthetic success does not satisfy any row below.`,
     "",
     "| Scenario | Required environment/target | Status |",
     "|---|---|---|",

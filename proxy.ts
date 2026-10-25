@@ -57,8 +57,7 @@ function respond(request: NextRequest, decision: RefreshDecision) {
 }
 
 export function proxy(request: NextRequest): NextResponse | Promise<NextResponse> {
-  // Requests without a session cookie (every request of the old picker and the synthetic profiles) take the
-  // synchronous path and are answered exactly as before.
+  // Requests without a session cookie (signed-out visitors) take the synchronous path.
   if (!request.cookies.has(REFRESH_COOKIE)) return respond(request, { action: "none" });
   const deps = refreshDepsFromEnvironment(process.env);
   if (!deps) return respond(request, { action: "none" });

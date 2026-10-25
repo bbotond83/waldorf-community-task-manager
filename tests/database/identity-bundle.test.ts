@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { describe, it } from "node:test";
+import { SEED_NAMESPACE, SEED_PASSWORDS } from "../../scripts/db/seed/index.ts";
 import { root, serviceKey } from "./stack-support.ts";
 
 /**
@@ -105,5 +106,32 @@ describe("the production bundle (NFR1.5)", () => {
       inlined.map((path) => path.slice(root.length)),
       [],
     );
+  });
+
+  it("keeps the seed module, its fictitious passwords and its id namespace out of the browser and server output (NFR1.64, NFR1.66, U5)", () => {
+    // The names of the seed code, the namespace of its derived ids and every seed password: the seed is a tool for
+    // the developer's machine and the application never imports it.
+    const markers = [
+      "buildSeedPlan",
+      "writeSeedPlan",
+      "provisionAccounts",
+      "createSeedAccountAdmin",
+      "SEED_PASSWORDS",
+      "SEED_STAFF_TAGS",
+      "resolveSeedSchema",
+      "assertLocalStack",
+      SEED_NAMESPACE,
+      ...Object.values(SEED_PASSWORDS),
+    ];
+    const offenders: string[] = [];
+    for (const path of filesUnder(`${root}.next`)) {
+      if (!/\.(js|css|map|html|json|txt)$/.test(path) || path.includes("/cache/")) continue;
+      const text = readFileSync(path, "utf8");
+      for (const marker of markers) {
+        if (text.includes(marker))
+          offenders.push(`${path.slice(root.length)} contains a seed marker`);
+      }
+    }
+    assert.deepEqual(offenders, []);
   });
 });

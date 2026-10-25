@@ -1,4 +1,4 @@
-import type { PendingRequests } from "../../../src/parent-web/notification-context.ts";
+import type { PendingRequests } from "../../../src/application/notification-context.ts";
 import { dutyStateLabel } from "../../../src/application/status-labels.ts";
 
 /**

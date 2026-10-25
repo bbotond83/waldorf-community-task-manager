@@ -10,27 +10,8 @@ import { resolveAdminFacade } from "./_lib/facade.ts";
 import { IMPORT_MESSAGES } from "./_lib/import-messages.ts";
 import { resolveAdminSession } from "./_lib/session.ts";
 
-export async function createImportPreviewAction(
-  _: AdminActionState,
-  formData: FormData,
-): Promise<AdminActionState> {
-  const fixtureId = text(formData, "fixtureId");
-  if (!fixtureId) return fieldError("fixtureId", "Válasszon ellenőrizhető munkafüzetet.");
-  const boundary = await resolveBoundary();
-  if (!boundary.ok) return boundary.state;
-  const result = await boundary.facade.import.createPreview(boundary.session.applicationSession, {
-    scope: boundary.session.scope,
-    id: fixtureId,
-    expectedVersion: 1,
-    idempotencyKey: text(formData, "idempotencyKey"),
-    payload: { scenario: text(formData, "scenario") },
-  });
-  revalidatePath("/admin/import");
-  return mapAdvancedResult(result, "A munkafüzet ellenőrzése és előnézete elkészült.");
-}
-
 /**
- * The upload of the real import (production mode): reads the chosen .xlsx file as bytes (never a path),
+ * The upload of the import: reads the chosen .xlsx file as bytes (never a path),
  * refuses an empty or oversized file with a Hungarian message before anything is read further, and hands the
  * bytes to the facade, which parses them on the server and stages them. Each attempt makes its own
  * idempotency key, so uploading another file after a refused one never reuses a key (BR41.2, BR42.1).
@@ -98,7 +79,6 @@ export async function commitImportAction(
     payload: {
       fingerprint: text(formData, "fingerprint"),
       confirmed: text(formData, "confirmed"),
-      scenario: text(formData, "scenario"),
     },
   });
   revalidatePath("/admin/import");
@@ -116,14 +96,14 @@ export async function recoverImportAction(
     id: text(formData, "runId"),
     expectedVersion: 1,
     idempotencyKey: text(formData, "idempotencyKey"),
-    payload: { action: "resume", scenario: text(formData, "scenario") },
+    payload: { action: "resume" },
   });
   revalidatePath("/admin/import");
   return mapAdvancedResult(result, "A megszakított import helyreállt.");
 }
 
 /**
- * Ends the open import run (production mode): its staged rows are deleted and the upload form shows again.
+ * Ends the open import run: its staged rows are deleted and the upload form shows again.
  * The screen offers it while a run is open, so a wrong file never has to wait for the seven-day expiry.
  */
 export async function cancelImportAction(
@@ -154,7 +134,7 @@ export async function retryReminderAction(
     id: text(formData, "jobId"),
     expectedVersion: number(formData, "expectedVersion"),
     idempotencyKey: text(formData, "correlationId"),
-    payload: { scenario: text(formData, "scenario") },
+    payload: {},
   });
   revalidatePath("/admin/emlekeztetok");
   return mapAdvancedResult(result, "Az újrapróbálás az eredeti korrelációs azonosítóval ütemezve.");
@@ -171,7 +151,7 @@ export async function updateGrantAction(
     id: text(formData, "grantId"),
     expectedVersion: number(formData, "expectedVersion"),
     idempotencyKey: text(formData, "idempotencyKey"),
-    payload: { scenario: text(formData, "scenario") },
+    payload: {},
   });
   return mapAdvancedResult(
     result,
@@ -190,7 +170,7 @@ export async function runLifecycleAction(
     id: text(formData, "familyId"),
     expectedVersion: number(formData, "expectedVersion"),
     idempotencyKey: text(formData, "idempotencyKey"),
-    payload: { confirmed: text(formData, "confirmed"), scenario: text(formData, "scenario") },
+    payload: { confirmed: text(formData, "confirmed") },
   });
   revalidatePath("/admin/adatvedelem");
   return mapAdvancedResult(result, "Az adat-életciklus művelet atomikusan lezárult.");

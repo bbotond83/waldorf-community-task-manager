@@ -13,7 +13,7 @@ import {
   matchesTrackingScope,
   projectTrackingEntry,
   type TrackingSourceRecord,
-} from "../teacher-tracking/tracking-model.ts";
+} from "./tracking-model.ts";
 export interface TeacherApplicationPort {
   getSchedule(input: {
     actorId: string;

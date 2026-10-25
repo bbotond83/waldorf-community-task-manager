@@ -15,6 +15,7 @@ import {
   serviceKey,
   stackSettings,
 } from "../database/stack-support.ts";
+import { bindSeededSchema } from "./support/seeded-schema.ts";
 
 /**
  * The four identity screens and the sign-out control against the real local stack, with the automated
@@ -22,7 +23,9 @@ import {
  * The servers started by playwright.config.ts use the schema named below, so these tests never touch the
  * data of the other database tests.
  */
-const SCHEMA = process.env.IDENTITY_BROWSER_SCHEMA ?? "worker_4";
+// The schema of the running browser project (tests/browser/support/projects.ts); known once the first hook has run.
+let SCHEMA = "";
+const world = bindSeededSchema({ seed: false });
 const ORGANIZATION = "aaaaaaaa-0000-4000-8000-000000000001";
 const FAMILY = "cccccccc-0000-4000-8000-000000000201";
 const GROUP = "cccccccc-0000-4000-8000-000000000101";
@@ -30,14 +33,9 @@ const MAIL_API = "http://127.0.0.1:54324/api/v1";
 
 const settings = stackSettings();
 const apiUrl = settings.apiUrl.replace(/\/$/, "");
-const admin = createAdminAccess({ url: apiUrl, serviceKey: serviceKey(), schema: SCHEMA });
+let admin: ReturnType<typeof createAdminAccess>;
 const service = createSignInService({ url: apiUrl, publicKey: settings.publicKey });
-const database = createDatabaseClient({
-  url: apiUrl,
-  publicKey: settings.publicKey,
-  sessionSecret: randomBytes(32).toString("hex"),
-  schema: SCHEMA,
-});
+let database: ReturnType<typeof createDatabaseClient>;
 const mailer = createInvitationMailer({
   transport: createSmtpTransport({ host: "127.0.0.1", port: 54325 }),
   from: "no-reply@example.test",
@@ -49,6 +47,14 @@ const password = () => `Pw-${randomBytes(6).toString("hex")}-1`;
 test.describe.configure({ mode: "serial" });
 
 test.beforeAll(async () => {
+  SCHEMA = world().schema;
+  admin = createAdminAccess({ url: apiUrl, serviceKey: serviceKey(), schema: SCHEMA });
+  database = createDatabaseClient({
+    url: apiUrl,
+    publicKey: settings.publicKey,
+    sessionSecret: randomBytes(32).toString("hex"),
+    schema: SCHEMA,
+  });
   db = await openDatabase();
   await lockSchemas(db, [SCHEMA]);
   await prepareSchema(db, SCHEMA);

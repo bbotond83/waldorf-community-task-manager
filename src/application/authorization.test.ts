@@ -20,8 +20,6 @@ function makeSession(role: Role, scope: Scope): SessionContext {
     ...sessionGrantBindings(`${role}-synthetic`, role, [scope]),
     roles: [role],
     scopes: [scope],
-    runtimeMode: "synthetic",
-    isSynthetic: true,
   };
 }
 
@@ -214,12 +212,11 @@ it("wrong organization group and unknown role deny", async () => {
   } as unknown as SessionContext;
   assert.equal((await contractFor(unknown).navigation(unknown)).state, "denied");
 });
-it("inactive revoked and invalid-mode sessions have no protected navigation", async () => {
+it("inactive and revoked sessions have no protected navigation", async () => {
   const session = makeSession("kindergarten_teacher", groupScope);
   for (const candidate of [
     { ...session, isActive: false },
     { ...session, grants: session.grants.map((grant) => ({ ...grant, revokedAt: "2026" })) },
-    { ...session, isSynthetic: false },
   ]) {
     const result = await contractFor(candidate).navigation(candidate);
     assert.equal(result.state, "denied");

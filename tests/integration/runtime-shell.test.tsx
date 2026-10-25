@@ -1,31 +1,13 @@
 import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { AppShell } from "../../src/runtime/AppShell";
-import { ProfileSelector } from "../../src/runtime/ProfileSelector";
 import { RuntimeConfigurationError } from "../../src/runtime/RuntimeConfigurationError";
-import { SYNTHETIC_PROFILES } from "../../src/runtime/synthetic/profiles";
+import { shellProfile } from "../support/role-profiles";
 
 describe("runtime shell", () => {
-  it("renders every privacy-safe test profile with stable controls", () => {
-    render(<ProfileSelector profiles={SYNTHETIC_PROFILES} />);
-    expect(screen.getByRole("heading", { name: "Helyi tesztprofil kiválasztása" })).toBeVisible();
-    expect(screen.getAllByRole("button")).toHaveLength(4);
-    expect(screen.queryByText("Profil használata")).not.toBeInTheDocument();
-    expect(screen.getByTestId("profile-selector-parent-local-button")).toBeVisible();
-  });
-
-  it("shows the logo with its name and a decorative cover photo on the chooser", () => {
-    render(<ProfileSelector profiles={SYNTHETIC_PROFILES} />);
-    const logo = screen.getByRole("img", { name: "Cinkotai Waldorf Óvoda" });
-    expect(logo).toBeVisible();
-    expect(logo.closest("a")).toBeNull();
-    const cover = within(screen.getByTestId("selector-hero")).getAllByRole("presentation");
-    expect(cover[0]).toHaveAttribute("alt", "");
-  });
-
   it("links the logo in the app header to the profile's default page", () => {
     render(
-      <AppShell profile={SYNTHETIC_PROFILES[2]}>
+      <AppShell profile={shellProfile("group-admin")}>
         <h1>Kezdőlap</h1>
       </AppShell>,
     );
@@ -36,7 +18,7 @@ describe("runtime shell", () => {
 
   it("renders the semantic shell and role announcement", () => {
     render(
-      <AppShell profile={SYNTHETIC_PROFILES[0]}>
+      <AppShell profile={shellProfile("parent")}>
         <h1>Szülői kezdőlap</h1>
       </AppShell>,
     );
@@ -46,9 +28,39 @@ describe("runtime shell", () => {
     expect(screen.getByTestId("app-shell-skip-link")).toHaveAttribute("href", "#fo-tartalom");
   });
 
+  it("has no profile switcher: the header offers only what the page gives it", () => {
+    const { rerender } = render(
+      <AppShell profile={shellProfile("parent")}>
+        <h1>Szülői kezdőlap</h1>
+      </AppShell>,
+    );
+    expect(screen.queryByTestId("app-shell-switch-profile-form")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("app-shell-switch-profile-button")).not.toBeInTheDocument();
+    expect(screen.queryByText("Tesztprofil váltása")).not.toBeInTheDocument();
+    rerender(
+      <AppShell profile={shellProfile("parent")} headerAction={<button>Kilépés</button>}>
+        <h1>Szülői kezdőlap</h1>
+      </AppShell>,
+    );
+    expect(screen.getByRole("button", { name: "Kilépés" })).toBeVisible();
+    expect(screen.queryByTestId("app-shell-switch-profile-button")).not.toBeInTheDocument();
+  });
+
+  it("shows the profile summary and a custom status message", () => {
+    render(
+      <AppShell profile={shellProfile("teacher")} statusMessage="Betöltve.">
+        <h1>x</h1>
+      </AppShell>,
+    );
+    expect(screen.getByTestId("app-shell-profile-summary")).toHaveTextContent(
+      "A kijelölt csoportok beosztása, módosítás nélkül",
+    );
+    expect(screen.getByRole("status")).toHaveTextContent("Betöltve.");
+  });
+
   it("projects only parent navigation for a parent profile", () => {
     render(
-      <AppShell profile={SYNTHETIC_PROFILES[0]}>
+      <AppShell profile={shellProfile("parent")}>
         <h1>Szülői kezdőlap</h1>
       </AppShell>,
     );
@@ -75,10 +87,10 @@ describe("runtime shell", () => {
   });
 
   it.each([
-    ["group-admin-local", 5],
-    ["super-admin-local", 9],
-  ])("shows the one menu of %s with %i items", (profileId, count) => {
-    const profile = SYNTHETIC_PROFILES.find((candidate) => candidate.id === profileId)!;
+    ["group-admin", 5],
+    ["super-admin", 9],
+  ] as const)("shows the one menu of %s with %i items", (id, count) => {
+    const profile = shellProfile(id);
     render(
       <AppShell profile={profile}>
         <h1>Kezdőlap</h1>
@@ -105,21 +117,9 @@ describe("runtime shell", () => {
   });
 });
 
-it("shows four role controls and no removed profile selection", () => {
-  render(<ProfileSelector profiles={SYNTHETIC_PROFILES} />);
-  expect(screen.getByRole("button", { name: /^Óvónő\./ })).toBeVisible();
-  expect(screen.getByTestId("profile-selector-kindergarten-teacher-local-button")).toHaveAttribute(
-    "type",
-    "submit",
-  );
-  expect(screen.queryByTestId("profile-selector-staff-local-button")).not.toBeInTheDocument();
-  expect(
-    screen.queryByTestId("profile-selector-kindergarten-admin-local-button"),
-  ).not.toBeInTheDocument();
-});
 it("teacher shell announces the localized role and has no menu", () => {
   render(
-    <AppShell profile={SYNTHETIC_PROFILES[1]}>
+    <AppShell profile={shellProfile("teacher")}>
       <h1>Óvónői kezdőlap</h1>
     </AppShell>,
   );
@@ -130,28 +130,4 @@ it("teacher shell announces the localized role and has no menu", () => {
   expect(screen.getByTestId("app-shell-skip-link")).toHaveAttribute("href", "#fo-tartalom");
   expect(screen.getByTestId("app-shell-main")).toHaveAttribute("tabindex", "-1");
   expect(screen.queryByRole("link", { name: "Importálás" })).not.toBeInTheDocument();
-});
-it("selector uses native keyboard-operable forms and stable accessible submit names", () => {
-  render(<ProfileSelector profiles={SYNTHETIC_PROFILES} />);
-  for (const profile of SYNTHETIC_PROFILES) {
-    const form = screen.getByTestId(`profile-selector-${profile.id}-form`);
-    expect(form).toHaveAttribute("method", "post");
-    expect(form).toHaveAttribute("action", "/api/synthetic/session");
-    const card = within(form).getByRole("button", {
-      name: `${profile.label}. ${profile.scopeSummary}`,
-    });
-    expect(card).toBeEnabled();
-    expect(card).toHaveAttribute("type", "submit");
-    expect(within(form).getByTestId(`profile-selector-${profile.id}-input`)).toHaveAttribute(
-      "value",
-      profile.id,
-    );
-  }
-});
-
-it("breaks long role names at syllables in the card but keeps the plain accessible name", () => {
-  render(<ProfileSelector profiles={SYNTHETIC_PROFILES} />);
-  const card = screen.getByTestId("profile-selector-super-admin-local-button");
-  expect(card.textContent).toContain("Szu­per­ad­mi­niszt­rá­tor");
-  expect(card).toHaveAccessibleName(/^Szuperadminisztrátor\./);
 });

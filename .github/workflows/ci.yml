@@ -17,12 +17,10 @@ jobs:
   validate:
     name: Validate
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 90
     permissions:
       contents: read
     env:
-      APP_RUNTIME_MODE: synthetic
-      APP_SYNTHETIC_FIXTURE_VERSION: waldorf-local-v1
       APP_HOST: 127.0.0.1
       # Identity settings (names and local-only values; the session secret is generated below).
       APP_PUBLIC_URL: http://127.0.0.1:3000
@@ -67,13 +65,22 @@ jobs:
           DB_ALLOW_ALL_INTERFACES: "1"
         run: npm run db:start
       # The server-only admin module finds the sign-in service's admin key in the job environment (masked in the
-      # log; the CLI's documented local default, not a secret of ours). Never printed.
-      - name: Expose the stack's admin key to the job environment
+      # log; the CLI's documented local default, not a secret of ours). Never printed. The build, the start smoke
+      # and the browser phase find the stack's address and public key in the same place.
+      - name: Expose the stack's settings to the job environment
         run: |
-          key="$(npx supabase status -o env | sed -n 's/^SERVICE_ROLE_KEY="\(.*\)"$/\1/p')"
+          status="$(npx supabase status -o env)"
+          key="$(printf '%s\n' "$status" | sed -n 's/^SERVICE_ROLE_KEY="\(.*\)"$/\1/p')"
+          anon="$(printf '%s\n' "$status" | sed -n 's/^ANON_KEY="\(.*\)"$/\1/p')"
+          url="$(printf '%s\n' "$status" | sed -n 's/^API_URL="\(.*\)"$/\1/p')"
           test -n "$key"
+          test -n "$anon"
+          test -n "$url"
           echo "::add-mask::$key"
+          echo "::add-mask::$anon"
           echo "SUPABASE_SERVICE_ROLE_KEY=$key" >> "$GITHUB_ENV"
+          echo "SUPABASE_ANON_KEY=$anon" >> "$GITHUB_ENV"
+          echo "SUPABASE_URL=$url" >> "$GITHUB_ENV"
       - name: Run the complete local verification pipeline
         run: npm run verify:local
       - name: Stop the local database stack
@@ -88,11 +95,12 @@ jobs:
     permissions:
       contents: read
     env:
-      APP_RUNTIME_MODE: synthetic
-      APP_SYNTHETIC_FIXTURE_VERSION: waldorf-local-v1
-      # Build-only placeholders so this job's environment has the same setting names as the validate job.
-      # There is no service-role key here and no stack; the session secret is generated below.
+      # Build-only placeholders so this job's environment has the same setting names as the validate job and the
+      # production build finds the database settings it requires. There is no service-role key here and no stack;
+      # the session secret is generated below. The values are not secrets and point nowhere.
       APP_PUBLIC_URL: https://app.example.invalid
+      SUPABASE_URL: https://app.example.invalid
+      SUPABASE_ANON_KEY: build-only-placeholder-public-key
       SMTP_HOST: 127.0.0.1
       SMTP_PORT: "54325"
       SMTP_FROM: no-reply@example.test
@@ -135,8 +143,6 @@ jobs:
             runAttempt: env.GITHUB_RUN_ATTEMPT,
             runUrl: `${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}/actions/runs/${env.GITHUB_RUN_ID}`,
             nodeVersion: process.version,
-            runtimeMode: env.APP_RUNTIME_MODE,
-            fixtureVersion: env.APP_SYNTHETIC_FIXTURE_VERSION,
             createdAt: new Date().toISOString(),
           };
           writeFileSync('build-metadata.json', JSON.stringify(metadata, null, 2) + '\n');

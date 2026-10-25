@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AppNav, currentNavigationId } from "../../src/runtime/AppNav";
 import { BackToHomeLink } from "../../src/runtime/BackToHomeLink";
-import { getSyntheticProfile } from "../../src/runtime/synthetic/profiles";
+import { roleProfile } from "../support/role-profiles";
 
 const navigation = vi.hoisted(() => ({
   pathname: null as string | null,
@@ -13,7 +13,7 @@ vi.mock("next/navigation", () => ({
   useSearchParams: () => new URLSearchParams(navigation.search),
 }));
 
-const adminItems = getSyntheticProfile("super-admin-local")!.navigation;
+const adminItems = roleProfile("super-admin").navigation;
 
 beforeEach(() => {
   navigation.pathname = null;
@@ -63,7 +63,7 @@ describe("AppNav", () => {
 });
 
 describe("AppNav for a parent", () => {
-  const parentItems = getSyntheticProfile("parent-local")!.navigation;
+  const parentItems = roleProfile("parent").navigation;
 
   it("lists Értesítések before Feladatok and ends with Cserék", () => {
     render(<AppNav items={parentItems} />);
@@ -119,7 +119,7 @@ describe("AppNav for a parent", () => {
 
 describe("currentNavigationId", () => {
   it("lets a task page opened from a notification stand for the notification list", () => {
-    const items = getSyntheticProfile("parent-local")!.navigation;
+    const items = roleProfile("parent").navigation;
     expect(currentNavigationId(items, "/szulo/feladatok/duty-1", true)).toBe(
       "parent-notifications",
     );

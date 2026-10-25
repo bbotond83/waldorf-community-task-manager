@@ -5,8 +5,7 @@ import {
   NOTIFICATION_LIST_PATH,
   pendingRequests,
   resolveNotificationContext,
-} from "../../../../src/parent-web/notification-context.ts";
-import { isProductionMode } from "../../../_identity/production-request.ts";
+} from "../../../../src/application/notification-context.ts";
 import { MarkNotificationRead } from "../../_components/MarkNotificationRead.tsx";
 import { ParentMutationForm } from "../../_components/ParentMutationForm.tsx";
 import { PendingRequestNotice } from "../../_components/PendingRequestNotice.tsx";
@@ -28,7 +27,6 @@ export default async function DutyDetailPage({
   const session = await resolveParentSession();
   const facade = await resolveParentFacade();
   if (session.state !== "success" || !facade) return null;
-  const production = await isProductionMode();
   const result = await facade.getDuty(session.data.applicationSession, {
     familyScope: session.data.familyScope,
     familyId: session.data.familyId,
@@ -116,7 +114,7 @@ export default async function DutyDetailPage({
                 action={updateContributionAction}
                 submitLabel="Saját megjegyzés mentése"
                 testId="contribution-form"
-                freshIdempotencyKey={production}
+                freshIdempotencyKey
               >
                 <input type="hidden" name="id" value={duty.id} />
                 <input

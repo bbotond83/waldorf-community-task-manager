@@ -1,4 +1,4 @@
-import { isCalendarDate } from "../../../../src/teacher-tracking/tracking-model.ts";
+import { isCalendarDate } from "../../../../src/application/tracking-model.ts";
 import { FilterClearLink } from "../../../../src/runtime/FilterClearLink.tsx";
 import type { TeacherFilters } from "../../_lib/filters.ts";
 

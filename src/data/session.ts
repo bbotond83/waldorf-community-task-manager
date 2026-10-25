@@ -116,8 +116,6 @@ export function toSessionContext(accountId: string, context: AccessContext): Ses
     grants,
     roles: Object.freeze([...new Set(grants.map((grant) => grant.role))]),
     scopes: Object.freeze(grants.map((grant) => grant.scope)),
-    runtimeMode: "production" as const,
-    isSynthetic: false,
   });
 }
 

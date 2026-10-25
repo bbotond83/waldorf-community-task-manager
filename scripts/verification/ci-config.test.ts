@@ -92,7 +92,8 @@ describe("CI workflow configuration (BR10.2, FR10.3)", () => {
     }
     // The session secret is generated per run, masked, and never a literal.
     assert.equal([...workflow.matchAll(/openssl rand -hex 32/g)].length, 2);
-    assert.equal([...workflow.matchAll(/::add-mask::/g)].length, 3);
+    // Masked: the two session secrets, the admin key and (U5) the stack's public key.
+    assert.equal([...workflow.matchAll(/::add-mask::/g)].length, 4);
     assert.equal(/APP_SESSION_SECRET:\s*\S/.test(workflow), false);
     // Only the validate job has a stack, so only it exposes the admin key (masked) to the environment.
     assert.equal([...workflow.matchAll(/SUPABASE_SERVICE_ROLE_KEY=\$key/g)].length, 1);
@@ -170,13 +171,83 @@ describe("CI workflow configuration (BR10.2, FR10.3)", () => {
     }
   });
 
-  it("holds no database secret, runs with read-only permissions and keeps the synthetic values until U5", () => {
+  it("runs the seed database stage after the notifications and import stage and before the shuffled run (U5)", () => {
+    const pipeline = read("scripts/verification/run-local-verification.ts");
+    assert.match(pipeline, /key: "database-seed", args: \["run", "test:database:seed"\]/);
+    assert.ok(
+      pipeline.indexOf("database-notifications-import") < pipeline.indexOf("database-seed"),
+    );
+    assert.ok(pipeline.indexOf("database-seed") < pipeline.indexOf("database-shuffled"));
+    assert.ok(pipeline.indexOf("database-seed") < pipeline.indexOf('key: "coverage"'));
+    const scripts = JSON.parse(read("package.json")).scripts as Record<string, string>;
+    for (const name of ["db:seed", "db:seed:large", "db:reset", "test:database:seed"]) {
+      assert.ok(scripts[name], name);
+    }
+    assert.match(scripts["db:seed:large"]!, /scripts\/db\/seed\.ts --large$/);
+    const shuffled = read("scripts/db/shuffled-tests.ts");
+    const files = scripts["test:database:seed"]!.split(" ").filter((part) =>
+      part.startsWith("tests/database/"),
+    );
+    for (const file of ["audit-purge", "seed", "reset", "seed-timing"]) {
+      assert.ok(files.includes(`tests/database/${file}.test.ts`), file);
+    }
+    for (const file of files)
+      assert.ok(shuffled.includes(`"${file}"`), `${file} in the shuffled run`);
+    // The seed module and the commands are inside the lint and format scope (scripts/ is listed).
+    for (const name of ["lint", "format", "format:check"]) {
+      assert.ok(scripts[name]!.split(" ").includes("scripts"), name);
+    }
+  });
+
+  it("holds no database secret, runs with read-only permissions and has no synthetic setting in either job (U5)", () => {
     assert.equal(/\$\{\{\s*secrets\./.test(workflow), false);
     assert.equal(/pull_request_target/.test(workflow), false);
     assert.match(workflow, /^permissions:\n  contents: read$/m);
     assert.equal([...workflow.matchAll(/^    permissions:\n      contents: read$/gm)].length, 2);
-    assert.match(workflow, /APP_RUNTIME_MODE: synthetic/);
-    assert.match(workflow, /APP_SYNTHETIC_FIXTURE_VERSION: waldorf-local-v1/);
+    assert.equal(/APP_RUNTIME_MODE|APP_SYNTHETIC_FIXTURE_VERSION|synthetic/i.test(workflow), false);
+    assert.equal(/runtimeMode|fixtureVersion/.test(workflow), false);
+  });
+
+  it("gives the validate job 90 minutes and the stack's address and public key for build, smoke and browser (U5)", () => {
+    const validate = workflow.slice(
+      workflow.indexOf("  validate:"),
+      workflow.indexOf("  build_evidence:"),
+    );
+    assert.match(validate, /timeout-minutes: 90/);
+    assert.equal(/timeout-minutes: 45/.test(workflow), false);
+    assert.match(validate, /echo "SUPABASE_URL=\$url" >> "\$GITHUB_ENV"/);
+    assert.match(validate, /echo "SUPABASE_ANON_KEY=\$anon" >> "\$GITHUB_ENV"/);
+    assert.match(validate, /echo "SUPABASE_SERVICE_ROLE_KEY=\$key" >> "\$GITHUB_ENV"/);
+    // The settings are exposed before the pipeline that builds, starts and browses the application.
+    assert.ok(validate.indexOf("SUPABASE_URL=") < validate.indexOf("npm run verify:local"));
+  });
+
+  it("gives the build evidence job build-only placeholders and no mode or fixture field in its metadata (U5)", () => {
+    const evidence = workflow.slice(workflow.indexOf("  build_evidence:"));
+    assert.match(evidence, /SUPABASE_URL: https:\/\/app\.example\.invalid/);
+    assert.match(evidence, /SUPABASE_ANON_KEY: build-only-placeholder-public-key/);
+    assert.equal(/SERVICE_ROLE/.test(evidence), false);
+    assert.equal(/runtimeMode|fixtureVersion/.test(evidence), false);
+  });
+
+  it("keeps the browser phase last, after every database key (U5)", () => {
+    const pipeline = read("scripts/verification/run-local-verification.ts");
+    const commandList = pipeline.slice(
+      pipeline.indexOf("const commands = ["),
+      pipeline.indexOf("] as const;"),
+    );
+    const keys = [...commandList.matchAll(/key: "([a-z-]+)"/g)].map((match) => match[1]!);
+    assert.equal(keys.at(-1), "browser");
+    for (const key of keys.filter((name) => name.startsWith("database-")))
+      assert.ok(keys.indexOf(key) < keys.indexOf("browser"), key);
+    assert.deepEqual(
+      keys.slice(
+        keys.indexOf("database-notifications-import"),
+        keys.indexOf("database-notifications-import") + 3,
+      ),
+      ["database-notifications-import", "database-seed", "database-shuffled"],
+    );
+    assert.equal(/APP_RUNTIME_MODE|APP_SYNTHETIC_FIXTURE_VERSION/.test(pipeline), false);
   });
 
   it("keeps the private build evidence for 14 days and the existing PostgreSQL role-migration step", () => {

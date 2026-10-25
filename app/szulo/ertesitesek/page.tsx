@@ -1,4 +1,4 @@
-import { notificationHref } from "../../../src/parent-web/notification-context.ts";
+import { notificationHref } from "../../../src/application/notification-context.ts";
 import { NotificationReadForm } from "../_components/NotificationReadForm.tsx";
 import { ParentStatePanel } from "../_components/ParentStatePanel.tsx";
 import { resolveParentFacade } from "../_lib/facade.ts";
@@ -51,7 +51,7 @@ export default async function ParentNotificationsPage() {
                 >
                   <h2>{notification.title}</h2>
                   <p>{TIMING_LABEL[notification.timing]}</p>
-                  <p className="synthetic-label">{PROVIDER_LABEL[notification.providerStatus]}</p>
+                  <p className="delivery-note">{PROVIDER_LABEL[notification.providerStatus]}</p>
                   <strong>{notification.isRead ? "Olvasott" : "Olvasatlan"}</strong>
                 </a>
                 <NotificationReadForm

@@ -1,28 +1,18 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page, type Locator } from "@playwright/test";
+import { CLEANING_DAY, EVENT_DAY, seedDay } from "./support/dates.ts";
+import { requestCancellation, withOtherPage } from "./support/scenarios.ts";
+import { SERIOUS, signInAs, bindSeededSchema } from "./support/seeded-schema.ts";
 
-type ProfileId =
-  "parent-local" | "kindergarten-teacher-local" | "group-admin-local" | "super-admin-local";
+const world = bindSeededSchema();
+
+/** The seeded accounts the specs sign in as, by the role the old profile names stood for. */
+type ProfileId = "parent-1" | "teacher-1" | "group-admin-1" | "super-admin";
 
 async function resetAndSelect(page: Page, profile: ProfileId) {
-  await page.goto("/");
-  await page.request.post("/api/synthetic/reset", {
-    headers: { origin: new URL(page.url()).origin },
-  });
-  await page.goto("/");
-  if (
-    await page
-      .getByTestId("app-shell-switch-profile-button")
-      .isVisible()
-      .catch(() => false)
-  ) {
-    await page.getByTestId("app-shell-switch-profile-button").click();
-  }
-  await page.getByTestId(`profile-selector-${profile}-button`).click();
+  await world().reseed();
+  await signInAs(page, world().account(profile));
 }
-
-const SERIOUS = ({ impact }: { impact?: string | null }) =>
-  impact === "serious" || impact === "critical";
 
 const isMobile = (name: string) => name === "mobile-chrome";
 
@@ -42,7 +32,7 @@ async function expectTeacherFieldsEmpty(page: Page) {
 }
 
 test.describe("teacher schedule: Szűrők törlése empties every field", () => {
-  test.beforeEach(async ({ page }) => resetAndSelect(page, "kindergarten-teacher-local"));
+  test.beforeEach(async ({ page }) => resetAndSelect(page, "teacher-1"));
 
   test("the first visit is unfiltered: all groups, empty dates, nothing required", async ({
     page,
@@ -55,8 +45,7 @@ test.describe("teacher schedule: Szűrők törlése empties every field", () => 
     );
     await expect(page.getByTestId("teacher-schedule-group-select").locator("option")).toHaveText([
       "Minden csoport",
-      "Tölgyfa csoport",
-      "Napraforgó csoport",
+      "Engedélyezett csoport",
     ]);
     await expect(scheduleItems(page, testInfo.project.name)).toHaveCount(3);
   });
@@ -66,8 +55,8 @@ test.describe("teacher schedule: Szűrők törlése empties every field", () => 
   }, testInfo) => {
     await page.goto("/teacher/schedule");
     await page.waitForLoadState("networkidle");
-    await page.getByTestId("teacher-schedule-from-input").fill("2026-08-14");
-    await page.getByTestId("teacher-schedule-group-select").selectOption("group-sunflower");
+    await page.getByTestId("teacher-schedule-from-input").fill(seedDay(EVENT_DAY));
+    await page.getByTestId("teacher-schedule-group-select").selectOption(world().id("group:1"));
     await page.getByTestId("teacher-schedule-filter-clear-link").click();
     await expectTeacherFieldsEmpty(page);
     await expect(page.getByRole("heading", { name: "Beosztás", exact: true })).toBeFocused();
@@ -77,9 +66,12 @@ test.describe("teacher schedule: Szűrők törlése empties every field", () => 
   test("an address with filters is cleared too, and everything the teacher may see shows", async ({
     page,
   }, testInfo) => {
-    await page.goto("/teacher/schedule?groupId=group-sunflower&from=2026-08-17&to=2026-08-19");
+    const group = world().id("group:1");
+    await page.goto(
+      `/teacher/schedule?groupId=${group}&from=${seedDay(CLEANING_DAY - 1)}&to=${seedDay(CLEANING_DAY + 1)}`,
+    );
     await page.waitForLoadState("networkidle");
-    await expect(page.getByTestId("teacher-schedule-group-select")).toHaveValue("group-sunflower");
+    await expect(page.getByTestId("teacher-schedule-group-select")).toHaveValue(group);
     await expect(scheduleItems(page, testInfo.project.name)).toHaveCount(1);
     await page.getByTestId("teacher-schedule-filter-clear-link").click();
     await expect(page).toHaveURL(/\/teacher\/schedule$/);
@@ -91,9 +83,9 @@ test.describe("teacher schedule: Szűrők törlése empties every field", () => 
   test("a single date is a one-sided limit", async ({ page }, testInfo) => {
     await page.goto("/teacher/schedule");
     await page.waitForLoadState("networkidle");
-    await page.getByTestId("teacher-schedule-from-input").fill("2026-08-14");
+    await page.getByTestId("teacher-schedule-from-input").fill(seedDay(EVENT_DAY));
     await page.getByTestId("teacher-schedule-filter-submit-button").click();
-    await expect(page).toHaveURL(/from=2026-08-14/);
+    await expect(page).toHaveURL(new RegExp(`from=${seedDay(EVENT_DAY)}`));
     await expect(scheduleItems(page, testInfo.project.name)).toHaveCount(2);
   });
 
@@ -106,18 +98,22 @@ test.describe("teacher schedule: Szűrők törlése empties every field", () => 
           ? `teacher-schedule-card-open-${id}`
           : `teacher-schedule-open-${id}`,
       );
-    await page.goto("/teacher/schedule?groupId=group-oak&from=2026-08-13&to=2026-08-15");
+    const group = world().id("group:1");
+    const from = seedDay(EVENT_DAY - 1);
+    const to = seedDay(EVENT_DAY + 1);
+    await page.goto(`/teacher/schedule?groupId=${group}&from=${from}&to=${to}`);
     await page.waitForLoadState("networkidle");
-    await open("schedule-garden").click();
+    await open(world().id("task:1:1")).click();
     await expect(page.getByTestId("teacher-schedule-detail-page")).toBeVisible();
     await page.goBack();
-    await expect(page.getByTestId("teacher-schedule-group-select")).toHaveValue("group-oak");
-    await expect(page.getByTestId("teacher-schedule-from-input")).toHaveValue("2026-08-13");
-    await expect(page.getByTestId("teacher-schedule-to-input")).toHaveValue("2026-08-15");
+    await expect(page.getByTestId("teacher-schedule-group-select")).toHaveValue(group);
+    await expect(page.getByTestId("teacher-schedule-from-input")).toHaveValue(from);
+    await expect(page.getByTestId("teacher-schedule-to-input")).toHaveValue(to);
 
     await page.getByTestId("teacher-schedule-filter-clear-link").click();
+    await expect(page).toHaveURL(/\/teacher\/schedule$/);
     await expectTeacherFieldsEmpty(page);
-    await open("schedule-garden").click();
+    await open(world().id("task:1:1")).click();
     await expect(page.getByTestId("teacher-schedule-detail-page")).toBeVisible();
     await page.goBack();
     await expectTeacherFieldsEmpty(page);
@@ -131,12 +127,12 @@ test.describe("teacher schedule: Szűrők törlése empties every field", () => 
     await page
       .getByTestId(
         isMobile(testInfo.project.name)
-          ? "teacher-schedule-card-open-schedule-coverage"
-          : "teacher-schedule-open-schedule-coverage",
+          ? `teacher-schedule-card-open-${world().id("task:1:3")}`
+          : `teacher-schedule-open-${world().id("task:1:3")}`,
       )
       .click();
     await expect(page.getByTestId("teacher-schedule-detail-fields")).toContainText(
-      "Napraforgó csoport",
+      "Engedélyezett csoport",
     );
     await page.getByTestId("teacher-schedule-detail-back-link").click();
     await expect(page).toHaveURL(/\/teacher\/schedule$/);
@@ -147,12 +143,12 @@ test.describe("teacher schedule: Szűrők törlése empties every field", () => 
     await page.goto("/teacher/schedule");
     const item = page.getByTestId(
       isMobile(testInfo.project.name)
-        ? "teacher-schedule-card-schedule-garden"
-        : "teacher-schedule-row-schedule-garden",
+        ? `teacher-schedule-card-${world().id("task:1:1")}`
+        : `teacher-schedule-row-${world().id("task:1:1")}`,
     );
-    await expect(item).toContainText("Ütemezve");
-    await expect(item).not.toContainText("Ütemezett");
-    const icon = item.locator("svg[data-status-icon='calendar']");
+    await expect(item).toContainText("Nyitott");
+    await expect(item).not.toContainText("open");
+    const icon = item.locator("svg[aria-hidden='true']").first();
     await expect(icon).toBeVisible();
     await expect(icon).toHaveAttribute("aria-hidden", "true");
   });
@@ -168,8 +164,14 @@ test.describe("admin lists: Szűrők törlése", () => {
   for (const list of ADMIN_LISTS) {
     test(`${list.path} resets the search and the status and shows the whole list`, async ({
       page,
-    }) => {
-      await resetAndSelect(page, "super-admin-local");
+      browser,
+    }, testInfo) => {
+      await resetAndSelect(page, "super-admin");
+      if (list.label === "approvals") {
+        await withOtherPage(browser, testInfo.project.use.baseURL, (other) =>
+          requestCancellation(other, world()),
+        );
+      }
       await page.goto(list.path);
       await page.waitForLoadState("networkidle");
       await expect(page.getByTestId("admin-filter-clear-link")).toHaveText("Szűrők törlése");
@@ -195,11 +197,18 @@ test.describe("admin lists: Szűrők törlése", () => {
     });
   }
 
-  test("Back after a clear and a detail shows empty fields", async ({ page }) => {
-    await resetAndSelect(page, "group-admin-local");
+  test("Back after a clear and a detail shows empty fields", async ({
+    page,
+    browser,
+  }, testInfo) => {
+    await resetAndSelect(page, "group-admin-1");
+    await withOtherPage(browser, testInfo.project.use.baseURL, (other) =>
+      requestCancellation(other, world()),
+    );
     await page.goto("/admin/jovahagyasok?state=pending&q=a");
     await page.waitForLoadState("networkidle");
     await page.getByTestId("admin-filter-clear-link").click();
+    await expect(page).toHaveURL(/\/admin\/jovahagyasok$/);
     await expect(page.getByTestId("admin-filter-state-select")).toHaveValue("");
     await page.locator(".admin-collection li a").first().click();
     await expect(page.getByTestId("admin-back-link")).toBeVisible();
@@ -220,6 +229,9 @@ async function expectLabelsAbove(page: Page, formSelector: string, minimum: numb
     const pairs = Array.from(form.querySelectorAll("label[for]")).flatMap((label) => {
       const control = document.getElementById(label.getAttribute("for") ?? "");
       if (!control) return [];
+      // A tick box carries its label beside it, by design; only text fields and selects are measured.
+      if (control instanceof HTMLInputElement && ["checkbox", "radio"].includes(control.type))
+        return [];
       const l = label.getBoundingClientRect();
       const c = control.getBoundingClientRect();
       return [{ text: label.textContent, gap: c.top - l.bottom, shift: Math.abs(c.left - l.left) }];
@@ -240,49 +252,49 @@ async function expectLabelsAbove(page: Page, formSelector: string, minimum: numb
 
 const FORMS = [
   {
-    profile: "kindergarten-teacher-local",
+    profile: "teacher-1",
     path: "/teacher/schedule",
     form: '[data-testid="teacher-schedule-filter-form"]',
     count: 3,
   },
   {
-    profile: "super-admin-local",
+    profile: "super-admin",
     path: "/admin/nyilvantartasok",
     form: '[data-testid="admin-filter-form"]',
     count: 2,
   },
   {
-    profile: "super-admin-local",
+    profile: "super-admin",
     path: "/admin/feladatok",
     form: '[data-testid="admin-filter-form"]',
     count: 2,
   },
   {
-    profile: "super-admin-local",
+    profile: "super-admin",
     path: "/admin/jovahagyasok",
     form: '[data-testid="admin-filter-form"]',
     count: 2,
   },
   {
-    profile: "parent-local",
+    profile: "parent-1",
     path: "/szulo/feladatok",
     form: '[data-testid="duty-filter-form"]',
     count: 1,
   },
   {
-    profile: "super-admin-local",
+    profile: "super-admin",
     path: "/admin/emlekeztetok",
     form: '[data-testid="admin-reminder-filter"]',
     count: 1,
   },
   {
-    profile: "group-admin-local",
+    profile: "group-admin-1",
     path: "/admin/nyilvantartasok/uj",
     form: '[data-testid="admin-record-create-form"]',
     count: 2,
   },
   {
-    profile: "group-admin-local",
+    profile: "group-admin-1",
     path: "/admin/feladatok/uj",
     form: '[data-testid="admin-task-create-form"]',
     count: 2,
@@ -307,8 +319,9 @@ test.describe("labels stay above their fields on every screen size", () => {
 
   test("the filter buttons line up with the controls and stack on a phone", async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 900 });
-    await resetAndSelect(page, "super-admin-local");
+    await resetAndSelect(page, "super-admin");
     await page.goto("/admin/feladatok");
+    await expect(page.getByTestId("admin-filter-form")).toBeVisible();
     const bottoms = await page
       .locator(
         '[data-testid="admin-filter-form"] :is(input, select, [data-testid="admin-filter-submit-button"], [data-testid="admin-filter-clear-link"])',
@@ -359,9 +372,11 @@ test.describe("create entries are buttons and say Elem", () => {
 
   for (const entry of entries) {
     test(`${entry.text} looks like Szűrés, is 44 px and shows the focus ring`, async ({ page }) => {
-      await resetAndSelect(page, "group-admin-local");
+      await resetAndSelect(page, "group-admin-1");
       await page.goto(entry.list);
       const link = page.getByTestId(entry.link);
+      // The page streams in behind a loading screen: measure only once the link is really shown.
+      await expect(link).toBeVisible();
       await expect(link).toHaveText(entry.text);
       await expect(link).toHaveClass(/button-link/);
       const box = await link.boundingBox();
@@ -396,8 +411,12 @@ test.describe("create entries are buttons and say Elem", () => {
 test.describe("status symbols", () => {
   test("lists show an icon before each word, hidden from the accessibility tree", async ({
     page,
-  }) => {
-    await resetAndSelect(page, "group-admin-local");
+    browser,
+  }, testInfo) => {
+    await resetAndSelect(page, "group-admin-1");
+    await withOtherPage(browser, testInfo.project.use.baseURL, (other) =>
+      requestCancellation(other, world()),
+    );
     await page.goto("/admin/jovahagyasok");
     const items = page.locator(".admin-collection li");
     const count = await items.count();
@@ -413,14 +432,14 @@ test.describe("status symbols", () => {
     }
     // The link's accessible name is the title and the word, without any symbol text.
     await expect(
-      page.getByRole("link", { name: /^Feladatcsere-kérelem (Függőben|Jóváhagyva)$/ }),
+      page.getByRole("link", { name: /^Lemondási kérelem – Sütés (Függőben|Jóváhagyva)$/ }),
     ).toHaveCount(1);
   });
 
   test("the dropdown options of the admin lists, reminders and the parent filter carry symbols", async ({
     page,
   }) => {
-    await resetAndSelect(page, "super-admin-local");
+    await resetAndSelect(page, "super-admin");
     const expected = {
       "/admin/nyilvantartasok": ["Minden állapot", "● Aktív", "○ Archivált"],
       "/admin/feladatok": ["Minden állapot", "◐ Nyitott", "▦ Ütemezve"],
@@ -442,7 +461,7 @@ test.describe("status symbols", () => {
   });
 
   test("the parent duty list and filter show the symbols", async ({ page }) => {
-    await resetAndSelect(page, "parent-local");
+    await resetAndSelect(page, "parent-1");
     await page.goto("/szulo/feladatok");
     await expect(page.getByTestId("duty-filter-select").locator("option")).toHaveText([
       "Minden állapot",
@@ -460,8 +479,14 @@ test.describe("status symbols", () => {
       await expect(badges.nth(index).locator("svg[aria-hidden='true']")).toBeVisible();
   });
 
-  test("the detail pages show the symbol in the Állapot line", async ({ page }) => {
-    await resetAndSelect(page, "group-admin-local");
+  test("the detail pages show the symbol in the Állapot line", async ({
+    page,
+    browser,
+  }, testInfo) => {
+    await resetAndSelect(page, "group-admin-1");
+    await withOtherPage(browser, testInfo.project.use.baseURL, (other) =>
+      requestCancellation(other, world()),
+    );
     await page.goto("/admin/jovahagyasok");
     await page.locator(".admin-collection li a").first().click();
     await expect(page).toHaveURL(/\/admin\/jovahagyasok\/[^/?]+/);
@@ -473,13 +498,13 @@ test("@a11y the polished lists and forms have no serious or critical findings", 
   page,
 }) => {
   const checks: ReadonlyArray<readonly [ProfileId, string]> = [
-    ["kindergarten-teacher-local", "/teacher/schedule"],
-    ["kindergarten-teacher-local", "/teacher/schedule?from=2026-09-01&to=2026-09-05"],
-    ["super-admin-local", "/admin/nyilvantartasok"],
-    ["super-admin-local", "/admin/feladatok"],
-    ["super-admin-local", "/admin/jovahagyasok"],
-    ["super-admin-local", "/admin/nyilvantartasok/uj"],
-    ["parent-local", "/szulo/feladatok"],
+    ["teacher-1", "/teacher/schedule"],
+    ["teacher-1", `/teacher/schedule?from=${seedDay(40)}&to=${seedDay(45)}`],
+    ["super-admin", "/admin/nyilvantartasok"],
+    ["super-admin", "/admin/feladatok"],
+    ["super-admin", "/admin/jovahagyasok"],
+    ["super-admin", "/admin/nyilvantartasok/uj"],
+    ["parent-1", "/szulo/feladatok"],
   ];
   let current: ProfileId | undefined;
   for (const [profile, path] of checks) {

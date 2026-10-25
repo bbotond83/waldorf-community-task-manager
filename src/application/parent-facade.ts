@@ -18,10 +18,10 @@ import { validateIdempotencyKey, validateMutationContext } from "./validation.ts
 
 /**
  * What the parent facade needs from a data source. The command inputs carry the idempotency key so a
- * database adapter can pass it on (BR32.1); the synthetic adapter ignores it. The swap operations that
- * came with the real backend (listSwapCandidates, respondToSwap, withdrawRequest, listSwapRequests) are
- * optional here for the same reason `getDuty` is: the synthetic adapter has none of them, and the facade
- * answers `denied` when the adapter lacks one.
+ * database adapter can pass it on (BR32.1). The swap operations that came with the real backend
+ * (listSwapCandidates, respondToSwap, withdrawRequest, listSwapRequests) are optional here for the same
+ * reason `getDuty` is: a test double may leave one out, and the facade answers `denied` when the port
+ * lacks one.
  */
 export interface ParentApplicationPort {
   listDuties(input: { actorId: string; familyId: string }): Promise<DomainOutcome<DutyListModel>>;

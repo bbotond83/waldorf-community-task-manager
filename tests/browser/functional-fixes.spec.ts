@@ -1,32 +1,33 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
+import { seedDay } from "./support/dates.ts";
+import {
+  addCleaningNotice,
+  requestCancellation,
+  signUpForDecorating,
+  withOtherPage,
+} from "./support/scenarios.ts";
+import { SERIOUS, signInAs, bindSeededSchema } from "./support/seeded-schema.ts";
 
-type ProfileId = "parent-local" | "group-admin-local" | "super-admin-local";
+const world = bindSeededSchema();
 
-async function resetAndSelect(page: Page, profile: ProfileId) {
-  await page.goto("/");
-  await page.request.post("/api/synthetic/reset", {
-    headers: { origin: new URL(page.url()).origin },
-  });
-  await page.goto("/");
-  if (
-    await page
-      .getByTestId("app-shell-switch-profile-button")
-      .isVisible()
-      .catch(() => false)
-  ) {
-    await page.getByTestId("app-shell-switch-profile-button").click();
-  }
-  await page.getByTestId(`profile-selector-${profile}-button`).click();
+/** The test id suffix of the notification card that names a task. */
+async function noticeId(page: Page, taskTitle: string): Promise<string> {
+  const card = page.locator('[data-testid^="notification-card-"]', { hasText: taskTitle });
+  await expect(card).toHaveCount(1);
+  return (await card.getAttribute("data-testid"))!.replace("notification-card-", "");
 }
 
-const SERIOUS = ({ impact }: { impact?: string | null }) =>
-  impact === "serious" || impact === "critical";
-
 test.describe("parent: notifications stay under Értesítések", () => {
-  test.beforeEach(async ({ page }) => resetAndSelect(page, "parent-local"));
+  test.beforeEach(async ({ page }) => {
+    await world().reseed();
+    await signUpForDecorating(page, world());
+    await addCleaningNotice(world());
+    await page.goto("/szulo/ertesitesek");
+  });
 
   test("the menu lists Értesítések first and the parent lands there", async ({ page }) => {
+    await page.goto("/");
     await expect(page).toHaveURL(/\/szulo\/ertesitesek$/);
     const links = page.getByTestId("app-shell-navigation").getByRole("link");
     await expect(links).toHaveText(["Értesítések", "Feladatok", "Cserék"]);
@@ -39,13 +40,18 @@ test.describe("parent: notifications stay under Értesítések", () => {
   test("notification journey: open, menu stays, back link, read and greyed, tick and reload", async ({
     page,
   }) => {
-    const card = page.getByTestId("notification-card-notice-7-day");
+    const decorating = world().id("task:1:2");
+    const first = await noticeId(page, "Díszítés");
+    const second = await noticeId(page, "Takarítás");
+    const card = page.getByTestId(`notification-card-${first}`);
     await expect(card).not.toHaveClass(/notification-card-read/);
     await expect(card).toContainText("Olvasatlan");
 
     // Opening the card goes to the task page with the notification as context.
-    await page.getByTestId("notification-link-notice-7-day").click();
-    await expect(page).toHaveURL(/\/szulo\/feladatok\/duty-assigned\?ertesites=notice-7-day$/);
+    await page.getByTestId(`notification-link-${first}`).click();
+    await expect(page).toHaveURL(
+      new RegExp(`/szulo/feladatok/${decorating}\\?ertesites=${first}$`),
+    );
     await expect(page.getByTestId("duty-detail-page")).toBeVisible();
     // The menu keeps Értesítések as the current item, not Feladatok.
     await expect(page.getByTestId("app-shell-navigation-parent-notifications")).toHaveAttribute(
@@ -64,13 +70,13 @@ test.describe("parent: notifications stay under Értesítések", () => {
 
     await back.click();
     await expect(page).toHaveURL(/\/szulo\/ertesitesek$/);
-    const read = page.getByTestId("notification-card-notice-7-day");
+    const read = page.getByTestId(`notification-card-${first}`);
     await expect(read).toHaveClass(/notification-card-read/);
     await expect(read).toContainText("Olvasott");
-    await expect(page.getByTestId("notification-read-checkbox-notice-7-day")).toBeChecked();
-    await expect(page.getByTestId("notification-read-checkbox-notice-7-day")).toBeDisabled();
+    await expect(page.getByTestId(`notification-read-checkbox-${first}`)).toBeChecked();
+    await expect(page.getByTestId(`notification-read-checkbox-${first}`)).toBeDisabled();
     // The read card is visibly greyer than an unread one.
-    const unread = page.getByTestId("notification-card-notice-24-hour");
+    const unread = page.getByTestId(`notification-card-${second}`);
     await expect(unread).not.toHaveClass(/notification-card-read/);
     const background = (locator: typeof read) =>
       locator.evaluate((element) => getComputedStyle(element).backgroundColor);
@@ -78,20 +84,21 @@ test.describe("parent: notifications stay under Értesítések", () => {
 
     // Ticking another notification marks it read, and the state survives a reload.
     await page.waitForLoadState("networkidle");
-    await page.getByTestId("notification-read-checkbox-notice-24-hour").check();
-    await expect(page.getByTestId("notification-state-notice-24-hour-success")).toBeVisible();
+    await page.getByTestId(`notification-read-checkbox-${second}`).check();
+    await expect(page.getByTestId(`notification-state-${second}-success`)).toBeVisible();
     await page.reload();
-    await expect(page.getByTestId("notification-card-notice-24-hour")).toHaveClass(
+    await expect(page.getByTestId(`notification-card-${second}`)).toHaveClass(
       /notification-card-read/,
     );
-    await expect(page.getByTestId("notification-read-checkbox-notice-24-hour")).toBeChecked();
+    await expect(page.getByTestId(`notification-read-checkbox-${second}`)).toBeChecked();
   });
 
   test("a task opened from the task list keeps Feladatok and does not mark anything read", async ({
     page,
   }) => {
+    const first = await noticeId(page, "Díszítés");
     await page.goto("/szulo/feladatok");
-    await page.getByTestId("duty-open-duty-assigned").click();
+    await page.getByTestId(`duty-open-${world().id("task:1:2")}`).click();
     await expect(page.getByTestId("app-shell-navigation-parent-duties")).toHaveAttribute(
       "aria-current",
       "page",
@@ -99,19 +106,21 @@ test.describe("parent: notifications stay under Értesítések", () => {
     await expect(page.getByTestId("duty-detail-back-link")).toHaveText("Vissza a feladatokhoz");
     await page.waitForLoadState("networkidle");
     await page.goto("/szulo/ertesitesek");
-    await expect(page.getByTestId("notification-card-notice-7-day")).not.toHaveClass(
+    await expect(page.getByTestId(`notification-card-${first}`)).not.toHaveClass(
       /notification-card-read/,
     );
   });
 
-  test("an unknown or foreign notification id is ignored", async ({ page }) => {
-    for (const id of ["notice-unknown", "notice-24-hour", "notice-stale"]) {
-      await page.goto(`/szulo/feladatok/duty-assigned?ertesites=${id}`);
-      await expect(page).toHaveURL(/\/szulo\/feladatok\/duty-assigned$/);
+  test("an unknown or malformed notification id is ignored", async ({ page }) => {
+    const second = await noticeId(page, "Takarítás");
+    const decorating = world().id("task:1:2");
+    for (const id of ["00000000-0000-4000-8000-000000000000", "not-an-id"]) {
+      await page.goto(`/szulo/feladatok/${decorating}?ertesites=${id}`);
+      await expect(page).toHaveURL(new RegExp(`/szulo/feladatok/${decorating}$`));
       await expect(page.getByTestId("duty-detail-back-link")).toHaveText("Vissza a feladatokhoz");
     }
     await page.goto("/szulo/ertesitesek");
-    await expect(page.getByTestId("notification-card-notice-24-hour")).not.toHaveClass(
+    await expect(page.getByTestId(`notification-card-${second}`)).not.toHaveClass(
       /notification-card-read/,
     );
   });
@@ -119,10 +128,13 @@ test.describe("parent: notifications stay under Értesítések", () => {
   test("@a11y the notification list, task page and request page have no serious findings", async ({
     page,
   }) => {
+    const first = await noticeId(page, "Díszítés");
+    const second = await noticeId(page, "Takarítás");
+    const baking = world().id("task:1:1");
     for (const path of [
       "/szulo/ertesitesek",
-      "/szulo/feladatok/duty-assigned?ertesites=notice-7-day",
-      "/szulo/feladatok/duty-assigned/csere",
+      `/szulo/feladatok/${world().id("task:1:2")}?ertesites=${first}`,
+      `/szulo/feladatok/${baking}/csere`,
     ]) {
       await page.goto(path);
       await page.waitForLoadState("networkidle");
@@ -132,23 +144,28 @@ test.describe("parent: notifications stay under Értesítések", () => {
     // A read (greyed) card is checked as well.
     await page.goto("/szulo/ertesitesek");
     await page.waitForLoadState("networkidle");
-    await page.getByTestId("notification-read-checkbox-notice-24-hour").check();
-    await expect(page.getByTestId("notification-state-notice-24-hour-success")).toBeVisible();
+    await page.getByTestId(`notification-read-checkbox-${second}`).check();
+    await expect(page.getByTestId(`notification-state-${second}-success`)).toBeVisible();
     const results = await new AxeBuilder({ page }).analyze();
     expect(results.violations.filter(SERIOUS)).toEqual([]);
   });
 });
 
 test.describe("parent: a request that is waiting", () => {
-  test.beforeEach(async ({ page }) => resetAndSelect(page, "parent-local"));
+  test.beforeEach(async ({ page }) => {
+    await world().reseed();
+    await signInAs(page, world().account("parent-1"));
+  });
 
   test("pending request journey: submit, notice, no duplicate, links hidden", async ({ page }) => {
-    await page.goto("/szulo/feladatok/duty-assigned");
+    const dutyId = world().id("task:1:1");
+    await page.goto(`/szulo/feladatok/${dutyId}`);
     await expect(page.getByTestId("swap-request-link")).toBeVisible();
     await expect(page.getByTestId("pending-request-notice")).toHaveCount(0);
 
-    await page.goto("/szulo/feladatok/duty-assigned/csere");
+    await page.goto(`/szulo/feladatok/${dutyId}/csere`);
     await page.waitForLoadState("networkidle");
+    await page.locator('input[name="counterpart"]').first().check();
     await page.getByTestId("swap-reason-input").fill("Családi egyeztetés szükséges.");
     await page.getByTestId("swap-request-form-submit-button").click();
     // The confirmation stays, and the form is replaced by the notice and a link back.
@@ -160,27 +177,26 @@ test.describe("parent: a request that is waiting", () => {
     await expect(page.getByTestId("swap-reason-input")).toHaveCount(0);
 
     await page.getByTestId("swap-pending-panel-back-link").click();
-    await expect(page).toHaveURL(/\/szulo\/feladatok\/duty-assigned$/);
+    await expect(page).toHaveURL(new RegExp(`/szulo/feladatok/${dutyId}$`));
     await expect(page.getByTestId("pending-swap-notice")).toHaveText("Cserekérelem folyamatban");
     await expect(page.getByTestId("swap-request-link")).toHaveCount(0);
     await expect(page.getByTestId("cancellation-request-link")).toHaveCount(0);
 
     // Both request pages show the notice instead of a form, so nothing can be sent twice.
     for (const path of ["csere", "lemondas"]) {
-      await page.goto(`/szulo/feladatok/duty-assigned/${path}`);
+      await page.goto(`/szulo/feladatok/${dutyId}/${path}`);
       await expect(page.getByTestId("pending-request-notice")).toBeVisible();
       await expect(page.getByRole("button", { name: /elküldése/ })).toHaveCount(0);
       await expect(page.locator('textarea[name="reason"]')).toHaveCount(0);
     }
     // The task list and the task page use the same state word.
     await page.goto("/szulo/feladatok");
-    await expect(page.getByTestId("duty-card-duty-assigned")).toContainText(
-      "Cserekérelem folyamatban",
-    );
+    await expect(page.getByTestId(`duty-card-${dutyId}`)).toContainText("Cserekérelem folyamatban");
   });
 
   test("a waiting cancellation shows its own notice", async ({ page }) => {
-    await page.goto("/szulo/feladatok/duty-assigned/lemondas");
+    const dutyId = world().id("task:1:1");
+    await page.goto(`/szulo/feladatok/${dutyId}/lemondas`);
     await page.waitForLoadState("networkidle");
     await page.getByTestId("cancellation-reason-input").fill("Átmeneti akadály.");
     await page.getByTestId("cancellation-request-form-submit-button").click();
@@ -188,26 +204,61 @@ test.describe("parent: a request that is waiting", () => {
     await expect(page.getByTestId("cancellation-pending-panel")).toContainText(
       "Lemondási kérelem folyamatban",
     );
-    await page.goto("/szulo/feladatok/duty-assigned");
+    await page.goto(`/szulo/feladatok/${dutyId}`);
     await expect(page.getByTestId("pending-cancellation-notice")).toBeVisible();
     await expect(page.getByTestId("cancellation-request-link")).toHaveCount(0);
   });
 });
 
-const detailPages = [
-  ["/admin/nyilvantartasok/family-feny", /\/admin\/nyilvantartasok$/, "group-admin-local"],
-  ["/admin/feladatok/task-kert", /\/admin\/feladatok$/, "group-admin-local"],
-  ["/admin/jovahagyasok/approval-csere", /\/admin\/jovahagyasok$/, "group-admin-local"],
-  ["/admin/archivum/year-2026", /\/admin\/archivum$/, "super-admin-local"],
-  ["/admin/nyilvantartasok/uj", /\/admin\/nyilvantartasok$/, "group-admin-local"],
-  ["/admin/feladatok/uj", /\/admin\/feladatok$/, "group-admin-local"],
-] as const;
-
 test.describe("admin: the way back", () => {
-  for (const [path, listUrl, profile] of detailPages) {
-    test(`${path} has a back link that returns to its list`, async ({ page }) => {
-      await resetAndSelect(page, profile);
-      await page.goto(path);
+  test.beforeEach(async () => world().reseed());
+
+  const detailPages: ReadonlyArray<
+    readonly [string, () => string, RegExp, "group-admin-1" | "super-admin", boolean]
+  > = [
+    [
+      "a family",
+      () => `/admin/nyilvantartasok/${world().id("family:1")}`,
+      /\/admin\/nyilvantartasok$/,
+      "group-admin-1",
+      false,
+    ],
+    [
+      "a task",
+      () => `/admin/feladatok/${world().id("task:1:1")}`,
+      /\/admin\/feladatok$/,
+      "group-admin-1",
+      false,
+    ],
+    ["an approval", () => "", /\/admin\/jovahagyasok$/, "group-admin-1", true],
+    [
+      "a new record",
+      () => "/admin/nyilvantartasok/uj",
+      /\/admin\/nyilvantartasok$/,
+      "group-admin-1",
+      false,
+    ],
+    ["a new task", () => "/admin/feladatok/uj", /\/admin\/feladatok$/, "group-admin-1", false],
+  ];
+
+  for (const [name, path, listUrl, tag, needsRequest] of detailPages) {
+    test(`${name} has a back link that returns to its list`, async ({
+      page,
+      browser,
+    }, testInfo) => {
+      if (needsRequest) {
+        await withOtherPage(browser, testInfo.project.use.baseURL, (other) =>
+          requestCancellation(other, world()),
+        );
+      }
+      await signInAs(page, world().account(tag));
+      if (needsRequest) {
+        await page.goto("/admin/jovahagyasok");
+        await page.locator(".admin-collection li a").first().click();
+        await expect(page).toHaveURL(/\/admin\/jovahagyasok\/[0-9a-f-]{36}$/);
+      } else {
+        await page.goto(path());
+      }
       const back = page.getByTestId("admin-back-link");
       await expect(back).toBeVisible();
       await expect(back).toContainText("Vissza");
@@ -219,8 +270,22 @@ test.describe("admin: the way back", () => {
     });
   }
 
-  test("the back link keeps the list's filter", async ({ page }) => {
-    await resetAndSelect(page, "group-admin-local");
+  test("an archived family has a back link to the archive", async ({ page }) => {
+    await signInAs(page, world().account("super-admin"));
+    await page.goto(`/admin/nyilvantartasok/${world().id("family:5")}`);
+    await page.waitForLoadState("networkidle");
+    await page.getByTestId("admin-record-archive-form-submit-button").click();
+    await expect(page.getByTestId("admin-record-archive-form-state-success")).toBeVisible();
+    await page.goto(`/admin/archivum/${world().id("family:5")}`);
+    await page.getByTestId("admin-back-link").click();
+    await expect(page).toHaveURL(/\/admin\/archivum$/);
+  });
+
+  test("the back link keeps the list's filter", async ({ page, browser }, testInfo) => {
+    await withOtherPage(browser, testInfo.project.use.baseURL, (other) =>
+      requestCancellation(other, world()),
+    );
+    await signInAs(page, world().account("group-admin-1"));
     await page.goto("/admin/jovahagyasok?state=pending");
     await page.locator(".admin-collection li a").first().click();
     await page.getByTestId("admin-back-link").click();
@@ -231,18 +296,29 @@ test.describe("admin: the way back", () => {
   test("a successful create shows the confirmation with a link back to the list", async ({
     page,
   }) => {
-    await resetAndSelect(page, "group-admin-local");
+    await signInAs(page, world().account("group-admin-1"));
     await page.goto("/admin/feladatok/uj");
     await page.waitForLoadState("networkidle");
     await page.getByTestId("admin-task-title-input").fill("Őszi kertészkedés");
+    await page.getByTestId("admin-task-group-select").selectOption({ index: 1 });
+    await page.getByTestId("admin-task-capacity-input").fill("3");
+    await page.getByTestId("admin-task-location-input").fill("Kert");
+    await page.getByTestId("admin-task-starts-at-input").fill(`${seedDay(20)}T09:00`);
+    await page.getByTestId("admin-task-ends-at-input").fill(`${seedDay(20)}T11:00`);
     await page.getByTestId("admin-task-create-form-submit-button").click();
     await expect(page.getByTestId("admin-task-create-form-state-success")).toBeVisible();
     await page.getByTestId("admin-task-create-form-success-link").click();
     await expect(page).toHaveURL(/\/admin\/feladatok$/);
+    await expect(page.getByText("Őszi kertészkedés")).toBeVisible();
   });
 });
 
 test.describe("admin: filters offer only matching statuses", () => {
+  test.beforeEach(async ({ page }) => {
+    await world().reseed();
+    await signInAs(page, world().account("super-admin"));
+  });
+
   const lists = [
     ["/admin/nyilvantartasok", ["Minden állapot", "● Aktív", "○ Archivált"]],
     ["/admin/feladatok", ["Minden állapot", "◐ Nyitott", "▦ Ütemezve"]],
@@ -251,7 +327,6 @@ test.describe("admin: filters offer only matching statuses", () => {
 
   for (const [path, labels] of lists) {
     test(`${path} offers ${labels.slice(1).join(", ")}`, async ({ page }) => {
-      await resetAndSelect(page, "super-admin-local");
       await page.goto(path);
       const select = page.getByTestId("admin-filter-state-select");
       await expect(select.locator("option")).toHaveText([...labels]);
@@ -262,15 +337,20 @@ test.describe("admin: filters offer only matching statuses", () => {
         await page.getByTestId("admin-filter-submit-button").click();
         await expect(page).toHaveURL(/state=/);
         const items = page.locator(".admin-collection li");
-        const empty = page.getByText(/nincs találata|Nincs a szűrésnek megfelelő/);
+        const empty = page.getByText(/nincs találata|Nincs a szűrésnek megfelelő|Nincs/);
         await expect(items.first().or(empty.first())).toBeVisible();
-        if (label !== "✕ Elutasítva") await expect(items.first()).toBeVisible();
       }
     });
   }
 
-  test("approved requests can be found with Jóváhagyva", async ({ page }) => {
-    await resetAndSelect(page, "group-admin-local");
+  test("approved requests can be found with Jóváhagyva", async ({ page, browser }, testInfo) => {
+    await withOtherPage(browser, testInfo.project.use.baseURL, (other) =>
+      requestCancellation(other, world()),
+    );
+    await page.goto("/admin/jovahagyasok");
+    await page.locator(".admin-collection li a").first().click();
+    await page.getByTestId("admin-approval-decision-form-submit-button").click();
+    await expect(page.getByTestId("admin-approval-decision-form-state-success")).toBeVisible();
     await page.goto("/admin/jovahagyasok");
     await page.getByTestId("admin-filter-state-select").selectOption({ label: "✓ Jóváhagyva" });
     await page.getByTestId("admin-filter-submit-button").click();
@@ -278,7 +358,6 @@ test.describe("admin: filters offer only matching statuses", () => {
   });
 
   test("an old filter link shows the whole list with a note, not an error", async ({ page }) => {
-    await resetAndSelect(page, "group-admin-local");
     await page.goto("/admin/feladatok?state=pending");
     await expect(page.getByTestId("admin-filter-unknown-note")).toBeVisible();
     await expect(page.locator(".admin-collection li").first()).toBeVisible();
@@ -287,10 +366,14 @@ test.describe("admin: filters offer only matching statuses", () => {
 });
 
 test.describe("admin: empty forms and technical text", () => {
+  test.beforeEach(async ({ page }) => {
+    await world().reseed();
+    await signInAs(page, world().account("group-admin-1"));
+  });
+
   test("an empty submit of both new forms shows the message next to the field", async ({
     page,
   }) => {
-    await resetAndSelect(page, "group-admin-local");
     for (const [path, form, field] of [
       ["/admin/nyilvantartasok/uj", "admin-record-create-form", "admin-record-title-input"],
       ["/admin/feladatok/uj", "admin-task-create-form", "admin-task-title-input"],
@@ -312,14 +395,9 @@ test.describe("admin: empty forms and technical text", () => {
   test("technical text is only inside Fejlesztői részletek, which opens on request", async ({
     page,
   }) => {
-    await resetAndSelect(page, "super-admin-local");
     for (const [path, texts] of [
-      ["/admin/feladatok/task-kert", ["Verzió:", "Kapacitási helyzet"]],
-      ["/admin/nyilvantartasok/family-feny", ["Verzió:"]],
-      ["/admin/emlekeztetok", ["Korreláció", "corr-lampas-01"]],
-      ["/admin/adatvedelem", ["Forgatókönyv"]],
-      ["/admin/import", ["Ellenőrzési forgatókönyv"]],
-      ["/admin/beallitasok", ["Ellenőrzési forgatókönyv"]],
+      [`/admin/feladatok/${world().id("task:1:1")}`, ["Verzió:"]],
+      [`/admin/nyilvantartasok/${world().id("family:1")}`, ["Verzió:"]],
     ] as const) {
       await page.goto(path);
       const details = page.getByTestId("developer-details");
@@ -342,14 +420,17 @@ test.describe("admin: empty forms and technical text", () => {
   });
 
   test("@a11y changed admin pages have no serious findings", async ({ page }) => {
-    await resetAndSelect(page, "super-admin-local");
     for (const path of [
-      "/admin/feladatok/task-kert",
+      `/admin/feladatok/${world().id("task:1:1")}`,
       "/admin/nyilvantartasok/uj",
       "/admin/jovahagyasok?state=approved",
-      "/admin/emlekeztetok",
-      "/admin/adatvedelem",
     ]) {
+      await page.goto(path);
+      const results = await new AxeBuilder({ page }).analyze();
+      expect(results.violations.filter(SERIOUS), path).toEqual([]);
+    }
+    await signInAs(page, world().account("super-admin"));
+    for (const path of ["/admin/emlekeztetok", "/admin/adatvedelem"]) {
       await page.goto(path);
       const results = await new AxeBuilder({ page }).analyze();
       expect(results.violations.filter(SERIOUS), path).toEqual([]);

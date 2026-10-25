@@ -1,30 +1,16 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test } from "@playwright/test";
+import { requestCancellation } from "./support/scenarios.ts";
+import { SERIOUS, signInAs, bindSeededSchema } from "./support/seeded-schema.ts";
+
+const world = bindSeededSchema();
 
 test.beforeEach(async ({ page }) => {
-  await page.goto("/");
-  await page.request.post("/api/synthetic/reset", {
-    headers: { origin: new URL(page.url()).origin },
-  });
+  await world().reseed();
+  await signInAs(page, world().account("group-admin-1"));
 });
 
-async function selectGroupAdministrator(page: Page) {
-  await page.goto("/");
-  if (
-    await page
-      .getByTestId("profile-selector-group-admin-local-button")
-      .isVisible()
-      .catch(() => false)
-  ) {
-    await page.getByTestId("profile-selector-group-admin-local-button").click();
-  } else {
-    await page.getByTestId("app-shell-switch-profile-button").click();
-    await page.getByTestId("profile-selector-group-admin-local-button").click();
-  }
-}
-
 test("Group Administrator sees scoped core dashboard without import", async ({ page }) => {
-  await selectGroupAdministrator(page);
   const startedAt = Date.now();
   await page.goto("/admin");
   await expect(page.getByRole("heading", { name: "Áttekintés" })).toBeFocused();
@@ -35,84 +21,96 @@ test("Group Administrator sees scoped core dashboard without import", async ({ p
 });
 
 test("records remain scoped and crafted outside-scope identifiers are denied", async ({ page }) => {
-  await selectGroupAdministrator(page);
   await page.goto("/admin/nyilvantartasok");
-  await expect(page.getByText("Fenyő család")).toBeVisible();
-  await expect(page.getByText("Napraforgó család")).toHaveCount(0);
-  await page.goto("/admin/nyilvantartasok/family-napraforgo");
+  await expect(page.getByText("Szabó család")).toBeVisible();
+  // The second family belongs to the other group.
+  await expect(page.getByText("Kiss család")).toHaveCount(0);
+  await page.goto(`/admin/nyilvantartasok/${world().id("family:2")}`);
   await expect(page.getByText("Nincs jogosultság")).toBeVisible();
-  await expect(page.getByText("Napraforgó család")).toHaveCount(0);
+  await expect(page.getByText("Kiss család")).toHaveCount(0);
 });
 
 test("assignment capacity conflict and approval success are explicit", async ({
   page,
-}, testInfo) => {
-  await selectGroupAdministrator(page);
-  await page.goto("/admin/feladatok/task-kert?scenario=full");
+  browser,
+}) => {
+  // The decorating task has two places and one is taken: the second family fits, the third does not.
+  const decorating = world().id("task:1:2");
+  await page.goto(`/admin/feladatok/${decorating}`);
+  await page.waitForLoadState("networkidle");
+  await page.getByTestId("admin-assignment-family-select").selectOption({ label: "Szabó család" });
+  await page.getByTestId("admin-assignment-form-submit-button").click();
+  await expect(page.getByTestId("admin-assignment-form-state-success")).toBeVisible();
+  await page.goto(`/admin/feladatok/${decorating}`);
+  await page.waitForLoadState("networkidle");
+  await page
+    .getByTestId("admin-assignment-family-select")
+    .selectOption({ label: "Horváth család" });
   await page.getByTestId("admin-assignment-form-submit-button").click();
   await expect(page.getByTestId("admin-assignment-form-state-conflict")).toContainText(
     "kapacitását",
   );
-  const approvalId =
-    testInfo.project.name === "firefox"
-      ? "approval-lemondas"
-      : testInfo.project.name === "mobile-chrome"
-        ? "approval-mobile"
-        : "approval-csere";
-  await page.goto(`/admin/jovahagyasok/${approvalId}`);
+
+  // A family asks to give up a task; the administrator approves it.
+  const parentContext = await browser.newContext({ baseURL: page.url().split("/admin")[0] });
+  const parentPage = await parentContext.newPage();
+  try {
+    await requestCancellation(parentPage, world());
+  } finally {
+    await parentContext.close();
+  }
+  await page.goto("/admin/jovahagyasok");
+  const href = await page.locator(".admin-collection li a").first().getAttribute("href");
+  await page.goto(href!);
   await page.getByTestId("admin-approval-decision-form-submit-button").click();
   await expect(page.getByTestId("admin-approval-decision-form-state-success")).toContainText(
     "jóváhagyva",
   );
 });
 
-test("a whole approval item opens its detail and shows Hungarian states", async ({ page }) => {
-  await selectGroupAdministrator(page);
+test("a whole approval item opens its detail and shows Hungarian states", async ({
+  page,
+  browser,
+}) => {
+  const parentContext = await browser.newContext({ baseURL: new URL(page.url()).origin });
+  const parentPage = await parentContext.newPage();
+  try {
+    await requestCancellation(parentPage, world());
+  } finally {
+    await parentContext.close();
+  }
   await page.goto("/admin/jovahagyasok");
   const list = page.getByTestId("admin-approvals-list");
   await expect(list).not.toContainText(/pending|approved|active|archived/);
   await expect(list.locator("li").first()).toContainText("Függőben");
   // Clicking the state word (not the title) still opens the item.
-  await list.locator("li").first().locator(".admin-state-badge").click();
-  await expect(page).toHaveURL(/\/admin\/jovahagyasok\/approval-/);
+  await list.locator("li").first().locator(".status-badge").click();
+  await expect(page).toHaveURL(/\/admin\/jovahagyasok\/[0-9a-f-]{36}$/);
   await expect(page.getByText(/Állapot: (Függőben|Jóváhagyva)/)).toBeVisible();
 });
 
-test("archive restore conflict preserves the archived item", async ({ page }) => {
-  await page.goto("/");
-  if (
-    !(await page
-      .getByTestId("profile-selector-super-admin-local-button")
-      .isVisible()
-      .catch(() => false))
-  ) {
-    await page.getByTestId("app-shell-switch-profile-button").click();
-  }
-  await page.getByTestId("profile-selector-super-admin-local-button").click();
-  await page.goto("/admin/archivum/year-2026?scenario=conflict");
-  await page.getByTestId("admin-record-restore-form-submit-button").click();
-  await expect(page.getByTestId("admin-record-restore-form-state-conflict")).toContainText(
-    "nem állítható vissza",
-  );
+test("archiving a family keeps it in the archive and out of the active list", async ({ page }) => {
+  await signInAs(page, world().account("super-admin"));
+  await page.goto(`/admin/nyilvantartasok/${world().id("family:5")}`);
+  await page.waitForLoadState("networkidle");
+  await page.getByTestId("admin-record-archive-form-submit-button").click();
+  await expect(page.getByTestId("admin-record-archive-form-state-success")).toBeVisible();
+  await page.goto("/admin/archivum");
+  await expect(page.getByTestId("admin-archive-page")).toContainText("Molnár család");
+  await page.goto(`/admin/archivum/${world().id("family:5")}`);
   await expect(page.getByText("Állapot: Archivált")).toBeVisible();
 });
 
 test("Group Administrator direct import access is generically denied", async ({ page }) => {
-  await selectGroupAdministrator(page);
   await page.goto("/admin/import");
   await expect(page.getByRole("heading", { name: "Nincs jogosultság" })).toBeVisible();
   await expect(page.getByText("import", { exact: false })).toHaveCount(0);
 });
 
 test("@a11y administrator keyboard and automated accessibility checks pass", async ({ page }) => {
-  await selectGroupAdministrator(page);
   await page.goto("/admin/nyilvantartasok");
   await page.keyboard.press("Tab");
   await expect(page.getByTestId("app-shell-skip-link")).toBeFocused();
   const results = await new AxeBuilder({ page }).analyze();
-  expect(
-    results.violations.filter(
-      (violation) => violation.impact === "serious" || violation.impact === "critical",
-    ),
-  ).toEqual([]);
+  expect(results.violations.filter(SERIOUS)).toEqual([]);
 });

@@ -98,7 +98,14 @@ describe("honest executable denominator", () => {
     // of the two modules step 26 deletes (src/notifications 4, src/import-migration 3), plus the one file that
     // keeps the synthetic archive presentation's sheet table (src/admin-experience/legacy-destinations.ts), plus
     // the one file of the import screen (app/admin/_lib/import-messages.ts, the Hungarian import messages).
-    expect(inventory.length).toBe(233);
+    // U5 then adds the 9 files of the local seed (scripts/db local-guard, seed, reset, seed-support and the five
+    // files under scripts/db/seed) and 3 moved or new application files (navigation.ts, tracking-model.ts and
+    // notification-context.ts), and removes the 25 production files of the synthetic mode: the five synthetic
+    // modules (13), src/runtime synthetic (3), session (1), ProfileSelector (1) and security/origin (1), app/belepes
+    // (3), app/api/synthetic (2) and the synthetic invitation forms (1): 233 + 9 + 3 - 25 = 220. Step 22 then removes
+    // the 3 files of src/admin-experience (the archive presentation no screen used, with the sheet table kept above) and
+    // src/application/session-facade.ts, which nothing used after the profile switch went: 220 - 4.
+    expect(inventory.length).toBe(216);
     for (const path of [
       "src/runtime/AppNav.tsx",
       "src/runtime/StatusBadge.tsx",
@@ -106,7 +113,12 @@ describe("honest executable denominator", () => {
       "app/teacher/_lib/schedule.ts",
       "src/runtime/BackToHomeLink.tsx",
       "src/application/status-labels.ts",
-      "src/parent-web/notification-context.ts",
+      "src/application/notification-context.ts",
+      "src/runtime/navigation.ts",
+      "scripts/db/local-guard.ts",
+      "scripts/db/seed.ts",
+      "scripts/db/reset.ts",
+      "scripts/db/seed/data.ts",
       "app/szulo/_components/MarkNotificationRead.tsx",
       "app/szulo/_components/PendingRequestNotice.tsx",
       "app/admin/_components/AdminBackLink.tsx",
@@ -115,13 +127,26 @@ describe("honest executable denominator", () => {
       expect(inventory.some((entry) => entry.path === path)).toBe(true);
     }
     expect(inventory.some((entry) => entry.path === "scripts/verification/current-role-database.ts")).toBe(true);
-    for (const path of ["src/teacher-tracking/tracking-model.ts", "src/teacher-web/synthetic-teacher-repository.ts", "app/teacher/_lib/compatibility.ts", "app/munkatars/beosztas/route.ts", "app/munkatars/beosztas/[id]/route.ts"]) expect(inventory.some(entry => entry.path === path)).toBe(true);
+    for (const path of [
+      "src/application/tracking-model.ts",
+      "app/teacher/_lib/compatibility.ts",
+      "app/munkatars/beosztas/route.ts",
+      "app/munkatars/beosztas/[id]/route.ts",
+    ])
+      expect(inventory.some((entry) => entry.path === path)).toBe(true);
+    // The synthetic mode is gone: none of its files or folders is part of the production inventory.
+    expect(
+      inventory.filter((entry) =>
+        /^(src\/(parent-web|admin-core|admin-advanced|teacher-web|teacher-tracking)\/|src\/runtime\/(synthetic|session)\/|src\/runtime\/ProfileSelector|app\/belepes\/|app\/api\/synthetic\/)/.test(
+          entry.path,
+        ),
+      ),
+    ).toEqual([]);
     expect(inventory.some(entry => entry.path.startsWith("src/staff-") || entry.path === "src/application/staff-facade.ts")).toBe(false);
     for (const path of [
       "src/access/role-policy.ts",
       "src/access/legacy-role-conversion.ts",
       "src/access/session-grants.ts",
-      "src/runtime/synthetic/access-state.ts",
     ]) {
       expect(inventory.some((entry) => entry.path === path)).toBe(true);
     }

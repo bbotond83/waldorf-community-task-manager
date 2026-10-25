@@ -184,7 +184,7 @@ describe("the import step actions", () => {
       expectedVersion: 5,
       idempotencyKey: "import-commit:0123",
     });
-    expect(input.payload).toEqual({ fingerprint: "ab".repeat(32), confirmed: "yes", scenario: "" });
+    expect(input.payload).toEqual({ fingerprint: "ab".repeat(32), confirmed: "yes" });
   });
 
   it("recovers by run id and cancels by run id and version", async () => {

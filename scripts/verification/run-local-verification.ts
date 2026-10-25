@@ -42,6 +42,8 @@ const commands = [
   // The notifications and import database stage (U4): notification records, reminder jobs and the
   // notice writes inside U3's use cases, and the import tables and functions, on the real stack.
   { key: "database-notifications-import", args: ["run", "test:database:notifications-import"] },
+  // The seed database stage (U5): the audit purge, the seed and reset commands and their timing limits, on the real stack.
+  { key: "database-seed", args: ["run", "test:database:seed"] },
   { key: "database-shuffled", args: ["run", "test:database:shuffled"] },
   { key: "coverage", args: ["run", "test:coverage"] },
   { key: "security", args: ["run", "verify:security"] },
@@ -59,8 +61,6 @@ for (const command of commands) {
     cwd: root,
     env: {
       ...process.env,
-      APP_RUNTIME_MODE: "synthetic",
-      APP_SYNTHETIC_FIXTURE_VERSION: "waldorf-local-v1",
       APP_HOST: "127.0.0.1",
     },
     encoding: "utf8",
@@ -139,9 +139,8 @@ for (const scenario of scenarios) {
     storyIds: scenario.storyIds,
     requirementIds: scenario.requirementIds,
     matrixRows: scenario.matrixRows,
-    fixtureVersion: "waldorf-local-v1",
     manifestVersion: "waldorf-scenarios-v1",
-    runtimeMode: scenario.target === "local" ? "synthetic" : "linked-target",
+    runtimeMode: scenario.target === "local" ? "database" : "linked-target",
     target: scenario.target,
     tool: scenario.command,
     toolVersion: `node=${nodeVersion};npm=${npmVersion}`,
@@ -184,6 +183,4 @@ if (privacy.status !== 0)
   throw new Error(
     `LOCAL_VERIFICATION_FAILED step=final-privacy exit=${privacy.status ?? "signal"}`,
   );
-console.log(
-  `LOCAL_VERIFICATION_PASS sha=${gitSha} fixture=waldorf-local-v1 manifest=waldorf-scenarios-v1`,
-);
+console.log(`LOCAL_VERIFICATION_PASS sha=${gitSha} manifest=waldorf-scenarios-v1`);

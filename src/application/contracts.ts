@@ -1,7 +1,5 @@
 import type { Role, RoleGrant, Scope } from "../access/index.ts";
 
-export type RuntimeMode = "synthetic" | "production";
-
 export type ApplicationState =
   | "initial"
   | "loading"
@@ -69,8 +67,6 @@ export type SessionContext = Readonly<{
   grants: readonly RoleGrant[];
   roles: readonly Role[];
   scopes: readonly Scope[];
-  runtimeMode: RuntimeMode;
-  isSynthetic: boolean;
 }>;
 
 export type AuthorizedContext = Readonly<{
@@ -152,8 +148,8 @@ export type NotificationModel = Readonly<{
 
 export type NotificationListModel = Readonly<{ notifications: readonly NotificationModel[] }>;
 
-export type { TrackingEntry } from "../teacher-tracking/tracking-model.ts";
-import type { TrackingEntry } from "../teacher-tracking/tracking-model.ts";
+export type { TrackingEntry } from "./tracking-model.ts";
+import type { TrackingEntry } from "./tracking-model.ts";
 export type TrackingModel = Readonly<{ entries: readonly TrackingEntry[] }>;
 
 export type DashboardModel = Readonly<{
@@ -228,8 +224,8 @@ export type AdminParentDetail = Readonly<{
 
 /**
  * What an admin form needs to show a stored item for editing, beyond its title: the fields of the record
- * type. The database adapter fills it for the real data; the synthetic adapter leaves it out, and a screen
- * without it keeps the one-field form it always had (BR32.7).
+ * type. The database adapter fills it for the real data; a port that leaves it out gives the one-field form
+ * (BR32.7).
  */
 export type AdminItemDetails = Readonly<{
   /** Group: the school year it belongs to. */
@@ -285,7 +281,6 @@ export type ImportPreviewModel = Readonly<{
     skipOnly?: boolean;
   }>[];
   step: 1 | 2 | 3 | 4 | 5 | 6 | 7;
-  fixtureId: string;
   totalRows: number;
   state:
     | "selected"
@@ -405,7 +400,7 @@ export type EvidenceReference = Readonly<{
   storyId: string;
   requirementId: string;
   matrixRowId: AuthorizationMatrixRowId;
-  executionTarget: "synthetic-local" | "linked-target";
+  executionTarget: "database" | "linked-target";
   status: EvidenceStatus;
   recordedAt: string;
   location: string;

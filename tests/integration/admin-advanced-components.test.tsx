@@ -9,7 +9,6 @@ const preview: ImportPreviewModel = {
   changedRows: ["Boróka csoport: 2 módosítás"],
   conflicts: [{ id: "conflict-family-1", rowLabel: "Családok · 12. sor", message: "Már létezik." }],
   step: 4,
-  fixtureId: "workbook-waldorf-v1",
   totalRows: 30,
   state: "conflicts",
 };

@@ -1,11 +1,10 @@
 import { ParentMutationForm } from "../../../_components/ParentMutationForm.tsx";
-import { pendingRequests } from "../../../../../src/parent-web/notification-context.ts";
+import { pendingRequests } from "../../../../../src/application/notification-context.ts";
 import type {
   ApplicationResult,
   SwapCandidateListModel,
   SwapCandidateModel,
 } from "../../../../../src/application/index.ts";
-import { isProductionMode } from "../../../../_identity/production-request.ts";
 import { PendingRequestPanel } from "../../../_components/PendingRequestNotice.tsx";
 import { ParentStatePanel } from "../../../_components/ParentStatePanel.tsx";
 import { resolveParentFacade } from "../../../_lib/facade.ts";
@@ -13,27 +12,19 @@ import { resolveParentSession } from "../../../_lib/session.ts";
 import { requestSwapAction } from "../../../actions.ts";
 import { formatBudapestDate } from "../../page.tsx";
 
-export default async function SwapRequestPage({
-  params,
-  searchParams,
-}: {
-  params: Promise<{ id: string }>;
-  searchParams: Promise<{ scenario?: string }>;
-}) {
+export default async function SwapRequestPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const { scenario = "success" } = await searchParams;
   const session = await resolveParentSession();
   const facade = await resolveParentFacade();
   if (session.state !== "success" || !facade) return null;
-  const production = await isProductionMode();
   const result = await facade.getDuty(session.data.applicationSession, {
     familyScope: session.data.familyScope,
     familyId: session.data.familyId,
     dutyId: id,
   });
-  // The partner list exists only against the real database; the synthetic mode keeps its fixed partner.
+  // The partner list comes from the database: the families that hold a place the parent may swap with.
   const candidates =
-    production && result.state === "success" && result.data.assignmentId
+    result.state === "success" && result.data.assignmentId
       ? await facade.listSwapCandidates(session.data.applicationSession, {
           familyScope: session.data.familyScope,
           familyId: session.data.familyId,
@@ -48,10 +39,7 @@ export default async function SwapRequestPage({
       <h1 tabIndex={-1}>Cserekérelem</h1>
       <ParentStatePanel result={result} emptyMessage="A megbízás nem érhető el." testId="swap-duty">
         {(duty) =>
-          duty.assignmentId &&
-          production &&
-          !pendingRequests(duty).any &&
-          candidates?.state !== "success" ? (
+          duty.assignmentId && !pendingRequests(duty).any && candidates?.state !== "success" ? (
             <PartnerListUnavailable candidates={candidates} />
           ) : duty.assignmentId ? (
             <ParentMutationForm
@@ -59,7 +47,7 @@ export default async function SwapRequestPage({
               submitLabel="Cserekérelem elküldése"
               testId="swap-request-form"
               alreadyDone={pendingRequests(duty).any}
-              freshIdempotencyKey={production}
+              freshIdempotencyKey
               afterSuccess={
                 <PendingRequestPanel
                   pending={
@@ -74,15 +62,7 @@ export default async function SwapRequestPage({
             >
               <input type="hidden" name="id" value={duty.id} />
               <input type="hidden" name="assignmentId" value={duty.assignmentId} />
-              {production ? (
-                candidates?.state === "success" && <PartnerList candidates={candidates.data} />
-              ) : (
-                <input
-                  type="hidden"
-                  name="counterpartId"
-                  value={scenario === "success" ? "assignment-counterpart" : scenario}
-                />
-              )}
+              {candidates?.state === "success" && <PartnerList candidates={candidates.data} />}
               <input type="hidden" name="expectedVersion" value={duty.version} />
               <input
                 type="hidden"

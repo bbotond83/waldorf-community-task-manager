@@ -324,7 +324,7 @@ describe("pages", () => {
     expect(html).not.toContain(REAL_TOKEN);
   });
 
-  it("shows the not-valid message for an expired or unknown real token and the synthetic page otherwise", async () => {
+  it("shows the same plain not-valid page for an expired, unknown, unavailable, malformed or unconfigured case", async () => {
     mocks.configured.mockReturnValue(true);
     for (const validity of ["expired", "not_valid"]) {
       mocks.lookup.mockResolvedValue({ validity });
@@ -339,23 +339,28 @@ describe("pages", () => {
     const unavailable = renderToStaticMarkup(
       await InvitationPage({ params: Promise.resolve({ token: REAL_TOKEN }) }),
     );
-    expect(unavailable).toContain('data-testid="invitation-page-invalid"');
+    for (const page of [unavailable]) {
+      expect(page).toContain('data-testid="real-invitation-not-valid"');
+      expect(page).toContain(COPY.invitation.notValid);
+    }
     mocks.lookup.mockRejectedValue(new Error("down"));
     const broken = renderToStaticMarkup(
       await InvitationPage({ params: Promise.resolve({ token: REAL_TOKEN }) }),
     );
-    expect(broken).toContain('data-testid="invitation-page-invalid"');
+    expect(broken).toContain('data-testid="real-invitation-not-valid"');
     mocks.lookup.mockReset();
+    // A word that is not a token (the old demo tokens) is never looked up and never valid.
     const word = renderToStaticMarkup(
       await InvitationPage({ params: Promise.resolve({ token: "parent-valid-invitation" }) }),
     );
-    expect(word).toContain('data-testid="invitation-page-valid"');
+    expect(word).toContain('data-testid="real-invitation-not-valid"');
+    expect(word).not.toContain("invitation-page-valid");
     expect(mocks.lookup).not.toHaveBeenCalled();
     mocks.configured.mockReturnValue(false);
     const notConfigured = renderToStaticMarkup(
       await InvitationPage({ params: Promise.resolve({ token: REAL_TOKEN }) }),
     );
-    expect(notConfigured).toContain('data-testid="invitation-page-invalid"');
+    expect(notConfigured).toContain('data-testid="real-invitation-not-valid"');
     expect(mocks.lookup).not.toHaveBeenCalled();
   });
 });

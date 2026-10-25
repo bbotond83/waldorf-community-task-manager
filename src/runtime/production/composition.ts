@@ -1,6 +1,6 @@
 import { AuthorizationContract } from "../../application/index.ts";
 import { parseWorkbook } from "../../import-parser/server.ts";
-import type { ProductionRuntimeConfig } from "../config.ts";
+import type { RuntimeConfig } from "../config.ts";
 import { createDatabaseClient, type DatabaseClient } from "../database/client.ts";
 import { DEFAULT_DATABASE_SCHEMA } from "../database/config.ts";
 import type { RuntimeComposition } from "../types.ts";
@@ -22,7 +22,7 @@ export type ProductionDependencies = Readonly<{
 const clients = new Map<string, DatabaseClient>();
 
 function clientFor(
-  config: ProductionRuntimeConfig,
+  config: RuntimeConfig,
   environment: Partial<Record<string, string | undefined>>,
 ): DatabaseClient {
   const schema = environment.DATABASE_SCHEMA?.trim() || DEFAULT_DATABASE_SCHEMA;
@@ -40,16 +40,15 @@ function clientFor(
 }
 
 export function createProductionComposition(
-  config: ProductionRuntimeConfig,
+  config: RuntimeConfig,
   dependencies: ProductionDependencies = {},
-): Extract<RuntimeComposition, { mode: "production" }> {
+): RuntimeComposition {
   const database =
     dependencies.database ?? clientFor(config, dependencies.environment ?? process.env);
   // The composition is the one place that reaches the server-only workbook reader (BR41.2, NFR2.21); the
   // services and adapters receive it as a plain function.
   const services: ProductionServices = createProductionServices(database, { parseWorkbook });
   return {
-    mode: "production",
     config,
     authenticationBoundary: "supabase-session",
     application: {

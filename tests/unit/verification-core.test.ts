@@ -21,9 +21,8 @@ function validEvidence(root: string): Evidence {
     storyIds: scenario.storyIds,
     requirementIds: scenario.requirementIds,
     matrixRows: scenario.matrixRows,
-    fixtureVersion: "waldorf-local-v1",
     manifestVersion: "waldorf-scenarios-v1",
-    runtimeMode: "synthetic",
+    runtimeMode: "database",
     target: "local",
     tool: scenario.command,
     toolVersion: "test",
@@ -65,7 +64,7 @@ describe("verification manifests", () => {
   it("rejects metadata mismatch", () => {
     const root = mkdtempSync(join(tmpdir(), "waldorf-evidence-"));
     const record = validEvidence(root);
-    record.fixtureVersion = "other" as Evidence["fixtureVersion"];
+    record.manifestVersion = "other" as Evidence["manifestVersion"];
     expect(() => validateEvidence(record, scenarios, root)).toThrow(/metadata mismatch/);
   });
 

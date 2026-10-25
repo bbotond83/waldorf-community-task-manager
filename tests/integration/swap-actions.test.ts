@@ -88,7 +88,7 @@ describe("requestSwapAction with the partner list", () => {
   });
 
   it("asks for a choice, linked to the first partner, when none was made", async () => {
-    const result = await requestSwapAction(initial, form({ partnerList: "1" }));
+    const result = await requestSwapAction(initial, form({}));
     expect(result).toMatchObject({
       state: "validation",
       fieldErrors: { counterpart: "Válasszon egy cseretársat." },
@@ -107,12 +107,14 @@ describe("requestSwapAction with the partner list", () => {
     },
   );
 
-  it("keeps the fixed partner of the demo when the form has no list", async () => {
-    await requestSwapAction(initial, form({ counterpartId: "assignment-counterpart" }));
-    const input = world.facade.requestSwap.mock.calls[0]![1];
-    expect(input.counterpartId).toBe("assignment-counterpart");
-    expect(input).not.toHaveProperty("counterpartVersion");
-    expect(world.revalidated).toContain("/szulo/feladatok/duty-1");
+  it("no longer takes a fixed partner id from the form: without a chosen partner nothing is sent", async () => {
+    const result = await requestSwapAction(
+      initial,
+      form({ counterpartId: "assignment-counterpart" }),
+    );
+    expect(result.state).toBe("validation");
+    expect(world.facade.requestSwap).not.toHaveBeenCalled();
+    expect(world.revalidated).toEqual([]);
   });
 
   it("maps the conflicts of a swap to Hungarian messages and does not refresh pages", async () => {

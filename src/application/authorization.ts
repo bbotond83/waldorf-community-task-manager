@@ -133,8 +133,7 @@ export class AuthorizationContract {
     session: SessionContext,
     request: AuthorizationRequest,
   ): Promise<ApplicationResult<AuthorizedContext>> {
-    if (!isValidSessionMode(session) || !isCurrentSession(session))
-      return denied("INVALID_SESSION_MODE");
+    if (!isCurrentSession(session)) return denied("INVALID_SESSION");
 
     const currentVersion = await this.versions.getCurrentVersion(session.subjectId);
     if (
@@ -162,7 +161,7 @@ export class AuthorizationContract {
   }
 
   async navigation(session: SessionContext): Promise<ApplicationResult<NavigationModel>> {
-    if (!isValidSessionMode(session) || !isCurrentSession(session)) return denied();
+    if (!isCurrentSession(session)) return denied();
     const currentVersion = await this.versions.getCurrentVersion(session.subjectId);
     if (
       !isAuthorizationVersion(currentVersion) ||
@@ -193,10 +192,6 @@ export class AuthorizationContract {
       "NAVIGATION_READY",
     );
   }
-}
-
-function isValidSessionMode(session: SessionContext): boolean {
-  return session.runtimeMode === "synthetic" ? session.isSynthetic : !session.isSynthetic;
 }
 
 function matchesRow(

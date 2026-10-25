@@ -1,18 +1,13 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import { SERIOUS, signInAs, signOut, bindSeededSchema } from "./support/seeded-schema.ts";
 
-test.beforeEach(async ({ page }) => {
-  await page.goto("/");
-  await page.request.post("/api/synthetic/reset", {
-    headers: { origin: new URL(page.url()).origin },
-  });
-});
+const world = bindSeededSchema();
 
-test("selects a synthetic parent profile and renders its permitted shell", async ({ page }) => {
+test("signs in as a parent and renders its permitted shell", async ({ page }) => {
+  await signInAs(page, world().account("parent-1"));
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "Helyi tesztprofil kiválasztása" })).toBeVisible();
-  await page.getByTestId("profile-selector-parent-local-button").click();
-  // The parent lands on Értesítések; there is no welcome page any more.
+  // The parent lands on Értesítések; there is no welcome page.
   await expect(page).toHaveURL(/\/szulo\/ertesitesek$/);
   await expect(page.getByRole("heading", { name: "Értesítések", exact: true })).toBeFocused();
   await expect(page.getByText("Üdvözlünk")).toHaveCount(0);
@@ -22,15 +17,18 @@ test("selects a synthetic parent profile and renders its permitted shell", async
     "page",
   );
   await expect(page.getByTestId("app-shell-navigation-admin-import")).toHaveCount(0);
+  // There is no way to pick another profile any more: only the sign-out control.
+  await expect(page.getByTestId("app-shell-switch-profile-button")).toHaveCount(0);
+  await expect(page.getByTestId("sign-out-button")).toBeVisible();
 });
 
-test("switching profiles clears the prior projection", async ({ page }) => {
-  await page.goto("/");
-  await page.getByTestId("profile-selector-parent-local-button").click();
+test("signing out and signing in as another role clears the prior projection", async ({ page }) => {
+  await signInAs(page, world().account("parent-1"));
+  await page.goto("/szulo/ertesitesek");
   await expect(page.getByRole("heading", { name: "Értesítések", exact: true })).toBeFocused();
-  await page.getByTestId("app-shell-switch-profile-button").click();
-  await expect(page.getByRole("heading", { name: "Helyi tesztprofil kiválasztása" })).toBeVisible();
-  await page.getByTestId("profile-selector-kindergarten-teacher-local-button").click();
+  await signOut(page);
+  await signInAs(page, world().account("teacher-1"));
+  await page.goto("/");
   await expect(page).toHaveURL(/\/teacher\/schedule$/);
   await expect(page.getByRole("heading", { name: "Beosztás", exact: true })).toBeVisible();
   // The teacher has a single page, so there is no menu and no menu toggle.
@@ -41,27 +39,22 @@ test("switching profiles clears the prior projection", async ({ page }) => {
 
 test("@a11y root flow has no serious or critical accessibility violations", async ({ page }) => {
   await page.goto("/");
+  await expect(page.getByRole("heading", { name: "Biztonságos bejelentkezés" })).toBeVisible();
   const results = await new AxeBuilder({ page }).analyze();
-  const blockingViolations = results.violations.filter(
-    (violation) => violation.impact === "serious" || violation.impact === "critical",
-  );
-  expect(blockingViolations).toEqual([]);
+  expect(results.violations.filter(SERIOUS)).toEqual([]);
 });
 
-test("sign-out and history cannot restore a previous profile's protected content", async ({
+test("sign-out and history cannot restore a previous person's protected content", async ({
   page,
 }) => {
-  await page.goto("/");
-  await page.getByTestId("profile-selector-parent-local-button").click();
-  await page.getByTestId("app-shell-navigation-parent-duties").click();
+  await signInAs(page, world().account("parent-1"));
+  await page.goto("/szulo/feladatok");
   await expect(page.getByTestId("duty-list")).toBeVisible();
-  await page.getByTestId("app-shell-switch-profile-button").click();
-  await expect(page.getByTestId("profile-selector")).toBeVisible();
+  await signOut(page);
   await page.goBack();
   await expect(page.getByTestId("duty-list")).toHaveCount(0);
   await expect(page.getByTestId("app-shell-profile-summary")).toHaveCount(0);
-  await page.goto("/");
-  await page.getByTestId("profile-selector-kindergarten-teacher-local-button").click();
+  await signInAs(page, world().account("teacher-1"));
   await page.goto("/szulo/feladatok");
   await expect(page.getByRole("heading", { name: "Nincs jogosultság", exact: true })).toBeVisible();
   await expect(page.getByTestId("duty-list")).toHaveCount(0);

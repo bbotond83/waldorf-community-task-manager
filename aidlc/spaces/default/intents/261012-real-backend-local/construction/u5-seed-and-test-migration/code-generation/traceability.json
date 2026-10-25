@@ -1,0 +1,538 @@
+{
+  "stage": "code-generation",
+  "unit": "u5-seed-and-test-migration",
+  "upstream_ids": [
+    "NFR1.63",
+    "NFR1.64",
+    "NFR1.65",
+    "NFR1.66",
+    "NFR1.67",
+    "NFR1.68",
+    "NFR1.69",
+    "NFR1.70",
+    "NFR2.28",
+    "NFR2.29",
+    "NFR2.30",
+    "NFR2.31",
+    "NFR2.32",
+    "NFR2.33",
+    "NFR2.34",
+    "NFR2.35",
+    "NFR2.36",
+    "NFR2.37",
+    "NFR2.38",
+    "NFR3.18",
+    "NFR3.19",
+    "NFR3.20",
+    "NFR3.21",
+    "NFR4.17",
+    "NFR4.18",
+    "NFR4.19",
+    "NFR4.20",
+    "NFR5.8",
+    "NFR6.27",
+    "NFR6.28",
+    "NFR6.29",
+    "NFR6.30",
+    "NFR7.5",
+    "NFR8.4",
+    "FR1.3",
+    "FR1.5",
+    "FR11.1",
+    "FR11.2",
+    "FR12.1"
+  ],
+  "coverage": [
+    {
+      "id": "NFR1.63",
+      "status": "OK",
+      "target": "scripts/db/local-guard.ts",
+      "plan_steps": [
+        2,
+        3,
+        6
+      ],
+      "tests": [
+        "scripts/db/seed/commands.test.ts",
+        "tests/database/seed.test.ts",
+        "tests/database/reset.test.ts"
+      ]
+    },
+    {
+      "id": "NFR1.64",
+      "status": "OK",
+      "target": "scripts/db/seed/data.ts",
+      "plan_steps": [
+        4,
+        5,
+        24
+      ],
+      "tests": [
+        "tests/database/seed.test.ts",
+        "scripts/db/seed/owner-connection.test.ts",
+        "scripts/db/seed/ids.test.ts",
+        "tests/database/identity-bundle.test.ts"
+      ]
+    },
+    {
+      "id": "NFR1.65",
+      "status": "OK",
+      "target": "scripts/verification/scan-core.ts",
+      "plan_steps": [
+        23
+      ],
+      "tests": [
+        "scripts/verification/scan-artifacts.test.ts"
+      ]
+    },
+    {
+      "id": "NFR1.66",
+      "status": "OK",
+      "target": "tests/database/identity-bundle.test.ts",
+      "plan_steps": [
+        23
+      ],
+      "tests": [
+        "tests/database/identity-bundle.test.ts"
+      ]
+    },
+    {
+      "id": "NFR1.67",
+      "status": "OK",
+      "target": "tests/unit/removed-synthetic-mode.test.ts",
+      "plan_steps": [
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "tests": [
+        "tests/unit/removed-synthetic-mode.test.ts",
+        "scripts/start-smoke.mjs",
+        "tests/coverage/smoke-entrypoint.test.ts"
+      ]
+    },
+    {
+      "id": "NFR1.68",
+      "status": "OK",
+      "target": "supabase/migrations/20261044_audit_purge.sql",
+      "plan_steps": [
+        2
+      ],
+      "tests": [
+        "tests/database/audit-purge.test.ts",
+        "tests/database/audit.test.ts"
+      ]
+    },
+    {
+      "id": "NFR1.69",
+      "status": "OK",
+      "target": "verification/reports/u5-workbook-and-known-limits.md",
+      "plan_steps": [
+        27
+      ],
+      "tests": [
+        "tests/unit/readme-commands.test.ts",
+        "scripts/verification/scan-artifacts.test.ts"
+      ]
+    },
+    {
+      "id": "NFR1.70",
+      "status": "OK",
+      "target": "package.json",
+      "plan_steps": [
+        1
+      ],
+      "tests": [
+        "scripts/verification/ci-config.test.ts"
+      ]
+    },
+    {
+      "id": "NFR2.28",
+      "status": "OK",
+      "target": "tests/coverage/production-inventory.test.ts",
+      "plan_steps": [
+        17
+      ],
+      "tests": [
+        "tests/coverage/production-inventory.test.ts",
+        "vitest.config.ts"
+      ]
+    },
+    {
+      "id": "NFR2.29",
+      "status": "OK",
+      "target": "scripts/verification/replaced-modules.test.ts",
+      "plan_steps": [
+        10,
+        15,
+        22
+      ],
+      "tests": [
+        "scripts/verification/replaced-modules.test.ts",
+        "scripts/verification/lint-scope.test.ts"
+      ]
+    },
+    {
+      "id": "NFR2.30",
+      "status": "OK",
+      "target": "scripts/db/seed.ts",
+      "plan_steps": [
+        3,
+        6
+      ],
+      "tests": [
+        "scripts/db/seed/commands.test.ts",
+        "tests/database/seed.test.ts"
+      ]
+    },
+    {
+      "id": "NFR2.31",
+      "status": "OK",
+      "target": "scripts/db/seed/data.ts",
+      "plan_steps": [
+        4,
+        5
+      ],
+      "tests": [
+        "scripts/db/seed/data.test.ts",
+        "scripts/db/seed/ids.test.ts"
+      ]
+    },
+    {
+      "id": "NFR2.32",
+      "status": "OK",
+      "target": "scripts/db/local-guard.ts",
+      "plan_steps": [
+        3
+      ],
+      "tests": [
+        "scripts/db/seed/commands.test.ts"
+      ]
+    },
+    {
+      "id": "NFR2.33",
+      "status": "OK",
+      "target": "playwright.config.ts",
+      "plan_steps": [
+        18
+      ],
+      "tests": [
+        "tests/unit/browser-harness.test.ts"
+      ]
+    },
+    {
+      "id": "NFR2.34",
+      "status": "OK",
+      "target": "src/runtime/config.ts",
+      "plan_steps": [
+        11,
+        12,
+        13,
+        14,
+        21
+      ],
+      "tests": [
+        "tests/unit/removed-synthetic-mode.test.ts",
+        "tests/integration/runtime-config-cli.test.ts"
+      ]
+    },
+    {
+      "id": "NFR2.35",
+      "status": "OK",
+      "target": "supabase/migrations/20261044_audit_purge.sql",
+      "plan_steps": [
+        2
+      ],
+      "tests": [
+        "tests/database/audit-purge.test.ts"
+      ]
+    },
+    {
+      "id": "NFR2.36",
+      "status": "OK",
+      "target": "package.json",
+      "plan_steps": [
+        1
+      ],
+      "tests": [
+        "scripts/verification/ci-config.test.ts"
+      ]
+    },
+    {
+      "id": "NFR2.37",
+      "status": "OK",
+      "target": "scripts/verification/run-local-verification.ts",
+      "plan_steps": [
+        21,
+        22
+      ],
+      "tests": [
+        "scripts/verification/ci-config.test.ts",
+        "tests/unit/verification-core.test.ts",
+        "tests/coverage/verification-entrypoints.test.ts"
+      ]
+    },
+    {
+      "id": "NFR2.38",
+      "status": "OK",
+      "target": "README.md",
+      "plan_steps": [
+        25,
+        26,
+        27
+      ],
+      "tests": [
+        "tests/unit/readme-commands.test.ts"
+      ]
+    },
+    {
+      "id": "NFR3.18",
+      "status": "OK",
+      "target": "scripts/db/seed.ts",
+      "plan_steps": [
+        4,
+        5,
+        6
+      ],
+      "tests": [
+        "tests/database/seed.test.ts"
+      ]
+    },
+    {
+      "id": "NFR3.19",
+      "status": "OK",
+      "target": "scripts/db/seed.ts",
+      "plan_steps": [
+        3,
+        6
+      ],
+      "tests": [
+        "tests/database/seed.test.ts",
+        "scripts/db/seed/write.test.ts"
+      ]
+    },
+    {
+      "id": "NFR3.20",
+      "status": "OK",
+      "target": "tests/browser/support/seeded-schema.ts",
+      "plan_steps": [
+        18,
+        19
+      ],
+      "tests": [
+        "tests/unit/browser-harness.test.ts",
+        "tests/browser/runtime-foundation.spec.ts",
+        "tests/browser/parent-web.spec.ts",
+        "tests/browser/admin-core.spec.ts"
+      ]
+    },
+    {
+      "id": "NFR3.21",
+      "status": "OK",
+      "target": "tests/support/port-doubles.ts",
+      "plan_steps": [
+        16,
+        18,
+        19
+      ],
+      "tests": [
+        "tests/integration/copy.test.ts",
+        "tests/coverage/parent-pages.test.tsx",
+        "tests/browser/teacher-web.spec.ts",
+        "tests/database/seed.test.ts"
+      ]
+    },
+    {
+      "id": "NFR4.17",
+      "status": "OK",
+      "target": "tests/database/seed-timing.test.ts",
+      "plan_steps": [
+        8
+      ],
+      "tests": [
+        "tests/database/seed-timing.test.ts"
+      ]
+    },
+    {
+      "id": "NFR4.18",
+      "status": "OK",
+      "target": "tests/database/seed-timing.test.ts",
+      "plan_steps": [
+        8
+      ],
+      "tests": [
+        "tests/database/seed-timing.test.ts"
+      ]
+    },
+    {
+      "id": "NFR4.19",
+      "status": "OK",
+      "target": "tests/browser/sign-in-timing.spec.ts",
+      "plan_steps": [
+        20
+      ],
+      "tests": [
+        "tests/browser/sign-in-timing.spec.ts"
+      ]
+    },
+    {
+      "id": "NFR4.20",
+      "status": "OK",
+      "target": ".github/workflows/ci.yml",
+      "plan_steps": [
+        20,
+        21
+      ],
+      "tests": [
+        "scripts/verification/ci-config.test.ts"
+      ]
+    },
+    {
+      "id": "NFR5.8",
+      "status": "OK",
+      "target": "tests/browser/identity.spec.ts",
+      "plan_steps": [
+        19
+      ],
+      "tests": [
+        "tests/browser/notifications-import.spec.ts",
+        "tests/browser/identity.spec.ts"
+      ]
+    },
+    {
+      "id": "NFR6.27",
+      "status": "OK",
+      "target": "supabase/migrations/20261044_audit_purge.sql",
+      "plan_steps": [
+        2
+      ],
+      "tests": [
+        "tests/database/migrations.test.ts"
+      ]
+    },
+    {
+      "id": "NFR6.28",
+      "status": "OK",
+      "target": "scripts/db/reset.ts",
+      "plan_steps": [
+        3,
+        24
+      ],
+      "tests": [
+        "tests/database/reset.test.ts",
+        "scripts/db/seed/owner-connection.test.ts"
+      ]
+    },
+    {
+      "id": "NFR6.29",
+      "status": "OK",
+      "target": "scripts/db/seed-support.ts",
+      "plan_steps": [
+        3,
+        7
+      ],
+      "tests": [
+        "tests/database/seed.test.ts",
+        "tests/database/reset.test.ts"
+      ]
+    },
+    {
+      "id": "NFR6.30",
+      "status": "OK",
+      "target": "verification/reports/u5-workbook-and-known-limits.md",
+      "plan_steps": [
+        27
+      ],
+      "tests": [
+        "tests/unit/readme-commands.test.ts"
+      ]
+    },
+    {
+      "id": "NFR7.5",
+      "status": "OK",
+      "target": "tests/browser/parent-web.spec.ts",
+      "plan_steps": [
+        16,
+        19
+      ],
+      "tests": [
+        "tests/browser/parent-web.spec.ts",
+        "tests/browser/functional-fixes.spec.ts",
+        "tests/integration/copy.test.ts"
+      ]
+    },
+    {
+      "id": "NFR8.4",
+      "status": "OK",
+      "target": "scripts/db/seed/data.ts",
+      "plan_steps": [
+        4,
+        5
+      ],
+      "tests": [
+        "scripts/db/seed/data.test.ts"
+      ]
+    },
+    {
+      "id": "FR1.3",
+      "status": "OK",
+      "target": "src/runtime/config.ts",
+      "plan_steps": [
+        11,
+        12
+      ],
+      "tests": [
+        "tests/integration/runtime-config-cli.test.ts",
+        "tests/integration/production-wiring.test.ts"
+      ]
+    },
+    {
+      "id": "FR1.5",
+      "status": "OK",
+      "target": "README.md",
+      "plan_steps": [
+        25
+      ],
+      "tests": [
+        "tests/unit/readme-commands.test.ts"
+      ]
+    },
+    {
+      "id": "FR11.1",
+      "status": "OK",
+      "target": "verification/reports/u5-workbook-and-known-limits.md",
+      "plan_steps": [
+        27
+      ],
+      "tests": [
+        "scripts/verification/scan-artifacts.test.ts"
+      ]
+    },
+    {
+      "id": "FR11.2",
+      "status": "OK",
+      "target": "verification/reports/u5-workbook-and-known-limits.md",
+      "plan_steps": [
+        27
+      ],
+      "tests": [
+        "tests/unit/readme-commands.test.ts"
+      ]
+    },
+    {
+      "id": "FR12.1",
+      "status": "OK",
+      "target": "HASZNALATI_UTMUTATO_HU.md",
+      "plan_steps": [
+        26
+      ],
+      "tests": [
+        "tests/unit/readme-commands.test.ts"
+      ]
+    }
+  ],
+  "reverse": []
+}

@@ -307,6 +307,33 @@ describe("migrations on the real local stack", () => {
     }
   });
 
+  it("applies U5's audit purge file after U4's last file in the default and in a worker schema, and a second run changes nothing (NFR2.35, NFR6.27)", async () => {
+    const purgeFile = "20261044_audit_purge.sql";
+    const names = migrations.map((file) => file.name);
+    assert.ok(names.includes(purgeFile), "the purge migration exists");
+    assert.ok(
+      names.indexOf(purgeFile) > names.indexOf("20261043_u4_repairs.sql"),
+      "the purge file sorts after U4's last file",
+    );
+    for (const schema of ["public", "worker_4"]) {
+      const tracked = (
+        await db.query(
+          `select filename from ${TRACKING_SCHEMA}.applied_migrations where schema_name = $1 and filename = $2`,
+          [schema, purgeFile],
+        )
+      ).rows;
+      assert.equal(tracked.length, 1, schema);
+      const again = await run(db, schema);
+      assert.deepEqual(again.applied, [], schema);
+      const objects = await db.query(
+        `select (select count(*)::int from pg_proc p where p.pronamespace = $1::regnamespace and p.proname = 'audit_purge') as purge,
+                (select count(*)::int from pg_proc p where p.pronamespace = $1::regnamespace and p.proname = 'audit_events_refuse_change') as guard`,
+        [schema],
+      );
+      assert.deepEqual(objects.rows[0], { purge: 1, guard: 1 }, schema);
+    }
+  });
+
   it("refuses a file with a hard-coded schema name, names it, and applies nothing", async () => {
     const before = (
       await db.query(`select count(*)::int as n from ${TRACKING_SCHEMA}.applied_migrations`)

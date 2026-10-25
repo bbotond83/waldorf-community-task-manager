@@ -19,10 +19,9 @@ export default async function TeacherSchedulePage({
   if (session.state === "signed-out") redirect("/");
   if (session.state !== "success") return null;
   const filters = parseTeacherFilters(await searchParams, session.data.applicationSession);
-  const facade = await resolveTeacherFacade(filters.scenario);
+  const facade = await resolveTeacherFacade();
   if (session.state !== "success" || !facade) return null;
   const result = await readTeacherSchedule(facade, session.data.applicationSession, filters);
-  const retryFilters = { ...filters, scenario: "ready" as const };
 
   return (
     <section className="teacher-page" data-testid="teacher-schedule-page">
@@ -38,7 +37,7 @@ export default async function TeacherSchedulePage({
         result.state === "validation") && <ScheduleFilter filters={filters} />}
       <TeacherStatePanel
         result={result}
-        retryHref={teacherScheduleHref(teacherFilterQuery(retryFilters))}
+        retryHref={teacherScheduleHref(teacherFilterQuery(filters))}
         testId="teacher-schedule"
       >
         {(model) => <ScheduleCollection entries={model.entries} filters={filters} />}

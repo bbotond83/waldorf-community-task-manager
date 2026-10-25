@@ -241,6 +241,8 @@ h1 {
 
 .brand-link {
   display: inline-flex;
+  /* Not aligned on the logo's text baseline, which differs when the image cannot load (R-05). */
+  vertical-align: top;
   align-items: center;
   min-width: 44px;
   min-height: 44px;
@@ -249,6 +251,9 @@ h1 {
 .brand-mark {
   display: block;
   height: auto;
+  /* Keeps the logo's box when the image cannot load, so the broken-image text never moves the page (R-05). */
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
 }
 
 .centered-panel {
@@ -749,6 +754,16 @@ nav a:hover {
   padding: 1rem;
 }
 
+/* The import fingerprint is one long unbroken string; it wraps instead of widening the page on a phone. */
+.advanced-details code {
+  overflow-wrap: anywhere;
+}
+
+/* A sign-in address has no spaces to break at: let it wrap so a narrow screen never scrolls sideways. */
+.advanced-panel h3 {
+  overflow-wrap: anywhere;
+}
+
 .advanced-details dt {
   font-weight: 750;
 }
@@ -923,12 +938,12 @@ nav a:hover {
 }
 
 .parent-state-badge,
-.synthetic-label,
+.delivery-note,
 .form-hint {
   color: var(--color-muted);
 }
 
-.synthetic-label {
+.delivery-note {
   border-left: 0.3rem solid var(--color-focus);
   padding-left: 0.6rem;
 }
@@ -1073,7 +1088,7 @@ nav a:hover {
 
 .notification-card-read .parent-card-link h2,
 .notification-card-read .parent-state-badge,
-.notification-card-read .synthetic-label,
+.notification-card-read .delivery-note,
 .notification-card-read .notification-read-label,
 .notification-card-read .notification-read-state {
   color: var(--color-read-text);

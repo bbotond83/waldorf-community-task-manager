@@ -41,9 +41,7 @@ export async function requestSwapAction(
     familyId: boundary.session.familyId,
     assignmentId: stringValue(formData, "assignmentId"),
     counterpartId: counterpart.value.id,
-    ...(counterpart.value.version !== undefined
-      ? { counterpartVersion: counterpart.value.version }
-      : {}),
+    counterpartVersion: counterpart.value.version,
     expectedVersion: context.value.expectedVersion,
     idempotencyKey: context.value.idempotencyKey,
   });
@@ -56,26 +54,22 @@ export async function requestSwapAction(
 
 /**
  * The partner a parent chose for a swap. The partner list sends one radio value, `<assignment>:<version>`
- * (the version of the partner's place that was on screen); the old form sends a fixed `counterpartId`.
- * No choice is a field error on the list, so the message is linked to it.
+ * (the version of the partner's place that was on screen). No choice is a field error on the list, so
+ * the message is linked to it; an unselected radio sends nothing at all.
  */
 function parseCounterpart(
   formData: FormData,
-): { ok: true; value: { id: string; version?: number } } | { ok: false; state: ParentActionState } {
+): { ok: true; value: { id: string; version: number } } | { ok: false; state: ParentActionState } {
   const chosen = stringValue(formData, "counterpart");
-  // `partnerList` is sent by the partner list only; an unselected radio sends nothing at all.
-  if (chosen === "" && stringValue(formData, "partnerList") === "1") {
+  if (chosen === "") {
     return { ok: false, state: validationState({ counterpart: "Válasszon egy cseretársat." }) };
   }
-  if (chosen !== "") {
-    const [id = "", versionText = ""] = chosen.split(":");
-    const version = Number(versionText);
-    if (!isIdentifier(id) || !Number.isInteger(version) || version < 1) {
-      return { ok: false, state: validationState({ counterpart: "Érvénytelen cseretárs." }) };
-    }
-    return { ok: true, value: { id, version } };
+  const [id = "", versionText = ""] = chosen.split(":");
+  const version = Number(versionText);
+  if (!isIdentifier(id) || !Number.isInteger(version) || version < 1) {
+    return { ok: false, state: validationState({ counterpart: "Érvénytelen cseretárs." }) };
   }
-  return { ok: true, value: { id: stringValue(formData, "counterpartId") } };
+  return { ok: true, value: { id, version } };
 }
 
 /** The other family answers a swap request addressed to it: `decision` is `accept` or `decline`. */

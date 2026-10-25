@@ -57,10 +57,7 @@ import { currentSession } from "../../app/_identity/current-session";
 import { signInAction } from "../../app/bejelentkezes/actions";
 import { requestResetAction } from "../../app/jelszo-visszaallitas/actions";
 import { setNewPasswordAction } from "../../app/jelszo-visszaallitas/uj/actions";
-import {
-  acceptRealInvitationAction,
-  resendInvitationAction,
-} from "../../app/meghivas/[token]/actions";
+import { acceptRealInvitationAction } from "../../app/meghivas/[token]/actions";
 
 const idle = { status: "idle", message: "" } as const;
 const TOKEN = "T".repeat(43);
@@ -318,9 +315,9 @@ describe("acceptRealInvitationAction (W5, BR2.11)", () => {
     ).toBe(COPY.common.temporary);
   });
 
-  it("leaves the old synthetic resend action working without a runtime", async () => {
-    const result = await resendInvitationAction({ state: "initial" }, form({ identifier: "x" }));
-    expect(result.state).toBe("terminal");
+  it("offers no other invitation action than the real one: the old demo accept and resend are gone", async () => {
+    const actions = await import("../../app/meghivas/[token]/actions.ts");
+    expect(Object.keys(actions)).toEqual(["acceptRealInvitationAction"]);
   });
 });
 

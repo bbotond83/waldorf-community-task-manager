@@ -3,7 +3,7 @@
  *
  * The application reads exactly four settings: the database address, the public key, the session
  * secret and the schema name. It never reads a service credential: that one belongs to the local
- * tooling only. There is no synthetic fallback and no mode switch; a bad setting stops startup and
+ * tooling only. There is no fallback and no mode switch; a bad setting stops startup and
  * the message names the setting, never its value.
  */
 export const EXAMPLE_SESSION_SECRET = "replace-with-a-random-value-of-at-least-32-characters";

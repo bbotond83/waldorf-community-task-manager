@@ -31,7 +31,6 @@ export default async function ApprovalDetailPage({
       result = list;
     }
   }
-  const scenario = typeof query.scenario === "string" ? query.scenario : "";
   return (
     <section className="admin-page" data-testid="admin-approval-detail-page">
       <header>
@@ -71,7 +70,6 @@ export default async function ApprovalDetailPage({
                 name="idempotencyKey"
                 value={`approval:decide:${approval.id}:${randomUUID()}`}
               />
-              <input type="hidden" name="scenario" value={scenario} />
               <fieldset>
                 <legend>Döntés</legend>
                 <label>

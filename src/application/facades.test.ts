@@ -10,7 +10,6 @@ import {
   InMemoryAuthorizationVersions,
   InMemoryIdempotencyStore,
   ParentApplicationFacade,
-  SessionApplicationFacade,
   TeacherApplicationFacade,
 } from "./index.ts";
 import type {
@@ -19,7 +18,6 @@ import type {
   DomainOutcome,
   ParentApplicationPort,
   SessionContext,
-  SessionGateway,
   TeacherApplicationPort,
 } from "./index.ts";
 
@@ -314,51 +312,6 @@ describe("role application facades", () => {
       true,
     );
   });
-
-  it("does not expose synthetic session selection in production", async () => {
-    const gateway = new FakeSessionGateway(parentSession);
-    const facade = new SessionApplicationFacade(
-      "production",
-      gateway,
-      authorizationFor(parentSession),
-    );
-    const result = await facade.selectSynthetic("parent-local");
-    assert.equal(result.state, "denied");
-    assert.equal(gateway.syntheticCalls, 0);
-  });
-
-  it("keeps invitation resend non-enumerating on adapter failure", async () => {
-    const gateway = new FakeSessionGateway(parentSession);
-    gateway.resendFails = true;
-    const result = await new SessionApplicationFacade(
-      "synthetic",
-      gateway,
-      authorizationFor(parentSession),
-    ).resendInvitation("unknown@example.invalid");
-    assert.equal(result.state, "success");
-    assert.equal(result.code, "INVITATION_RESEND_ACCEPTED");
-  });
-
-  it("resolves synthetic sessions, invitation destinations, and navigation", async () => {
-    const gateway = new FakeSessionGateway(parentSession);
-    const facade = new SessionApplicationFacade(
-      "synthetic",
-      gateway,
-      authorizationFor(parentSession),
-    );
-    const results = await Promise.all([
-      facade.resolve("session-reference"),
-      facade.selectSynthetic("parent-local"),
-      facade.switchSynthetic("parent-local"),
-      facade.acceptInvitation("invitation-token-long-enough", { displayName: "Kitalált Szülő" }),
-      facade.navigation(parentSession),
-    ]);
-    assert.equal(
-      results.every((result) => result.state === "success"),
-      true,
-    );
-    assert.equal(gateway.syntheticCalls, 2);
-  });
 });
 
 function makeSession(role: SessionContext["roles"][number], scope: Scope): SessionContext {
@@ -368,8 +321,6 @@ function makeSession(role: SessionContext["roles"][number], scope: Scope): Sessi
     ...sessionGrantBindings(`${role}-synthetic`, role, [scope]),
     roles: [role],
     scopes: [scope],
-    runtimeMode: "synthetic",
-    isSynthetic: true,
   };
 }
 
@@ -455,31 +406,5 @@ class FlexibleAdminPort implements AdminApplicationPort {
   async execute<T>(): Promise<DomainOutcome<T>> {
     this.calls += 1;
     return { state: "success", data: Object.freeze({ completed: true }) as T };
-  }
-}
-
-class FakeSessionGateway implements SessionGateway {
-  syntheticCalls = 0;
-  resendFails = false;
-  private readonly session: SessionContext;
-  constructor(session: SessionContext) {
-    this.session = session;
-  }
-  async resolve(): Promise<SessionContext> {
-    return this.session;
-  }
-  async selectSynthetic(): Promise<SessionContext> {
-    this.syntheticCalls += 1;
-    return this.session;
-  }
-  async switchSynthetic(): Promise<SessionContext> {
-    this.syntheticCalls += 1;
-    return this.session;
-  }
-  async acceptInvitation(): Promise<{ destination: string }> {
-    return { destination: "/szulo/feladatok" };
-  }
-  async resendInvitation(): Promise<void> {
-    if (this.resendFails) throw new Error("mailbox unavailable");
   }
 }

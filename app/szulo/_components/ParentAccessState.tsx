@@ -9,7 +9,7 @@ export function ParentAccessState({
       <section className="centered-panel" data-testid="parent-signed-out">
         <h1 tabIndex={-1}>Bejelentkezés szükséges</h1>
         <p>A szülői felülethez előbb jelentkezzen be.</p>
-        <a href="/belepes" data-testid="parent-login-link">
+        <a href="/bejelentkezes" data-testid="parent-login-link">
           Tovább a bejelentkezéshez
         </a>
       </section>

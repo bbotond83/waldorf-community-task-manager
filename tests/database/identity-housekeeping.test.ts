@@ -16,7 +16,7 @@ import {
   SUPER_ADMIN,
   tokenHashFor,
 } from "./identity-support.ts";
-import { ensureAccount, report, sessionIdFor } from "./stack-support.ts";
+import { ensureAccount, report, sessionIdFor, SYSTEM_ACCOUNT } from "./stack-support.ts";
 
 /** Housekeeping with a controllable clock, and the removal of a user's sessions (BR2.2, BR2.12, BR2.21, NFR6.7, NFR4.5). */
 for (const schema of IDENTITY_SCHEMAS) {
@@ -194,6 +194,23 @@ for (const schema of IDENTITY_SCHEMAS) {
         [second.attempts_removed, second.users_removed, second.invitations_removed],
         [0, 0, 0],
       );
+    });
+
+    // U5 (NFR1.68): housekeeping purges the audit events older than 365 days and reports how many.
+    it("purges audit events older than 365 days, keeps the others, and reports the count", async () => {
+      await db.query(
+        `insert into audit_events (actor_account_id, actor_role, action, target_type, target_id, organization_id, outcome, occurred_at)
+         select $1, 'system', 'role.grant', 'account', gen_random_uuid(), $2, 'success', now() - age.value
+           from (values (interval '366 days'), (interval '500 days'), (interval '364 days 23 hours'), (interval '1 day')) as age(value)`,
+        [SYSTEM_ACCOUNT, ORGANIZATION],
+      );
+      const first = await housekeeping();
+      assert.equal(first.state, "success");
+      assert.equal(first.audit_events_purged, 2);
+      assert.equal(await count(db, "audit_events"), 2);
+      const second = await housekeeping();
+      assert.equal(second.audit_events_purged, 0);
+      assert.equal(await count(db, "audit_events"), 2);
     });
 
     it("is executable only by the service role", async () => {

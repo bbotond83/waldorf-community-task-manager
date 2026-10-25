@@ -119,7 +119,7 @@ test("an upload is parsed from its bytes, staged with its rows, and answered wit
   assert.equal(preview.id, RUN);
   assert.equal(preview.runVersion, 1);
   assert.equal(preview.fileName, "tavaszi-feladatok.xlsx");
-  assert.equal(preview.fixtureId, "tavaszi-feladatok.xlsx");
+  assert.equal(preview.fileName, "tavaszi-feladatok.xlsx");
   assert.equal(preview.state, "conflicts");
   assert.equal(preview.step, 4);
   assert.equal(preview.warningCount, 1);

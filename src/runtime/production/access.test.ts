@@ -55,7 +55,8 @@ test("a parent's family comes from the linked Parent and the matching family gra
   assert.equal(access.data.familyId, FAMILY);
   assert.deepEqual(access.data.familyScope, { id: FAMILY, type: "family", organizationId: ORG });
   assert.equal(access.data.applicationSession.subjectId, ACCOUNT);
-  assert.equal(access.data.applicationSession.runtimeMode, "production");
+  assert.deepEqual(access.data.applicationSession.roles, ["parent"]);
+  assert.equal("runtimeMode" in access.data.applicationSession, false);
   assert.equal(access.data.profile.homePath, "/szulo/ertesitesek");
   assert.deepEqual(
     access.data.profile.navigation.map((item) => item.href),
@@ -164,10 +165,9 @@ test("the production path holds no fixed family, parent, login or organization",
     "app/admin/_lib/session.ts",
     "app/teacher/_lib/session.ts",
   ]) {
+    // Since U5 the whole session helper is the production path: nothing in it may name a fixed value.
     const text = readFileSync(file, "utf8");
-    const start = text.indexOf("async function resolveProduction");
-    assert.ok(start > 0, `${file} has a production path`);
-    const production = text.slice(start, text.indexOf("\n}\n", start));
-    assert.doesNotMatch(production, forbidden, file);
+    assert.match(text, /productionRequest\(\)/, `${file} reads the signed-in request`);
+    assert.doesNotMatch(text, forbidden, file);
   }
 });

@@ -1,17 +1,12 @@
-import { beforeEach, afterEach, expect, it, vi } from "vitest";
+import { beforeEach, expect, it, vi } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import type { ReactNode } from "react";
-import { createSyntheticSessionToken } from "../../src/runtime/session/session.ts";
-import { getSyntheticProfile } from "../../src/runtime/synthetic/profiles.ts";
-import { resetSyntheticAdminFixtures } from "../../src/admin-core/synthetic-admin.ts";
-import { resetSyntheticAdvancedFixtures } from "../../src/admin-advanced/index.ts";
-import { resetSyntheticParentState } from "../../src/parent-web/index.ts";
+import { requestWorld } from "../support/request-world.ts";
 
-const boundary = vi.hoisted(() => ({ token: undefined as string | undefined }));
 vi.mock("server-only", () => ({}));
-vi.mock("next/headers", () => ({
-  cookies: async () => ({ get: () => (boundary.token ? { value: boundary.token } : undefined) }),
-}));
+vi.mock("../../app/_identity/production-request.ts", async () =>
+  (await import("../support/request-world.ts")).requestWorldModule(),
+);
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 vi.mock("next/navigation", () => ({
   redirect: (path: string) => {
@@ -23,13 +18,9 @@ vi.mock("next/navigation", () => ({
 }));
 
 beforeEach(() => {
-  vi.stubEnv("APP_RUNTIME_MODE", "synthetic");
-  boundary.token = createSyntheticSessionToken(getSyntheticProfile("super-admin-local")!);
-  resetSyntheticAdminFixtures();
-  resetSyntheticAdvancedFixtures();
-  resetSyntheticParentState();
+  requestWorld.reset();
+  requestWorld.signIn("super_admin");
 });
-afterEach(() => vi.unstubAllEnvs());
 
 type Page = (input: {
   params: Promise<{ id: string }>;
@@ -124,10 +115,9 @@ it("shows the unfiltered list and a short note for a status the list does not of
 const technicalText = /Verzió:|Korreláció|Kapacitási helyzet|Forgatókönyv|corr-/;
 
 it.each([
-  ["task detail", "../../app/admin/feladatok/[id]/page.tsx", "task-kert", ["Verzió:", "Kapacitási helyzet"]],
+  ["task detail", "../../app/admin/feladatok/[id]/page.tsx", "task-kert", ["Verzió:"]],
   ["record detail", "../../app/admin/nyilvantartasok/[id]/page.tsx", "family-feny", ["Verzió:"]],
   ["reminders", "../../app/admin/emlekeztetok/page.tsx", "", ["Korreláció", "corr-"]],
-  ["privacy", "../../app/admin/adatvedelem/page.tsx", "", ["Forgatókönyv"]],
 ] as const)(
   "keeps the technical text of the %s page in a closed Fejlesztői részletek section",
   async (_name, path, id, texts) => {
@@ -141,26 +131,32 @@ it.each([
   },
 );
 
-it("keeps the assignment scenario select working: it still belongs to the assignment form", async () => {
+it("keeps the assignment form whole without any scenario control, whatever the address says", async () => {
   const doc = await render("../../app/admin/feladatok/[id]/page.tsx", "task-kert", {
     scenario: "full",
   });
-  const select = doc.querySelector<HTMLSelectElement>(
-    '[data-testid="admin-assignment-scenario-select"]',
-  )!;
-  expect(select.getAttribute("form")).toBe("admin-assignment-form");
-  expect(select.getAttribute("name")).toBe("scenario");
-  expect(select.querySelector("option[selected]")?.getAttribute("value")).toBe("full");
+  expect(doc.querySelector('[data-testid="admin-assignment-scenario-select"]')).toBeNull();
   expect(doc.getElementById("admin-assignment-form")).not.toBeNull();
   expect(doc.querySelector('input[name="expectedVersion"]')).not.toBeNull();
 });
 
-it("keeps the privacy scenario selects tied to their forms and the retry correlation field", async () => {
+it.each([
+  ["../../app/admin/feladatok/[id]/page.tsx", "task-kert"],
+  ["../../app/admin/adatvedelem/page.tsx", ""],
+  ["../../app/admin/beallitasok/page.tsx", ""],
+  ["../../app/admin/jovahagyasok/[id]/page.tsx", "approval-csere"],
+  ["../../app/admin/archivum/[id]/page.tsx", "year-2026"],
+  ["../../app/admin/import/page.tsx", ""],
+])("offers no scenario control or hidden scenario field on %s", async (path, id) => {
+  const doc = await render(path, id, { scenario: "conflict" });
+  expect(doc.querySelectorAll('[name="scenario"], [id*="scenario"], [data-testid*="scenario"]')).toHaveLength(
+    0,
+  );
+});
+
+it("keeps the retry correlation field of the reminders page and the privacy forms without developer controls", async () => {
   const privacy = await render("../../app/admin/adatvedelem/page.tsx");
-  for (const select of privacy.querySelectorAll("details.developer-details select")) {
-    const formId = select.getAttribute("form")!;
-    expect(privacy.getElementById(formId)).not.toBeNull();
-  }
+  expect(privacy.querySelectorAll("details.developer-details")).toHaveLength(0);
   const reminders = await render("../../app/admin/emlekeztetok/page.tsx");
   expect(reminders.querySelector('input[name="correlationId"]')).not.toBeNull();
 });

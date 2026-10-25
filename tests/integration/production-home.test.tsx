@@ -3,7 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { empty, success, type AdminItemModel } from "../../src/application/index.ts";
 
 const world = vi.hoisted(() => ({
-  production: true,
   request: { state: "signed-out" } as unknown,
   access: { state: "signed-out" } as unknown,
   redirected: undefined as string | undefined,
@@ -24,7 +23,6 @@ vi.mock("next/navigation", () => ({
 }));
 vi.mock("../../app/_identity/actions.ts", () => ({ signOutAction: vi.fn() }));
 vi.mock("../../app/_identity/production-request.ts", () => ({
-  isProductionMode: async () => world.production,
   productionRequest: async () => world.request,
 }));
 vi.mock("../../src/runtime/production/access.ts", () => ({
@@ -36,7 +34,7 @@ import { shellHeaderAction } from "../../app/_identity/shell-action.tsx";
 import { resolveProductionHome } from "../../app/_identity/production-home.ts";
 import { AppShell } from "../../src/runtime/AppShell.tsx";
 import { loadAdminLookups, NO_LOOKUPS } from "../../app/admin/_lib/lookups.ts";
-import { SYNTHETIC_PROFILES } from "../../src/runtime/synthetic/profiles.ts";
+import { shellProfile } from "../support/role-profiles.ts";
 import { freshKey, keyPrefix } from "../../app/szulo/_components/fresh-key.ts";
 
 const READY = {
@@ -46,11 +44,9 @@ const READY = {
 };
 
 beforeEach(() => {
-  world.production = true;
   world.request = { state: "signed-out" };
   world.access = { state: "signed-out" };
   world.redirected = undefined;
-  vi.stubEnv("APP_RUNTIME_MODE", "production");
   vi.stubEnv("APP_SESSION_SECRET", "a-production-only-secret-with-32-chars");
   vi.stubEnv("SUPABASE_URL", "http://127.0.0.1:54321");
   vi.stubEnv("SUPABASE_ANON_KEY", "placeholder-anon-key-value");
@@ -126,16 +122,7 @@ describe("the home page of the production mode", () => {
 });
 
 describe("the header of the page shell", () => {
-  const profile = SYNTHETIC_PROFILES[0]!;
-
-  it("keeps the test-profile switcher in the synthetic mode", async () => {
-    world.production = false;
-    expect(await shellHeaderAction()).toBeUndefined();
-    render(<AppShell profile={profile}>x</AppShell>);
-    expect(screen.getByTestId("app-shell-switch-profile-button")).toHaveTextContent(
-      "Tesztprofil váltása",
-    );
-  });
+  const profile = shellProfile("parent");
 
   it("shows the sign-out button instead of the switcher for a real session", async () => {
     render(

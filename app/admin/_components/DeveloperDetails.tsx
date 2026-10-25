@@ -1,8 +1,7 @@
 import type { ReactNode } from "react";
 
 /**
- * Technical material for developers and tests (version numbers, correlation ids, scenario
- * selectors). It sits in one collapsed section at the bottom of a page, so normal screens show
+ * Technical material for developers and tests (version numbers, correlation ids). It sits in one collapsed section at the bottom of a page, so normal screens show
  * no technical text. The fields inside keep their names and test ids; the section only hides
  * them until it is opened.
  */

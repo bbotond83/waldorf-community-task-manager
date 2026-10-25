@@ -24,7 +24,6 @@ const base: ImportPreviewModel = {
     { id: C2, rowLabel: "Kinti takarítás · 3. sor", message: "Ismeretlen család.", skipOnly: true },
   ],
   step: 4,
-  fixtureId: "tavaszi-feladatok.xlsx",
   totalRows: 42,
   state: "conflicts",
   warningCount: 0,
@@ -40,7 +39,6 @@ function recording() {
       return { state: "success", message: "Rendben." };
     });
   const actions: ImportWorkflowActions = {
-    createPreview: answer("createPreview"),
     resolveConflict: answer("resolve"),
     commit: answer("commit"),
     recover: answer("recover"),
@@ -51,7 +49,7 @@ function recording() {
 }
 
 const production = (preview: ImportPreviewModel | undefined, actions: ImportWorkflowActions) =>
-  render(<ImportWorkflow mode="production" preview={preview} actions={actions} />);
+  render(<ImportWorkflow preview={preview} actions={actions} />);
 
 function hidden(form: HTMLElement, name: string): string | undefined {
   return form.querySelector<HTMLInputElement>(`input[name="${name}"]`)?.value;
@@ -71,14 +69,13 @@ describe("the upload step in production mode", () => {
     expect(document.querySelector('[name="scenario"]')).toBeNull();
   });
 
-  it("keeps the demo select, the scenario select and the fixed key in the synthetic mode", () => {
+  it("has no demo workbook select, no scenario select and no fixed key: the form takes a file only", () => {
     render(<ImportWorkflow actions={recording().actions} />);
-    expect(screen.getByTestId("admin-import-fixture-select")).toBeInTheDocument();
-    expect(screen.getByTestId("admin-import-scenario-select")).toBeInTheDocument();
-    expect(screen.queryByTestId("admin-import-file-input")).not.toBeInTheDocument();
-    expect(hidden(screen.getByTestId("admin-import-preview-form"), "idempotencyKey")).toBe(
-      "import-preview-waldorf-v1",
-    );
+    expect(screen.queryByTestId("admin-import-fixture-select")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("admin-import-scenario-select")).not.toBeInTheDocument();
+    expect(screen.getByTestId("admin-import-file-input")).toBeInTheDocument();
+    const form = screen.getByTestId("admin-import-preview-form");
+    expect(hidden(form, "idempotencyKey")).not.toBe("import-preview-waldorf-v1");
   });
 
   it("falls back to no form when the upload action is not provided", () => {
@@ -108,9 +105,8 @@ describe("the upload step in production mode", () => {
 
 describe("the preview and the conflict forms in production mode", () => {
   it("shows the file name on the source line instead of the demo fixture id", () => {
-    production({ ...base, fixtureId: "workbook-waldorf-v1" }, recording().actions);
+    production(base, recording().actions);
     expect(screen.getByTestId("admin-import-source")).toHaveTextContent("tavaszi-feladatok.xlsx");
-    expect(document.body).not.toHaveTextContent("workbook-waldorf-v1");
   });
 
   it("sends the real run id and run version, never the demo constants", () => {
@@ -159,7 +155,6 @@ describe("the preview and the conflict forms in production mode", () => {
     // The first conflict is resolved: the page renders again with the version the answer carried.
     view.rerender(
       <ImportWorkflow
-        mode="production"
         actions={first.actions}
         preview={{
           ...base,
@@ -174,7 +169,6 @@ describe("the preview and the conflict forms in production mode", () => {
     expect(hidden(remaining[0]!, "expectedVersion")).toBe("4");
     view.rerender(
       <ImportWorkflow
-        mode="production"
         actions={first.actions}
         preview={{
           ...base,
@@ -210,13 +204,13 @@ describe("the confirmation and the result in production mode", () => {
     expect(document.body).not.toHaveTextContent("3 engedélyezett változást");
   });
 
-  it("keeps the demo sentence in the synthetic mode", () => {
+  it("states the real size of the run even when the preview carries no file name", () => {
     render(
       <ImportWorkflow actions={recording().actions} preview={{ ...ready, fileName: undefined }} />,
     );
-    expect(screen.getByTestId("admin-import-confirm-text")).toHaveTextContent(
-      "A mentés 3 engedélyezett változást hajt végre.",
-    );
+    expect(screen.getByTestId("admin-import-confirm-text")).toHaveTextContent("42 sorát");
+    // The database always names the file; with no name the source line is empty and shows no demo fixture id.
+    expect(screen.getByTestId("admin-import-source")).toBeEmptyDOMElement();
   });
 
   it("sends the fingerprint, the confirmation, a fresh key and no scenario", async () => {
@@ -320,12 +314,10 @@ describe("an interrupted run and the cancel control in production mode", () => {
     expect(String(calls[0]!.data.get("idempotencyKey"))).toMatch(/^import-cancel:[0-9a-f]{32}$/);
   });
 
-  it("offers the cancel next to the conflicts of a fresh preview, and not in the synthetic mode", () => {
-    const view = production(base, recording().actions);
+  it("offers the cancel next to the conflicts of a fresh preview", () => {
+    production(base, recording().actions);
     expect(screen.getByTestId("admin-import-cancel-form")).toBeInTheDocument();
-    view.unmount();
-    render(<ImportWorkflow actions={recording().actions} preview={base} />);
-    expect(screen.queryByTestId("admin-import-cancel-form")).not.toBeInTheDocument();
+    expect(screen.getAllByTestId("admin-import-conflict-form")).toHaveLength(2);
   });
 
   it("does not render the cancel without a cancel action", () => {

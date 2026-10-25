@@ -1,5 +1,5 @@
 import { sessionGrantBindings } from "../../src/access/session-grants.ts";
-import { TEACHER_GROUPS } from "../../src/teacher-web/index.ts";
+import { TEACHER_GROUPS } from "../support/port-doubles.ts";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import type { ApplicationResult, TrackingModel } from "../../src/application/index.ts";
@@ -20,8 +20,6 @@ const session = {
   ),
   roles: ["kindergarten_teacher"] as const,
   scopes: TEACHER_GROUPS.map((group) => group.scope),
-  runtimeMode: "synthetic" as const,
-  isSynthetic: true,
 };
 const filters = parseTeacherFilters({}, session);
 const model: TrackingModel = {
@@ -56,8 +54,9 @@ describe("Teacher schedule components", () => {
     const options = within(screen.getByLabelText("Csoport")).getAllByRole("option");
     expect(options.map((option) => [option.getAttribute("value"), option.textContent])).toEqual([
       ["", "Minden csoport"],
-      ["group-oak", "Tölgyfa csoport"],
-      ["group-sunflower", "Napraforgó csoport"],
+      // The group's own name is not part of the grant; the screen names each granted group generically.
+      ["group-oak", "Engedélyezett csoport"],
+      ["group-sunflower", "Engedélyezett csoport"],
     ]);
     expect(screen.getByLabelText("Kezdő dátum")).not.toBeRequired();
     expect(screen.getByLabelText("Záró dátum")).not.toBeRequired();
@@ -127,8 +126,8 @@ describe("Teacher schedule components", () => {
     const cards = screen.getByTestId("teacher-schedule-card-list");
     expect(within(table).getByText("Kitalált felügyelet")).toBeVisible();
     expect(within(cards).getByText("Kitalált felügyelet")).toBeVisible();
-    expect(within(table).getByText("Tölgyfa csoport")).toBeVisible();
-    expect(within(cards).getByText("Tölgyfa csoport")).toBeVisible();
+    expect(within(table).getByRole("cell", { name: "Engedélyezett csoport" })).toBeVisible();
+    expect(within(cards).getAllByText("Engedélyezett csoport").length).toBeGreaterThan(0);
   });
 
   it("renders an empty state with a clear-filter link", () => {

@@ -16,6 +16,7 @@ import {
   stackSettings,
   uuid,
 } from "../database/stack-support.ts";
+import { bindSeededSchema } from "./support/seeded-schema.ts";
 
 /**
  * Directory and coordination on a production build against the real local stack (U3, steps 28 to 30):
@@ -25,7 +26,9 @@ import {
  * WCAG 2.2 AA violations. The production server is started here (the servers of playwright.config.ts are
  * synthetic), on its own port, over the schema named below.
  */
-const SCHEMA = process.env.IDENTITY_BROWSER_SCHEMA ?? "worker_4";
+// The schema of the running browser project (tests/browser/support/projects.ts); known once the first hook has run.
+let SCHEMA = "";
+const world = bindSeededSchema({ seed: false });
 const PORT = Number(process.env.DIRECTORY_BROWSER_PORT ?? 3140);
 const ORIGIN = `http://127.0.0.1:${PORT}`;
 const MAIL_API = "http://127.0.0.1:54324/api/v1";
@@ -55,14 +58,9 @@ const A_CANCEL = uuid(9503 + 1000);
 
 const settings = stackSettings();
 const apiUrl = settings.apiUrl.replace(/\/$/, "");
-const admin = createAdminAccess({ url: apiUrl, serviceKey: serviceKey(), schema: SCHEMA });
+let admin: ReturnType<typeof createAdminAccess>;
 const service = createSignInService({ url: apiUrl, publicKey: settings.publicKey });
-const database = createDatabaseClient({
-  url: apiUrl,
-  publicKey: settings.publicKey,
-  sessionSecret: randomBytes(32).toString("hex"),
-  schema: SCHEMA,
-});
+let database: ReturnType<typeof createDatabaseClient>;
 const mailer = createInvitationMailer({
   transport: createSmtpTransport({ host: "127.0.0.1", port: 54325 }),
   from: "no-reply@example.test",
@@ -96,7 +94,6 @@ async function startServer(): Promise<void> {
       env: {
         ...process.env,
         ...stack,
-        APP_RUNTIME_MODE: "production",
         APP_SESSION_SECRET: randomBytes(32).toString("hex"),
         DATABASE_SCHEMA: SCHEMA,
         APP_PUBLIC_URL: ORIGIN,
@@ -115,7 +112,7 @@ async function startServer(): Promise<void> {
         signal: AbortSignal.timeout(2000),
       });
       if (response.ok) {
-        expect((await response.json()).mode).toBe("production");
+        expect((await response.json()).status).toBe("ready");
         return;
       }
     } catch {
@@ -137,6 +134,14 @@ function stopServer(): void {
 }
 
 test.beforeAll(async () => {
+  SCHEMA = world().schema;
+  admin = createAdminAccess({ url: apiUrl, serviceKey: serviceKey(), schema: SCHEMA });
+  database = createDatabaseClient({
+    url: apiUrl,
+    publicKey: settings.publicKey,
+    sessionSecret: randomBytes(32).toString("hex"),
+    schema: SCHEMA,
+  });
   db = await openDatabase();
   await lockSchemas(db, [SCHEMA]);
   await prepareSchema(db, SCHEMA);

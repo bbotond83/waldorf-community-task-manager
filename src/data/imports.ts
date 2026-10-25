@@ -74,7 +74,6 @@ function toPreview(row: Row): ImportPreviewModel {
       }),
     ),
     step: step as ImportPreviewModel["step"],
-    fixtureId: fileName,
     totalRows: integer(row, "total_rows"),
     state,
     runId,

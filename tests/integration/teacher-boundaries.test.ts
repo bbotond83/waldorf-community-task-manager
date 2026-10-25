@@ -10,10 +10,10 @@ import { convertLegacyRoles } from "../../src/access/legacy-role-conversion.ts";
 import { AuthorizationContract } from "../../src/application/index.ts";
 import type { SessionContext } from "../../src/application/index.ts";
 import {
-  createSyntheticTeacherFacade,
-  createSyntheticTeacherRepository,
+  createTeacherFacadeDouble,
+  createTeacherRepositoryDouble,
   TEACHER_GROUPS,
-} from "../../src/teacher-web/index.ts";
+} from "../support/port-doubles.ts";
 function setup() {
   const users = new InMemoryUserRepository([
     { id: "converted", isActive: true, authorizationVersion: 1 },
@@ -42,15 +42,13 @@ function setup() {
     grants: grants.list(),
     roles: ["kindergarten_teacher"],
     scopes: [TEACHER_GROUPS[0]!.scope],
-    runtimeMode: "synthetic",
-    isSynthetic: true,
   };
   const authorization = new AuthorizationContract({
     getCurrentVersion: (id) => users.findById(id)?.authorizationVersion,
     clearProtectedCache() {},
   });
-  const source = createSyntheticTeacherRepository();
-  const facade = createSyntheticTeacherFacade(authorization, "ready", source.repository);
+  const source = createTeacherRepositoryDouble();
+  const facade = createTeacherFacadeDouble(authorization, "ready", source.repository);
   return { users, grants, audit, store, session, authorization, source, facade };
 }
 const query = { groupScope: TEACHER_GROUPS[0]!.scope, from: "2026-08-12", to: "2026-08-20" };

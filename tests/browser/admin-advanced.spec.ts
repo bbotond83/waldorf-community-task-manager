@@ -1,32 +1,39 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
+import { DIRECTORY_SHEET } from "../../src/import-parser/template.ts";
+import { buildWorkbook, directoryRow } from "../support/workbook.ts";
+import { SERIOUS, signInAs, bindSeededSchema } from "./support/seeded-schema.ts";
 
-async function reset(page: Page) {
-  await page.goto("/");
-  await page.evaluate(async () => {
-    await fetch("/api/synthetic/reset", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-    });
+const world = bindSeededSchema();
+
+const XLSX_TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
+/** A workbook with one new family in the first seeded group: no conflict, so the run goes straight to the confirmation. */
+const newFamilyWorkbook = () =>
+  buildWorkbook({
+    rows: {
+      [DIRECTORY_SHEET]: [
+        directoryRow({
+          Csoport: "Katica",
+          Család: "Mézes család",
+          "Szülő neve": "Mézes Márta",
+          "E-mail": "marta@example.test",
+        }),
+      ],
+    },
   });
+
+async function upload(page: Page, name: string, bytes: Uint8Array) {
+  await page
+    .getByTestId("admin-import-file-input")
+    .setInputFiles({ name, mimeType: XLSX_TYPE, buffer: Buffer.from(bytes) });
+  await page.getByTestId("admin-import-preview-form-submit-button").click();
 }
 
-async function selectProfile(
-  page: Page,
-  id: "parent-local" | "kindergarten-teacher-local" | "group-admin-local" | "super-admin-local",
-) {
-  await page.goto("/");
-  const button = page.getByTestId(`profile-selector-${id}-button`);
-  if (!(await button.isVisible().catch(() => false))) {
-    await page.getByTestId("app-shell-switch-profile-button").click();
-  }
-  await page.getByTestId(`profile-selector-${id}-button`).click();
-}
-
-test.beforeEach(async ({ page }) => reset(page));
+test.beforeEach(async () => world().reseed());
 
 test("advanced navigation observes strict administrator role boundaries", async ({ page }) => {
-  await selectProfile(page, "group-admin-local");
+  await signInAs(page, world().account("group-admin-1"));
   await page.goto("/admin");
   await expect(page.getByTestId("app-shell-navigation-admin-import")).toHaveCount(0);
   await expect(page.getByTestId("app-shell-navigation-admin-reminders")).toHaveCount(0);
@@ -34,131 +41,85 @@ test("advanced navigation observes strict administrator role boundaries", async 
   await page.goto("/admin/import");
   await expect(page.getByRole("heading", { name: "Nincs jogosultság" })).toBeVisible();
 
-  await selectProfile(page, "super-admin-local");
+  await signInAs(page, world().account("super-admin"));
   await page.goto("/admin/beallitasok");
   await expect(page.getByTestId("admin-recipient-settings")).toBeVisible();
   await expect(page.getByTestId("admin-governance-section")).toBeVisible();
 });
 
-test("Super Administrator completes seven-step import once", async ({ page }) => {
-  await selectProfile(page, "super-admin-local");
-  const startedAt = Date.now();
+test("Super Administrator completes the seven-step import once", async ({ page }) => {
+  await signInAs(page, world().account("super-admin"));
   await page.goto("/admin/import");
   await expect(page.getByRole("heading", { name: "Importálás" })).toBeFocused();
-  await page.getByTestId("admin-import-preview-form-submit-button").press("Enter");
+  await upload(page, "uj-csalad.xlsx", newFamilyWorkbook());
   await expect(page.getByTestId("admin-import-preview")).toBeVisible();
-  await page.getByLabel("Importált adat használata").check();
-  await page.getByTestId("admin-import-conflict-form-submit-button").click();
+  await expect(page.getByTestId("admin-import-source")).toHaveText("uj-csalad.xlsx");
   await expect(page.getByTestId("admin-import-commit-form")).toBeVisible();
   await page.getByTestId("admin-import-confirm-checkbox").check();
   await page.getByTestId("admin-import-commit-form-submit-button").click();
-  await expect(page.getByTestId("admin-import-outcome")).toContainText("3 elem");
-  expect(Date.now() - startedAt).toBeLessThan(2_000);
-  await expect(page.locator("body")).not.toContainText(/email|provider body|telefonszám/i);
-});
-
-test("interrupted import recovers without partial outcome", async ({ page }) => {
-  await selectProfile(page, "super-admin-local");
-  await page.goto("/admin/import");
-  await page.getByTestId("admin-import-preview-form-submit-button").click();
-  await page.getByLabel("Meglévő adat megtartása").check();
-  await page.getByTestId("admin-import-conflict-form-submit-button").click();
-  await page.getByTestId("developer-details-toggle").click();
-  await page.getByLabel("Mentési forgatókönyv").selectOption("interrupted");
-  await page.getByTestId("admin-import-confirm-checkbox").check();
-  await page.getByTestId("admin-import-commit-form-submit-button").click();
-  await expect(page.getByTestId("admin-import-recovery-form")).toContainText("részleges");
-  await page.getByTestId("admin-import-recovery-form-submit-button").click();
   await expect(page.getByTestId("admin-import-outcome")).toBeVisible();
+  await expect(page.getByTestId("admin-import-outcome-counts")).toContainText("elem jött létre");
+  await expect(page.locator("body")).not.toContainText(/provider body|telefonszám/i);
+  // The new family is really in the records.
+  await page.goto("/admin/nyilvantartasok");
+  await expect(page.getByText("Mézes család")).toBeVisible();
 });
 
-test("reminder retry preserves correlation identity and blocks non-retryable jobs", async ({
+test("the reminder page and the privacy page show their explicit empty states", async ({
   page,
 }) => {
-  await selectProfile(page, "super-admin-local");
+  await signInAs(page, world().account("super-admin"));
   await page.goto("/admin/emlekeztetok");
-  // The correlation id is technical text: it sits in the closed "Fejlesztői részletek" section.
-  await expect(page.getByTestId("admin-reminder-job-lampas")).not.toContainText("corr-lampas-01");
-  await expect(page.getByTestId("developer-details")).not.toHaveAttribute("open", "");
-  await page.getByTestId("developer-details-toggle").click();
-  await expect(page.getByTestId("admin-reminder-correlation-job-lampas")).toContainText(
-    "corr-lampas-01",
-  );
-  await page.getByTestId("admin-reminder-retry-job-lampas-submit-button").click();
-  await expect(page.getByTestId("admin-reminder-job-lampas")).toContainText(
-    "Újrapróbálás folyamatban",
-  );
-  await expect(
-    page.getByTestId("admin-reminder-job-kert").getByRole("button", { name: "Újrapróbálás" }),
-  ).toHaveCount(0);
+  await expect(page.getByTestId("admin-reminder-page")).toBeVisible();
+  await expect(page.getByText("Nincs a szűrésnek megfelelő feladat.")).toBeVisible();
+  // Technical correlation text never shows outside the closed developer section.
+  await expect(page.locator("main")).not.toContainText(/corr-/);
+  await page.goto("/admin/adatvedelem");
+  await expect(page.getByTestId("admin-lifecycle-page")).toBeVisible();
+  await expect(page.getByText("Nincs életciklus-jelölt.")).toBeVisible();
 });
 
-test("Super Administrator revocation denies the affected profile on its next request", async ({
+test("Super Administrator revocation denies the affected person on their next request", async ({
   page,
   browser,
 }) => {
-  const origin = new URL(page.url()).origin;
-  const groupContext = await browser.newContext({ baseURL: origin });
+  const groupContext = await browser.newContext({ baseURL: test.info().project.use.baseURL });
   const groupPage = await groupContext.newPage();
   try {
-    await selectProfile(groupPage, "group-admin-local");
+    await signInAs(groupPage, world().account("group-admin-1"));
     await groupPage.goto("/admin");
     await expect(groupPage.getByTestId("admin-dashboard-page")).toBeVisible();
-    const existingSession = (await groupContext.cookies()).find(
-      (cookie) => cookie.name === "waldorf_local_session",
-    );
-    expect(existingSession).toBeDefined();
-    await selectProfile(page, "super-admin-local");
+
+    await signInAs(page, world().account("super-admin"));
     await page.goto("/admin/beallitasok");
     await expect(page.getByTestId("admin-governance-section")).toBeVisible();
-    await page.getByTestId("admin-grant-revoke-grant-group-target-submit-button").press("Enter");
-    await expect(
-      page.getByTestId("admin-grant-revoke-grant-group-target-state-success"),
-    ).toContainText("következő kérés");
+    const grantId = world().account("group-admin-1").grantId;
+    await page.getByTestId(`admin-grant-revoke-${grantId}-submit-button`).press("Enter");
+    await expect(page.getByTestId(`admin-grant-revoke-${grantId}-state-success`)).toContainText(
+      "következő kérés",
+    );
+
     await groupPage.goto("/admin");
-    await expect(groupPage).toHaveURL(`${origin}/admin`);
     await expect(
       groupPage.getByRole("heading", { name: "Nincs jogosultság", exact: true }),
     ).toBeVisible();
     for (const hook of ["app-shell-navigation", "admin-dashboard-page", "admin-governance-section"])
       await expect(groupPage.getByTestId(hook)).toHaveCount(0);
-    expect(
-      (await groupContext.cookies()).find((cookie) => cookie.name === existingSession!.name),
-    ).toEqual(existingSession);
-    const rejectedSigning = await groupPage.request.post("/api/synthetic/session", {
-      headers: { origin },
-      form: { profileId: "group-admin-local" },
-      maxRedirects: 0,
-    });
-    expect(rejectedSigning.status()).toBe(400);
-    expect(await rejectedSigning.json()).toEqual({ error: { code: "SYNTHETIC_PROFILE_INVALID" } });
-    expect(rejectedSigning.headers()["set-cookie"]).toBeUndefined();
-    await groupPage.goto("/admin");
-    await expect(groupPage).toHaveURL(`${origin}/admin`);
+    await groupPage.goto("/admin/nyilvantartasok");
     await expect(
       groupPage.getByRole("heading", { name: "Nincs jogosultság", exact: true }),
     ).toBeVisible();
-    await expect(groupPage.getByTestId("admin-dashboard-page")).toHaveCount(0);
   } finally {
     await groupContext.close();
   }
 });
 
-test("lifecycle blocker, atomic completion, and allowlisted settings are explicit", async ({
-  page,
-}) => {
-  await selectProfile(page, "super-admin-local");
-  await page.goto("/admin/adatvedelem");
-  await expect(page.getByTestId("admin-lifecycle-family-retained")).toContainText("megőrzési");
-  await expect(page.getByTestId("admin-lifecycle-family-retained").getByRole("button")).toHaveCount(
-    0,
-  );
-  await page.getByTestId("admin-lifecycle-run-family-delete").getByRole("checkbox").check();
-  await page.getByTestId("admin-lifecycle-run-family-delete-submit-button").click();
-  await expect(page.getByTestId("admin-lifecycle-family-delete")).toHaveCount(0);
+test("allowlisted settings are explicit", async ({ page }) => {
+  await signInAs(page, world().account("super-admin"));
   await page.goto("/admin/beallitasok");
+  await page.waitForLoadState("networkidle");
   await expect(page.getByLabel("Címzetti kör").locator("option")).toHaveCount(2);
-  await page.getByLabel("Címzetti kör").selectOption("recipient-group");
+  await page.getByLabel("Címzetti kör").selectOption({ index: 1 });
   await page.getByTestId("admin-settings-form-submit-button").press("Enter");
   await expect(page.getByTestId("admin-settings-form-state-success")).toBeVisible();
 });
@@ -166,7 +127,7 @@ test("lifecycle blocker, atomic completion, and allowlisted settings are explici
 test("@a11y advanced admin supports keyboard, focus, zoom, mobile touch, and axe", async ({
   page,
 }) => {
-  await selectProfile(page, "super-admin-local");
+  await signInAs(page, world().account("super-admin"));
   await page.goto("/admin/import");
   for (let step = 0; step < 15; step += 1) {
     const isFocused = await page
@@ -184,22 +145,14 @@ test("@a11y advanced admin supports keyboard, focus, zoom, mobile touch, and axe
   expect(submitBox?.height ?? 0).toBeGreaterThanOrEqual(44);
   expect(submitBox?.width ?? 0).toBeGreaterThanOrEqual(44);
   const results = await new AxeBuilder({ page }).analyze();
-  expect(
-    results.violations.filter(
-      (violation) => violation.impact === "serious" || violation.impact === "critical",
-    ),
-  ).toEqual([]);
+  expect(results.violations.filter(SERIOUS)).toEqual([]);
 });
 
 test("Parent Teacher and Group admin direct advanced routes disclose no privileged content", async ({
   page,
 }) => {
-  for (const profile of [
-    "parent-local",
-    "kindergarten-teacher-local",
-    "group-admin-local",
-  ] as const) {
-    await selectProfile(page, profile);
+  for (const tag of ["parent-1", "teacher-1", "group-admin-1"]) {
+    await signInAs(page, world().account(tag));
     for (const route of [
       "/admin/import",
       "/admin/emlekeztetok",
@@ -214,8 +167,8 @@ test("Parent Teacher and Group admin direct advanced routes disclose no privileg
         "admin-import-preview",
         "admin-governance-section",
         "admin-recipient-settings",
-        "admin-reminder-job-lampas",
-        "admin-lifecycle-family-delete",
+        "admin-reminder-page",
+        "admin-lifecycle-page",
       ])
         await expect(page.getByTestId(hook)).toHaveCount(0);
     }

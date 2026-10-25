@@ -1,33 +1,21 @@
-import { beforeEach, afterEach, expect, it, vi } from "vitest";
-import { createSyntheticSessionToken } from "../../src/runtime/session/session.ts";
-import { getSyntheticProfile } from "../../src/runtime/synthetic/profiles.ts";
-import { resetSyntheticAdminFixtures } from "../../src/admin-core/synthetic-admin.ts";
-import { resetSyntheticAdvancedFixtures } from "../../src/admin-advanced/index.ts";
-import { resetSyntheticParentState } from "../../src/parent-web/index.ts";
-const boundary = vi.hoisted(() => ({
-  token: undefined as string | undefined,
-  set: vi.fn(),
-  revalidate: vi.fn(),
-}));
+import { beforeEach, expect, it, vi } from "vitest";
+import { requestWorld } from "../support/request-world.ts";
+const boundary = vi.hoisted(() => ({ revalidate: vi.fn() }));
 vi.mock("server-only", () => ({}));
-vi.mock("next/headers", () => ({
-  cookies: async () => ({
-    get: () => (boundary.token ? { value: boundary.token } : undefined),
-    set: boundary.set,
-  }),
-}));
+vi.mock("../../app/_identity/production-request.ts", async () =>
+  (await import("../support/request-world.ts")).requestWorldModule(),
+);
 vi.mock("next/cache", () => ({ revalidatePath: boundary.revalidate }));
 beforeEach(() => {
-  vi.stubEnv("APP_RUNTIME_MODE", "synthetic");
-  boundary.token = undefined;
   vi.clearAllMocks();
-  resetSyntheticAdminFixtures();
-  resetSyntheticAdvancedFixtures();
-  resetSyntheticParentState();
+  requestWorld.reset();
 });
-afterEach(() => vi.unstubAllEnvs());
-function signIn(id: string) {
-  boundary.token = createSyntheticSessionToken(getSyntheticProfile(id)!);
+function signIn(role: "super_admin" | "group_admin" = "super_admin") {
+  requestWorld.signIn(role);
+}
+/** Makes the data source answer the next admin calls with a named failure or conflict word. */
+function force(scenario: string) {
+  requestWorld.ports.admin.forcedScenario = scenario;
 }
 function form(values: Record<string, string> = {}) {
   const result = new FormData();
@@ -59,7 +47,7 @@ const coreCases = [
 ] as const;
 for (const [name, values, state] of coreCases) {
   it(name + " authorizes and returns its actual mutation outcome", async () => {
-    signIn("super-admin-local");
+    signIn();
     const result = await core[name](initial, form(values));
     expect(result.state).toBe(state);
     expect(result.code).toBeTruthy();
@@ -79,7 +67,7 @@ for (const [name, values, state] of coreCases) {
   });
 }
 it("normalizes title validation, notes bounds and idempotent repeat", async () => {
-  signIn("super-admin-local");
+  signIn();
   expect((await core.saveRecordAction(initial, form({ title: " " }))).state).toBe("validation");
   expect((await core.saveTaskAction(initial, form({ title: " " }))).state).toBe("validation");
   expect(
@@ -92,7 +80,7 @@ it("normalizes title validation, notes bounds and idempotent repeat", async () =
 it.each(["saveRecordAction", "saveTaskAction"] as const)(
   "%s names an empty or too long title in Hungarian and creates nothing",
   async (name) => {
-    signIn("super-admin-local");
+    signIn();
     const empty = await core[name](initial, form({ id: "new", title: "   " }));
     expect(empty.state).toBe("validation");
     expect(empty.fieldErrors).toEqual({ title: "A megnevezés megadása kötelező." });
@@ -115,11 +103,13 @@ it.each(["saveRecordAction", "saveTaskAction"] as const)(
 it.each([
   ["full", "conflict"],
   ["ineligible", "conflict"],
-  ["retryable", "terminal"],
+  // A transient source failure is retryable (the old demo classifier mis-labelled it terminal).
+  ["retryable", "retryable"],
   ["terminal", "terminal"],
 ])("maps assignment %s without leaking details", async (scenario, state) => {
-  signIn("super-admin-local");
-  const result = await core.assignTaskAction(initial, form({ scenario }));
+  signIn();
+  force(scenario);
+  const result = await core.assignTaskAction(initial, form());
   expect(result.state).toBe(state);
   expect(result.message).toBeTruthy();
   expect(boundary.revalidate).not.toHaveBeenCalled();
@@ -127,19 +117,20 @@ it.each([
 it.each([
   ["invalidated", "invalidated"],
   ["denied", "denied"],
-  ["retryable", "terminal"],
+  ["retryable", "retryable"],
   ["terminal", "terminal"],
 ])("maps approval %s to a distinct outcome", async (scenario, state) => {
-  signIn("super-admin-local");
+  signIn();
+  force(scenario);
   const result = await core.decideApprovalAction(
     initial,
-    form({ id: "approval-csere", decision: "approved", scenario }),
+    form({ id: "approval-csere", decision: "approved" }),
   );
   expect(result.state).toBe(state);
   expect(result.outcome).toBe(state);
 });
 it("refuses a missing or unknown approval decision before anything is decided (fail closed)", async () => {
-  signIn("super-admin-local");
+  signIn();
   for (const values of [
     { id: "approval-csere" } as Record<string, string>,
     { id: "approval-csere", decision: "" },
@@ -158,7 +149,7 @@ it("refuses a missing or unknown approval decision before anything is decided (f
   ).toBe("success");
 });
 it("distinguishes rejected and already-decided approvals", async () => {
-  signIn("super-admin-local");
+  signIn();
   expect(
     (await core.decideApprovalAction(initial, form({ id: "approval-csere", decision: "rejected" })))
       .outcome,
@@ -177,6 +168,11 @@ it("distinguishes rejected and already-decided approvals", async () => {
     ).outcome,
   ).toBe("already-decided");
 });
+function upload(bytes: number | undefined, name = "munkafuzet.xlsx") {
+  const data = form();
+  if (bytes !== undefined) data.set("workbook", new File([new Uint8Array(bytes)], name));
+  return data;
+}
 it("rejects unsigned callers at every advanced boundary", async () => {
   for (const action of Object.values(advanced))
     expect(
@@ -184,7 +180,6 @@ it("rejects unsigned callers at every advanced boundary", async () => {
         await action(
           initial,
           form({
-            fixtureId: "workbook-waldorf-v1",
             resolution: "keep-existing",
             recipientId: "allowed",
           }),
@@ -193,8 +188,9 @@ it("rejects unsigned callers at every advanced boundary", async () => {
     ).toBe("denied");
 });
 it("returns field-specific advanced validation", async () => {
-  expect((await advanced.createImportPreviewAction(initial, form())).fieldErrors).toHaveProperty(
-    "fixtureId",
+  signIn();
+  expect((await advanced.uploadImportWorkbookAction(initial, form())).fieldErrors).toHaveProperty(
+    "workbook",
   );
   expect((await advanced.resolveImportConflictAction(initial, form())).fieldErrors).toHaveProperty(
     "resolution",
@@ -203,28 +199,48 @@ it("returns field-specific advanced validation", async () => {
     "recipientId",
   );
 });
+it("refuses an empty or oversized workbook before the facade is called, and names the limit", async () => {
+  signIn();
+  expect((await advanced.uploadImportWorkbookAction(initial, upload(0))).fieldErrors).toEqual({
+    workbook: "Válasszon ki egy .xlsx munkafüzetet.",
+  });
+  const big = await advanced.uploadImportWorkbookAction(initial, upload(5 * 1024 * 1024 + 1));
+  expect(big.fieldErrors).toEqual({ workbook: "A munkafüzet legfeljebb 5 MB lehet." });
+  expect(boundary.revalidate).not.toHaveBeenCalled();
+});
 it("creates and rejects workbook previews through actual facade", async () => {
-  signIn("super-admin-local");
-  expect(
-    (await advanced.createImportPreviewAction(initial, form({ fixtureId: "workbook-waldorf-v1" })))
-      .state,
-  ).toBe("success");
-  expect(
-    (
-      await advanced.createImportPreviewAction(
-        initial,
-        form({
-          fixtureId: "workbook-waldorf-v1",
-          scenario: "malformed",
-          idempotencyKey: "coverage:preview:0002",
-        }),
-      )
-    ).code,
-  ).toBe("IMPORT_MALFORMED");
+  signIn();
+  expect((await advanced.uploadImportWorkbookAction(initial, upload(10))).state).toBe("success");
   expect(boundary.revalidate).toHaveBeenCalledWith("/admin/import");
+  force("malformed");
+  expect((await advanced.uploadImportWorkbookAction(initial, upload(10))).code).toBe(
+    "IMPORT_MALFORMED",
+  );
+});
+it("sends no scenario value in any admin payload, whatever the form carries", async () => {
+  signIn();
+  const seen: unknown[] = [];
+  const port = requestWorld.ports.admin;
+  const original = port.execute.bind(port);
+  port.execute = (async (input: { payload: Record<string, unknown> }) => {
+    seen.push(input.payload);
+    return original(input as never);
+  }) as typeof port.execute;
+  await core.assignTaskAction(initial, form({ scenario: "full" }));
+  await core.decideApprovalAction(
+    initial,
+    form({ id: "approval-csere", decision: "approved", scenario: "denied" }),
+  );
+  await core.archiveRecordAction(initial, form({ id: "family-feny", scenario: "terminal" }));
+  await advanced.retryReminderAction(
+    initial,
+    form({ jobId: "job-lampas", correlationId: "coverage:correlation:0001", scenario: "terminal" }),
+  );
+  expect(seen.length).toBeGreaterThanOrEqual(4);
+  for (const payload of seen) expect(payload).not.toHaveProperty("scenario");
 });
 it("runs advanced mutation outcomes with real invalid identities", async () => {
-  signIn("super-admin-local");
+  signIn();
   const actions = [
     advanced.commitImportAction,
     advanced.recoverImportAction,

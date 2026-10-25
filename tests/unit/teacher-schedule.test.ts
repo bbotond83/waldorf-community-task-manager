@@ -3,9 +3,16 @@ import { sessionGrantBindings } from "../../src/access/session-grants.ts";
 import type { SessionContext } from "../../src/application/index.ts";
 import {
   AuthorizationContract,
+  FacadePipeline,
   InMemoryAuthorizationVersions,
+  TeacherApplicationFacade,
 } from "../../src/application/index.ts";
-import { createSyntheticTeacherFacade, TEACHER_GROUPS } from "../../src/teacher-web/index.ts";
+import {
+  classifyDoubleFailure,
+  TEACHER_GROUPS,
+  TeacherPortDouble,
+  type TeacherScenario,
+} from "../support/port-doubles.ts";
 import { parseTeacherFilters } from "../../app/teacher/_lib/filters.ts";
 import { readTeacherSchedule, teacherRange } from "../../app/teacher/_lib/schedule.ts";
 
@@ -16,14 +23,15 @@ const session: SessionContext = {
   ...sessionGrantBindings("teacher", "kindergarten_teacher", grantedScopes),
   roles: ["kindergarten_teacher"] as const,
   scopes: grantedScopes,
-  runtimeMode: "synthetic",
-  isSynthetic: true,
 };
 
-function facade(scenario: "ready" | "empty" | "denied" = "ready") {
-  return createSyntheticTeacherFacade(
-    new AuthorizationContract(new InMemoryAuthorizationVersions({ teacher: 1 })),
-    scenario,
+function facade(scenario: TeacherScenario = "ready") {
+  return new TeacherApplicationFacade(
+    new FacadePipeline(
+      new AuthorizationContract(new InMemoryAuthorizationVersions({ teacher: 1 })),
+      classifyDoubleFailure,
+    ),
+    new TeacherPortDouble(undefined, scenario),
   );
 }
 

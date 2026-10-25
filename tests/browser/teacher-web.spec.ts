@@ -1,124 +1,91 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
+import { CLEANING_DAY, EVENT_DAY, seedDay } from "./support/dates.ts";
+import { SERIOUS, signInAs, bindSeededSchema } from "./support/seeded-schema.ts";
 
-async function resetAndSelectTeacher(page: Page) {
-  await page.goto("/");
-  await page.request.post("/api/synthetic/reset", {
-    headers: { origin: new URL(page.url()).origin },
-  });
-  if (
-    await page
-      .getByTestId("app-shell-switch-profile-button")
-      .isVisible()
-      .catch(() => false)
-  ) {
-    await page.getByTestId("app-shell-switch-profile-button").click();
-  }
-  await page.getByTestId("profile-selector-kindergarten-teacher-local-button").click();
+const world = bindSeededSchema();
+const isMobile = (name: string) => name === "mobile-chrome";
+
+test.beforeEach(async ({ page }) => signInAs(page, world().account("teacher-1")));
+
+/** The schedule entry of a task: a table row on a desktop, a card on a phone. */
+function entry(page: Page, project: string, taskId: string) {
+  return page.getByTestId(
+    isMobile(project) ? `teacher-schedule-card-${taskId}` : `teacher-schedule-row-${taskId}`,
+  );
 }
-
-test.beforeEach(async ({ page }) => resetAndSelectTeacher(page));
+function entryOpen(page: Page, project: string, taskId: string) {
+  return page.getByTestId(
+    isMobile(project) ? `teacher-schedule-card-open-${taskId}` : `teacher-schedule-open-${taskId}`,
+  );
+}
 
 test("Teacher filters, list, detail, and return preserve authorized context under two seconds", async ({
   page,
 }, testInfo) => {
+  const baking = world().id("task:1:1");
+  const cleaning = world().id("task:1:3");
   const startedAt = Date.now();
   await page.goto("/teacher/schedule");
   await expect(page.getByRole("heading", { name: "Beosztás", exact: true })).toBeFocused();
-  const initialItem =
-    testInfo.project.name === "mobile-chrome"
-      ? page.getByTestId("teacher-schedule-card-schedule-garden")
-      : page.getByTestId("teacher-schedule-row-schedule-garden");
-  await expect(initialItem).toBeVisible();
+  await expect(entry(page, testInfo.project.name, baking)).toBeVisible();
   expect(Date.now() - startedAt).toBeLessThan(2_000);
 
-  await page.getByTestId("teacher-schedule-from-input").fill("2026-08-14");
-  await page.getByTestId("teacher-schedule-to-input").fill("2026-08-14");
+  const day = seedDay(CLEANING_DAY);
+  await page.getByTestId("teacher-schedule-from-input").fill(day);
+  await page.getByTestId("teacher-schedule-to-input").fill(day);
   await page.getByTestId("teacher-schedule-filter-submit-button").click();
-  await expect(
-    page.getByTestId(
-      testInfo.project.name === "mobile-chrome"
-        ? "teacher-schedule-card-schedule-crafts"
-        : "teacher-schedule-row-schedule-crafts",
-    ),
-  ).toBeVisible();
-  await page
-    .getByTestId(
-      testInfo.project.name === "mobile-chrome"
-        ? "teacher-schedule-card-open-schedule-crafts"
-        : "teacher-schedule-open-schedule-crafts",
-    )
-    .click();
-  await expect(page.getByTestId("teacher-schedule-detail-fields")).toContainText("Tölgyfa csoport");
+  await expect(entry(page, testInfo.project.name, cleaning)).toBeVisible();
+  await expect(entry(page, testInfo.project.name, baking)).toHaveCount(0);
+  await entryOpen(page, testInfo.project.name, cleaning).click();
+  await expect(page.getByTestId("teacher-schedule-detail-fields")).toContainText(
+    "Engedélyezett csoport",
+  );
+  await expect(page.getByTestId("teacher-schedule-detail-fields")).toContainText("Takarítás");
   await page.getByTestId("teacher-schedule-detail-back-link").click();
-  await expect(page.getByTestId("teacher-schedule-from-input")).toHaveValue("2026-08-14");
+  await expect(page.getByTestId("teacher-schedule-from-input")).toHaveValue(day);
 });
 
 test("empty state clears filters and invalid ranges never expose rows", async ({
   page,
 }, testInfo) => {
-  await page.goto("/teacher/schedule?from=2026-09-01&to=2026-09-05");
+  const baking = world().id("task:1:1");
+  await page.goto(`/teacher/schedule?from=${seedDay(40)}&to=${seedDay(45)}`);
   await expect(page.getByTestId("teacher-schedule-empty")).toBeVisible();
   await page.getByTestId("teacher-schedule-clear-link").click();
-  await expect(
-    page.getByTestId(
-      testInfo.project.name === "mobile-chrome"
-        ? "teacher-schedule-card-schedule-garden"
-        : "teacher-schedule-row-schedule-garden",
-    ),
-  ).toBeVisible();
+  await expect(entry(page, testInfo.project.name, baking)).toBeVisible();
 
-  await page.goto("/teacher/schedule?from=2026-08-01&to=2026-09-02");
+  await page.goto(`/teacher/schedule?from=${seedDay(0)}&to=${seedDay(40)}`);
   await expect(page.getByTestId("teacher-schedule-validation")).toBeFocused();
   await expect(page.getByTestId("teacher-schedule-table")).toHaveCount(0);
 });
 
 test("out-of-scope group and crafted row are generically denied", async ({ page }) => {
-  await page.goto("/teacher/schedule?groupId=group-ungranted&from=2026-08-12&to=2026-08-20");
+  const otherGroup = world().id("group:2");
+  await page.goto(
+    `/teacher/schedule?groupId=${otherGroup}&from=${seedDay(0)}&to=${seedDay(EVENT_DAY + 2)}`,
+  );
   await expect(page.getByTestId("teacher-schedule-denied")).toContainText("nem érhető el");
   await expect(page.getByTestId("teacher-schedule-denied")).toBeFocused();
-  await expect(page.locator("body")).not.toContainText("group-ungranted");
+  await expect(page.locator("body")).not.toContainText(otherGroup);
 
-  await page.goto("/teacher/schedule/schedule-unrelated?from=2026-08-12&to=2026-08-20");
+  const foreignTask = world().id("task:2:1");
+  await page.goto(`/teacher/schedule/${foreignTask}`);
   await expect(page.getByTestId("teacher-detail-denied")).toContainText("nem érhető el");
-  await expect(page.locator("body")).not.toContainText("schedule-unrelated");
-});
-
-test("retryable failure preserves filters while terminal failure has no retry", async ({
-  page,
-}, testInfo) => {
-  const retryUrl =
-    "/teacher/schedule?groupId=group-oak&from=2026-08-14&to=2026-08-14&fixture=retryable";
-  await page.goto(retryUrl);
-  await expect(page.getByTestId("app-shell-main")).toBeFocused();
-  await page.getByTestId("teacher-schedule-retry-link").click();
-  await expect(page.getByTestId("teacher-schedule-from-input")).toHaveValue("2026-08-14");
-  await expect(
-    page.getByTestId(
-      testInfo.project.name === "mobile-chrome"
-        ? "teacher-schedule-card-schedule-crafts"
-        : "teacher-schedule-row-schedule-crafts",
-    ),
-  ).toBeVisible();
-
-  await page.goto("/teacher/schedule?fixture=terminal");
-  await expect(page.getByTestId("app-shell-main")).toBeFocused();
-  await expect(page.getByTestId("teacher-schedule-retry-link")).toHaveCount(0);
+  await expect(page.locator("body")).not.toContainText(foreignTask);
 });
 
 test("Teacher DOM has no sensitive or mutating capability", async ({ page }) => {
-  await page.goto("/teacher/schedule/schedule-garden?from=2026-08-12&to=2026-08-20");
+  await page.goto(`/teacher/schedule/${world().id("task:1:1")}`);
   const body = page.locator("body");
   await expect(body).not.toContainText(
     /e-mail|email|telefon|lakhely|családi|védett indok|hozzárendelés/iu,
   );
+  // The one form of the page is the shell's sign-out form.
   await expect(page.locator("form")).toHaveCount(1);
-  await expect(
-    page.locator('button:not([data-testid="app-shell-switch-profile-button"])'),
-  ).toHaveCount(0);
-  await expect(
-    page.locator('input:not([data-testid="app-shell-switch-profile-input"])'),
-  ).toHaveCount(0);
+  // The only controls are the shell's: the sign-out button, nothing that edits.
+  await expect(page.locator('button:not([data-testid="sign-out-button"])')).toHaveCount(0);
+  await expect(page.locator('input:not([type="hidden"])')).toHaveCount(0);
   await expect(page.getByRole("button", { name: /szerkeszt|módosít|mentés|törlés/iu })).toHaveCount(
     0,
   );
@@ -147,57 +114,44 @@ test("@a11y Teacher supports keyboard, focus, zoom, touch, mobile cards, and axe
 
   if (testInfo.project.name === "mobile-chrome") {
     await expect(page.getByTestId("teacher-schedule-card-list")).toBeVisible();
-    const box = await page.getByTestId("teacher-schedule-card-open-schedule-garden").boundingBox();
+    const box = await entryOpen(page, testInfo.project.name, world().id("task:1:1")).boundingBox();
     expect(box?.height ?? 0).toBeGreaterThanOrEqual(44);
   }
   const results = await new AxeBuilder({ page }).analyze();
-  expect(
-    results.violations.filter(({ impact }) => impact === "serious" || impact === "critical"),
-  ).toEqual([]);
+  expect(results.violations.filter(SERIOUS)).toEqual([]);
 });
 
-test("Teacher current responsibility assignment status and absence match list/detail layouts", async ({
+test("Teacher current responsibility, assignment and status match list and detail layouts", async ({
   page,
 }, testInfo) => {
+  const baking = world().id("task:1:1");
   await page.goto("/teacher/schedule");
-  const row = page.getByTestId(
-    testInfo.project.name === "mobile-chrome"
-      ? "teacher-schedule-card-schedule-garden"
-      : "teacher-schedule-row-schedule-garden",
-  );
-  // The source word "Ütemezett" is shown as the shared status word "Ütemezve".
-  for (const text of ["Kitalált Dóra", "Kitalált Eszter", "Ütemezve"])
+  const row = entry(page, testInfo.project.name, baking);
+  // The seed places two families on the baking task; the first of them is the responsible one.
+  for (const text of ["Szabó család", "Horváth család", "Nyitott", "Tóth Mária"])
     await expect(row).toContainText(text);
-  await page.goto("/teacher/schedule/schedule-garden");
-  for (const text of ["Kitalált Dóra", "Kitalált Eszter", "Ütemezve"])
-    await expect(page.getByTestId("teacher-schedule-detail-fields")).toContainText(text);
-  await page.goto("/teacher/schedule?groupId=group-sunflower");
-  const missing = page.getByTestId(
-    testInfo.project.name === "mobile-chrome"
-      ? "teacher-schedule-card-schedule-coverage"
-      : "teacher-schedule-row-schedule-coverage",
-  );
-  for (const text of ["Nincs kijelölt felelős", "Nincs beosztott", "Nincs elérhető állapot"])
-    await expect(missing).toContainText(text);
-  await page.goto("/teacher/schedule/schedule-coverage?groupId=group-sunflower");
-  for (const text of ["Nincs kijelölt felelős", "Nincs beosztott", "Nincs elérhető állapot"])
+  await page.goto(`/teacher/schedule/${baking}`);
+  for (const text of ["Szabó család", "Horváth család", "Nyitott"])
     await expect(page.getByTestId("teacher-schedule-detail-fields")).toContainText(text);
 });
+
 test("Teacher old bookmarks redirect safely and destination independently denies or validates", async ({
   page,
 }) => {
+  const group = world().id("group:1");
+  const day = seedDay(EVENT_DAY);
   const response = await page.request.get(
-    "/munkatars/beosztas?csoport=group-oak&kezdet=2026-08-14&veg=2026-08-14&scenario=terminal&returnTo=https://evil.invalid",
+    `/munkatars/beosztas?csoport=${group}&kezdet=${day}&veg=${day}&returnTo=https://evil.invalid`,
     { maxRedirects: 0 },
   );
   expect(response.status()).toBe(307);
   expect(response.headers()["set-cookie"]).toBeUndefined();
   expect(response.headers()["location"]).toBe(
-    "/teacher/schedule?groupId=group-oak&from=2026-08-14&to=2026-08-14",
+    `/teacher/schedule?groupId=${group}&from=${day}&to=${day}`,
   );
-  await page.goto("/munkatars/beosztas?csoport=group-ungranted&kezdet=bad");
+  await page.goto(`/munkatars/beosztas?csoport=${world().id("group:2")}&kezdet=bad`);
   await expect(page.getByTestId("teacher-schedule-denied")).toBeVisible();
-  await page.goto("/munkatars/beosztas?csoport=group-oak&csoport=group-sunflower");
+  await page.goto(`/munkatars/beosztas?csoport=${group}&csoport=${world().id("group:2")}`);
   await expect(page.getByTestId("teacher-schedule-validation")).toBeVisible();
   await expect(page.getByTestId("teacher-schedule-table")).toHaveCount(0);
 });
@@ -205,33 +159,28 @@ test("Teacher old bookmarks redirect safely and destination independently denies
 test("Teacher opens an entry with a click on any part of its row or card and by keyboard", async ({
   page,
 }, testInfo) => {
-  const isMobile = testInfo.project.name === "mobile-chrome";
+  const mobile = isMobile(testInfo.project.name);
+  const baking = world().id("task:1:1");
   await page.goto("/teacher/schedule");
-  const item = page.getByTestId(
-    isMobile ? "teacher-schedule-card-schedule-garden" : "teacher-schedule-row-schedule-garden",
-  );
+  const item = entry(page, testInfo.project.name, baking);
   // A click on the item's text outside its title opens the same detail page.
   // The stretched link covers the item, so click by position like a person would.
-  const target = isMobile ? item.locator("dd").first() : item.getByRole("cell").nth(3);
+  const target = mobile ? item.locator("dd").first() : item.getByRole("cell").nth(3);
   await target.scrollIntoViewIfNeeded();
   const box = (await target.boundingBox())!;
   await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
-  await expect(page).toHaveURL(/\/teacher\/schedule\/schedule-garden/);
+  await expect(page).toHaveURL(new RegExp(`/teacher/schedule/${baking}`));
   await expect(page.getByTestId("teacher-schedule-detail-fields")).toBeVisible();
   await page.getByTestId("teacher-schedule-detail-back-link").click();
   // The list was unfiltered, so the way back is the bare schedule address.
   await expect(page).toHaveURL(/\/teacher\/schedule$/);
 
   // Keyboard: the one link of the row or card is reachable and opens the entry with Enter.
-  const link = page.getByTestId(
-    isMobile
-      ? "teacher-schedule-card-open-schedule-garden"
-      : "teacher-schedule-open-schedule-garden",
-  );
+  const link = entryOpen(page, testInfo.project.name, baking);
   await link.focus();
   await expect(link).toBeFocused();
   await page.keyboard.press("Enter");
-  await expect(page).toHaveURL(/\/teacher\/schedule\/schedule-garden/);
+  await expect(page).toHaveURL(new RegExp(`/teacher/schedule/${baking}`));
 });
 
 test("Teacher has no menu and finds the way back to Beosztás from other pages", async ({

@@ -2,11 +2,9 @@ import { AdminAccessState } from "../_components/AdminAccessState.tsx";
 import { ImportWorkflow } from "../_components/ImportWorkflow.tsx";
 import { resolveAdminFacade } from "../_lib/facade.ts";
 import { resolveAdminSession } from "../_lib/session.ts";
-import { isProductionMode } from "../../_identity/production-request.ts";
 import {
   cancelImportAction,
   commitImportAction,
-  createImportPreviewAction,
   recoverImportAction,
   resolveImportConflictAction,
   uploadImportWorkbookAction,
@@ -15,10 +13,9 @@ import {
 export default async function AdminImportPage({
   searchParams,
 }: Readonly<{ searchParams?: Promise<Readonly<Record<string, string | string[] | undefined>>> }>) {
-  const [session, facade, production, query] = await Promise.all([
+  const [session, facade, query] = await Promise.all([
     resolveAdminSession(),
     resolveAdminFacade(),
-    isProductionMode(),
     searchParams ?? Promise.resolve({}),
   ]);
   if (session.state !== "success" || !facade) return <AdminAccessState kind="denied" />;
@@ -29,24 +26,21 @@ export default async function AdminImportPage({
   // run, so it only applies while that run is the latest one: once the new upload has made a newer run, that
   // run is what shows, and later its own result.
   const newUpload =
-    production &&
     result.state === "success" &&
     (result.data.state === "committed" || result.data.state === "recovered") &&
     (query as Record<string, unknown>).uj === (result.data.runId ?? result.data.id);
   return (
     <section className="admin-page" data-testid="admin-import-page">
       <header>
-        <p className="eyebrow">Adminisztráció · szintetikus folyamat</p>
+        <p className="eyebrow">Adminisztráció · Import</p>
         <h1 tabIndex={-1} autoFocus>
           Importálás
         </h1>
         <p>Hét ellenőrizhető lépés, változatlan ujjlenyomat és egyszeri atomikus mentés.</p>
       </header>
       <ImportWorkflow
-        mode={production ? "production" : "synthetic"}
         preview={result.state === "success" && !newUpload ? result.data : undefined}
         actions={{
-          createPreview: createImportPreviewAction,
           resolveConflict: resolveImportConflictAction,
           commit: commitImportAction,
           recover: recoverImportAction,

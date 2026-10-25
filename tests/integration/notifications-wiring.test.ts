@@ -70,8 +70,6 @@ const session = (role: "super_admin" | "parent") => {
     ],
     roles: [role],
     scopes: [granted],
-    runtimeMode: "production" as const,
-    isSynthetic: false,
   };
 };
 
@@ -216,7 +214,6 @@ describe("production mode builds the notification and import operations (BR42.1)
   it("builds the production composition with the parser handed in, and its source reaches the reader only through the server door", () => {
     const composition = createProductionComposition(
       {
-        mode: "production",
         sessionSecret: "a-production-only-secret-with-32-chars",
         supabaseUrl: "https://example.supabase.co",
         supabaseAnonKey: "placeholder-anon-key-value",
@@ -251,14 +248,16 @@ describe("the interim port is out of the production path for these operations (B
     expect([...DATABASE_ADMIN_OPERATIONS].sort()).toEqual([...operations].sort());
   });
 
-  it("leaves the synthetic mode as it was: profiles, no database services, and the demo store of the advanced screens", async () => {
+  it("has one composition: it builds the database services and no profiles, whatever an old mode setting says", async () => {
     vi.stubEnv("APP_RUNTIME_MODE", "synthetic");
+    vi.stubEnv("APP_SESSION_SECRET", "a-production-only-secret-with-32-chars");
+    vi.stubEnv("SUPABASE_URL", "https://example.supabase.co");
+    vi.stubEnv("SUPABASE_ANON_KEY", "placeholder-anon-key-value");
     const composed = await composeRuntime();
     expect(composed.ok).toBe(true);
     if (!composed.ok) return;
-    expect(composed.value.mode).toBe("synthetic");
-    expect("services" in composed.value).toBe(false);
-    expect("profiles" in composed.value).toBe(true);
+    expect("services" in composed.value).toBe(true);
+    expect("profiles" in composed.value).toBe(false);
     vi.unstubAllEnvs();
   });
 });

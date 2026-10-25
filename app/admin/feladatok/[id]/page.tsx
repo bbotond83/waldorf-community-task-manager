@@ -18,7 +18,7 @@ import { denied, terminalFailure } from "../../../../src/application/results.ts"
 import { statusDisplay } from "../../../../src/application/status-labels.ts";
 import { StatusBadge } from "../../../../src/runtime/StatusBadge.tsx";
 
-/** The real-data form is used when the data source says what the item is; the synthetic one never does. */
+/** The edit form is used when the data source says what the item is. */
 function isTaskKind(kind: AdminItemModel["kind"]): kind is "task" | "event" {
   return kind === "task" || kind === "event";
 }
@@ -184,20 +184,6 @@ export default async function TaskDetailPage({
             )}
             <DeveloperDetails>
               <p>Verzió: {task.version}</p>
-              <label htmlFor="scenario">Kapacitási helyzet</label>
-              <select
-                id="scenario"
-                name="scenario"
-                form="admin-assignment-form"
-                defaultValue={typeof query.scenario === "string" ? query.scenario : "eligible"}
-                data-testid="admin-assignment-scenario-select"
-              >
-                <option value="eligible">Jogosult, van hely</option>
-                <option value="ineligible">Nem jogosult</option>
-                <option value="full">Betelt kapacitás</option>
-                <option value="retryable">Átmeneti szolgáltatáshiba</option>
-                <option value="terminal">Végleges szolgáltatáshiba</option>
-              </select>
             </DeveloperDetails>
           </div>
         )}

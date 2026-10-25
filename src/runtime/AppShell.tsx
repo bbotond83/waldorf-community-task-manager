@@ -7,11 +7,7 @@ type AppShellProps = {
   profile: ShellProfile;
   children: ReactNode;
   statusMessage?: string;
-  /**
-   * What the header offers in place of the test-profile switcher. The synthetic mode passes nothing and
-   * keeps the switcher; a real person's session passes its own control (the sign-out button), because a
-   * real person never switches to a test profile.
-   */
+  /** What the header offers next to the person's name: the sign-out button of the real session. */
   headerAction?: ReactNode;
 };
 
@@ -32,27 +28,7 @@ export function AppShell({ profile, children, statusMessage, headerAction }: App
             </p>
           </div>
         </div>
-        {headerAction ?? (
-          <form
-            action="/api/synthetic/session"
-            method="post"
-            data-testid="app-shell-switch-profile-form"
-          >
-            <input
-              type="hidden"
-              name="profileId"
-              value=""
-              data-testid="app-shell-switch-profile-input"
-            />
-            <button
-              className="secondary-button"
-              type="submit"
-              data-testid="app-shell-switch-profile-button"
-            >
-              Tesztprofil váltása
-            </button>
-          </form>
-        )}
+        {headerAction}
       </header>
 
       {profile.navigation.length > 0 && <AppNav items={profile.navigation} />}

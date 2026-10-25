@@ -1,4 +1,4 @@
-import type { TrackingSourceRecord } from "../teacher-tracking/tracking-model.ts";
+import type { TrackingSourceRecord } from "../application/tracking-model.ts";
 import { scheduleStatusLabel } from "./copy.ts";
 import { malformedResponse } from "./errors.ts";
 import { optionalText, text, type Row } from "./values.ts";

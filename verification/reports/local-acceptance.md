@@ -1,9 +1,8 @@
 # Local Acceptance Report
 
-- Git SHA: `71a3b5f8d74be036b10571690e439d865fb5d664`
-- Fixture: `waldorf-local-v1`
-- Manifest: `waldorf-scenarios-v1` (SHA-256 `261ffedec4261ac5754e0c965d70a9a58c0ec126c5d92f9618178f1b3ad116be`)
-- Generated from evidence completed at: `2026-10-01T08:13:45.144Z`
+- Git SHA: `4db6acbf6a98364f8719f2755bac02db591ca5ec`
+- Manifest: `waldorf-scenarios-v1` (SHA-256 `0a911aa974ac3d0435e7613440f7ff48c8422e043c164873aa9af8119f4bf896`)
+- Generated from evidence completed at: `2026-10-24T16:44:36.801Z`
 - Results: 33 PASS, 0 FAIL, 6 OUTSTANDING
 
 | Scenario | Target | Result | Tool | Artifact |
@@ -18,7 +17,7 @@
 | LOCAL-PARENT-A11Y-RECOVERY | local | PASS | `npm run test:a11y` | `.verification/logs/browser.log` |
 | LOCAL-INVITATION-AUTH | local | PASS | `npm run test:browser` | `.verification/logs/browser.log` |
 | LOCAL-EVENT-NOTES | local | PASS | `npm run test:browser` | `.verification/logs/browser.log` |
-| LOCAL-STAFF-SCHEDULE | local | PASS | `npm run test:browser` | `.verification/logs/browser.log` |
+| LOCAL-TEACHER-TRACKING | local | PASS | `npm run test:browser` | `.verification/logs/browser.log` |
 | LOCAL-ADMIN-RECORDS | local | PASS | `npm run test:browser` | `.verification/logs/browser.log` |
 | LOCAL-ADMIN-ARCHIVE | local | PASS | `npm run test:browser` | `.verification/logs/browser.log` |
 | LOCAL-ADMIN-TASKS | local | PASS | `npm run test:browser` | `.verification/logs/browser.log` |

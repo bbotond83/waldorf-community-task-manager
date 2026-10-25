@@ -222,6 +222,10 @@ export const ELEVATED: Record<
   import_mark_interrupted: "authenticated",
   import_expire: "authenticated",
   import_expire_system: "service_role",
+  // U5 audit purge (NFR1.68): deletes audit events older than 365 days. Elevated because no application role holds
+  // a delete right on the audit table; it checks that the caller is the system, sets the transaction-local purge
+  // setting for its own transaction only, and is called by identity_housekeeping (the service-role key).
+  audit_purge: "service_role",
 };
 
 /** Tables with row-level security and the test that covers each (NFR1.2): fails when one has no entry. */

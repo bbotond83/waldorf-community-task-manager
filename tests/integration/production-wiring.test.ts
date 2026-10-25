@@ -27,11 +27,7 @@ import { resolveTeacherSession } from "../../app/teacher/_lib/session.ts";
 import { parseWorkbook } from "../../src/import-parser/workbook.ts";
 import { composeRuntime } from "../../src/runtime/composition.ts";
 import { createProductionComposition } from "../../src/runtime/production/composition.ts";
-import {
-  createProductionServices,
-  RoutedAdminPort,
-} from "../../src/runtime/production/services.ts";
-import type { AdminApplicationPort, AdminOperation } from "../../src/application/index.ts";
+import { createProductionServices } from "../../src/runtime/production/services.ts";
 
 const ACCOUNT = "bbbbbbbb-0000-4000-8000-000000000014";
 const ORG = "aaaaaaaa-0000-4000-8000-000000000001";
@@ -39,7 +35,6 @@ const FAMILY = "cccccccc-0000-4000-8000-000000000201";
 const GROUP = "cccccccc-0000-4000-8000-000000000101";
 
 const PRODUCTION = {
-  APP_RUNTIME_MODE: "production",
   APP_SESSION_SECRET: "a-production-only-secret-with-32-chars",
   SUPABASE_URL: "https://example.supabase.co",
   SUPABASE_ANON_KEY: "placeholder-anon-key-value",
@@ -92,9 +87,10 @@ describe("the production composition", () => {
     stubProduction();
     const composed = await composeRuntime();
     expect(composed.ok).toBe(true);
-    if (!composed.ok || composed.value.mode !== "production") throw new Error("not production");
+    if (!composed.ok) throw new Error("not composed");
     expect(composed.value.authenticationBoundary).toBe("supabase-session");
     expect("profiles" in composed.value).toBe(false);
+    expect("mode" in composed.value).toBe(false);
     const request = composed.value.services.forRequest("token-a");
     expect(request.parent.constructor.name).toBe("ParentApplicationFacade");
     expect(request.admin.constructor.name).toBe("AdminApplicationFacade");
@@ -108,7 +104,6 @@ describe("the production composition", () => {
     const fake = fakeData();
     const composition = createProductionComposition(
       {
-        mode: "production",
         sessionSecret: PRODUCTION.APP_SESSION_SECRET,
         supabaseUrl: PRODUCTION.SUPABASE_URL,
         supabaseAnonKey: PRODUCTION.SUPABASE_ANON_KEY,
@@ -119,7 +114,6 @@ describe("the production composition", () => {
     expect(fake.tokens).toEqual(["the-token"]);
     const withSchema = createProductionComposition(
       {
-        mode: "production",
         sessionSecret: PRODUCTION.APP_SESSION_SECRET,
         supabaseUrl: PRODUCTION.SUPABASE_URL,
         supabaseAnonKey: PRODUCTION.SUPABASE_ANON_KEY,
@@ -132,7 +126,7 @@ describe("the production composition", () => {
   it("keeps the shared authorization slot closed: it knows no version and denies", async () => {
     stubProduction();
     const composed = await composeRuntime();
-    if (!composed.ok || composed.value.mode !== "production") throw new Error("not production");
+    if (!composed.ok) throw new Error("not composed");
     const { application } = composed.value;
     const result = await application.authorization.authorize(
       {
@@ -142,8 +136,6 @@ describe("the production composition", () => {
         grants: [],
         roles: [],
         scopes: [],
-        runtimeMode: "production",
-        isSynthetic: false,
       },
       {
         matrixRowId: "AUTH-PARENT-DUTIES",
@@ -155,57 +147,18 @@ describe("the production composition", () => {
     expect(result.state).not.toBe("success");
   });
 
-  it("leaves the synthetic mode as it was: profiles and no database services", async () => {
+  it("has no other mode to compose: an old mode setting changes nothing", async () => {
+    stubProduction();
     vi.stubEnv("APP_RUNTIME_MODE", "synthetic");
     const composed = await composeRuntime();
     expect(composed.ok).toBe(true);
     if (!composed.ok) return;
-    expect(composed.value.mode).toBe("synthetic");
-    expect("services" in composed.value).toBe(false);
-    expect("profiles" in composed.value).toBe(true);
+    expect("services" in composed.value).toBe(true);
+    expect("profiles" in composed.value).toBe(false);
   });
 });
 
-describe("the routing rule between the database and another admin port", () => {
-  const record = (name: string) => {
-    const seen: string[] = [];
-    const port: AdminApplicationPort = {
-      async execute(input) {
-        seen.push(`${name}:${input.operation}`);
-        return { state: "empty" };
-      },
-    };
-    return { port, seen };
-  };
-
-  it("routes every operation the database answers, import and reminders included, to the database", async () => {
-    const database = record("database");
-    const interim = record("interim");
-    const routed = new RoutedAdminPort(database.port, interim.port);
-    const scope = { id: ORG, type: "organization" as const, organizationId: ORG };
-    const operations: AdminOperation[] = [
-      "records.list",
-      "records.save",
-      "tasks.save",
-      "assignments.remove",
-      "approvals.decide",
-      "settings.save",
-      "governance.update",
-      "lifecycle.run",
-      "dashboard.get",
-      "import.preview",
-      "import.status",
-      "import.commit",
-      "reminders.list",
-      "reminders.retry",
-    ];
-    for (const operation of operations) {
-      await routed.execute({ actorId: ACCOUNT, operation, scope, payload: {} });
-    }
-    expect(interim.seen).toEqual([]);
-    expect(database.seen).toHaveLength(operations.length);
-  });
-
+describe("the admin import status in a production request", () => {
   it("answers the import status from the database inside a production request", async () => {
     const { services, fake } = readyRequest({
       ...world([grant("super_admin", "organization", ORG)]),
@@ -228,8 +181,6 @@ describe("the routing rule between the database and another admin port", () => {
       ],
       roles: ["super_admin" as const],
       scopes: [scope],
-      runtimeMode: "production" as const,
-      isSynthetic: false,
     };
     const result = await services.admin.import.status(session, scope);
     expect(result.state).toBe("empty");
@@ -248,7 +199,7 @@ describe("the session helpers in the production mode", () => {
     expect(session.data.familyId).toBe(FAMILY);
     expect(session.data.familyScope).toEqual({ id: FAMILY, type: "family", organizationId: ORG });
     expect(session.data.applicationSession.subjectId).toBe(ACCOUNT);
-    expect(session.data.applicationSession.runtimeMode).toBe("production");
+    expect("runtimeMode" in session.data.applicationSession).toBe(false);
     expect(session.data.profile.label).toBe("Szülő");
     expect(session.data.profile.navigation.map((item) => item.href)).toContain("/szulo/feladatok");
   });
@@ -330,7 +281,7 @@ describe("the session helpers in the production mode", () => {
         { id: GROUP, type: "group", organizationId: ORG },
       ]);
     }
-    expect(await resolveTeacherFacade("denied")).toBeDefined();
+    expect(await resolveTeacherFacade()).toBeDefined();
   });
 
   it("treats a request with no sign-in as signed out and one that cannot be checked as unavailable", async () => {

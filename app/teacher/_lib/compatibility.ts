@@ -1,4 +1,4 @@
-import { isCalendarDate } from "../../../src/teacher-tracking/tracking-model.ts";
+import { isCalendarDate } from "../../../src/application/tracking-model.ts";
 export type SearchParams = Readonly<Record<string, string | string[] | undefined>>;
 export const INVALID_FILTER = "invalid";
 export function isGroupIdentifier(value: unknown): value is string {

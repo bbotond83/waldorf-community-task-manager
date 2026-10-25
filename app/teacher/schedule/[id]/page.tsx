@@ -25,7 +25,7 @@ export default async function TeacherScheduleDetailPage({
   if (session.state === "signed-out") redirect("/");
   if (session.state !== "success") return null;
   const filters = parseTeacherFilters(await searchParams, session.data.applicationSession);
-  const facade = await resolveTeacherFacade(filters.scenario);
+  const facade = await resolveTeacherFacade();
   if (session.state !== "success" || !facade) return null;
   const result = await facade.getScheduleEntry(session.data.applicationSession, {
     groupScope: filters.groupScope,

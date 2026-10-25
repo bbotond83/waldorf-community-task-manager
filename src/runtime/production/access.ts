@@ -8,7 +8,7 @@ import {
   PARENT_NAVIGATION,
   SUPER_ADMIN_NAVIGATION,
   TEACHER_NAVIGATION,
-} from "../synthetic/profiles.ts";
+} from "../navigation.ts";
 
 /**
  * What a signed-in account may do on the parent, admin and teacher pages, read from the database as the

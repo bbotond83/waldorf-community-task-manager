@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import type { Scope } from "../access/index.ts";
-import { SyntheticAdminPort } from "../admin-core/synthetic-admin.ts";
+import { AdminPortDouble } from "../../tests/support/port-doubles.ts";
 import {
   ADMIN_LIST_STATUS_OPTIONS,
   DUTY_STATE_LABELS,
@@ -69,8 +69,8 @@ const FORBIDDEN_ENGLISH_WORDS = [
   /\bretry\b/i,
 ];
 
-async function syntheticAdminStates(): Promise<string[]> {
-  const port = new SyntheticAdminPort();
+async function fixtureAdminStates(): Promise<string[]> {
+  const port = new AdminPortDouble();
   const states = new Set<string>();
   for (const operation of ["records.list", "tasks.list", "approvals.list"] as const) {
     const outcome = await port.execute({
@@ -90,9 +90,9 @@ async function syntheticAdminStates(): Promise<string[]> {
 }
 
 describe("statusLabel", () => {
-  it("labels every status value the synthetic admin data can produce", async () => {
-    const states = await syntheticAdminStates();
-    assert.ok(states.length >= 6, "the synthetic data exposes the six list states");
+  it("labels every status value the admin list fixtures can produce", async () => {
+    const states = await fixtureAdminStates();
+    assert.ok(states.length >= 6, "the fixtures expose the six list states");
     for (const state of states) {
       assert.notEqual(statusLabel(state), UNKNOWN_STATUS_LABEL, `no label for ${state}`);
     }
@@ -168,8 +168,8 @@ describe("ADMIN_LIST_STATUS_OPTIONS", () => {
     approvals: "approvals.list",
   } as const;
 
-  it("offers only labelled statuses, each once, and every status the demo data holds", async () => {
-    const port = new SyntheticAdminPort();
+  it("offers only labelled statuses, each once, and every status the fixtures hold", async () => {
+    const port = new AdminPortDouble();
     for (const kind of Object.keys(ADMIN_LIST_STATUS_OPTIONS) as AdminListKind[]) {
       const offered: readonly string[] = ADMIN_LIST_STATUS_OPTIONS[kind];
       assert.equal(new Set(offered).size, offered.length, `${kind} repeats a status`);
@@ -193,8 +193,8 @@ describe("ADMIN_LIST_STATUS_OPTIONS", () => {
     }
   });
 
-  it("returns a result for every offered value that the demo data holds", async () => {
-    const port = new SyntheticAdminPort();
+  it("returns a result for every offered value that the fixtures hold", async () => {
+    const port = new AdminPortDouble();
     for (const kind of ["records", "tasks"] as const) {
       for (const value of ADMIN_LIST_STATUS_OPTIONS[kind]) {
         const outcome = await port.execute({

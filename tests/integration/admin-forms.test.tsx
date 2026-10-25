@@ -5,7 +5,6 @@ import type { AdminActionState } from "../../app/admin/actions.ts";
 import type { AdminLookups } from "../../app/admin/_lib/lookups.ts";
 
 const world = vi.hoisted(() => ({
-  production: true,
   submitted: [] as { action: string; data: FormData }[],
   answer: { state: "success", message: "Mentve." } as AdminActionState,
   lookups: undefined as AdminLookups | undefined,
@@ -18,10 +17,6 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: vi.fn() }),
   usePathname: () => "/admin",
   useSearchParams: () => new URLSearchParams(),
-}));
-vi.mock("../../app/_identity/production-request.ts", () => ({
-  isProductionMode: async () => world.production,
-  productionRequest: async () => ({ state: "not-production" }),
 }));
 vi.mock("../../app/admin/_lib/request-lookups.ts", () => ({
   resolveAdminLookups: async () =>
@@ -85,7 +80,6 @@ const LOOKUPS: AdminLookups = {
 };
 
 beforeEach(() => {
-  world.production = true;
   world.submitted = [];
   world.answer = { state: "success", message: "Mentve." };
   world.lookups = LOOKUPS;
@@ -502,26 +496,25 @@ async function renderNode(node: Promise<React.ReactNode>) {
 }
 
 describe("the admin pages with real data", () => {
-  it("builds the create pages from the extended fields in the production mode", async () => {
+  it("builds the create pages from the extended fields", async () => {
     await renderNode(NewRecordPage());
     expect(screen.getByLabelText("Elem típusa")).toBeInTheDocument();
     expect(screen.getByLabelText("A család neve")).toBeInTheDocument();
     expect(screen.getByTestId("admin-record-create-form")).toBeInTheDocument();
+    expect(document.querySelector('input[name="extended"]')).toHaveValue("1");
   });
 
-  it("keeps the one-field create pages in the synthetic mode", async () => {
-    world.production = false;
+  it("marks both create pages as extended forms, never the old title-only variant", async () => {
     const record = await renderNode(NewRecordPage());
-    expect(screen.getByLabelText("Megnevezés")).toBeInTheDocument();
-    expect(screen.queryByLabelText("Csoport")).not.toBeInTheDocument();
-    expect(document.querySelector('input[name="extended"]')).toBeNull();
+    expect(document.querySelector('input[name="extended"]')).toHaveValue("1");
+    expect(screen.getByLabelText("A család neve")).toBeInTheDocument();
     record.unmount();
     await renderNode(NewTaskPage());
-    expect(screen.getByLabelText("Megnevezés")).toBeInTheDocument();
-    expect(screen.queryByLabelText("Férőhelyek száma")).not.toBeInTheDocument();
+    expect(document.querySelector('input[name="extended"]')).toHaveValue("1");
+    expect(screen.getByLabelText("Férőhelyek száma")).toBeInTheDocument();
   });
 
-  it("builds the task create page from the extended fields in the production mode", async () => {
+  it("builds the task create page from the extended fields", async () => {
     await renderNode(NewTaskPage());
     expect(screen.getByLabelText("Férőhelyek száma")).toBeInTheDocument();
   });

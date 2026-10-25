@@ -101,7 +101,6 @@ export async function saveTaskAction(
     payload: {
       title: title.data,
       kind,
-      scenario: stringValue(formData, "scenario"),
       ...extras.payload,
     },
   });
@@ -118,7 +117,7 @@ export async function assignTaskAction(
 ): Promise<AdminActionState> {
   const context = parseMutationContext(formData);
   if (!context.ok) return context.state;
-  // The family selector exists on the real-data form only; the synthetic form assigns the demo family.
+  // The family selector sends `familySelector`; choosing no family is a field error.
   const familyId = stringValue(formData, "familyId");
   if (formData.has("familySelector") && familyId === "") {
     return mapApplicationResult(validation({ familyId: "Válassza ki a családot." }));
@@ -128,7 +127,7 @@ export async function assignTaskAction(
   const result = await boundary.facade.assign(boundary.session.applicationSession, {
     scope: boundary.session.scope,
     ...context.value,
-    payload: { scenario: stringValue(formData, "scenario"), ...(familyId ? { familyId } : {}) },
+    payload: familyId ? { familyId } : {},
   });
   if (result.state === "success") revalidatePath(`/admin/feladatok/${context.value.id}`);
   return mapApplicationResult(result, "A hozzárendelés sikerült.");
@@ -152,7 +151,7 @@ export async function decideApprovalAction(
     scope: boundary.session.scope,
     ...context.value,
     decision,
-    payload: { scenario: stringValue(formData, "scenario") },
+    payload: {},
   });
   if (result.state === "success") {
     revalidatePath("/admin/jovahagyasok");
@@ -212,7 +211,7 @@ async function runRecordStateAction(
   const input = {
     scope: boundary.session.scope,
     ...context.value,
-    payload: { scenario: stringValue(formData, "scenario") },
+    payload: {},
   };
   const result =
     operation === "archive"

@@ -50,6 +50,10 @@ export const DATABASE_TEST_FILES = [
   "tests/database/import-privacy.test.ts",
   "tests/database/notifications-timing.test.ts",
   "tests/database/notifications-adapters.test.ts",
+  "tests/database/audit-purge.test.ts",
+  "tests/database/seed.test.ts",
+  "tests/database/reset.test.ts",
+  "tests/database/seed-timing.test.ts",
 ] as const;
 
 /** A small seeded generator (mulberry32), so a printed seed reproduces the order. */

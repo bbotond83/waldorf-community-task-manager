@@ -29,8 +29,6 @@ function session(role: SessionContext["roles"][number], scope: Scope): SessionCo
     ...sessionGrantBindings(`${role}-1`, role, [scope]),
     roles: [role],
     scopes: [scope],
-    runtimeMode: "production",
-    isSynthetic: false,
   };
 }
 
@@ -221,7 +219,7 @@ describe("the swap operations of the parent facade (BR32.7)", () => {
     assert.equal(port.calls.length, 0);
   });
 
-  it("denies the operations when the adapter has none of them, as for a synthetic adapter", async () => {
+  it("denies the operations when the adapter has none of them, as for a minimal adapter", async () => {
     const synthetic = new SwapPort();
     const bare: ParentApplicationPort = {
       listDuties: synthetic.listDuties.bind(synthetic),

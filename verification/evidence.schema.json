@@ -9,7 +9,6 @@
     "storyIds",
     "requirementIds",
     "matrixRows",
-    "fixtureVersion",
     "manifestVersion",
     "runtimeMode",
     "target",
@@ -31,9 +30,8 @@
       "items": { "type": "string", "minLength": 1 }
     },
     "matrixRows": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
-    "fixtureVersion": { "const": "waldorf-local-v1" },
     "manifestVersion": { "const": "waldorf-scenarios-v1" },
-    "runtimeMode": { "enum": ["synthetic", "linked-target"] },
+    "runtimeMode": { "enum": ["database", "linked-target"] },
     "target": { "enum": ["local", "linked-target"] },
     "tool": { "type": "string", "minLength": 1 },
     "toolVersion": { "type": "string", "minLength": 1 },

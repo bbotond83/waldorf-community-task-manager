@@ -42,7 +42,14 @@ test("create and read of requests stay as they were, and the new actions open no
   const parent = grant("parent", family);
   assert.equal(allows(parent, "create", "swap_request", family), true);
   assert.equal(allows(parent, "read", "cancellation_request", family), true);
-  for (const kind of ["assignment", "contribution", "notification", "family", "schedule", "record"]) {
+  for (const kind of [
+    "assignment",
+    "contribution",
+    "notification",
+    "family",
+    "schedule",
+    "record",
+  ]) {
     assert.equal(allows(parent, "respond", kind, family), false, `respond ${kind}`);
     assert.equal(allows(parent, "withdraw", kind, family), false, `withdraw ${kind}`);
   }
@@ -76,7 +83,9 @@ test("an action nobody knows is refused for every role", () => {
 });
 
 test("the parent row of the matrix lists the new actions and no other row does", () => {
-  const rows = AUTHORIZATION_MATRIX.filter((row) => row.actions.some((action) => action === "respond" || action === "withdraw"));
+  const rows = AUTHORIZATION_MATRIX.filter((row) =>
+    row.actions.some((action) => action === "respond" || action === "withdraw"),
+  );
   assert.deepEqual(
     rows.map((row) => row.id),
     ["AUTH-PARENT-DUTIES"],

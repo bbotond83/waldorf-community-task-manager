@@ -9,15 +9,8 @@ import { terminalFailure } from "../../../../src/application/results.ts";
 import { statusDisplay } from "../../../../src/application/status-labels.ts";
 import { StatusBadge } from "../../../../src/runtime/StatusBadge.tsx";
 
-export default async function ArchiveDetailPage({
-  params,
-  searchParams,
-}: {
-  params: Promise<{ id: string }>;
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-}) {
+export default async function ArchiveDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const query = await searchParams;
   const session = await resolveAdminSession();
   const facade = await resolveAdminFacade();
   const result =
@@ -53,11 +46,6 @@ export default async function ArchiveDetailPage({
                 type="hidden"
                 name="idempotencyKey"
                 value={`record:restore:${record.id}:${randomUUID()}`}
-              />
-              <input
-                type="hidden"
-                name="scenario"
-                value={query.scenario === "conflict" ? "restore-conflict" : ""}
               />
             </AdminMutationForm>
           </>

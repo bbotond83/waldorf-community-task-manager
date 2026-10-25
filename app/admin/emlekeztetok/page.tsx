@@ -72,7 +72,7 @@ export default async function ReminderMonitorPage({
                   <dd>{job.recipientSummary}</dd>
                 </div>
               </dl>
-              <p className="synthetic-label">
+              <p className="delivery-note">
                 {job.providerLabel}; valódi szolgáltatói kézbesítés: OUTSTANDING.
               </p>
               {job.status === "retryable" && (
