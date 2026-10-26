@@ -7,6 +7,7 @@ import {
   assertLocalStackPassword,
   connectLocalStack,
   IDENTITY_QUERY,
+  LOCAL_STACK_DB_PASSWORD_HASH,
   LOCAL_STACK_JWT_HASH,
   resolveSeedSchema,
   SEED_SCHEMAS,
@@ -102,6 +103,21 @@ describe("local-only guard: the connection password marker", () => {
         url,
       );
     }
+  });
+
+  // Finding B4 (U1 review R-10): a refused custom password said only that this is not the local stack.
+  it("tells a developer with a custom local password what the limit is, without echoing the password", () => {
+    const secret = "my-custom-local-password";
+    let message = "";
+    try {
+      assertLocalStackPassword(`postgresql://postgres:${secret}@127.0.0.1:54322/postgres`);
+    } catch (error) {
+      message = (error as Error).message;
+    }
+    assert.match(message, /default local database password/);
+    assert.match(message, /restart the stack with the default password/);
+    assert.ok(!message.includes(secret), "the password is never echoed");
+    assert.ok(!message.includes(LOCAL_STACK_DB_PASSWORD_HASH), "the stored hash is never echoed");
   });
 
   it("refuses a loopback database with another password before connecting, so nothing can change", async () => {

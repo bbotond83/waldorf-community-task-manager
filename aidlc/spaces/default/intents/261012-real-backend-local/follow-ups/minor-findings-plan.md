@@ -46,6 +46,7 @@ B3. Denied-call audit events carry caller-supplied labels (U1 R-02).
 
 B4. Custom local database password gives a dead-end message (U1 R-10).
 - Plan: add one sentence to the refusal message and to the README line: seed and reset only work with the Supabase CLI's default local password. Test: the message contains the hint.
+- **Done (branch `fix/local-password-hint`, intent `261026-local-password-hint`).** The refusal message and the README now say that the seed and the reset work only with the Supabase CLI's default local database password and that the stack must be restarted with it; a test checks the hint and that neither the password nor the stored hash is echoed.
 
 B5. Reset guard on a hosted database through a loopback tunnel (U1 R-09) was fixed by the password check. Confirm `db:worker` applies an equivalent address check; add the same guard if it does not.
 

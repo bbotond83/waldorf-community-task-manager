@@ -81,7 +81,7 @@ or that does not identify itself as the local stack, and they change nothing whe
 All three commands take `--schema <name>`: `public` (the default, what `npm run dev` uses), or `worker_1` to
 `worker_4` (the test schemas). Any other name is refused. Example: `npm run db:seed -- --schema worker_2`.
 
-The seed and the reset also refuse a database whose connection password is not the local stack's default, so a hosted database reached through a tunnel on this machine is never touched.
+The seed and the reset also refuse a database whose connection password is not the local stack's default, so a hosted database reached through a tunnel on this machine is never touched. This means the seed and the reset work only with the Supabase CLI's default local database password; a stack started with a custom password has to be restarted with the default one to use them.
 
 The seeded sign-in addresses are `<schema>.<tag>@example.test` with the tags `super-admin`, `group-admin-1`,
 `group-admin-2`, `teacher-1` and `parent-1` to `parent-6` (`parent-1` to `parent-30` in the large set). The fictitious

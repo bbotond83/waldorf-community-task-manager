@@ -53,7 +53,7 @@ export function assertLocalStackPassword(databaseUrl: string): void {
   if (hash !== LOCAL_STACK_DB_PASSWORD_HASH) {
     throw new ToolingError(
       "guard",
-      "The database connection does not use the local stack's default password, so it is not the local stack; nothing was changed.",
+      "The database connection does not use the local stack's default password, so it is not the local stack; nothing was changed. The seed and the reset work only with the Supabase CLI's default local database password: restart the stack with the default password to use them.",
     );
   }
 }
