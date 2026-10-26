@@ -1,0 +1,33 @@
+{
+  "stage": "code-generation",
+  "upstream_ids": [
+    "FR1.1",
+    "FR1.2",
+    "FR1.3",
+    "FR2.1",
+    "FR2.2",
+    "FR2.3",
+    "FR3",
+    "NFR1",
+    "NFR2",
+    "NFR3",
+    "NFR4"
+  ],
+  "coverage": [
+    { "id": "FR1.1", "status": "OK", "target": "src/identity/reset.ts" },
+    { "id": "FR1.2", "status": "OK", "target": "src/identity/reset.test.ts" },
+    { "id": "FR1.3", "status": "OK", "target": "src/identity/reset.test.ts" },
+    { "id": "FR2.1", "status": "OK", "target": "src/identity/reset.test.ts" },
+    { "id": "FR2.2", "status": "OK", "target": "src/identity/reset.test.ts" },
+    { "id": "FR2.3", "status": "OK", "target": "src/identity/reset.test.ts" },
+    {
+      "id": "FR3",
+      "status": "OK",
+      "target": "aidlc/spaces/default/intents/261012-real-backend-local/follow-ups/minor-findings-plan.md"
+    },
+    { "id": "NFR1", "status": "OK", "target": "src/identity/reset.test.ts" },
+    { "id": "NFR2", "status": "OK", "target": "src/identity/reset.ts" },
+    { "id": "NFR3", "status": "OK", "target": "src/identity/reset.test.ts" },
+    { "id": "NFR4", "status": "OK", "target": "src/identity/reset.test.ts" }
+  ]
+}

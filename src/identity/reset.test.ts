@@ -124,16 +124,18 @@ describe("using a reset link (BR2.4, BR2.12)", () => {
     assert.equal(result.state === "success" && result.data.tokens.accessToken, session.accessToken);
     assert.deepEqual(names(service.calls), ["verifyRecovery", "updatePassword"]);
     assert.deepEqual(service.calls[1]!.args, [session.accessToken, "new-password-1"]);
-    assert.deepEqual(admin.calls[0], {
-      name: "sessions_remove",
-      args: [{ p_user_id: ACCOUNT_ID, p_keep_session_id: SESSION_ID }],
-    });
-    assert.deepEqual(admin.calls[1]!.args, [
+    // The lockout is cleared first, then the other sessions end (review R-12).
+    assert.deepEqual(names(admin.calls), ["sign_in_attempt_clear", "sessions_remove"]);
+    assert.deepEqual(admin.calls[0]!.args, [
       {
         p_email_hash: keyedHash("person@example.test", SECRET, "email"),
         p_user_id: ACCOUNT_ID,
       },
     ]);
+    assert.deepEqual(admin.calls[1], {
+      name: "sessions_remove",
+      args: [{ p_user_id: ACCOUNT_ID, p_keep_session_id: SESSION_ID }],
+    });
     assert.deepEqual(
       events.events.map((entry) => entry.event),
       ["reset_used"],
@@ -202,5 +204,66 @@ describe("using a reset link (BR2.4, BR2.12)", () => {
     assert.equal(result.code, RESET_SESSIONS_NOT_ENDED);
     assert.deepEqual(names(broken.service.calls), ["verifyRecovery", "updatePassword", "signOut"]);
     assert.ok(broken.events.events.some((entry) => entry.event === "follow_up_failed"));
+  });
+
+  // Regression (finding B2, U2 review R-12): the lockout was cleared only after the sessions were ended, so a
+  // person who was locked out and whose other sessions could not be ended was told to sign in but stayed locked.
+  it("clears the lockout before ending the other sessions, so it is cleared even when that fails", async () => {
+    const broken = setup({ sessions_remove: () => envelope("denied", "admin_access_required") });
+    const result = await completePasswordReset(input, broken.deps);
+    assert.equal(result.state, "dependency-failure-terminal");
+    assert.equal(result.code, RESET_SESSIONS_NOT_ENDED);
+    // The clear came first and exactly once, then the three tries to end the sessions.
+    assert.deepEqual(names(broken.admin.calls), [
+      "sign_in_attempt_clear",
+      "sessions_remove",
+      "sessions_remove",
+      "sessions_remove",
+    ]);
+    assert.deepEqual(names(broken.service.calls), ["verifyRecovery", "updatePassword", "signOut"]);
+    assert.deepEqual(
+      broken.events.events.map((entry) => entry.event),
+      ["follow_up_failed"],
+      "reset_used is emitted only on full success",
+    );
+  });
+
+  it("keeps the outcome when the clear itself fails: a failed clear changes nothing", async () => {
+    const clearFails = setup({
+      sign_in_attempt_clear: () => envelope("denied", "admin_access_required"),
+    });
+    const succeeded = await completePasswordReset(input, clearFails.deps);
+    assert.equal(succeeded.state, "success");
+    assert.ok(names(clearFails.admin.calls).includes("sessions_remove"), "the sessions still end");
+
+    // Both the clear and the session removal fail: the terminal result is the same as when only the removal fails.
+    const bothFail = setup({
+      sign_in_attempt_clear: () => unavailable,
+      sessions_remove: () => envelope("denied", "admin_access_required"),
+    });
+    const result = await completePasswordReset(input, bothFail.deps);
+    assert.equal(result.state, "dependency-failure-terminal");
+    assert.equal(result.code, RESET_SESSIONS_NOT_ENDED);
+    assert.deepEqual(names(bothFail.service.calls), [
+      "verifyRecovery",
+      "updatePassword",
+      "signOut",
+    ]);
+  });
+
+  it("never clears the lockout without a valid code and a changed password", async () => {
+    const rejectedRule = setup();
+    await completePasswordReset({ ...input, password: "nodigitshere" }, rejectedRule.deps);
+    const malformed = setup();
+    await completePasswordReset({ ...input, tokenHash: "no spaces allowed" }, malformed.deps);
+    const usedCode = setup({}, { verifyRecovery: async () => rejected("otp_expired", 403) });
+    await completePasswordReset(input, usedCode.deps);
+    const refused = setup({}, { updatePassword: async () => rejected("same_password", 422) });
+    await completePasswordReset(input, refused.deps);
+    const down = setup({}, { updatePassword: async () => unavailable });
+    await completePasswordReset(input, down.deps);
+    for (const attempt of [rejectedRule, malformed, usedCode, refused, down]) {
+      assert.deepEqual(attempt.admin.calls, [], "no admin call at all, so no lockout was cleared");
+    }
   });
 });

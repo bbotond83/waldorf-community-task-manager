@@ -96,5 +96,13 @@
     "scope": "express",
     "status": "complete",
     "request": "a945588c"
+  },
+  {
+    "uuid": "01a17747-62eb-77ba-850f-35257d1f9851",
+    "slug": "reset-clears-lockout",
+    "dirName": "261026-reset-clears-lockout",
+    "scope": "express",
+    "status": "complete",
+    "request": "95b7abd9"
   }
 ]

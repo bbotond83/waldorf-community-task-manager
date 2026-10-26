@@ -97,6 +97,14 @@ export async function completePasswordReset(
       : terminalFailure(RESET_LINK_SPENT);
   }
 
+  // The lockout ends as soon as the password has changed, before the other sessions are touched: a person who
+  // was locked out must be able to sign in with the new password even when ending the other sessions fails
+  // below (review R-12). The result is ignored on purpose; a failed clear never changes the outcome of the reset.
+  await deps.admin.callFunction("sign_in_attempt_clear", {
+    p_email_hash: keyedHash(normalizeEmail(session.email), deps.emailKeySecret, "email"),
+    p_user_id: session.userId,
+  });
+
   // Every other session of the account ends (BR2.12); the person's new session stays.
   let removed = false;
   for (let attempt = 0; attempt < REMOVE_ATTEMPTS && !removed; attempt += 1) {
@@ -112,10 +120,6 @@ export async function completePasswordReset(
     // The password has changed, so the same link cannot be used again: tell the person to sign in instead.
     return terminalFailure(RESET_SESSIONS_NOT_ENDED);
   }
-  await deps.admin.callFunction("sign_in_attempt_clear", {
-    p_email_hash: keyedHash(normalizeEmail(session.email), deps.emailKeySecret, "email"),
-    p_user_id: session.userId,
-  });
   deps.events.emit("reset_used", { account: session.userId });
   return success({
     accountId: session.userId,
