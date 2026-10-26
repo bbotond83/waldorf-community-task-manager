@@ -53,7 +53,7 @@ export function assertLocalStackPassword(databaseUrl: string): void {
   if (hash !== LOCAL_STACK_DB_PASSWORD_HASH) {
     throw new ToolingError(
       "guard",
-      "The database connection does not use the local stack's default password, so it is not the local stack; nothing was changed. The seed and the reset work only with the Supabase CLI's default local database password: restart the stack with the default password to use them.",
+      "The database connection does not use the local stack's default password, so it is not the local stack; nothing was changed. The database tools that change data (the seed, the reset and the test workers) work only with the Supabase CLI's default local database password: restart the stack with the default password to use them.",
     );
   }
 }
@@ -89,8 +89,20 @@ export function assertLocalSettings(settings: { databaseUrl: string; apiUrl: str
   assertLocalStackPassword(settings.databaseUrl);
 }
 
+/**
+ * Options of the identity check. `requireManaged` (default `true`) also demands that this repository's migration
+ * tooling has set the database up; the worker command turns it off because it is one of the tools that creates the
+ * tracking table, so it must work on a stack that has never been migrated.
+ */
+export interface LocalStackOptions {
+  requireManaged?: boolean;
+}
+
 /** Refuses a database that does not identify itself as the local stack; reads only. */
-export async function assertLocalStack(client: SqlClient): Promise<void> {
+export async function assertLocalStack(
+  client: SqlClient,
+  options: LocalStackOptions = {},
+): Promise<void> {
   let row: Record<string, unknown> | undefined;
   try {
     row = (await client.query(IDENTITY_QUERY)).rows[0];
@@ -107,7 +119,7 @@ export async function assertLocalStack(client: SqlClient): Promise<void> {
   const reasons: string[] = [];
   if (row.database_name !== "postgres") reasons.push("it is not the CLI's postgres database");
   if (row.supabase_role !== true) reasons.push("it has no supabase_admin role");
-  if (row.managed !== true)
+  if (options.requireManaged !== false && row.managed !== true)
     reasons.push('the migration tooling has not set it up ("npm run db:migrate")');
   if (typeof hash === "string" && hash !== LOCAL_STACK_JWT_HASH) {
     reasons.push("it holds a project secret instead of the local stack's default");
@@ -127,11 +139,12 @@ export async function assertLocalStack(client: SqlClient): Promise<void> {
 export async function connectLocalStack(
   settings: { databaseUrl: string; apiUrl: string },
   connect: (url: string) => Promise<SqlClient>,
+  options: LocalStackOptions = {},
 ): Promise<SqlClient> {
   assertLocalSettings(settings);
   const client = await connect(settings.databaseUrl);
   try {
-    await assertLocalStack(client);
+    await assertLocalStack(client, options);
   } catch (error) {
     await client.end().catch(() => undefined);
     throw error;

@@ -21,6 +21,7 @@ import {
   main as migrateMain,
   type MigrateDeps,
 } from "./migrate.ts";
+import { IDENTITY_QUERY, LOCAL_STACK_JWT_HASH } from "./local-guard.ts";
 import { connectPostgres } from "./postgres.ts";
 import { checksumOf, type MigrationFile } from "./runner.ts";
 import {
@@ -45,6 +46,30 @@ const FILES: Record<string, string> = {
   [PUBLIC_ENV_FILE]: `SUPABASE_URL=http://127.0.0.1:54321\nSUPABASE_ANON_KEY=${FAKE_KEY}\n`,
   [SERVICE_ENV_FILE]: `DATABASE_URL=${FAKE_URL}\n`,
 };
+// The worker command now runs the local-only guard, so its tests use the Supabase CLI's default local password
+// (a public value, the same one the guard tests use) and a fake database that answers the identity query.
+const WORKER_URL = "postgresql://postgres:postgres@127.0.0.1:54322/postgres";
+const WORKER_FILES: Record<string, string> = {
+  ...FILES,
+  [SERVICE_ENV_FILE]: `DATABASE_URL=${WORKER_URL}\n`,
+};
+const LOCAL_IDENTITY = {
+  database_name: "postgres",
+  supabase_role: true,
+  managed: true,
+  jwt_hash: LOCAL_STACK_JWT_HASH,
+};
+/** Wraps a fake database's reply so that it also answers the guard's identity query. */
+const withIdentity =
+  (
+    next: (
+      sql: string,
+      values?: unknown[],
+    ) => Error | { rows: Record<string, unknown>[] } | undefined,
+    identity: Record<string, unknown> = LOCAL_IDENTITY,
+  ) =>
+  (sql: string, values?: unknown[]) =>
+    sql === IDENTITY_QUERY ? { rows: [identity] } : next(sql, values);
 const migration = (name: string, sql: string): MigrationFile => ({
   name,
   sql,
@@ -331,13 +356,13 @@ describe("migrate command", () => {
 function workerDeps(overrides: Partial<WorkerDeps> & { statuses?: number[] } = {}) {
   const lines: string[] = [];
   let clock = 0;
-  const sql = fakeSql(trackingRows);
+  const sql = fakeSql(withIdentity(trackingRows));
   const requests: { url: string; headers: Record<string, string> }[] = [];
   const statuses = overrides.statuses ?? [200];
   const deps: WorkerDeps = {
     connect: async () => sql.client,
     readFiles: () => [migration("20260101_a.sql", "create table a (id int);")],
-    readFile: (path) => FILES[path],
+    readFile: (path) => WORKER_FILES[path],
     environment: {},
     log: (line) => lines.push(line),
     now: () => (clock += 100),
@@ -416,8 +441,10 @@ describe("worker schema setup", () => {
   });
 
   it("rebuilds the schema and clears its tracking rows on reset", async () => {
-    const sql = fakeSql((statement) =>
-      statement.includes("to_regclass") ? { rows: [{ relation: "x" }] } : trackingRows(statement),
+    const sql = fakeSql(
+      withIdentity((statement) =>
+        statement.includes("to_regclass") ? { rows: [{ relation: "x" }] } : trackingRows(statement),
+      ),
     );
     const fake = workerDeps({ connect: async () => sql.client });
     await setupWorker(fake.deps, "worker_3", { reset: true });
@@ -432,8 +459,12 @@ describe("worker schema setup", () => {
   });
 
   it("does not touch tracking when the tracking table does not exist yet", async () => {
-    const sql = fakeSql((statement) =>
-      statement.includes("to_regclass") ? { rows: [{ relation: null }] } : trackingRows(statement),
+    const sql = fakeSql(
+      withIdentity((statement) =>
+        statement.includes("to_regclass")
+          ? { rows: [{ relation: null }] }
+          : trackingRows(statement),
+      ),
     );
     const fake = workerDeps({ connect: async () => sql.client });
     await setupWorker(fake.deps, "worker_3", { reset: true });
@@ -479,8 +510,10 @@ describe("worker schema setup", () => {
   });
 
   it("names the migration step and file when a migration fails", async () => {
-    const sql = fakeSql((statement) =>
-      statement.startsWith("bad") ? new Error("broken") : trackingRows(statement),
+    const sql = fakeSql(
+      withIdentity((statement) =>
+        statement.startsWith("bad") ? new Error("broken") : trackingRows(statement),
+      ),
     );
     const fake = workerDeps({
       connect: async () => sql.client,
@@ -499,17 +532,20 @@ describe("worker schema setup", () => {
   });
 
   it("names the failing step for an unexpected database error and redacts it", async () => {
-    const sql = fakeSql((statement) =>
-      statement.startsWith("drop schema")
-        ? new Error(`denied ${FAKE_URL}`)
-        : trackingRows(statement),
+    const sql = fakeSql(
+      withIdentity((statement) =>
+        statement.startsWith("drop schema")
+          ? new Error(`denied ${WORKER_URL}`)
+          : trackingRows(statement),
+      ),
     );
     const fake = workerDeps({ connect: async () => sql.client });
     await assert.rejects(
       setupWorker(fake.deps, "worker_1", { reset: true }),
       (error: Error & { step?: string }) => {
         assert.equal(error.step, "reset-schema");
-        assert.equal(error.message.includes("fake-db-password"), false);
+        assert.equal(error.message.includes(WORKER_URL), false);
+        assert.equal(error.message.includes("postgres:postgres@"), false);
         return true;
       },
     );
@@ -532,10 +568,12 @@ describe("worker schema setup", () => {
   });
 
   it("main output never contains keys or the database address", async () => {
-    const sql = fakeSql((statement) =>
-      statement.startsWith("bad")
-        ? new Error(`x ${FAKE_KEY} ${FAKE_URL}`)
-        : trackingRows(statement),
+    const sql = fakeSql(
+      withIdentity((statement) =>
+        statement.startsWith("bad")
+          ? new Error(`x ${FAKE_KEY} ${WORKER_URL}`)
+          : trackingRows(statement),
+      ),
     );
     const fake = workerDeps({
       connect: async () => sql.client,
@@ -543,7 +581,75 @@ describe("worker schema setup", () => {
     });
     assert.equal(await workerMain(["worker_1"], fake.deps), 1);
     const output = fake.lines.join("\n");
-    for (const secret of [FAKE_KEY, FAKE_URL, "fake-db-password"])
+    for (const secret of [FAKE_KEY, WORKER_URL, "postgres:postgres@"])
       assert.equal(output.includes(secret), false);
+  });
+
+  // Finding B5 (U1 review R-09): the worker runs the same local-only guard as the seed and the reset.
+  describe("local-only guard", () => {
+    const CHANGING = /^(drop|create|truncate|delete|alter|grant|insert)\b/i;
+
+    it("refuses a password that is not the local stack's default before any connection is made", async () => {
+      let connected = 0;
+      const fake = workerDeps({
+        connect: async () => {
+          connected++;
+          throw new Error("must not connect");
+        },
+        readFile: (path) =>
+          path === SERVICE_ENV_FILE
+            ? "DATABASE_URL=postgresql://postgres:a-hosted-project-password@127.0.0.1:54322/postgres\n"
+            : WORKER_FILES[path],
+      });
+      await assert.rejects(
+        setupWorker(fake.deps, "worker_2", { reset: true }),
+        (error: Error & { step?: string; detail?: Record<string, string> }) => {
+          assert.equal(error.step, "guard");
+          assert.equal(error.detail?.step, "guard");
+          assert.match(error.message, /the test workers/);
+          assert.equal(error.detail?.worker, "worker_2");
+          assert.equal(error.detail?.schema, "worker_2");
+          assert.equal(error.message.includes("a-hosted-project-password"), false);
+          return true;
+        },
+      );
+      assert.equal(connected, 0);
+    });
+
+    it("refuses a database that does not identify itself as the local stack, closes it and changes nothing", async () => {
+      const sql = fakeSql(
+        withIdentity(trackingRows, { ...LOCAL_IDENTITY, database_name: "hosted" }),
+      );
+      const fake = workerDeps({ connect: async () => sql.client });
+      await assert.rejects(
+        setupWorker(fake.deps, "worker_1", { reset: true }),
+        (error: Error & { step?: string; detail?: Record<string, string> }) => {
+          assert.equal(error.step, "guard");
+          assert.equal(error.detail?.step, "guard");
+          assert.equal(error.detail?.worker, "worker_1");
+          assert.equal(error.detail?.schema, "worker_1");
+          assert.match(error.message, /does not identify itself as the local stack/);
+          return true;
+        },
+      );
+      assert.equal(sql.state.ended, true);
+      assert.deepEqual(
+        sql.statements.map((entry) => entry.sql),
+        [IDENTITY_QUERY],
+        "only the identity read was asked",
+      );
+      assert.equal(
+        sql.statements.some((entry) => CHANGING.test(entry.sql.trim())),
+        false,
+      );
+    });
+
+    it("still sets up a worker schema on a stack that has never been migrated (no tracking table yet)", async () => {
+      const sql = fakeSql(withIdentity(trackingRows, { ...LOCAL_IDENTITY, managed: false }));
+      const fake = workerDeps({ connect: async () => sql.client });
+      const result = await setupWorker(fake.deps, "worker_3", { reset: false });
+      assert.equal(result.schema, "worker_3");
+      assert.equal(sql.state.ended, true);
+    });
   });
 });

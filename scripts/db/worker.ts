@@ -14,6 +14,7 @@ import {
   type ToolingSettings,
   WORKER_SCHEMAS,
 } from "./common.ts";
+import { connectLocalStack } from "./local-guard.ts";
 import { FRESH_SCHEMA_SETTINGS } from "./migrate.ts";
 import { connectPostgres } from "./postgres.ts";
 import {
@@ -183,11 +184,13 @@ export async function setupWorker(
   let step = "connect";
   const wrap = (error: unknown): ToolingError => {
     if (error instanceof ToolingError) {
-      return new ToolingError(step === "connect" ? error.step : step, error.message, {
+      // While connecting, the error knows best which step failed (the guard or the connection itself).
+      const reported = step === "connect" ? error.step : step;
+      return new ToolingError(reported, error.message, {
         ...error.detail,
         worker: schema,
         schema,
-        step,
+        step: reported,
       });
     }
     const message = error instanceof Error ? error.message : String(error);
@@ -199,7 +202,10 @@ export async function setupWorker(
   };
   try {
     deps.log(`[1/5] connecting (worker ${schema})`);
-    client = await deps.connect(settings.databaseUrl);
+    // The same local-only guard as the seed and the reset: a loopback address, the CLI's default local password,
+    // and a database that identifies itself as the local stack, so a hosted database reached through a tunnel is
+    // never touched. The tracking table is not required: the worker is one of the tools that creates it.
+    client = await connectLocalStack(settings, deps.connect, { requireManaged: false });
 
     step = options.reset ? "reset-schema" : "create-schema";
     deps.log(`[2/5] ${options.reset ? "rebuilding" : "creating if missing"} schema ${schema}`);

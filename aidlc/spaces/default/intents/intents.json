@@ -112,5 +112,13 @@
     "scope": "express",
     "status": "complete",
     "request": "f4d715c2"
+  },
+  {
+    "uuid": "01a177f0-2d3d-76f6-b4f1-b45b7de66aab",
+    "slug": "worker-local-guard",
+    "dirName": "261026-worker-local-guard",
+    "scope": "express",
+    "status": "complete",
+    "request": "533abd3b"
   }
 ]

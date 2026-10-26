@@ -1,0 +1,33 @@
+{
+  "stage": "code-generation",
+  "upstream_ids": [
+    "FR1.1",
+    "FR1.2",
+    "FR1.3",
+    "FR1.4",
+    "FR2",
+    "FR3",
+    "FR4",
+    "FR5",
+    "NFR1",
+    "NFR2",
+    "NFR3"
+  ],
+  "coverage": [
+    { "id": "FR1.1", "status": "OK", "target": "scripts/db/worker.ts" },
+    { "id": "FR1.2", "status": "OK", "target": "scripts/db/tooling.test.ts" },
+    { "id": "FR1.3", "status": "OK", "target": "scripts/db/local-guard.ts" },
+    { "id": "FR1.4", "status": "OK", "target": "tests/database/worker.test.ts" },
+    { "id": "FR2", "status": "OK", "target": "scripts/db/tooling.test.ts" },
+    { "id": "FR3", "status": "OK", "target": "scripts/db/local-guard.test.ts" },
+    { "id": "FR4", "status": "OK", "target": "README.md" },
+    {
+      "id": "FR5",
+      "status": "OK",
+      "target": "aidlc/spaces/default/intents/261012-real-backend-local/follow-ups/minor-findings-plan.md"
+    },
+    { "id": "NFR1", "status": "OK", "target": "scripts/db/local-guard.test.ts" },
+    { "id": "NFR2", "status": "OK", "target": "tests/database/worker.test.ts" },
+    { "id": "NFR3", "status": "OK", "target": "scripts/db/tooling.test.ts" }
+  ]
+}

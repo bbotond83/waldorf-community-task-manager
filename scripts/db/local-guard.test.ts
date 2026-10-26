@@ -289,4 +289,41 @@ describe("local-only guard: the database identifies itself", () => {
     assert.equal(client, accepted.client);
     assert.equal(accepted.ended(), 0);
   });
+
+  // Finding B5 (U1 review R-09): the worker command uses the guard on a stack that may never have been migrated.
+  it("requires the migration tooling's tracking table by default, and not when the caller turns that off", async () => {
+    const unmanaged = { ...GOOD, managed: false };
+    // The default (seed and reset) still refuses a database the tooling has not set up.
+    await assert.rejects(
+      () => assertLocalStack(fakeClient(unmanaged).client),
+      (error: unknown) => error instanceof ToolingError && /db:migrate/.test(error.message),
+    );
+    const refused = fakeClient(unmanaged);
+    await refusal(() => connectLocalStack(LOCAL, async () => refused.client));
+    assert.equal(refused.ended(), 1);
+
+    // With the requirement off the database passes, and the connection stays open.
+    await assertLocalStack(fakeClient(unmanaged).client, { requireManaged: false });
+    const accepted = fakeClient(unmanaged);
+    const client = await connectLocalStack(LOCAL, async () => accepted.client, {
+      requireManaged: false,
+    });
+    assert.equal(client, accepted.client);
+    assert.equal(accepted.ended(), 0);
+  });
+
+  it("keeps every other identity reason even when the tracking table is not required", async () => {
+    for (const identity of [
+      { ...GOOD, managed: false, database_name: "other" },
+      { ...GOOD, managed: false, supabase_role: false },
+      { ...GOOD, managed: false, jwt_hash: "f".repeat(64) },
+    ]) {
+      const refused = fakeClient(identity);
+      await assert.rejects(
+        () => connectLocalStack(LOCAL, async () => refused.client, { requireManaged: false }),
+        (error: unknown) => error instanceof ToolingError && error.step === "guard",
+      );
+      assert.equal(refused.ended(), 1);
+    }
+  });
 });

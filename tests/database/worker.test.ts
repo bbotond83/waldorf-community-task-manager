@@ -242,12 +242,34 @@ describe("worker schemas on the real local stack", () => {
   it("fails naming the worker, the schema and the step when the database cannot be reached", async () => {
     const deps = {
       ...quiet(),
-      environment: { DATABASE_URL: "postgresql://postgres:wrong-password@127.0.0.1:1/postgres" },
+      // The local stack's default password (a public value) on a port nothing listens on: the guard passes, the
+      // connection fails.
+      environment: { DATABASE_URL: "postgresql://postgres:postgres@127.0.0.1:1/postgres" },
     };
     await assert.rejects(
       setupWorker(deps, "worker_4", { reset: false }),
       (error: Error & { step?: string; detail?: Record<string, string> }) => {
         assert.equal(error.step, "connect");
+        assert.equal(error.detail?.worker, "worker_4");
+        assert.equal(error.detail?.schema, "worker_4");
+        assert.equal(error.message.includes("postgres:postgres@"), false);
+        return true;
+      },
+    );
+  });
+
+  // Finding B5 (U1 review R-09): a database whose password is not the local stack's default is refused by the
+  // guard before any connection, naming the worker and the schema, and never echoing the password.
+  it("refuses a connection that does not use the local stack's default password, at the guard step", async () => {
+    const deps = {
+      ...quiet(),
+      environment: { DATABASE_URL: "postgresql://postgres:wrong-password@127.0.0.1:1/postgres" },
+    };
+    await assert.rejects(
+      setupWorker(deps, "worker_4", { reset: true }),
+      (error: Error & { step?: string; detail?: Record<string, string> }) => {
+        assert.equal(error.step, "guard");
+        assert.equal(error.detail?.step, "guard");
         assert.equal(error.detail?.worker, "worker_4");
         assert.equal(error.detail?.schema, "worker_4");
         assert.equal(error.message.includes("wrong-password"), false);
