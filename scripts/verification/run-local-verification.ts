@@ -1,5 +1,5 @@
 import { execFileSync, spawnSync } from "node:child_process";
-import { mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, rmSync, writeFileSync, writeSync } from "node:fs";
 import { resolve } from "node:path";
 import { validateManifests, type Evidence, type Scenario } from "./core.ts";
 
@@ -20,6 +20,21 @@ const commandResults = new Map<
   string,
   { startedAt: string; finishedAt: string; durationMs: number; log: string }
 >();
+
+// spawnSync blocks the event loop, so process.stdout.write on a pipe (CI) only queues the text and the
+// queue is lost when a failing stage ends the process: the failure showed no output. Write it out
+// synchronously instead, waiting when the pipe is full.
+function printNow(text: string): void {
+  const bytes = Buffer.from(text);
+  let offset = 0;
+  while (offset < bytes.length) {
+    try {
+      offset += writeSync(1, bytes, offset);
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== "EAGAIN") throw error;
+    }
+  }
+}
 
 const commands = [
   { key: "toolchain", args: ["run", "check:toolchain"] },
@@ -70,7 +85,7 @@ for (const command of commands) {
   const output = `${result.stdout ?? ""}${result.stderr ?? ""}`;
   const log = `.verification/logs/${command.key}.log`;
   writeFileSync(resolve(root, log), output);
-  process.stdout.write(output);
+  printNow(output);
   if (result.status !== 0)
     throw new Error(
       `LOCAL_VERIFICATION_FAILED step=${command.key} exit=${result.status ?? "signal"} log=${log}`,

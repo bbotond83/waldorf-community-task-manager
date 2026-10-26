@@ -16,8 +16,8 @@ Built without asking: plan approval is off for this piece of work (set by you).
 Full plan: aidlc/spaces/default/intents/261012-real-backend-local/construction/u2-identity-and-access/code-generation/code-generation-plan.md
 Test instructions: aidlc/spaces/default/intents/261012-real-backend-local/construction/u2-identity-and-access/code-generation/unit-test-instructions.md
 
-[Approval Fingerprint]: sha256:v3:78f1426d6ee1303889f2b1d4397594ba147aa3d1fb655ea1bfb2d3712f7af1ab
-[Planned Source]: 9f3925a76f593a0400aca37141e221345b96982a175599f70f653bd376c90667
+[Approval Fingerprint]: sha256:v3:895c9083fbb0794b0af73b3b205967bf21c5ba9ab760516d7dea9f8f4ee04882
+[Planned Source]: dc43492a534a2e3c643ad9c28064df4e97ba3e6be2c38c0dd4a8fc10140f22c4
 
 
 [Answer]: Plan approval off
