@@ -10,7 +10,7 @@ export const START_HELP = `Usage: npm run db:start [-- --allow-all-interfaces]
 
 Starts the local stack (Postgres, sign-in service, data API gateway, mail catcher) with Docker and
 waits until it is healthy. It then checks that only those services run and that the published
-ports are not reachable from other machines, and writes the git-ignored files .env.database.local
+ports are not reachable on any of this machine's IPv4 or IPv6 addresses, and writes the git-ignored files .env.database.local
 (address and public key) and .env.service.local (tooling values). Prints a final timing.
 
 The Supabase CLI publishes its ports on all interfaces and the stack uses well-known default keys.

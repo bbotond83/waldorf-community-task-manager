@@ -80,5 +80,13 @@
     "scope": "classic",
     "status": "complete",
     "request": "ea7841d6"
+  },
+  {
+    "uuid": "01a176b5-b118-7a28-9abd-bd476a3360ef",
+    "slug": "ipv6-exposure-check",
+    "dirName": "261026-ipv6-exposure-check",
+    "scope": "express",
+    "status": "complete",
+    "request": "58bcb192"
   }
 ]

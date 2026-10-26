@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { mkdtempSync, rmSync, readFileSync, statSync } from "node:fs";
 import { createServer } from "node:net";
-import { tmpdir } from "node:os";
+import { type NetworkInterfaceInfo, tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, it } from "node:test";
 import { PUBLIC_ENV_FILE, SERVICE_ENV_FILE } from "./common.ts";
@@ -10,7 +10,9 @@ import { main as stopMain, STOP_HELP } from "./stop.ts";
 import {
   ACKNOWLEDGE_ALL_INTERFACES,
   defaultStackDeps,
+  externalAddressesFrom,
   findExposedPorts,
+  formatEndpoint,
   parseStatusValues,
   PROJECT_ID,
   PUBLISHED_PORTS,
@@ -40,6 +42,8 @@ interface Setup {
   running?: boolean;
   openLoopbackPorts?: number[];
   exposedPorts?: number[];
+  /** Fictitious external addresses (IPv4 or IPv6) the fake machine reports. */
+  addresses?: string[];
   containers?: string;
   startResult?: RunResult;
   statusAfterStart?: RunResult;
@@ -79,7 +83,7 @@ function fakeDeps(setup: Setup = {}) {
       if (host === "127.0.0.1") return (setup.openLoopbackPorts ?? []).includes(port) && !started;
       return (setup.exposedPorts ?? []).includes(port);
     },
-    externalAddresses: () => ["192.168.0.10"],
+    externalAddresses: () => setup.addresses ?? ["192.168.0.10"],
     writeSecretFile: (path, content) => {
       files[path] = content;
     },
@@ -312,9 +316,8 @@ describe("default dependencies", () => {
     assert.equal(await deps.isPortOpen("127.0.0.1", port), false);
   });
 
-  it("lists external IPv4 addresses and writes secret files readable only by the owner", () => {
+  it("writes secret files readable only by the owner", () => {
     const deps = defaultStackDeps();
-    for (const address of deps.externalAddresses()) assert.match(address, /^\d+\.\d+\.\d+\.\d+$/);
     const directory = mkdtempSync(join(tmpdir(), "stack-files-"));
     try {
       const path = join(directory, "secret.env");
@@ -326,5 +329,88 @@ describe("default dependencies", () => {
     }
     assert.ok(deps.cliPath.endsWith("node_modules/.bin/supabase"));
     assert.equal(typeof deps.now(), "number");
+  });
+
+  it("reads the address list from the operating system without failing", () => {
+    for (const address of defaultStackDeps().externalAddresses()) {
+      assert.equal(typeof address, "string");
+    }
+  });
+});
+
+const entry = (address: string, family: "IPv4" | "IPv6", internal = false): NetworkInterfaceInfo =>
+  ({ address, family, internal, mac: "00:00:00:00:00:00", cidr: null }) as NetworkInterfaceInfo;
+
+describe("externalAddressesFrom", () => {
+  it("lists a non-internal IPv4 address", () => {
+    assert.deepEqual(externalAddressesFrom({ en0: [entry("192.168.0.10", "IPv4")] }), [
+      "192.168.0.10",
+    ]);
+  });
+
+  it("lists global and unique-local IPv6 addresses unscoped", () => {
+    assert.deepEqual(
+      externalAddressesFrom({
+        en0: [entry("2001:db8::10", "IPv6"), entry("fd12:3456:789a::1", "IPv6")],
+      }),
+      ["2001:db8::10", "fd12:3456:789a::1"],
+    );
+  });
+
+  it("lists link-local IPv6 addresses (fe80 to febf) with the interface scope", () => {
+    assert.deepEqual(
+      externalAddressesFrom({ en0: [entry("fe80::1", "IPv6")], en1: [entry("febf::1", "IPv6")] }),
+      ["fe80::1%en0", "febf::1%en1"],
+    );
+  });
+
+  it("lists fec0:: unscoped because it is not link-local", () => {
+    assert.deepEqual(externalAddressesFrom({ en0: [entry("fec0::1", "IPv6")] }), ["fec0::1"]);
+  });
+
+  it("never lists internal addresses", () => {
+    assert.deepEqual(
+      externalAddressesFrom({
+        lo0: [entry("127.0.0.1", "IPv4", true), entry("::1", "IPv6", true)],
+      }),
+      [],
+    );
+  });
+
+  it("returns nothing for missing or empty interface entries", () => {
+    assert.deepEqual(externalAddressesFrom({ en0: undefined, en1: [] }), []);
+    assert.deepEqual(externalAddressesFrom({}), []);
+  });
+});
+
+describe("formatEndpoint", () => {
+  it("renders IPv4 plainly and IPv6, scoped or not, in brackets", () => {
+    assert.equal(formatEndpoint("192.168.0.10", 54321), "192.168.0.10:54321");
+    assert.equal(formatEndpoint("2001:db8::10", 54321), "[2001:db8::10]:54321");
+    assert.equal(formatEndpoint("fe80::1%en0", 54322), "[fe80::1%en0]:54322");
+  });
+});
+
+describe("IPv6 exposure", () => {
+  it("reports an IPv6 address when a port answers and nothing when none does", async () => {
+    const open = fakeDeps({ addresses: ["2001:db8::10"], exposedPorts: [PUBLISHED_PORTS.api] });
+    assert.deepEqual(await findExposedPorts(open.deps), [
+      { port: PUBLISHED_PORTS.api, address: "2001:db8::10" },
+    ]);
+    assert.deepEqual(await findExposedPorts(fakeDeps({ addresses: ["2001:db8::10"] }).deps), []);
+  });
+
+  it("refuses with the bracketed address and stops the stack", async () => {
+    const fake = fakeDeps({ addresses: ["fe80::1%en0"], exposedPorts: [PUBLISHED_PORTS.database] });
+    assert.equal(await startStack(fake.deps, { allowAllInterfaces: false }), 1);
+    assert.match(fake.lines.join("\n"), /reachable at \[fe80::1%en0\]:54322/);
+    assert.ok(fake.commands.some((command) => command.endsWith("supabase stop")));
+    assert.equal(Object.keys(fake.files).length, 0);
+  });
+
+  it("warns with the bracketed address and goes on when acknowledged", async () => {
+    const fake = fakeDeps({ addresses: ["2001:db8::10"], exposedPorts: [PUBLISHED_PORTS.api] });
+    assert.equal(await startStack(fake.deps, { allowAllInterfaces: true }), 0);
+    assert.ok(fake.lines.some((line) => line.includes("reachable at [2001:db8::10]:54321")));
   });
 });

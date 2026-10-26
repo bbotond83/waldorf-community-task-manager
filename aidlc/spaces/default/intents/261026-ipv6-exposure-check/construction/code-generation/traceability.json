@@ -1,0 +1,16 @@
+{
+  "stage": "code-generation",
+  "upstream_ids": ["FR1.1", "FR1.2", "FR1.3", "FR1.4", "FR2.1", "FR3.1", "NFR1", "NFR2", "NFR3", "NFR4"],
+  "coverage": [
+    { "id": "FR1.1", "status": "OK", "target": "scripts/db/stack.ts" },
+    { "id": "FR1.2", "status": "OK", "target": "scripts/db/stack.ts" },
+    { "id": "FR1.3", "status": "OK", "target": "scripts/db/stack.test.ts" },
+    { "id": "FR1.4", "status": "OK", "target": "scripts/db/stack.test.ts" },
+    { "id": "FR2.1", "status": "OK", "target": "scripts/db/stack.test.ts" },
+    { "id": "FR3.1", "status": "OK", "target": "scripts/db/start.ts" },
+    { "id": "NFR1", "status": "OK", "target": "scripts/db/stack.ts" },
+    { "id": "NFR2", "status": "OK", "target": "scripts/db/stack.test.ts" },
+    { "id": "NFR3", "status": "OK", "target": "scripts/db/stack.ts" },
+    { "id": "NFR4", "status": "OK", "target": "scripts/db/stack.test.ts" }
+  ]
+}

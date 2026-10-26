@@ -1,7 +1,7 @@
 import { spawn } from "node:child_process";
 import { chmodSync, writeFileSync } from "node:fs";
 import { connect } from "node:net";
-import { networkInterfaces } from "node:os";
+import { type NetworkInterfaceInfo, networkInterfaces } from "node:os";
 import { fileURLToPath } from "node:url";
 import { redactSecrets } from "../../src/runtime/database/redact.ts";
 import {
@@ -50,6 +50,37 @@ export interface StackDeps {
   cliPath: string;
 }
 
+/** True for an IPv6 link-local address (fe80::/10, first group fe80 to febf). */
+function isLinkLocalIpv6(address: string): boolean {
+  const first = Number.parseInt(address.split(":")[0] ?? "", 16);
+  return first >= 0xfe80 && first <= 0xfebf;
+}
+
+/**
+ * The addresses to probe from the operating system's interface table (the shape of
+ * `os.networkInterfaces()`): every non-internal IPv4 and IPv6 address. A link-local IPv6 address
+ * only works with its scope, so it is returned as `<address>%<interface name>`. Internal
+ * (loopback) addresses are never returned.
+ */
+export function externalAddressesFrom(interfaces: NodeJS.Dict<NetworkInterfaceInfo[]>): string[] {
+  const addresses: string[] = [];
+  for (const [name, entries] of Object.entries(interfaces)) {
+    for (const entry of entries ?? []) {
+      if (entry.internal) continue;
+      if (entry.family === "IPv4") addresses.push(entry.address);
+      else if (entry.family === "IPv6") {
+        addresses.push(isLinkLocalIpv6(entry.address) ? `${entry.address}%${name}` : entry.address);
+      }
+    }
+  }
+  return addresses;
+}
+
+/** Renders an address and port for display: `a.b.c.d:port` for IPv4, `[address]:port` for IPv6. */
+export function formatEndpoint(address: string, port: number): string {
+  return address.includes(":") ? `[${address}]:${port}` : `${address}:${port}`;
+}
+
 export function defaultStackDeps(): StackDeps {
   return {
     run: (command, args) =>
@@ -77,11 +108,7 @@ export function defaultStackDeps(): StackDeps {
           resolve(false);
         });
       }),
-    externalAddresses: () =>
-      Object.values(networkInterfaces())
-        .flatMap((entries) => entries ?? [])
-        .filter((entry) => entry.family === "IPv4" && !entry.internal)
-        .map((entry) => entry.address),
+    externalAddresses: () => externalAddressesFrom(networkInterfaces()),
     writeSecretFile: (path, content) => {
       writeFileSync(path, content, { mode: 0o600 });
       chmodSync(path, 0o600);
@@ -137,7 +164,7 @@ async function portHolder(deps: StackDeps, port: number): Promise<string> {
   return line ? `the process "${line.slice(1)}"` : "another process";
 }
 
-/** Addresses of this machine (other than loopback) on which a published port answers. */
+/** Addresses of this machine (IPv4 and IPv6, other than loopback) on which a published port answers. */
 export async function findExposedPorts(
   deps: StackDeps,
 ): Promise<{ port: number; address: string }[]> {
@@ -214,9 +241,9 @@ export async function startStack(
     log("[6/7] checking that the published ports are reachable on this machine only");
     const exposed = await findExposedPorts(deps);
     if (exposed.length > 0) {
-      const detail = [...new Set(exposed.map((entry) => `${entry.address}:${entry.port}`))].join(
-        ", ",
-      );
+      const detail = [
+        ...new Set(exposed.map((entry) => formatEndpoint(entry.address, entry.port))),
+      ].join(", ");
       if (!options.allowAllInterfaces) {
         await cli(deps, ["stop"]);
         throw new ToolingError(

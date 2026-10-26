@@ -57,7 +57,7 @@ match. Configuration values are never part of that output.
 | `npm run db:worker -- <worker_N> [--reset]` | Prepares one test schema (`worker_1` to `worker_4`): creates it, applies the migrations, empties it, and removes its accounts. `--reset` drops it first.                                                                                   |
 
 The Supabase command line tool publishes its ports on all network interfaces and the stack uses well-known default keys.
-`db:start` therefore checks that the ports cannot be reached from other machines. If they can, it stops the stack and
+`db:start` therefore checks that the ports cannot be reached from other machines, on both the IPv4 and the IPv6 addresses of your machine. If they can, it stops the stack and
 fails. Block inbound connections to those ports with a host firewall rule on your machine, then acknowledge it with
 `DB_ALLOW_ALL_INTERFACES=1 npm run db:start` (or `npm run db:start -- --allow-all-interfaces`). Never set this on a
 machine that is reachable from an untrusted network.
