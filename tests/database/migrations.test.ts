@@ -334,6 +334,27 @@ describe("migrations on the real local stack", () => {
     }
   });
 
+  it("applies the audit purge isolation file after the purge file in the default and in a worker schema, and a second run changes nothing", async () => {
+    const isolationFile = "20261045_audit_purge_isolation.sql";
+    const names = migrations.map((file) => file.name);
+    assert.ok(names.includes(isolationFile), "the isolation migration exists");
+    assert.ok(
+      names.indexOf(isolationFile) > names.indexOf("20261044_audit_purge.sql"),
+      "the isolation file sorts after the purge file",
+    );
+    for (const schema of ["public", "worker_4"]) {
+      const tracked = (
+        await db.query(
+          `select filename from ${TRACKING_SCHEMA}.applied_migrations where schema_name = $1 and filename = $2`,
+          [schema, isolationFile],
+        )
+      ).rows;
+      assert.equal(tracked.length, 1, schema);
+      const again = await run(db, schema);
+      assert.deepEqual(again.applied, [], schema);
+    }
+  });
+
   it("refuses a file with a hard-coded schema name, names it, and applies nothing", async () => {
     const before = (
       await db.query(`select count(*)::int as n from ${TRACKING_SCHEMA}.applied_migrations`)

@@ -207,10 +207,65 @@ for (const schema of IDENTITY_SCHEMAS) {
       const first = await housekeeping();
       assert.equal(first.state, "success");
       assert.equal(first.audit_events_purged, 2);
+      assert.equal(first.audit_purge_failed, false);
       assert.equal(await count(db, "audit_events"), 2);
       const second = await housekeeping();
       assert.equal(second.audit_events_purged, 0);
       assert.equal(await count(db, "audit_events"), 2);
+    });
+
+    // Follow-up B1 (findings R-18, R-08): a purge that fails undoes only the purge. A delete trigger that always
+    // raises stands in for a failing or timed-out purge; it is dropped again whatever the outcome.
+    it("keeps the rest of the clean-up when the audit purge fails, and reports the failure without details", async () => {
+      await db.query(
+        `insert into audit_events (actor_account_id, actor_role, action, target_type, target_id, organization_id, outcome, occurred_at)
+         values ($1, 'system', 'role.grant', 'account', gen_random_uuid(), $2, 'success', now() - interval '400 days')`,
+        [SYSTEM_ACCOUNT, ORGANIZATION],
+      );
+      await db.query(
+        "insert into sign_in_attempts (email_hash, attempted_at) values ($1, now() - interval '1 hour')",
+        [emailHashFor("failing-purge@example.test")],
+      );
+      const orphan = await signInUser("failing-purge-orphan", 120, randomUUID());
+      await db.query(
+        "create function purge_failure_probe() returns trigger language plpgsql as $$ begin raise exception 'probe: secret detail'; end $$",
+      );
+      await db.query(
+        "create trigger a_purge_failure_probe before delete on audit_events for each row execute function purge_failure_probe()",
+      );
+      try {
+        const failed = await housekeeping();
+        assert.equal(failed.state, "success");
+        assert.equal(failed.audit_events_purged, 0);
+        assert.equal(failed.audit_purge_failed, true);
+        assert.equal(failed.attempts_removed, 1, "the other clean-up still ran");
+        assert.equal(failed.users_removed, 1, "the other clean-up still ran");
+        assert.ok(
+          !JSON.stringify(failed).includes("secret detail"),
+          "the result carries no error text",
+        );
+        assert.equal(await count(db, "sign_in_attempts"), 0, "the other clean-up was committed");
+        assert.equal(await userExists(orphan), false, "the other clean-up was committed");
+        assert.equal(await count(db, "audit_events"), 1, "the aged event is still there");
+        // The failed purge's own change (the deletion setting) was rolled back with it: a delete outside the
+        // purge is still refused by the append-only rule, not by the probe (which has no say in a refused delete).
+        const setting = await db.query("select current_setting('app.audit_purge', true) as value");
+        assert.ok(!setting.rows[0].value || setting.rows[0].value === "off");
+        await db.query("drop trigger a_purge_failure_probe on audit_events");
+        const refused = await failureOf(() => db.query("delete from audit_events"));
+        assert.equal(refused?.code, "42501", "the aged event cannot be deleted outside the purge");
+        assert.match(refused?.message ?? "", /append-only/);
+        await db.query(
+          "create trigger a_purge_failure_probe before delete on audit_events for each row execute function purge_failure_probe()",
+        );
+      } finally {
+        await db.query("drop trigger a_purge_failure_probe on audit_events");
+        await db.query("drop function purge_failure_probe()");
+      }
+      const recovered = await housekeeping();
+      assert.equal(recovered.audit_events_purged, 1, "the next run purges once the cause is gone");
+      assert.equal(recovered.audit_purge_failed, false);
+      assert.equal(await count(db, "audit_events"), 0);
     });
 
     it("is executable only by the service role", async () => {

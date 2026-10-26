@@ -227,6 +227,44 @@ for (const schema of ["worker_1", "public"]) {
       assert.equal((await remaining()).length, 300);
     });
 
+    /** Inserts `total` aged events, the nth being `366 days + n minutes` old, so a higher n is older. */
+    const insertAged = async (total: number) =>
+      db.query(
+        `insert into audit_events (actor_account_id, actor_role, action, target_type, target_id, organization_id, outcome, occurred_at)
+         select $1, 'system', 'role.grant', 'account', gen_random_uuid(), $2, 'success',
+                now() - interval '366 days' - n * interval '1 minute'
+           from generate_series(1, $3::int) as n`,
+        [SYSTEM_ACCOUNT, ORGANIZATION, total],
+      );
+    const agedCount = async () =>
+      (
+        await db.query(
+          "select count(*)::int as n from audit_events where occurred_at < now() - interval '365 days'",
+        )
+      ).rows[0].n as number;
+
+    // Follow-up B1 (FR2): one call deletes at most 5000 rows, the oldest first; the rest is left for the next run.
+    it("deletes at most 5000 aged events per call, oldest first, and leaves the rest for the next call", async () => {
+      await insertAged(5001);
+      await insertEvent(1, "1 day");
+      assert.equal(await purgeAs(service), 5000);
+      assert.equal(await agedCount(), 1, "one aged event is left");
+      const survivor = await db.query(
+        "select (now() - occurred_at) < interval '366 days 2 minutes' as youngest from audit_events where occurred_at < now() - interval '365 days'",
+      );
+      assert.equal(survivor.rows[0].youngest, true, "the youngest aged event is the one left");
+      assert.equal(await purgeAs(service), 1);
+      assert.equal(await purgeAs(service), 0);
+      assert.deepEqual(await remaining(), [uuid(1)], "the recent event was never touched");
+    });
+
+    it("deletes exactly 5000 aged events in one call and leaves none", async () => {
+      await insertAged(5000);
+      assert.equal(await purgeAs(service), 5000);
+      assert.equal(await agedCount(), 0);
+      assert.equal(await purgeAs(service), 0);
+    });
+
     it("is a security-definer function with a pinned search path and no rights for anon or everyone", async () => {
       const row = (
         await db.query(
