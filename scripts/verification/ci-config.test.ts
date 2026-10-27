@@ -262,6 +262,40 @@ describe("CI workflow configuration (BR10.2, FR10.3)", () => {
     assert.match(timing, /IMPORT_TIMING_STAGE === "1"/);
   });
 
+  it("validates pull requests with Chromium only, the weekly and manual runs with every browser, and records evidence on main", () => {
+    const triggers = workflow.slice(
+      workflow.indexOf("\non:\n"),
+      workflow.indexOf("\npermissions:"),
+    );
+    assert.match(triggers, /types: \[opened, synchronize, reopened, ready_for_review\]/);
+    assert.match(triggers, /schedule:\n {4}- cron: "0 3 \* \* 1"/);
+    assert.match(triggers, /workflow_dispatch:/);
+    // Only the AI-DLC records, which no check reads, are skipped; docs/ stays covered by the privacy scan.
+    assert.equal([...triggers.matchAll(/paths-ignore:\n {6}- "aidlc\/\*\*"\n/g)].length, 2);
+    assert.match(
+      workflow,
+      /group: ci-\$\{\{ github\.workflow \}\}-\$\{\{ github\.event_name \}\}-/,
+    );
+    const validate = workflow.slice(
+      workflow.indexOf("  validate:"),
+      workflow.indexOf("  build_evidence:"),
+    );
+    assert.match(
+      validate,
+      /if: github\.event_name != 'push' && !github\.event\.pull_request\.draft/,
+    );
+    assert.match(
+      validate,
+      /VERIFY_BROWSER_PROJECTS: \$\{\{ github\.event_name == 'pull_request' && 'chromium' \|\| '' \}\}/,
+    );
+    const evidence = workflow.slice(workflow.indexOf("  build_evidence:"));
+    assert.match(evidence, /if: github\.event_name == 'push'/);
+    assert.equal(/needs:/.test(evidence), false);
+    // The evidence names only the browsers that ran.
+    const pipeline = read("scripts/verification/run-local-verification.ts");
+    assert.match(pipeline, /selectedBrowserProjects\(process\.env\.VERIFY_BROWSER_PROJECTS\)/);
+  });
+
   it("keeps the private build evidence for 14 days and the existing PostgreSQL role-migration step", () => {
     assert.match(workflow, /retention-days: 14/);
     assert.match(workflow, /postgresql-18/);

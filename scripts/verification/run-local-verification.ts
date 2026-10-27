@@ -2,6 +2,7 @@ import { execFileSync, spawnSync } from "node:child_process";
 import { mkdirSync, rmSync, writeFileSync, writeSync } from "node:fs";
 import { resolve } from "node:path";
 import { validateManifests, type Evidence, type Scenario } from "./core.ts";
+import { selectedBrowserProjects } from "../../tests/browser/support/projects.ts";
 
 const root = process.cwd();
 const runtimeDirectory = resolve(root, ".verification");
@@ -12,6 +13,10 @@ for (const path of [evidenceDirectory, logDirectory]) {
   mkdirSync(path, { recursive: true });
 }
 
+// The browser projects this run uses (CI pull requests: Chromium only); the evidence names only those.
+const browserProjects = selectedBrowserProjects(process.env.VERIFY_BROWSER_PROJECTS).map(
+  (project) => project.name as string,
+);
 const gitSha = execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim();
 const nodeVersion = process.version;
 const npmVersion = execFileSync("npm", ["--version"], { encoding: "utf8" }).trim();
@@ -164,7 +169,7 @@ for (const scenario of scenarios) {
     ...(scenario.browser
       ? { browser: scenario.browser }
       : scenario.browsers
-        ? { browser: scenario.browsers.join(",") }
+        ? { browser: scenario.browsers.filter((name) => browserProjects.includes(name)).join(",") }
         : {}),
     result: scenario.target === "local" ? "PASS" : "OUTSTANDING",
     startedAt: source.startedAt,

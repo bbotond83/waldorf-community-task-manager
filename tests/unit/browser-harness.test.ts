@@ -1,7 +1,11 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { BROWSER_PROJECTS, schemaForProject } from "../browser/support/projects.ts";
+import {
+  BROWSER_PROJECTS,
+  schemaForProject,
+  selectedBrowserProjects,
+} from "../browser/support/projects.ts";
 
 /**
  * The guards of the browser phase (NFR3.20, NFR2.33): every spec file goes through the one seeded-schema helper, the
@@ -39,9 +43,21 @@ describe("the browser specs and their schemas", () => {
     expect(() => schemaForProject("webkit")).toThrow("BROWSER_PROJECT_UNKNOWN");
   });
 
+  it("selects every project by default and only the named ones when a list is given", () => {
+    const names = (list: string | undefined) =>
+      selectedBrowserProjects(list).map((project) => project.name);
+    expect(names(undefined)).toEqual(["chromium", "firefox", "mobile-chrome"]);
+    expect(names("")).toEqual(["chromium", "firefox", "mobile-chrome"]);
+    expect(names("chromium")).toEqual(["chromium"]);
+    expect(names(" mobile-chrome , chromium ")).toEqual(["chromium", "mobile-chrome"]);
+    expect(() => selectedBrowserProjects("chromium,webkit")).toThrow("BROWSER_PROJECT_UNKNOWN");
+  });
+
   it("starts one server per project with the project's schema and no demo-mode setting", () => {
     const config = read(join(process.cwd(), "playwright.config.ts"));
-    expect(config).toContain("BROWSER_PROJECTS.map(");
+    expect(config).toContain("selectedBrowserProjects(process.env.VERIFY_BROWSER_PROJECTS)");
+    expect(config).toContain("webServer: selected.map(");
+    expect(config).toContain(".filter((project) => isSelected(project.name))");
     expect(config).toContain("DATABASE_SCHEMA: schema");
     expect(config).not.toMatch(
       /APP_RUNTIME_MODE|APP_SYNTHETIC_FIXTURE_VERSION|SYNTHETIC_TEST_COPIES/,

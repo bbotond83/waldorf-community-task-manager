@@ -1,27 +1,43 @@
 name: CI
 
+# Sized for the free private-repository Actions minutes. A pull request runs the full check with Chromium only; the
+# weekly and the manually started runs add Firefox and mobile Chrome. A push to main only records the build evidence:
+# the squash-merged change was validated on its pull request. Changes that touch only AI-DLC workflow records
+# (aidlc/, which no check reads) start no run, and a draft pull request is checked once it is ready for review.
 on:
   pull_request:
     branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths-ignore:
+      - "aidlc/**"
   push:
     branches: [main]
+    paths-ignore:
+      - "aidlc/**"
+  schedule:
+    - cron: "0 3 * * 1"
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
+  # The event is part of the group, so a push to main never cancels the weekly full run on the same branch.
+  group: ci-${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   validate:
     name: Validate
+    if: github.event_name != 'push' && !github.event.pull_request.draft
     runs-on: ubuntu-latest
     timeout-minutes: 90
     permissions:
       contents: read
     env:
       APP_HOST: 127.0.0.1
+      # Pull requests browse with Chromium only; empty means every browser project (tests/browser/support/projects.ts).
+      VERIFY_BROWSER_PROJECTS: ${{ github.event_name == 'pull_request' && 'chromium' || '' }}
       # Identity settings (names and local-only values; the session secret is generated below).
       APP_PUBLIC_URL: http://127.0.0.1:3000
       SMTP_HOST: 127.0.0.1
@@ -89,7 +105,8 @@ jobs:
 
   build_evidence:
     name: SBOM and build evidence
-    needs: validate
+    # Only for the merged commit on main; its pull request ran the validate job.
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:

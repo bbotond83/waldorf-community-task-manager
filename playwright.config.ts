@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { defineConfig, devices } from "@playwright/test";
 import { parseEnvFile, PUBLIC_ENV_FILE, SERVICE_ENV_FILE } from "./scripts/db/common.ts";
 import { firefoxLaunchOptions } from "./scripts/verification/firefox-launch.ts";
-import { BROWSER_PROJECTS } from "./tests/browser/support/projects.ts";
+import { selectedBrowserProjects } from "./tests/browser/support/projects.ts";
 
 const basePort = Number(process.env.APP_PORT ?? 3100);
 
@@ -36,6 +36,10 @@ const serverEnvironment = (port: number, schema: string) => ({
   SMTP_FROM: process.env.SMTP_FROM ?? "no-reply@example.test",
 });
 
+// VERIFY_BROWSER_PROJECTS narrows the run (CI pull requests: Chromium only); unset means every project.
+const selected = selectedBrowserProjects(process.env.VERIFY_BROWSER_PROJECTS);
+const isSelected = (name: string) => selected.some((project) => project.name === name);
+
 export default defineConfig({
   testDir: "./tests/browser",
   fullyParallel: false,
@@ -46,7 +50,7 @@ export default defineConfig({
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
   },
-  webServer: BROWSER_PROJECTS.map(({ portOffset, schema }) => ({
+  webServer: selected.map(({ portOffset, schema }) => ({
     command: "npm run start",
     env: serverEnvironment(basePort + portOffset, schema),
     url: `http://127.0.0.1:${basePort + portOffset}/api/readiness`,
@@ -70,5 +74,5 @@ export default defineConfig({
       name: "mobile-chrome",
       use: { ...devices["Pixel 7"], baseURL: `http://127.0.0.1:${basePort + 2}` },
     },
-  ],
+  ].filter((project) => isSelected(project.name)),
 });

@@ -145,7 +145,9 @@ Playwright runs Chromium against `worker_1` (port 3100), Firefox against `worker
 `worker_3` (3102), one project after the other, each with its own production server. A shared helper resets and seeds the
 project's schema before each spec file, and the specs sign in for real with the seeded accounts. Run `npm run build`
 with the stack settings loaded first, and install the browsers once with `npx playwright install chromium firefox`.
-If a browser run was interrupted, make sure ports 3100 to 3102 are free and retry.
+If a browser run was interrupted, make sure ports 3100 to 3102 are free and retry. Set
+`VERIFY_BROWSER_PROJECTS` to a comma-separated list (for example `chromium`) to run only those projects; the evidence then
+names only the browsers that ran.
 
 `npm run verify:local` is the canonical local acceptance command. It checks the toolchain and the verification
 manifests, runs formatting, lint and types, all tests, every database stage, coverage, the scans, the build, the bundle
@@ -162,10 +164,17 @@ supported Apple environment. Supabase hosted-target checks, the scheduler, e-mai
 preview or staging also stay `OUTSTANDING` until a separate, approved, linked-target workflow runs them. The local
 command accepts no target credentials and calls no hosted target.
 
+### CI runs
+
+CI is sized for the free private-repository GitHub Actions minutes. A pull request runs `npm run verify:local` with
+Chromium only (`VERIFY_BROWSER_PROJECTS=chromium`); a draft pull request is checked once it is marked ready for review.
+The full browser phase (Chromium, Firefox and mobile Chrome) runs every Monday at 03:00 UTC and whenever the workflow is
+started by hand from the **Actions** tab (**Run workflow**). A push to `main` does not repeat the validation: the
+squash-merged change was validated on its pull request. Changes that touch only `aidlc/` workflow records start no run.
+
 ### CI build evidence
 
-After validation succeeds on a pull request or a push to `main`, CI rebuilds the application with build-only
-placeholder settings and uploads a private `build-evidence-<commit>-<attempt>` Actions artifact. It contains
+After a change is merged to `main`, CI rebuilds the application with build-only placeholder settings and uploads a private `build-evidence-<commit>-<attempt>` Actions artifact. It contains
 `next-build.tar.gz`, the CycloneDX `sbom.cdx.json`, `build-metadata.json` with the commit and workflow run details, and
 `SHA256SUMS`. Download it from the workflow run's **Artifacts** section and run `sha256sum -c SHA256SUMS` in the
 extracted directory to check the files. Evidence expires after 14 days.

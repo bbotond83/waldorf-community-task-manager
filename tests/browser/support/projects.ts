@@ -18,3 +18,19 @@ export function schemaForProject(projectName: string): string {
   if (!project) throw new Error(`BROWSER_PROJECT_UNKNOWN: no schema is mapped to "${projectName}"`);
   return project.schema;
 }
+
+/**
+ * The browser projects a run uses, from a comma-separated list such as `VERIFY_BROWSER_PROJECTS=chromium` (CI uses
+ * Chromium only on pull requests). Unset or empty means every project; an unknown name is a configuration error.
+ */
+export function selectedBrowserProjects(
+  list: string | undefined,
+): (typeof BROWSER_PROJECTS)[number][] {
+  const names = (list ?? "")
+    .split(",")
+    .map((name) => name.trim())
+    .filter(Boolean);
+  if (names.length === 0) return [...BROWSER_PROJECTS];
+  for (const name of names) schemaForProject(name);
+  return BROWSER_PROJECTS.filter((project) => names.includes(project.name));
+}
