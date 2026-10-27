@@ -98,6 +98,7 @@ Do these in one PR, with the date in each note, after the intent is closed.
 1. Abuse limit for denied-call audit events (B3): require an existing organization, a fixed scope for unknown organizations, or a per-account rate limit.
 2. Timing tests (C2): keep the 60 s ceiling as is, or a quiet stage with one automatic retry.
 3. Items carried from earlier laps that are still open: Hungarian notice titles need an owner check; reminder recipients are not re-planned when a family changes group; staged-data expiry depends on sign-ins until a scheduler exists; no screen sends invitations yet.
+   - **F3 decisions, 2026-10-27 (owner):** (a) notice titles: the assistant lists them for the owner's review, see `follow-ups/notice-titles-review.md`; wording is applied after the owner replies. (b) reminders on a group change: fix it, separate PR with an AI-DLC express run. (c) staged-data expiry depends on sign-ins: accepted until a hosted environment exists; owner: Botond; review trigger: when a hosted environment is planned, add a scheduler that calls the housekeeping function. (d) no screen sends invitations: deferred to a later feature lap; accepted, owner: Botond, 2026-10-27.
 4. Real workbook in git history: the owner performs the history rewrite. Until then the report `verification/reports/u5-workbook-and-known-limits.md` states it.
    - **Checklist delivered 2026-10-27:** `follow-ups/f4-history-rewrite-checklist.md`. The owner confirmed the workbook holds real personal data, so the rewrite is urgent. The owner performs it; D1 waits for it.
 
