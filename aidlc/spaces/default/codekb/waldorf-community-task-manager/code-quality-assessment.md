@@ -1,57 +1,67 @@
 # Code Quality Assessment
 
-Full rescan, 2026-10-12, HEAD `80bd4f4`. Test results executed on Node 24.21.0 in this run.
+Full rescan 2026-10-12 (HEAD `80bd4f4`), focused update 2026-10-27 (HEAD `5d2b484`, intent `denied-audit-ratelimit`). The focused update was read-only (no test, build or program run) and added "Database layer and audit area"; the 2026-10-12 sections below record results executed then and are not current (per project rule, current executable results are authoritative over these counts).
 
-## Tests, layers, and their dependence on synthetic state
+## Database layer and audit area (2026-10-27)
 
-| Layer | Runner | Size (executed) | Synthetic/fixture dependence |
+### Tests
+| Layer | Runner | Size | Notes |
 |---|---|---|---|
-| Domain unit | `node --experimental-strip-types --test` (`npm run test:domain`) | 32 files in `src/`, 258 tests, pass, about 1 s | In-memory adapters tested directly; most reusable against future database ports if ports become async |
-| Vitest "delivery" | Vitest 4.1.11, jsdom | 42 files, 531 tests, pass, about 12 s: `tests/unit` 11, `tests/integration` 15, `tests/coverage` 16 | About 40 files reference synthetic modules, reset state or fixtures (list in handoff: admin-actions, admin-pages, app-entrypoints, parent-actions, synthetic-route, runtime-config-cli, teacher-routes, etc.) |
-| Browser | Playwright 1.62.1; chromium, firefox, mobile-chrome (Pixel 7) | 11 spec files; about 92 `test(` declarations; 2 excluded from default (`profile-login-existing`, `profile-login-performance`); about 90 default tests x 3 projects, about 270 executions; `workers: 1`, `fullyParallel: false`, `retries: 2` in CI | Nine of eleven specs call `POST /api/synthetic/reset` in setup and sign in via the profile selector or `/api/synthetic/session`; three `webServer` entries (`npm run start`, ports 3100, 3101, 3102, health `/api/readiness`) each with `APP_RUNTIME_MODE=synthetic`, `APP_SYNTHETIC_FIXTURE_VERSION=waldorf-local-v1`, `APP_HOST=127.0.0.1`, `SYNTHETIC_TEST_COPIES=1`. One server per browser so each mutates its own in-memory copy; a shared database would remove that isolation |
-| Database | `node:test`, `psql` CLI (`npm run test:database:roles`, step `database-roles` of `verify:local`, not in `npm test`) | 1 file, 340 lines, 9 cases | Uses `tests/database/fixtures/current-role-baseline.sql` (alias `g`), not the real first migration |
-| Accessibility | `@axe-core/playwright` inside browser specs | serious/critical violations block (team rule) | Synthetic data |
+| Database (real local stack) | `node --experimental-strip-types --test`, `pg` client | 55 files in `tests/database/` (test files, support modules and one SQL fixture) | Every file runs against the started Supabase stack; files that share a schema serialize through advisory locks; each test starts from `resetWorkerData`; most audit files run twice, in `worker_1` and in `public` |
 
-Coverage: domain run requires lines, branches, functions at 80; Vitest istanbul includes `app/**`, `src/**`, `scripts/**`, `proxy.ts`, `next.config.ts` at 80/80/80 with `ProductionCoverageReporter` (`tests/coverage/support/production-coverage-reporter.ts`, honest denominator via `production-inventory.ts`: every production file must be measured). New production files (adapters, seed or reset scripts) enter the denominator.
+- The audit area is well covered: refused rights for every application role, append-only behaviour, actor attribution (including `none` and `system`), denied event committed with the denied result, atomic rollback, `details` format, check lists, indexes, overhead under 50 ms per operation (NFR4.5), purge boundaries and the 5000-row cap.
+- Not covered today: any volume limit on denied events (none exists), concurrent denials from one account.
+- No SQL coverage measurement; the 80/80/80 coverage floor applies to TypeScript production files only.
 
-## Lint, format, types
+### Ratings (code-analysis guide scale)
+| Aspect | Rating | Evidence |
+|---|---|---|
+| Naming clarity | good | `platform_*`, `identity_*`, `audit_*` prefixes; header comments cite rule ids |
+| Function size | good | audit write 15 lines; finish-operation 14 lines |
+| Error handling | good | expected outcomes as `platform_result` states; unexpected as SQLSTATE exceptions (`28000`, `42501`, `22023`, `23505`) |
+| Test presence | good | each migration unit and follow-up has real-stack tests and an ordering test in `migrations.test.ts` |
+| Duplication | fair | follow-up files restate whole functions (for example `identity_housekeeping` in 20261044 and 20261045), which is the forward-only cost |
+| Dead code | good | superseded `app_audit_events` dropped by catalogue check (20261019:7-19) |
 
-- ESLint 9 flat config `eslint.config.mjs`, `--max-warnings=0`; scope `app src/application src/runtime tests scripts *.config.* proxy.ts`.
-- Prettier scope: `app src/application src/runtime tests scripts verification *.config.* README.md`.
-- `tsc --noEmit` covers `app src tests scripts proxy.ts *.config.ts`.
-- Gap: the other `src/*` modules (about 3,300 lines including all Family B and the four adapters) are outside lint and format.
+### Technical debt and risks for intent `denied-audit-ratelimit`
+1. A1 No volume limit on denied events per account; `audit_events` growth from repeated denials is bounded only by the 365-day purge.
+2. A2 No outcome-aware index; counting an account's denials in the last hour can use `audit_events_actor (actor_account_id, occurred_at desc)` but must filter `outcome` row by row.
+3. A3 No serialization for a count-then-insert cap; concurrent denials of one account can overshoot unless a per-account advisory transaction lock is taken (pattern: 20261013:38).
+4. A4 `occurred_at` is the transaction start time (`now()`); denials in one transaction share a timestamp.
+5. A5 Forward-only is enforced by checksum (`scripts/db/runner.ts:146-151`); a fix must be a new file, which must also restate `revoke all` on the function.
+6. A6 Test registration is manual in two places (npm script and `scripts/db/shuffled-tests.ts`); a new test file missing from either does not run in `verify:local`.
+7. A7 Existing tests that create 20 or more denials for one account inside one test would change behaviour under a cap; a grep found none (loops of 20 or more are reads or successes), but this is unverified until the database suites run.
+8. A8 Four files share the prefix `20261035_`; ordering relies on the full file-name sort.
 
-## CI (`.github/workflows/ci.yml`)
+## Tests, layers and synthetic state (2026-10-12)
 
-Triggers: pull request and push to `main`. Job `validate` (ubuntu-latest, 45 min): env synthetic, setup-node from `.nvmrc`, `npm ci`, Playwright install, PostgreSQL 18 binaries with `create_main_cluster = false`, `npm run verify:local`. Job `build_evidence`: build, CycloneDX SBOM, build tarball, `build-metadata.json` (includes `runtimeMode`, `fixtureVersion`), SHA256SUMS, 14-day artifacts; unsigned, not cryptographic attestations. Actions pinned by SHA. No `services:` block. `npm run verify:local`: toolchain, manifests, format, lint, typecheck, tests, database-roles, coverage, security, build, smoke, browser, then evidence aggregation. `npm run smoke:start` runs `next start` on port 3210 and polls `/api/readiness`.
+| Layer | Runner | Size then | Note |
+|---|---|---|---|
+| Domain unit | `node --test` (`npm run test:domain`) | 32 files, 258 tests, pass | In-memory adapters |
+| Vitest delivery | Vitest 4.1.11, jsdom | 42 files, 531 tests, pass | About 40 files referenced synthetic state |
+| Browser | Playwright 1.62.1 (chromium, firefox, mobile-chrome) | 11 specs | Nine specs called `POST /api/synthetic/reset` |
+| Database | `node:test`, `psql` | 1 file, 9 cases | Superseded by the 55-file real-stack suite above |
+| Accessibility | `@axe-core/playwright` | serious/critical violations block | Synthetic data |
+
+Coverage: 80/80/80 lines/branches/functions with an honest denominator (`tests/coverage/support/production-coverage-reporter.ts`).
+
+## Lint, format, types (2026-10-12)
+
+- ESLint 9 flat config, `--max-warnings=0`; Prettier; `tsc --noEmit`. Other `src/*` modules were outside lint and format scope then.
+
+## CI
+
+- 2026-10-12: job `validate` runs `npm ci`, Playwright install, `npm run verify:local`; job `build_evidence` builds, CycloneDX SBOM, build tarball, metadata, SHA256SUMS, 14-day private artifacts (not cryptographic attestations). Actions pinned by SHA.
+- 2026-10-27 skim: `validate` now starts the local Supabase stack (`npm run db:start`) before `npm run verify:local` and stops it after; `verify:local` runs every `test:database:*` script and the shuffled order run.
 
 ## Documentation
 
-`README.md` (runtime and verification sections; marks Supabase auth/RLS, persistence, scheduled jobs, providers `OUTSTANDING`), Hungarian user guide, `verification/RUNBOOK.md` and `AUTHORIZATION.md`, PRD. Code comments are sparse but purposeful (the `globalThis` workaround, SQL comments).
+`README.md`, Hungarian user guide, `verification/RUNBOOK.md`, `AUTHORIZATION.md`, PRD. SQL migrations carry purposeful header comments with rule ids and forward-only notes (2026-10-27).
 
-## Technical debt and risks (observations)
+## Technical debt and risks recorded 2026-10-12 (not re-verified)
 
-1. R1 Migration 1 cannot be applied to real PostgreSQL (reserved word `grant`, verified on PostgreSQL 18.6); hash-pinned by `tests/unit/current-role-references.test.ts`; the database test avoids the file via a rewritten fixture.
-2. R2 SQL covers about a quarter of the domain (grants, versions, evidence, four thin tables).
-3. R3 Id type mismatch: uuid in SQL, slugs in TypeScript, cookie and `verification/fixtures.json`; org slug differs (`org-waldorf-local` vs `org-napsugar`).
-4. R4 Synchronous ports in Family B and `IdempotencyStore`; `InMemoryAccessTransaction.run` rejects promises.
-5. R5 Family B is dead code from the app's view; rules duplicated inside `SyntheticParentPort`, `SyntheticAdminPort`, `AdvancedWorkflowStore`.
-6. R6 Fake behaviours: admin `assign`, `saveNotes`; fixed import preview and no parser; no reminder runner; hardcoded lifecycle/governance rows; dashboard conflicts always 0; "simulated" provider labels.
-7. R7 Single-parent design: literal `parent-local` and constant `PARENT_FAMILY_SCOPE`; one global notification list.
-8. R8 Session secret hardcoded, `secure` cookie false, no server-side session store, `APP_SESSION_SECRET` unused.
-9. R9 Global mutable state: three `globalThis` stores and one module-level `Map` (`access-state.ts`), plus a reset route depending on them.
-10. R10 Test isolation designed for in-memory state (three servers, reset endpoint).
-11. R11 Evidence and CI tooling encode `runtimeMode: "synthetic"` (`scripts/verification/core.ts` throws on `record.target === "local" && record.runtimeMode !== "synthetic"`, about line 267).
-12. R12 Production config demands `https://` Supabase URL; only two modes.
-13. R13 Coverage denominator and lint/format scope differences for new directories.
-14. R14 Environment: no container runtime, no Supabase CLI; Homebrew PostgreSQL 18 needs `LC_ALL=C`; Node 26 default vs 24 required; unix socket path limit of 103 bytes.
-15. R15 AI-DLC records coupled into a unit test (`261006-simplify-user-roles` manifest).
-16. R16 `proxy.ts` has no gating; `/api/*` outside matcher; `upgrade-insecure-requests` unconditional (relevant to local http).
-17. Floating `latest` ranges for react, react-dom and zod.
-18. SQL migration file name `20260806_access_rls.sql` lacks a time part; no `config.toml`, seed, or SQL tests; no database client library.
-19. Fake-feature hooks (`scenario` hidden fields, magic ids) live in production code under `app/`.
-20. Secret-like constant in source (session key) and a hardcoded fixture fingerprint.
+R1 first migration not applicable (since fixed, FR1.2); R2 thin SQL coverage (since extended); R3 uuid versus slug ids; R4 synchronous Family B ports; R5 Family B dead code; R6 fake behaviours; R7 single-parent design; R8 hardcoded session secret; R9 global mutable state; R10 test isolation for in-memory state; R11 evidence tooling encodes synthetic mode; R12 production config demands `https://`; R13 coverage and lint scope for new directories; R14 local environment constraints; R15 AI-DLC records coupled into a unit test; R16 no gating in `proxy.ts`; floating `latest` ranges; fake-feature hooks in production code; secret-like constant in source.
 
 ## Quality strengths
 
-All 789 tests (258 + 531) currently pass; enforced 80/80/80 coverage with an honest denominator; strict TypeScript; explicit result states; pinned CI actions; secret scanning and SAST per team rules; accessibility checks in the critical browser flow.
+Strict TypeScript; explicit result states in TypeScript and SQL; enforced coverage floor; pinned CI actions; secret scanning and SAST per team rules; accessibility checks in the critical browser flow; forward-only, schema-neutral, checksum-tracked migrations with real-stack tests (2026-10-27).

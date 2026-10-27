@@ -355,6 +355,27 @@ describe("migrations on the real local stack", () => {
     }
   });
 
+  it("applies the denied audit limit file after the purge isolation file in the default and in a worker schema, and a second run changes nothing", async () => {
+    const limitFile = "20261046_audit_denied_rate_limit.sql";
+    const names = migrations.map((file) => file.name);
+    assert.ok(names.includes(limitFile), "the denied audit limit migration exists");
+    assert.ok(
+      names.indexOf(limitFile) > names.indexOf("20261045_audit_purge_isolation.sql"),
+      "the denied audit limit file sorts after the purge isolation file",
+    );
+    for (const schema of ["public", "worker_4"]) {
+      const tracked = (
+        await db.query(
+          `select filename from ${TRACKING_SCHEMA}.applied_migrations where schema_name = $1 and filename = $2`,
+          [schema, limitFile],
+        )
+      ).rows;
+      assert.equal(tracked.length, 1, schema);
+      const again = await run(db, schema);
+      assert.deepEqual(again.applied, [], schema);
+    }
+  });
+
   it("refuses a file with a hard-coded schema name, names it, and applies nothing", async () => {
     const before = (
       await db.query(`select count(*)::int as n from ${TRACKING_SCHEMA}.applied_migrations`)

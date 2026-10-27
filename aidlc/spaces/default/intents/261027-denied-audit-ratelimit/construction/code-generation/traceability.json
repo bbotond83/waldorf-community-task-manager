@@ -1,0 +1,19 @@
+{
+  "stage": "code-generation",
+  "upstream_ids": ["FR1.1", "FR1.2", "FR1.3", "FR1.4", "FR2", "FR3", "FR4", "FR5", "NFR1", "NFR2", "NFR3", "NFR4"],
+  "coverage": [
+    { "id": "FR1.1", "status": "OK", "target": "supabase/migrations/20261046_audit_denied_rate_limit.sql" },
+    { "id": "FR1.2", "status": "OK", "target": "supabase/migrations/20261046_audit_denied_rate_limit.sql" },
+    { "id": "FR1.3", "status": "OK", "target": "tests/database/audit-denied-limit.test.ts" },
+    { "id": "FR1.4", "status": "OK", "target": "tests/database/audit-denied-limit.test.ts" },
+    { "id": "FR2", "status": "OK", "target": "tests/database/audit-denied-limit.test.ts" },
+    { "id": "FR3", "status": "OK", "target": "tests/database/audit-denied-limit.test.ts" },
+    { "id": "FR4", "status": "OK", "target": "supabase/migrations/20261046_audit_denied_rate_limit.sql" },
+    { "id": "FR5", "status": "OK", "target": "supabase/migrations/20261046_audit_denied_rate_limit.sql" },
+    { "id": "NFR1", "status": "OK", "target": "tests/database/audit-denied-limit.test.ts" },
+    { "id": "NFR2", "status": "OK", "target": "supabase/migrations/20261046_audit_denied_rate_limit.sql" },
+    { "id": "NFR3", "status": "OK", "target": "supabase/migrations/20261046_audit_denied_rate_limit.sql" },
+    { "id": "NFR4", "status": "OK", "target": "scripts/db/shuffled-tests.ts" }
+  ],
+  "reverse": []
+}

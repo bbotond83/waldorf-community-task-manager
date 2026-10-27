@@ -9,6 +9,7 @@ import { type Log, parseArguments, runAsCommand } from "./common.ts";
 export const DATABASE_TEST_FILES = [
   "tests/database/migrations.test.ts",
   "tests/database/audit.test.ts",
+  "tests/database/audit-denied-limit.test.ts",
   "tests/database/idempotency.test.ts",
   "tests/database/holds.test.ts",
   "tests/database/worker.test.ts",

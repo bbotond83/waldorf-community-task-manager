@@ -120,5 +120,13 @@
     "scope": "express",
     "status": "complete",
     "request": "533abd3b"
+  },
+  {
+    "uuid": "01a17d26-e406-78ec-8fed-64ed658cb327",
+    "slug": "denied-audit-ratelimit",
+    "dirName": "261027-denied-audit-ratelimit",
+    "scope": "express",
+    "status": "complete",
+    "request": "b5783aef"
   }
 ]
