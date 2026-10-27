@@ -69,6 +69,7 @@ D1. Content scans skip `aidlc/` and `source-materials/` entirely (U1 R-03).
 
 D2. The nine fictitious phone numbers are allowed repository-wide (U1 R-05).
 - Plan: optionally restrict them to test paths. Keep the scan test that proves a number not on the list is still flagged.
+- **Done (branch `chore/phone-numbers-test-paths-only`, plain change without an AI-DLC run, 2026-10-27).** The nine numbers are now accepted only in test files (`tests/` and `*.test.*` / `*.spec.*`) and in the paths listed under `phoneAllowedPaths` in `scripts/verification/privacy-allowlist.json` (the seed data and the allowlist file itself). A listed number anywhere else is a finding, and an unlisted number is still a finding everywhere. Two scan tests cover both directions.
 
 D3. Five moderate `npm audit` advisories (nodemailer chain) are not listed in any summary (U1, U2, U4 reviews).
 - Plan: list them with an owner and a review date, and update the dependency when a fixed version exists. The blocking rule (high and critical) is met today.

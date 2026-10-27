@@ -1,5 +1,5 @@
 {
-  "description": "Allowlist for scripts/verification/scan-artifacts.ts. Everything here is public by design: example addresses, example phone numbers, schema files that are not data dumps, record folders, and the SHA-256 hashes of the Supabase CLI's documented local default keys.",
+  "description": "Allowlist for scripts/verification/scan-artifacts.ts. Everything here is public by design: example addresses, example phone numbers (accepted in test files and the seed only), schema files that are not data dumps, record folders, and the SHA-256 hashes of the Supabase CLI's documented local default keys.",
   "emailDomains": ["example.com", "example.net", "example.org", "example.test", "example.invalid"],
   "emails": ["git@github.com"],
   "phoneNumbers": [
@@ -13,6 +13,7 @@
     "+36 20 555 1212",
     "+36 30 555 0000"
   ],
+  "phoneAllowedPaths": ["scripts/db/seed/", "scripts/verification/privacy-allowlist.json"],
   "allowedPaths": ["supabase/migrations/", "supabase/roles.sql", "tests/database/fixtures/"],
   "ignoredPrefixes": ["aidlc/", ".aidlc-archive/", "source-materials/"],
   "secretIgnoredPrefixes": ["aidlc/", "source-materials/"],

@@ -15,6 +15,8 @@ export interface Allowlist {
   emailDomains: string[];
   emails: string[];
   phoneNumbers: string[];
+  /** Where the listed phone numbers are accepted, besides test files: everywhere else they are findings. */
+  phoneAllowedPaths: string[];
   allowedPaths: string[];
   ignoredPrefixes: string[];
   secretIgnoredPrefixes: string[];
@@ -29,6 +31,7 @@ export function loadAllowlist(
     emailDomains: raw.emailDomains ?? [],
     emails: raw.emails ?? [],
     phoneNumbers: raw.phoneNumbers ?? [],
+    phoneAllowedPaths: raw.phoneAllowedPaths ?? [],
     allowedPaths: raw.allowedPaths ?? [],
     ignoredPrefixes: raw.ignoredPrefixes ?? [],
     secretIgnoredPrefixes: raw.secretIgnoredPrefixes ?? [],
@@ -170,6 +173,8 @@ function digits(value: string): number {
   return value.replace(/\D/g, "").length;
 }
 
+const TEST_FILE = /(^tests\/|\.(test|spec)\.[cm]?[jt]sx?$)/;
+
 /** Privacy scan (BR11.1, BR11.2): data files, emails and phone numbers outside the allowed places. */
 export function scanPrivacy(options: ScanOptions): ScanResult {
   const allowlist = options.allowlist ?? loadAllowlist();
@@ -208,9 +213,14 @@ export function scanPrivacy(options: ScanOptions): ScanResult {
       findings.push(`${path} contains an email address`);
       break;
     }
+    // The listed fictitious numbers are accepted in test files and the seed only; elsewhere they are findings too.
+    const phonesAllowedHere =
+      TEST_FILE.test(path) || startsWithAny(path, allowlist.phoneAllowedPaths);
     for (const pattern of PHONE_PATTERNS) {
       const hit = [...text.matchAll(pattern)].find(
-        (match) => digits(match[0]) >= 8 && !allowedPhones.has(match[0].replace(/\D/g, "")),
+        (match) =>
+          digits(match[0]) >= 8 &&
+          !(phonesAllowedHere && allowedPhones.has(match[0].replace(/\D/g, ""))),
       );
       if (hit) {
         findings.push(`${path} contains a phone number`);

@@ -22,11 +22,13 @@ const part = (character: string) => character.repeat(24);
 const fakeJwt = () => ["eyJ" + part("a"), part("b"), part("c")].join(".");
 const fakeEmail = () => `person${at}invented.invalid`;
 const fakePhone = () => ["+36", "20", "123", "4567"].join(" ");
+const otherPhone = () => ["+36", "70", "999", "8888"].join(" ");
 
 const noAllowlist: Allowlist = {
   emailDomains: ["example.test"],
   emails: [],
   phoneNumbers: [],
+  phoneAllowedPaths: [],
   allowedPaths: ["db/migrations/"],
   ignoredPrefixes: ["records/"],
   secretIgnoredPrefixes: ["records/"],
@@ -125,11 +127,46 @@ describe("privacy scan", () => {
     );
   });
 
-  it("allows an exact allowlisted address and an allowlisted phone number", () => {
-    withTree({ "docs/a.md": `${fakeEmail()} ${fakePhone()}` }, (root) => {
-      const allowlist = { ...noAllowlist, emails: [fakeEmail()], phoneNumbers: [fakePhone()] };
-      assert.deepEqual(privacy(root, allowlist), []);
-    });
+  it("allows an exact allowlisted address anywhere and a listed phone number in test files and listed paths", () => {
+    withTree(
+      {
+        "docs/a.md": fakeEmail(),
+        "src/form.test.ts": fakePhone(),
+        "tests/support/people.ts": fakePhone(),
+        "seed/people.ts": fakePhone(),
+      },
+      (root) => {
+        const allowlist = {
+          ...noAllowlist,
+          emails: [fakeEmail()],
+          phoneNumbers: [fakePhone()],
+          phoneAllowedPaths: ["seed/"],
+        };
+        assert.deepEqual(privacy(root, allowlist), []);
+      },
+    );
+  });
+
+  it("flags a listed phone number outside test files and the listed paths, and an unlisted one inside them", () => {
+    withTree(
+      {
+        "src/form.ts": fakePhone(),
+        "docs/a.md": fakePhone(),
+        "src/other.test.ts": otherPhone(),
+      },
+      (root) => {
+        const allowlist = {
+          ...noAllowlist,
+          phoneNumbers: [fakePhone()],
+          phoneAllowedPaths: ["seed/"],
+        };
+        assert.deepEqual(privacy(root, allowlist), [
+          "docs/a.md contains a phone number",
+          "src/form.ts contains a phone number",
+          "src/other.test.ts contains a phone number",
+        ]);
+      },
+    );
   });
 
   it("does not mistake version numbers, hashes or package names for personal data", () => {
@@ -280,6 +317,7 @@ describe("scan configuration and timing", () => {
         emailDomains: [],
         emails: [],
         phoneNumbers: [],
+        phoneAllowedPaths: [],
         allowedPaths: [],
         ignoredPrefixes: [],
         secretIgnoredPrefixes: [],
