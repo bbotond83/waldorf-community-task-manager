@@ -250,6 +250,18 @@ describe("CI workflow configuration (BR10.2, FR10.3)", () => {
     assert.equal(/APP_RUNTIME_MODE|APP_SYNTHETIC_FIXTURE_VERSION/.test(pipeline), false);
   });
 
+  it("runs the 2000-row import timing test alone in its own database step after the shuffled run, with a retry", () => {
+    const pipeline = read("scripts/verification/run-local-verification.ts");
+    assert.match(
+      pipeline,
+      /key: "database-import-timing", args: \["run", "test:database:import-timing"\]/,
+    );
+    assert.ok(pipeline.indexOf("database-shuffled") < pipeline.indexOf("database-import-timing"));
+    assert.ok(pipeline.indexOf("database-import-timing") < pipeline.indexOf('key: "coverage"'));
+    const timing = read("tests/database/notifications-timing.test.ts");
+    assert.match(timing, /IMPORT_TIMING_STAGE === "1"/);
+  });
+
   it("keeps the private build evidence for 14 days and the existing PostgreSQL role-migration step", () => {
     assert.match(workflow, /retention-days: 14/);
     assert.match(workflow, /postgresql-18/);

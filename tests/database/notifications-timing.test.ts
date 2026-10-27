@@ -212,84 +212,100 @@ for (const schema of DIRECTORY_SCHEMAS) {
       assert.ok(staged < 200);
     });
 
-    it("previews and commits a 2000-row workbook within the ceilings (NFR4.10, NFR4.11)", async () => {
-      // 300 new families (a parent row and a child row each) and 280 new tasks with five rows each, whose families
-      // are the 15 families of the first group; 2000 rows in all.
-      const rows: ParsedRow[] = [];
-      let row = 2;
-      for (let n = 0; n < 300; n += 1) {
-        rows.push(
-          dirRow(row, {
-            Csoport: "Boróka",
-            Család: `Import család ${n}`,
-            "Szülő neve": `Import Szülő ${n}`,
-            "E-mail": `import${n}@example.test`,
-            Telefon: "+36 30 555 0000",
-            Helység: "Pécs",
-          }),
-        );
-        row += 1;
-        rows.push(
-          dirRow(row, {
-            Csoport: "Boróka",
-            Család: `Import család ${n}`,
-            "Gyermek neve": `Import Gyerek ${n}`,
-          }),
-        );
-        row += 1;
-      }
-      const sheet = "Kinti - benti takarítás 2025-26";
-      for (let t = 0; t < 280; t += 1) {
-        for (let k = 0; k < 5; k += 1) {
+    // Skipped here and run alone by `npm run test:database:import-timing` (scripts/db/import-timing-stage.ts): on a
+    // busy shared runner this test alone exceeded its ceiling without any change to the import.
+    it(
+      "previews and commits a 2000-row workbook within the ceilings (NFR4.10, NFR4.11)",
+      {
+        skip:
+          process.env.IMPORT_TIMING_STAGE === "1" ? false : "runs in the quiet import timing stage",
+      },
+      async () => {
+        // 300 new families (a parent row and a child row each) and 280 new tasks with five rows each, whose families
+        // are the 15 families of the first group; 2000 rows in all.
+        const rows: ParsedRow[] = [];
+        let row = 2;
+        for (let n = 0; n < 300; n += 1) {
           rows.push(
-            taskRow(
-              row,
-              {
-                Csoport: "Boróka",
-                Feladat: `Import feladat ${t}`,
-                Kezdés: budapestText(90 + t, 9),
-                Befejezés: budapestText(90 + t, 11),
-                Létszám: "5",
-                Család: `Adat család ${((t + k) % 15) * 10}`,
-              },
-              sheet,
-            ),
+            dirRow(row, {
+              Csoport: "Boróka",
+              Család: `Import család ${n}`,
+              "Szülő neve": `Import Szülő ${n}`,
+              "E-mail": `import${n}@example.test`,
+              Telefon: "+36 30 555 0000",
+              Helység: "Pécs",
+            }),
+          );
+          row += 1;
+          rows.push(
+            dirRow(row, {
+              Csoport: "Boróka",
+              Család: `Import család ${n}`,
+              "Gyermek neve": `Import Gyerek ${n}`,
+            }),
           );
           row += 1;
         }
-      }
-      assert.equal(rows.length, 2000);
+        const sheet = "Kinti - benti takarítás 2025-26";
+        for (let t = 0; t < 280; t += 1) {
+          for (let k = 0; k < 5; k += 1) {
+            rows.push(
+              taskRow(
+                row,
+                {
+                  Csoport: "Boróka",
+                  Feladat: `Import feladat ${t}`,
+                  Kezdés: budapestText(90 + t, 9),
+                  Befejezés: budapestText(90 + t, 11),
+                  Létszám: "5",
+                  Család: `Adat család ${((t + k) % 15) * 10}`,
+                },
+                sheet,
+              ),
+            );
+            row += 1;
+          }
+        }
+        assert.equal(rows.length, 2000);
 
-      const started = performance.now();
-      const model = await preview(db, schema, SUPER_ADMIN, rows, "iskola.xlsx", importKeyOf("big"));
-      const previewMs = performance.now() - started;
-      assert.equal(model.state, "success");
-      assert.equal(model.conflicts.length, 0, JSON.stringify(model.conflicts.slice(0, 3)));
-      assert.equal(model.total_rows, 2000);
-      report(
-        `import preview of 2000 rows in ${schema}: ${SECONDS(previewMs)} s (typical target 10 s, fails above 60 s)`,
-      );
-      assert.ok(previewMs < 60_000, `the preview took ${previewMs.toFixed(0)} ms`);
+        const started = performance.now();
+        const model = await preview(
+          db,
+          schema,
+          SUPER_ADMIN,
+          rows,
+          "iskola.xlsx",
+          importKeyOf("big"),
+        );
+        const previewMs = performance.now() - started;
+        assert.equal(model.state, "success");
+        assert.equal(model.conflicts.length, 0, JSON.stringify(model.conflicts.slice(0, 3)));
+        assert.equal(model.total_rows, 2000);
+        report(
+          `import preview of 2000 rows in ${schema}: ${SECONDS(previewMs)} s (typical target 10 s, fails above 60 s)`,
+        );
+        assert.ok(previewMs < 60_000, `the preview took ${previewMs.toFixed(0)} ms`);
 
-      const committedAt = performance.now();
-      const outcome = (await fn(SUPER_ADMIN, "import_commit($1, $2, $3, 'yes')", [
-        importKeyOf("big-commit"),
-        model.run_id,
-        model.fingerprint,
-      ])) as unknown as { state: string; imported_rows: number; skipped_rows: number };
-      const commitMs = performance.now() - committedAt;
-      assert.deepEqual(
-        [outcome.state, outcome.imported_rows, outcome.skipped_rows],
-        ["success", 2000, 0],
-      );
-      report(
-        `import commit of 2000 rows in ${schema}: ${SECONDS(commitMs)} s (typical target 15 s, fails above 60 s)`,
-      );
-      assert.ok(commitMs < 60_000, `the commit took ${commitMs.toFixed(0)} ms`);
-      assert.equal(await count(db, "families", "display_name like 'Import család%'"), 300);
-      assert.equal(await count(db, "tasks", "title like 'Import feladat%'"), 280);
-      assert.equal(await count(db, "assignments", "source = 'import'"), 1400);
-      assert.equal(await count(db, "import_staged_rows"), 0);
-    });
+        const committedAt = performance.now();
+        const outcome = (await fn(SUPER_ADMIN, "import_commit($1, $2, $3, 'yes')", [
+          importKeyOf("big-commit"),
+          model.run_id,
+          model.fingerprint,
+        ])) as unknown as { state: string; imported_rows: number; skipped_rows: number };
+        const commitMs = performance.now() - committedAt;
+        assert.deepEqual(
+          [outcome.state, outcome.imported_rows, outcome.skipped_rows],
+          ["success", 2000, 0],
+        );
+        report(
+          `import commit of 2000 rows in ${schema}: ${SECONDS(commitMs)} s (typical target 15 s, fails above 60 s)`,
+        );
+        assert.ok(commitMs < 60_000, `the commit took ${commitMs.toFixed(0)} ms`);
+        assert.equal(await count(db, "families", "display_name like 'Import család%'"), 300);
+        assert.equal(await count(db, "tasks", "title like 'Import feladat%'"), 280);
+        assert.equal(await count(db, "assignments", "source = 'import'"), 1400);
+        assert.equal(await count(db, "import_staged_rows"), 0);
+      },
+    );
   });
 }

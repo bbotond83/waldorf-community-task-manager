@@ -61,6 +61,7 @@ C1. `tests/integration/swap-screens.test.tsx` fails now and then under load (see
 C2. `tests/database/notifications-timing.test.ts` 2000-row import ceiling of 60 s (U4/U5 R-06).
 - Facts: it measured 86.8 s once on a loaded machine. The ceiling has not been relaxed.
 - Plan: this is a decision (Group F, decision 2): keep the ceiling and rely on the CI runner, or run the timing tests in a quiet stage with one automatic retry that reports both results. Do not raise the ceiling silently.
+- **Done (branch `ci/quiet-stage-import-timing`, plain change without an AI-DLC run, 2026-10-27; the owner chose the quiet stage with one retry).** The 2000-row test is skipped in the notifications-import group and the shuffled run (it runs only when `IMPORT_TIMING_STAGE=1`) and runs alone in a new last database step, `database-import-timing` (`npm run test:database:import-timing`, `scripts/db/import-timing-stage.ts`). A failed run is repeated once after 30 s; both attempts print their own result. Both ceilings stay at 60 s, so a real slowdown fails both attempts. Not run locally (no Docker); first proven by CI. Limit: the CI runner still runs the other jobs of the pipeline in sequence, so the stage is quiet only in the sense that nothing else of ours runs beside it.
 
 ## D. Security tooling
 

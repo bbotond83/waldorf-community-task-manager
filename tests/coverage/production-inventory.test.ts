@@ -104,8 +104,9 @@ describe("honest executable denominator", () => {
     // modules (13), src/runtime synthetic (3), session (1), ProfileSelector (1) and security/origin (1), app/belepes
     // (3), app/api/synthetic (2) and the synthetic invitation forms (1): 233 + 9 + 3 - 25 = 220. Step 22 then removes
     // the 3 files of src/admin-experience (the archive presentation no screen used, with the sheet table kept above) and
-    // src/application/session-facade.ts, which nothing used after the profile switch went: 220 - 4.
-    expect(inventory.length).toBe(216);
+    // src/application/session-facade.ts, which nothing used after the profile switch went: 220 - 4. The quiet stage of the
+    // 2000-row import timing test then adds scripts/db/import-timing-stage.ts: 216 + 1.
+    expect(inventory.length).toBe(217);
     for (const path of [
       "src/runtime/AppNav.tsx",
       "src/runtime/StatusBadge.tsx",
@@ -119,6 +120,7 @@ describe("honest executable denominator", () => {
       "scripts/db/seed.ts",
       "scripts/db/reset.ts",
       "scripts/db/seed/data.ts",
+      "scripts/db/import-timing-stage.ts",
       "app/szulo/_components/MarkNotificationRead.tsx",
       "app/szulo/_components/PendingRequestNotice.tsx",
       "app/admin/_components/AdminBackLink.tsx",
