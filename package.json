@@ -29,7 +29,7 @@
     "test:database:directory": "node --experimental-strip-types --test tests/database/directory-schema.test.ts tests/database/directory-functions.test.ts tests/database/coordination-schema.test.ts tests/database/coordination-functions.test.ts tests/database/kernel-signup.test.ts tests/database/kernel-race.test.ts tests/database/kernel-swaps.test.ts tests/database/kernel-family.test.ts tests/database/directory-link.test.ts tests/database/schedule.test.ts tests/database/lifecycle.test.ts tests/database/placeholder-drop.test.ts tests/database/directory-timing.test.ts tests/database/data-adapters.test.ts",
     "test:database:notifications-import": "node --experimental-strip-types --test tests/database/notifications-schema.test.ts tests/database/notifications-functions.test.ts tests/database/notifications-handoff.test.ts tests/database/notifications-locks.test.ts tests/database/import-schema.test.ts tests/database/import-functions.test.ts tests/database/import-commit.test.ts tests/database/import-catalogue.test.ts tests/database/import-privacy.test.ts tests/database/notifications-timing.test.ts tests/database/notifications-adapters.test.ts",
     "test:database:seed": "node --experimental-strip-types --test tests/database/audit-purge.test.ts tests/database/seed.test.ts tests/database/reset.test.ts tests/database/seed-timing.test.ts",
-    "test:bundle":"node --experimental-strip-types --test tests/database/identity-bundle.test.ts",
+    "test:bundle": "node --experimental-strip-types --test tests/database/identity-bundle.test.ts",
     "test:database:shuffled": "node --experimental-strip-types scripts/db/shuffled-tests.ts",
     "test": "npm run test:domain && npm run test:scripts && npm run test:delivery",
     "test:coverage:domain": "node --experimental-strip-types --experimental-test-coverage --test-coverage-lines=80 --test-coverage-branches=80 --test-coverage-functions=80 --test-coverage-exclude=\"tests/**\" --test \"src/**/*.test.ts\"",
@@ -61,7 +61,7 @@
     "@next/env": "16.4.2",
     "@supabase/supabase-js": "2.117.3",
     "next": "16.4.2",
-    "nodemailer": "10.0.12",
+    "nodemailer": "10.2.1",
     "react": "latest",
     "react-dom": "latest",
     "zod": "latest"
@@ -81,8 +81,8 @@
     "@types/pg": "8.23.1",
     "@types/react": "latest",
     "@types/react-dom": "latest",
-    "@vitest/coverage-istanbul": "4.1.11",
-    "@vitest/coverage-v8": "4.1.11",
+    "@vitest/coverage-istanbul": "4.1.12",
+    "@vitest/coverage-v8": "4.1.12",
     "eslint": "latest",
     "eslint-config-next": "16.3.8",
     "jsdom": "latest",
@@ -90,6 +90,6 @@
     "prettier": "latest",
     "supabase": "2.120.0",
     "typescript": "^5.9.0",
-    "vitest": "4.1.11"
+    "vitest": "4.1.12"
   }
 }

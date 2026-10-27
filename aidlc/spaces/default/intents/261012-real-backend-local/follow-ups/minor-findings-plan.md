@@ -72,6 +72,7 @@ D2. The nine fictitious phone numbers are allowed repository-wide (U1 R-05).
 
 D3. Five moderate `npm audit` advisories (nodemailer chain) are not listed in any summary (U1, U2, U4 reviews).
 - Plan: list them with an owner and a review date, and update the dependency when a fixed version exists. The blocking rule (high and critical) is met today.
+- **Done (branch `chore/audit-advisories-owner`, plain change without an AI-DLC run, 2026-10-27).** Fixed versions existed, so the dependencies were updated instead of only listed: `nodemailer` 10.0.12 to 10.2.1 (three address-parsing advisories; a runtime dependency that sends the invitation and reset mails) and `vitest`, `@vitest/coverage-istanbul`, `@vitest/coverage-v8` 4.1.11 to 4.1.12 (two `@vitest/mocker` advisories; test tooling only). `npm audit` now reports 0 vulnerabilities. The statements in the U1 to U5 summaries that mention "5 moderate advisories" are as of their dates and are covered by the dated note planned in group E. If new advisories appear without a fixed version, list them here with an owner and a review date.
 
 ## E. Documentation and manifest drift (docs only)
 
