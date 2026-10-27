@@ -91,6 +91,7 @@ Do these in one PR, with the date in each note, after the intent is closed.
 - Refresh the three report files `verification/reports/local-acceptance.json`, `local-acceptance.md` and `outstanding-targets.md` by running `npm run verify:local` once and committing the result (Build and Test restored them to keep U5 approved).
 - **Done in branch `docs/unit-record-drift` (2026-10-27), except the report refresh:** the dated "Superseded by later units" notes in the five unit summaries (including the advisories line), the manifest fixes (U1 narrowed; U2 four files added; U3 and U4 twelve deleted paths dropped each), and the traceability fixes (U2 and U3 targets are one file each, with extra files moved to `tests` or `also_built` and prose kept in `note`; U5 got FR2.6, FR2.7, FR9.1, FR9.2, FR9.3, FR10.1). **Still open:** the `npm run verify:local` refresh of the three report files, which needs the running stack and is a separate small PR. `aidlc engine sensor-traceability` reads the active intent only, so these older records were checked by a script (every target is one existing file) instead.
 - U2 Step 26: its design-file edits are recorded in the summary instead of in the frozen design files. Accept as is, or apply the edits to the design files; the owner decides.
+  - **Done (2026-10-27, owner decision).** Accepted as is: the edits stay recorded in the U2 summary; the frozen design files are not changed.
 
 ## F. Decisions for the owner
 
@@ -98,6 +99,7 @@ Do these in one PR, with the date in each note, after the intent is closed.
 2. Timing tests (C2): keep the 60 s ceiling as is, or a quiet stage with one automatic retry.
 3. Items carried from earlier laps that are still open: Hungarian notice titles need an owner check; reminder recipients are not re-planned when a family changes group; staged-data expiry depends on sign-ins until a scheduler exists; no screen sends invitations yet.
 4. Real workbook in git history: the owner performs the history rewrite. Until then the report `verification/reports/u5-workbook-and-known-limits.md` states it.
+   - **Checklist delivered 2026-10-27:** `follow-ups/f4-history-rewrite-checklist.md`. The owner confirmed the workbook holds real personal data, so the rewrite is urgent. The owner performs it; D1 waits for it.
 
 ## Definition of done
 
