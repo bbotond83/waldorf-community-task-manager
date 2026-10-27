@@ -281,3 +281,12 @@ This section replaces the "stopped at database-roles" statement above, which was
 - **Minor 3.** `traceability.json` now names single existing files for every target and test; no glob and no command string remains (a script checked that each path exists).
 - **Minor 4.** `source-manifest.json` keeps only `stage`, `unit`, `version` and `writes`; deleted files are listed inside `writes`, and the three regenerated reports under `verification/reports/` are added.
 - **Minor 5, known load-sensitive test.** The 2000-row import timing test (U4, `tests/database/notifications-timing.test.ts`) measured 86.8 s against its ceiling once, while the machine was loaded; alone the whole stage passes in about 23 s. The ceiling and the test are unchanged: it is a known load-sensitive test, and a failure under heavy machine load should be re-run alone before it is treated as a regression.
+
+## Superseded by later notes (note of 2026-10-27)
+
+The text above is kept as written.
+
+- **Audit purge:** follow-up B1 made `identity_housekeeping()` survive a failing purge and capped one `audit_purge()` run at 5000 rows (`20261045_audit_purge_isolation.sql`). Statements here that the purge is all-or-nothing are as of U5.
+- **Local database guard:** follow-up B5 gave `db:worker` the same local-only guard as the seed and the reset; B4 made its password refusal say why.
+- **Traceability:** FR2.6, FR2.7, FR9.1, FR9.2, FR9.3 and FR10.1 are now listed in `traceability.json` of this unit, each with one file.
+- **Advisories (2026-10-27):** the "4 or 5 moderate advisories" lines in this summary are as of their date. `nodemailer` 10.2.1 and `vitest` 4.1.12 (with the two coverage packages) removed them; `npm audit` reports 0 vulnerabilities (follow-up D3, PR 36).

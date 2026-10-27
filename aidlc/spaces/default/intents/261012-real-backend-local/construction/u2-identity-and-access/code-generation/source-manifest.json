@@ -179,6 +179,18 @@
     },
     {
       "path": "tests/coverage/framework-entrypoints.test.ts"
+    },
+    {
+      "path": "supabase/migrations/20261021_identity_invitation_stale_reservation.sql"
+    },
+    {
+      "path": "supabase/migrations/20261022_identity_email_change_guard.sql"
+    },
+    {
+      "path": "supabase/migrations/20261023_identity_ban_reconcile.sql"
+    },
+    {
+      "path": "tests/database/identity-email-change.test.ts"
     }
   ]
 }

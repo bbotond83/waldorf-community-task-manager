@@ -131,3 +131,13 @@ Exported as `NOTIFICATION_USE_CASES` in `src/data/index.ts` and compared with th
 
 - The approved plan listed 10 to 15 tests per component and about 400 tests; the unit's own database suites count 346 tests in the directory stage, plus tests in `src/data`, the integration and unit folders, and the 9-test browser spec per project.
 - The earlier note "9 passing browser tests" refers to the new browser spec in one project; the three-project existing suite is 441 tests (421 passed, 20 skipped).
+
+## Superseded by later units (note of 2026-10-27)
+
+The text above is kept as written; these statements were overtaken later.
+
+- **Audit purge (R-12):** "the audit retention purge has no implementation" is no longer true. U5 added `audit_purge()` (migration `20261044_audit_purge.sql`, system caller only), and follow-up B1 made a purge failure unable to stop the housekeeping job and capped one run at 5000 rows (`20261045_audit_purge_isolation.sql`).
+- **Interim admin port (R-12):** `src/admin-advanced/interim-port.ts` is gone. U4 answered import and reminders from the database and U5 deleted the interim port with `src/admin-advanced`. The production-inventory count of 228 files is also out of date; the test holds the current count.
+- **Build and start smoke:** `APP_RUNTIME_MODE=synthetic` in the verification table no longer exists (U5).
+- **Manifest:** the twelve paths of folders and files that later units deleted were dropped from `source-manifest.json`.
+- **Advisories (2026-10-27):** the "4 or 5 moderate advisories" lines in this summary are as of their date. `nodemailer` 10.2.1 and `vitest` 4.1.12 (with the two coverage packages) removed them; `npm audit` reports 0 vulnerabilities (follow-up D3, PR 36).

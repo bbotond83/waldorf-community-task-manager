@@ -101,3 +101,14 @@ The second review of this unit found all eight earlier findings fixed and raised
 1. **Reset after a spent link.** When the new password could not be set because the sign-in service was unavailable or rate limiting, or when ending the other sign-ins failed after the password had changed, the answer was generic "try again" advice, and resubmitting the same link only said "not valid". There are now two explicit outcomes with Hungarian messages: `RESET_LINK_SPENT` ("request a new link", with the link to do so) and `RESET_SESSIONS_NOT_ENDED` ("the password changed, sign in with it"). Tests: `reset.test.ts`, `form-state.test.ts`. In the second case the account's other sign-ins stay open until their normal expiry (30 days idle), because nothing retries the removal; this is a known limit that was already there, now stated. The person is told to sign in, and the failure is logged as `follow_up_failed`.
 2. **Email-change guard wording.** Corrected above: the bypass setting is not protected by a privilege.
 3. **Test instructions.** The reference to a plan step number was removed.
+
+## Superseded by later units (note of 2026-10-27)
+
+The text above is kept as written; these statements were overtaken later.
+
+- **Verification block (R-13):** the block "Verification results (2026-10-21)" is a snapshot. `APP_RUNTIME_MODE=synthetic` no longer exists: U5 removed the synthetic mode, and the build and start smoke run on the single production configuration. Counts in the block are as of that date; current counts come from running the commands.
+- **Step 13 and NFR8.1 wording (R-17):** NFR8.1 (English identifiers, Hungarian copy only in the copy module, the recovery mail template and the invitation copy) still holds; the mention of "the pre-existing synthetic invitation copy" no longer applies, because the synthetic invitation forms were deleted in U5.
+- **Access functions re-created (R-14):** U3 re-created the access functions over the new family tables, in migrations `20261033_identity_group_reach.sql` and `20261035_*` (governance list, integrity reads, lifecycle, placeholder drop). The lowest-id rule for the audit group is defined there; the U2 definitions of these functions are replaced.
+- **Service role (R-15):** U4 gave the service role two more functions on purpose, so the U2 statement about the service role's reach is as of U2 only. The elevated-function catalogue test is the current authority.
+- **Manifest (R-16):** the manifest now lists migrations `20261021` to `20261023` and `tests/database/identity-email-change.test.ts`.
+- **Advisories (2026-10-27):** the "4 or 5 moderate advisories" lines in this summary are as of their date. `nodemailer` 10.2.1 and `vitest` 4.1.12 (with the two coverage packages) removed them; `npm audit` reports 0 vulnerabilities (follow-up D3, PR 36).

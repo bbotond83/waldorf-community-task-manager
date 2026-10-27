@@ -40,7 +40,13 @@
     "FR1.5",
     "FR11.1",
     "FR11.2",
-    "FR12.1"
+    "FR12.1",
+    "FR2.6",
+    "FR2.7",
+    "FR9.1",
+    "FR9.2",
+    "FR9.3",
+    "FR10.1"
   ],
   "coverage": [
     {
@@ -531,6 +537,58 @@
       ],
       "tests": [
         "tests/unit/readme-commands.test.ts"
+      ]
+    },
+    {
+      "id": "FR2.6",
+      "status": "OK",
+      "target": "scripts/verification/replaced-modules.test.ts",
+      "tests": [
+        "tests/browser/identity.spec.ts"
+      ]
+    },
+    {
+      "id": "FR2.7",
+      "status": "OK",
+      "target": "scripts/db/seed/accounts.ts",
+      "tests": [
+        "scripts/db/seed/accounts.test.ts",
+        "tests/database/seed.test.ts"
+      ]
+    },
+    {
+      "id": "FR9.1",
+      "status": "OK",
+      "target": "scripts/db/seed/data.ts",
+      "tests": [
+        "scripts/db/seed/data.test.ts",
+        "tests/database/seed.test.ts"
+      ]
+    },
+    {
+      "id": "FR9.2",
+      "status": "OK",
+      "target": "scripts/db/reset.ts",
+      "tests": [
+        "tests/database/reset.test.ts",
+        "tests/database/seed.test.ts"
+      ]
+    },
+    {
+      "id": "FR9.3",
+      "status": "OK",
+      "target": "scripts/db/local-guard.ts",
+      "tests": [
+        "scripts/db/local-guard.test.ts",
+        "scripts/db/seed/commands.test.ts"
+      ]
+    },
+    {
+      "id": "FR10.1",
+      "status": "OK",
+      "target": "scripts/verification/replaced-modules.test.ts",
+      "tests": [
+        "tests/coverage/production-inventory.test.ts"
       ]
     }
   ],

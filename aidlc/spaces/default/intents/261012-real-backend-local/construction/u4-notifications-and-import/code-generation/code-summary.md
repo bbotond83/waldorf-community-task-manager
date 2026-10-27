@@ -170,3 +170,13 @@ The reviewer's report for the finished unit (verdict READY with two Major findin
 | Existing browser suite | not re-run: no screen, route or component changed (the adapter change is server-side and the new spec exercises it) |
 
 **Owner decisions.** (1) The group-scope membership limit (deviation 11): fix it as its own small piece with a review of the import commit's lock set, or accept it while the reminder scope stays `duty`. (2) Expiry of staged data depends on sign-ins (no scheduler); accept, or add a scheduled job when a deployment target exists.
+
+## Superseded by later units (note of 2026-10-27)
+
+The text above is kept as written; these statements were overtaken later.
+
+- **Synthetic mode:** removed in U5. `APP_RUNTIME_MODE=synthetic` in the verification table no longer exists, and the interim in-memory port that U3 describes is gone.
+- **Audit retention (R-03 and the U4 finding "audit events are never purged"):** no longer true. `audit_purge()` (U5, `20261044_audit_purge.sql`) deletes rows older than 365 days, system caller only, and follow-up B1 (`20261045_audit_purge_isolation.sql`) isolates its failures and caps a run at 5000 rows.
+- **2000-row import timing test:** since follow-up C2 it runs alone in the step `database-import-timing`, with one retry; its ceilings are unchanged.
+- **Manifest (R-02):** the twelve paths of modules that U5 deleted were dropped from `source-manifest.json`.
+- **Advisories (2026-10-27):** the "4 or 5 moderate advisories" lines in this summary are as of their date. `nodemailer` 10.2.1 and `vitest` 4.1.12 (with the two coverage packages) removed them; `npm audit` reports 0 vulnerabilities (follow-up D3, PR 36).
