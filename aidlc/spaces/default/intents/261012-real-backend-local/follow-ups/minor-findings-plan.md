@@ -56,6 +56,7 @@ B5. Reset guard on a hosted database through a loopback tunnel (U1 R-09) was fix
 C1. `tests/integration/swap-screens.test.tsx` fails now and then under load (seen once in U3's review and once earlier; U5 R-07).
 - Cause (probable): the test clicks the same withdraw button a second time right after the error alert appears, while the button may still be disabled during the pending transition, so the second click is ignored.
 - Plan: before the second click wait until the button is enabled (`waitFor` with `toBeEnabled`), then click. Run the file 20 times in a row, in parallel with the full suite, to confirm.
+- **Done (branch `fix/swap-screens-flaky-test`, plain change without an AI-DLC run, 2026-10-27).** The cause was as suspected: the "withdraws a cancellation request" test clicked the withdraw button again as soon as the error alert appeared. The test now waits until the button is enabled before the second click. Checked by running the file 20 times in a row while the full delivery suite ran in parallel: 20 of 20 passed, and the parallel suite passed (59 files, 834 tests). The failure was never reproduced on demand before the fix, so this is evidence of stability, not of a before/after difference.
 
 C2. `tests/database/notifications-timing.test.ts` 2000-row import ceiling of 60 s (U4/U5 R-06).
 - Facts: it measured 86.8 s once on a loaded machine. The ceiling has not been relaxed.

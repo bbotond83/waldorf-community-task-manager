@@ -279,6 +279,9 @@ describe("the incoming swaps board", () => {
     fireEvent.click(button);
     await waitFor(() => expect(world.submitted).toHaveLength(1));
     await waitFor(() => expect(screen.getByRole("alert")).toHaveTextContent("Már nem nyitott."));
+    // The button stays disabled while the answered request is still a pending transition. Under load the alert can
+    // appear before it is enabled again, and a click on a disabled button is ignored, so wait for it (flaky test fix).
+    await waitFor(() => expect(button).toBeEnabled());
     fireEvent.click(button);
     await waitFor(() => expect(world.submitted).toHaveLength(2));
     const [first, second] = world.submitted.map((entry) => entry.data);
