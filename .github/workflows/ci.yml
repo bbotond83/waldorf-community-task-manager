@@ -1,8 +1,8 @@
 name: CI
 
-# Sized for the free private-repository Actions minutes. A pull request runs the full check with Chromium only; the
-# weekly and the manually started runs add Firefox and mobile Chrome. A push to main only records the build evidence:
-# the squash-merged change was validated on its pull request. Changes that touch only AI-DLC workflow records
+# This is a public repository, so Actions minutes are free. Every pull request, the weekly run and the manually started
+# runs run the full check in every browser (Chromium, Firefox and mobile Chrome). A push to main only records the build
+# evidence: the squash-merged change was validated on its pull request. Changes that touch only AI-DLC workflow records
 # (aidlc/, which no check reads) start no run, and a draft pull request is checked once it is ready for review.
 on:
   pull_request:
@@ -36,8 +36,6 @@ jobs:
       contents: read
     env:
       APP_HOST: 127.0.0.1
-      # Pull requests browse with Chromium only; empty means every browser project (tests/browser/support/projects.ts).
-      VERIFY_BROWSER_PROJECTS: ${{ github.event_name == 'pull_request' && 'chromium' || '' }}
       # Identity settings (names and local-only values; the session secret is generated below).
       APP_PUBLIC_URL: http://127.0.0.1:3000
       SMTP_HOST: 127.0.0.1

@@ -30,9 +30,9 @@ We automatically build and deploy eligible changes to staging. We promote immuta
 
 We use strict, idiomatic TypeScript with English technical identifiers and Hungarian user-facing copy. We use Prettier and ESLint as blocking checks. We preserve functional module boundaries, explicit ports, constructor injection at infrastructure seams, and colocated `*.test.ts` files.
 
-We represent expected application failures as explicit result states and map unexpected infrastructure errors at the application boundary. CI includes secret scanning and SAST, with high and critical SAST findings blocking delivery. We pin CI actions to immutable revisions. For this private repository, validated changes produce a CycloneDX SBOM, a synthetic build archive, explicitly unsigned commit/run metadata and SHA256 checksums retained as private Actions artifacts for 14 days. These records are not cryptographic artifact attestations.
+We represent expected application failures as explicit result states and map unexpected infrastructure errors at the application boundary. CI includes secret scanning and SAST, with high and critical SAST findings blocking delivery. We pin CI actions to immutable revisions. For this repository, validated changes produce a CycloneDX SBOM, a synthetic build archive, explicitly unsigned commit/run metadata and SHA256 checksums retained as Actions artifacts for 14 days. These records are not cryptographic artifact attestations.
 
-The private evidence approach reflects the later human instruction to keep the repository private and fix the unsupported attestation service, followed by their merge of PR #9. It supersedes the older attestation wording for this repository; signing infrastructure is not added to this role change.
+The unsigned evidence approach reflects the earlier human instruction to fix the unsupported attestation service (the repository was private then), followed by their merge of PR #9. The repository is now public, so Actions minutes are free and CI runs every browser on every run; the evidence stays unsigned and contains only synthetic build output. It supersedes the older attestation wording for this repository; signing infrastructure is not added to this role change.
 
 ## Forbidden
 
