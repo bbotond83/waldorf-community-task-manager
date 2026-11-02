@@ -262,7 +262,7 @@ describe("CI workflow configuration (BR10.2, FR10.3)", () => {
     assert.match(timing, /IMPORT_TIMING_STAGE === "1"/);
   });
 
-  it("validates pull requests with Chromium only, the weekly and manual runs with every browser, and records evidence on main", () => {
+  it("validates pull requests, the weekly and the manual runs with every browser, and records evidence on main", () => {
     const triggers = workflow.slice(
       workflow.indexOf("\non:\n"),
       workflow.indexOf("\npermissions:"),
@@ -284,10 +284,8 @@ describe("CI workflow configuration (BR10.2, FR10.3)", () => {
       validate,
       /if: github\.event_name != 'push' && !github\.event\.pull_request\.draft/,
     );
-    assert.match(
-      validate,
-      /VERIFY_BROWSER_PROJECTS: \$\{\{ github\.event_name == 'pull_request' && 'chromium' \|\| '' \}\}/,
-    );
+    // No run narrows the browser phase: the repository is public, so every run uses every browser.
+    assert.equal(/VERIFY_BROWSER_PROJECTS/.test(workflow), false);
     const evidence = workflow.slice(workflow.indexOf("  build_evidence:"));
     assert.match(evidence, /if: github\.event_name == 'push'/);
     assert.equal(/needs:/.test(evidence), false);
@@ -296,7 +294,7 @@ describe("CI workflow configuration (BR10.2, FR10.3)", () => {
     assert.match(pipeline, /selectedBrowserProjects\(process\.env\.VERIFY_BROWSER_PROJECTS\)/);
   });
 
-  it("keeps the private build evidence for 14 days and the existing PostgreSQL role-migration step", () => {
+  it("keeps the build evidence for 14 days and the existing PostgreSQL role-migration step", () => {
     assert.match(workflow, /retention-days: 14/);
     assert.match(workflow, /postgresql-18/);
   });

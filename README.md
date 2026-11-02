@@ -169,15 +169,15 @@ command accepts no target credentials and calls no hosted target.
 
 ### CI runs
 
-CI is sized for the free private-repository GitHub Actions minutes. A pull request runs `npm run verify:local` with
-Chromium only (`VERIFY_BROWSER_PROJECTS=chromium`); a draft pull request is checked once it is marked ready for review.
-The full browser phase (Chromium, Firefox and mobile Chrome) runs every Monday at 03:00 UTC and whenever the workflow is
-started by hand from the **Actions** tab (**Run workflow**). A push to `main` does not repeat the validation: the
-squash-merged change was validated on its pull request. Changes that touch only `aidlc/` workflow records start no run.
+This is a public repository, so GitHub Actions minutes are free. A pull request runs `npm run verify:local`, including
+the full browser phase (Chromium, Firefox and mobile Chrome); a draft pull request is checked once it is marked ready for
+review. The same full check runs every Monday at 03:00 UTC and whenever the workflow is started by hand from the
+**Actions** tab (**Run workflow**). A push to `main` does not repeat the validation: the squash-merged change was
+validated on its pull request. Changes that touch only `aidlc/` workflow records start no run.
 
 ### CI build evidence
 
-After a change is merged to `main`, CI rebuilds the application with build-only placeholder settings and uploads a private `build-evidence-<commit>-<attempt>` Actions artifact. It contains
+After a change is merged to `main`, CI rebuilds the application with build-only placeholder settings and uploads a `build-evidence-<commit>-<attempt>` Actions artifact (synthetic build only; anyone signed in to GitHub can download artifacts of a public repository). It contains
 `next-build.tar.gz`, the CycloneDX `sbom.cdx.json`, `build-metadata.json` with the commit and workflow run details, and
 `SHA256SUMS`. Download it from the workflow run's **Artifacts** section and run `sha256sum -c SHA256SUMS` in the
 extracted directory to check the files. Evidence expires after 14 days.
