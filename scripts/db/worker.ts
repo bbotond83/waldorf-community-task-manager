@@ -127,8 +127,24 @@ export interface WorkerSetupResult {
  */
 const REFERENCE_TABLES: ReadonlySet<string> = new Set(["sheet_registry"]);
 
+/**
+ * One reset at a time across all schemas. A reset empties the schema's tables and then deletes accounts from the shared
+ * sign-in table, which checks the account tables of every schema. Two resets of different schemas running together
+ * take those table locks in opposite orders and deadlock, so each reset holds this session lock for its duration.
+ */
+const RESET_LOCK_KEY = "waldorf-reset-worker-data";
+
 /** Empties every table of the worker schema (reference tables stay) and removes the worker's accounts. */
 export async function resetWorkerData(client: SqlClient, worker: string): Promise<void> {
+  await client.query("select pg_advisory_lock(hashtext($1))", [RESET_LOCK_KEY]);
+  try {
+    await emptyWorkerData(client, worker);
+  } finally {
+    await client.query("select pg_advisory_unlock(hashtext($1))", [RESET_LOCK_KEY]);
+  }
+}
+
+async function emptyWorkerData(client: SqlClient, worker: string): Promise<void> {
   const found = await client.query(
     "select tablename from pg_tables where schemaname = $1 order by tablename",
     [worker],
