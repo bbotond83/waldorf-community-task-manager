@@ -119,7 +119,7 @@ describe("signInAction (W1)", () => {
     const target = await redirectOf(
       signInAction(idle, form({ email: "Person@Example.test", password: "password-1x" })),
     );
-    expect(target).toBe("/bejelentkezes");
+    expect(target).toBe("/");
     expect(state.jar.get(ACCESS_COOKIE)?.value).toBeTruthy();
     expect(state.jar.get(REFRESH_COOKIE)?.options).toMatchObject({
       httpOnly: true,

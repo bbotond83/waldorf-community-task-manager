@@ -1,6 +1,7 @@
+import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import { requestCancellation, withOtherPage } from "./support/scenarios.ts";
-import { signInAs, bindSeededSchema } from "./support/seeded-schema.ts";
+import { SERIOUS, signInAs, bindSeededSchema, expectSignedIn } from "./support/seeded-schema.ts";
 
 const world = bindSeededSchema();
 
@@ -38,7 +39,7 @@ test("the sign-in form is reached and sent with mouse and with keyboard", async 
   await expect(page.getByTestId("sign-in-password")).toBeFocused();
   await page.keyboard.type(account.password);
   await page.keyboard.press("Enter");
-  await expect(page.getByTestId("signed-in-panel")).toBeVisible();
+  await expectSignedIn(page);
   await page.goto("/");
   const heading = page.getByRole("heading", { name: "Értesítések", exact: true });
   await expect(heading).toBeFocused();
@@ -95,3 +96,30 @@ test("the sign-in screen stays usable and stable when images fail to load (R-05)
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "Értesítések", exact: true })).toBeVisible();
 });
+
+// The reported defect: after sign-in the browser stayed on the sign-in page with no menu. Each seeded role
+// must land on the home page of its role, with the menu that role is allowed to see.
+const ROLE_LANDINGS = [
+  { tag: "super-admin", path: /\/admin$/, menuItems: 9 },
+  { tag: "group-admin-1", path: /\/admin$/, menuItems: 5 },
+  { tag: "parent-1", path: /\/szulo\/ertesitesek$/, menuItems: 3 },
+  { tag: "teacher-1", path: /\/teacher\/schedule$/, menuItems: 0 },
+] as const;
+
+for (const { tag, path, menuItems } of ROLE_LANDINGS) {
+  test(`signing in as ${tag} lands on the role home with its menu`, async ({ page }) => {
+    await signInAs(page, world().account(tag));
+    await expect(page).toHaveURL(path);
+    const menu = page.getByTestId("app-shell-navigation");
+    if (menuItems === 0) {
+      // The teacher keeps no menu by design: the schedule and the sign-out button are the whole page.
+      await expect(menu).toHaveCount(0);
+      await expect(page.getByRole("heading", { name: "Beosztás", exact: true })).toBeVisible();
+    } else {
+      await expect(menu.locator("li")).toHaveCount(menuItems);
+    }
+    await expect(page.getByTestId("sign-out-button").first()).toBeVisible();
+    const results = await new AxeBuilder({ page }).analyze();
+    expect(results.violations.filter(SERIOUS)).toEqual([]);
+  });
+}

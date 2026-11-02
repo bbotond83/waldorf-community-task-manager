@@ -1,6 +1,6 @@
 # Dependencies
 
-Full rescan 2026-10-12 (HEAD `80bd4f4`), focused update 2026-10-27 (HEAD `5d2b484`, intent `denied-audit-ratelimit`). The focused update added "Database object dependencies of the audit write" and "Database test dependencies"; the module topology is kept from 2026-10-12 and does not show `src/data`, `src/identity` or `scripts/db`.
+Full rescan 2026-10-12 (HEAD `80bd4f4`), focused update 2026-10-27 (HEAD `5d2b484`, intent `denied-audit-ratelimit`), focused update 2026-11-02 (HEAD `3456409`, intent `empty-nav-after-login`; section "Sign-in and shell dependencies (2026-11-02)"). Revision 2 on 2026-11-02 (same intent, owner asked to also scan the audit area) re-read the audit migrations 20261012, 20261013, 20261015, 20261019, 20261044 and 20261045, `supabase/config.toml` and the database test support, `audit`, `audit-purge` and `migrations` tests; sections marked "(2026-11-02, audit re-verified)" come from it. The 2026-10-27 update added "Database object dependencies of the audit write" and "Database test dependencies"; the module topology is kept from 2026-10-12 and does not show `src/data`, `src/identity` or `scripts/db`.
 
 ## External dependencies
 
@@ -27,6 +27,30 @@ flowchart LR
 
 Text: Family A modules depended on `src/application`, which imported only types and helpers from `src/access`; Family B modules had no inbound edges from `app/` at that time.
 
+## Sign-in and shell dependencies (2026-11-02)
+
+```mermaid
+flowchart TB
+  SignInPage["app/bejelentkezes (page, form, action)"] --> Identity["src/identity (sign-in, cookies, session)"]
+  SignInPage --> CurSess["app/_identity/current-session"]
+  Home["app/page.tsx"] --> ProdHome["app/_identity/production-home"]
+  ProdHome --> ProdReq["app/_identity/production-request"]
+  ProdHome --> Access["src/runtime/production/access"]
+  ProdReq --> CurSess
+  ProdReq --> Compose["src/runtime/composition (production)"]
+  Layouts["app/admin, szulo, teacher layouts"] --> ProdReq
+  Layouts --> Access
+  Layouts --> Shell["src/runtime AppShell + AppNav"]
+  Access --> Nav["src/runtime/navigation"]
+  Access --> Data["src/data readAccessContext"]
+  CurSess --> Identity
+  Proxy["proxy.ts"] --> Identity
+```
+
+Text: the sign-in page and action depend on `src/identity` only; they have no edge to `production-home` or the role access resolvers, which is why nothing routes a freshly signed-in person to their home. `app/page.tsx` is the only consumer of `production-home`. The role layouts use `production-request` and `access` for the profile and `AppShell` for the menu. `proxy.ts` depends on the cookie names and refresh logic of `src/identity`.
+
+Test dependencies: `tests/browser/*.spec.ts` -> `tests/browser/support/seeded-schema.ts` -> `scripts/db/{seed,reset,seed-support}` and `projects.ts`; `signInAs` appears on about 34 lines of the browser specs and support files (grep count, includes its definition and imports). `tests/integration/*` mock `next/headers`, `next/navigation`, `server-only` and the `app/_identity` modules.
+
 ## Database object dependencies of the audit write (2026-10-27)
 
 ```mermaid
@@ -45,15 +69,24 @@ flowchart TB
   Role --> Grants["app_role_grants"]
   Write --> Table[("audit_events")]
   Purge["audit_purge"] --> Table
+  House["identity_housekeeping"] --> Purge
+  Policies["RLS policies of identity tables and audit_events"] --> Active
 ```
 
-Text: denied events come only from `platform_finish_operation` (directly or through `identity_deny`); success events also come from seven direct calls. `platform_audit_write` depends on the two actor helpers, which depend on the system-caller check, the active-session check (sign-in service sessions and `accounts`) and `app_role_grants`. `audit_purge` is the only deleter. A redefinition of `platform_audit_write` with the same signature keeps every caller working without change; a changed signature would break the seven direct callers and `platform_finish_operation`, which cannot be edited in place.
+Text: denied events come only from `platform_finish_operation` (directly or through `identity_deny`); success events also come from seven direct calls. `platform_audit_write` depends on the two actor helpers, which depend on the system-caller check, the active-session check (sign-in service sessions and `accounts`) and `app_role_grants`. `audit_purge` is the only deleter. `identity_housekeeping` calls `audit_purge` inside its own exception block (20261045); the RLS policies and the `has_*_scope` helpers call `current_session_is_active`. A redefinition of `platform_audit_write` with the same signature keeps every caller working without change (this is what 20261046 does, per its header); a changed signature would break the seven direct callers and `platform_finish_operation`, which cannot be edited in place.
 
 ## Database test dependencies (2026-10-27)
 
 - `tests/database/*.test.ts` -> `tests/database/stack-support.ts` -> `scripts/db/common.ts` (connection settings, `.env` service file), `scripts/db/worker.ts` (`setupWorker`, `resetWorkerData`, `bootstrapSql`), `scripts/db/runner.ts` (`applyMigrations`, `readMigrationFiles`, `checksumOf`, `TRACKING_SCHEMA = "migration_runner"`), `scripts/db/migrate.ts` (`FRESH_SCHEMA_SETTINGS`).
 - Tracking: applied files are recorded per schema in `migration_runner.applied_migrations (schema_name, filename, checksum)`.
 - Test registration: npm `test:database:*` scripts and `scripts/db/shuffled-tests.ts` list files explicitly; `scripts/verification/run-local-verification.ts` runs every one of those scripts.
+
+## Migration and config dependencies (2026-11-02, audit re-verified)
+
+- Order dependencies between the audit files: 20261013 needs `platform_audit_write` and `platform_actor_account` from 20261012; 20261015 redefines `platform_actor_account` and adds `identity_deny`, which calls `platform_finish_operation`; 20261019 revokes execute on `lifecycle_hold_*` and `platform_cleanup_expired` (20261013) and refers to the `sign_in_*`, `invitation_*`, `account_recovery_check` and `sessions_remove` functions of earlier identity files; 20261044 redefines `identity_housekeeping` "last defined in 20261043" and needs `invitation_release_stale` and `import_expire_all`; 20261045 redefines `audit_purge` and `identity_housekeeping` from 20261044.
+- `20261019` and `20261015` depend on the Supabase `auth` schema (`auth.sessions`, `auth.users`, `auth.uid()`, `auth.jwt()`), so the migrations cannot run on plain PostgreSQL.
+- `supabase/config.toml` ties together: the schema list exposed by the data API (`public`, `worker_1` to `worker_4`) with the worker schemas created by `scripts/db/worker.ts`; the password-verification hook with `public.password_verification_hook` from the identity migrations; the 720-hour inactivity timeout with the 30-day check in 20261015; the recovery template path with `supabase/templates/recovery.html`.
+- No application code dependency on the audit table exists beyond the RPC calls; the web sign-in flow does not touch `audit_events`.
 
 ## Cross-cutting couplings (2026-10-12, not re-verified)
 

@@ -1,0 +1,1 @@
+"After successful sign-in as super admin, group admin and parent in the local dev app (npm run dev, seeded accounts), the page shows no menus, buttons or content, only a logout button. Reproduce, find root cause (app shell/navigation, role and permission resolution, proxy.ts session, seeded grants), fix with a regression test that fails before the fix."

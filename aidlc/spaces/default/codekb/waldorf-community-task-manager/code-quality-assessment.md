@@ -1,16 +1,40 @@
 # Code Quality Assessment
 
-Full rescan 2026-10-12 (HEAD `80bd4f4`), focused update 2026-10-27 (HEAD `5d2b484`, intent `denied-audit-ratelimit`). The focused update was read-only (no test, build or program run) and added "Database layer and audit area"; the 2026-10-12 sections below record results executed then and are not current (per project rule, current executable results are authoritative over these counts).
+Full rescan 2026-10-12 (HEAD `80bd4f4`), focused update 2026-10-27 (HEAD `5d2b484`, intent `denied-audit-ratelimit`), focused update 2026-11-02 (HEAD `3456409`, intent `empty-nav-after-login`; section "Sign-in, shell and navigation area (2026-11-02)"). Revision 2 on 2026-11-02 (same intent, owner asked to also scan the audit area) re-read the audit migrations 20261012, 20261013, 20261015, 20261019, 20261044 and 20261045, `supabase/config.toml` and the database test support, `audit`, `audit-purge` and `migrations` tests; sections marked "(2026-11-02, audit re-verified)" come from it. The section "Database layer and audit area" was re-verified and extended. Both focused updates were read-only (no test, build or program run) and added "Database layer and audit area"; the 2026-10-12 sections below record results executed then and are not current (per project rule, current executable results are authoritative over these counts).
+
+## Sign-in, shell and navigation area (2026-11-02)
+
+Read-only run; nothing executed (no tests, build or server), so test results below are not re-measured.
+
+### Findings
+1. **Defect located (not fixed here)**: `signInAction` redirects to `/bejelentkezes` (`app/bejelentkezes/actions.ts:45`) and `SignInPage` renders a shell-less `signed-in-panel` for a signed-in visitor (`app/bejelentkezes/page.tsx:19-24`). The role home resolver exists and works (`app/_identity/production-home.ts`, used by `app/page.tsx:16-17`) but the sign-in flow never calls it. The role shells, menus and role access resolvers are correct for all four roles.
+2. **Intended emptiness**: `TEACHER_NAVIGATION` is `[]` (`src/runtime/navigation.ts:13-14`), so a teacher home page shows header and sign-out but no menu. Not a defect.
+3. **Tests pin the defect**: `identity-actions.test.ts:122` expects the redirect `/bejelentkezes`; `identity-screens.test.tsx:268-282` expects the signed-in panel; `signInAs` (`tests/browser/support/seeded-schema.ts:72`) and 12 spec lines wait for `signed-in-panel`. A fix must change these together; no test covers "after sign-in the person sees their role menu".
+4. **Shared destination**: password reset (`jelszo-visszaallitas/uj/actions.ts:38`) and invitation acceptance (`meghivas/[token]/actions.ts:41,43`) also end on `/bejelentkezes`, with tests at `identity-actions.test.ts:243,282,299`.
+5. **Inconsistency**: signed-out handling differs by area (admin and teacher `redirect("/")`; parent renders `ParentAccessState`).
+6. **Naming**: `resolveProductionHome` relies on `resolveAdminAccess` being the generic resolver (its `denied` carries the strongest role's home); this is documented in a comment but easy to misread.
+
+### Ratings (code-analysis guide scale)
+| Aspect | Rating | Evidence |
+|---|---|---|
+| Naming clarity | good | `signed-in-panel`, `resolveProductionHome`, `ShellProfile`; Hungarian copy centralised in `src/identity/copy.ts` |
+| Function size | good | actions and resolvers under 50 lines |
+| Error handling | good | explicit state unions (`ready / signed-out / no-role / unavailable`); config problems become a Hungarian message |
+| Test presence | good | colocated tests for every `src/identity` module, integration tests for actions and screens, browser specs for the flow |
+| Duplication | fair | three role resolvers share the load pattern; menu lists are constants |
+| Dead code | good | none seen in the area |
 
 ## Database layer and audit area (2026-10-27)
 
 ### Tests
 | Layer | Runner | Size | Notes |
 |---|---|---|---|
-| Database (real local stack) | `node --experimental-strip-types --test`, `pg` client | 55 files in `tests/database/` (test files, support modules and one SQL fixture) | Every file runs against the started Supabase stack; files that share a schema serialize through advisory locks; each test starts from `resetWorkerData`; most audit files run twice, in `worker_1` and in `public` |
+| Database (real local stack) | `node --experimental-strip-types --test`, `pg` client | 58 entries in `tests/database/` at HEAD (55 at 2026-10-27) (test files, support modules and one SQL fixture) | Every file runs against the started Supabase stack; files that share a schema serialize through advisory locks; each test starts from `resetWorkerData`; most audit files run twice, in `worker_1` and in `public` |
 
 - The audit area is well covered: refused rights for every application role, append-only behaviour, actor attribution (including `none` and `system`), denied event committed with the denied result, atomic rollback, `details` format, check lists, indexes, overhead under 50 ms per operation (NFR4.5), purge boundaries and the 5000-row cap.
-- Not covered today: any volume limit on denied events (none exists), concurrent denials from one account.
+- Not covered by the files analyzed here: the denied-event limit (its tests are in `audit-denied-limit.test.ts`, not read), concurrent denials from one account.
+- Re-verified 2026-11-02: `audit.test.ts` pins refused rights for `anon`, `authenticated` and `service_role`, the read policy, append-only (even for the owner), actor attribution, atomic rollback via an injected trigger, `details` format, check lists, indexes and the 50 ms overhead; `audit-purge.test.ts` pins the 365-day boundary, system-caller-only, setting scope, no leak, 5000 cap and security-definer pinning; `migrations.test.ts` pins ordering, second-run no-op, pinned search paths and platform privileges.
+- Test hygiene: each test file builds its own session ids (`SESSION_NAMESPACE`) and takes a per-schema advisory lock, so files can run in parallel and shuffled; aged events are inserted with an explicit `occurred_at`, never by waiting.
 - No SQL coverage measurement; the 80/80/80 coverage floor applies to TypeScript production files only.
 
 ### Ratings (code-analysis guide scale)
@@ -23,7 +47,16 @@ Full rescan 2026-10-12 (HEAD `80bd4f4`), focused update 2026-10-27 (HEAD `5d2b48
 | Duplication | fair | follow-up files restate whole functions (for example `identity_housekeeping` in 20261044 and 20261045), which is the forward-only cost |
 | Dead code | good | superseded `app_audit_events` dropped by catalogue check (20261019:7-19) |
 
-### Technical debt and risks for intent `denied-audit-ratelimit`
+### Audit-area findings, revision 2 (2026-11-02)
+1. D1 The execute-right sweep of 20261019 is a one-time loop over existing functions; functions created later keep PostgreSQL's default PUBLIC execute unless their file restates the revoke (20261019:28-30, 42-53). Convention and `migrations.test.ts` cover it for the platform functions only.
+2. D2 `identity_housekeeping` swallows every purge error (`exception when others`, 20261045:65-69) and reports only a boolean; a permanently failing purge shows as a flag in a result nobody may read.
+3. D3 Whole-function restatement: `identity_housekeeping` is defined in full in 20261044 and again in 20261045 (and earlier in 20261043), so a reader must find the last definition by file order.
+4. D4 `lifecycle_hold_place` and `_release` compute the request fingerprint from the arguments before authorization; a denied call is stored for replay, which is intended (BR3.6) but means the denied result of a later-authorized caller is replayed for 24 hours per key.
+5. D5 Test code: `useSchema` / `bindSchema` duplicate one function; `stack-support.ts` mixes pure helpers and database access (247 lines, acceptable).
+6. D6 The published store was stale by one migration: 20261046 exists at HEAD; items A1, A3 and A5 below describe the state before it and are addressed by it per its header (not analyzed here).
+7. No finding in the audit area touches the sign-in redirect defect of this intent.
+
+### Technical debt and risks for intent `denied-audit-ratelimit` (2026-10-27, state before 20261046)
 1. A1 No volume limit on denied events per account; `audit_events` growth from repeated denials is bounded only by the 365-day purge.
 2. A2 No outcome-aware index; counting an account's denials in the last hour can use `audit_events_actor (actor_account_id, occurred_at desc)` but must filter `outcome` row by row.
 3. A3 No serialization for a count-then-insert cap; concurrent denials of one account can overshoot unless a per-account advisory transaction lock is taken (pattern: 20261013:38).

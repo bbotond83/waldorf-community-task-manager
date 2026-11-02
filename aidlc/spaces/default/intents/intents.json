@@ -128,5 +128,13 @@
     "scope": "express",
     "status": "complete",
     "request": "b5783aef"
+  },
+  {
+    "uuid": "01a19c73-22e7-7a70-8285-44797c9d8cbc",
+    "slug": "empty-nav-after-login",
+    "dirName": "261102-empty-nav-after-login",
+    "scope": "bugfix",
+    "status": "complete",
+    "request": "784d5129"
   }
 ]

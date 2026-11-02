@@ -20,7 +20,7 @@ import {
   stackSettings,
   uuid,
 } from "../database/stack-support.ts";
-import { bindSeededSchema } from "./support/seeded-schema.ts";
+import { bindSeededSchema, expectSignedIn } from "./support/seeded-schema.ts";
 
 /**
  * Notifications and the Excel import on a production build against the real local stack (U4, step 25).
@@ -239,7 +239,7 @@ async function openSession(
     page.waitForResponse((response) => response.request().method() === "POST"),
     page.getByTestId("sign-in-submit").click(),
   ]);
-  await expect(page.getByTestId("signed-in-panel")).toBeVisible();
+  await expectSignedIn(page);
   return { context, page };
 }
 

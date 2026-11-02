@@ -15,7 +15,7 @@ import {
   serviceKey,
   stackSettings,
 } from "../database/stack-support.ts";
-import { bindSeededSchema } from "./support/seeded-schema.ts";
+import { bindSeededSchema, expectSignedIn } from "./support/seeded-schema.ts";
 
 /**
  * The four identity screens and the sign-out control against the real local stack, with the automated
@@ -116,6 +116,13 @@ async function newUser(
       "insert into app_authorization_versions (subject_id, authorization_version) values ($1, 1) on conflict do nothing",
       [created.value.id],
     );
+    // A parent's home page needs the parent record linked to the account; without it the page denies access.
+    if (grant.role === "parent") {
+      await db.query(
+        "insert into parents (organization_id, family_id, account_id, display_name) values ($1, $2, $3, 'Teszt Szülő')",
+        [ORGANIZATION, grant.scope, created.value.id],
+      );
+    }
   }
   return { id: created.value.id, address, password: secret };
 }
@@ -226,8 +233,8 @@ test("signing in sets httpOnly sameSite cookies, shows the signed-in state, and 
     { "sign-in-email": user.address, "sign-in-password": user.password },
     "sign-in-submit",
   );
-  await expect(page.getByTestId("signed-in-panel")).toBeVisible();
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText(COPY.signIn.signedInHeading);
+  await expectSignedIn(page);
+  await expect(page).toHaveURL(/\/szulo\/ertesitesek$/);
   await noSeriousViolations(page, "signed in");
 
   const cookies = (await context.cookies()).filter((cookie) => cookie.name.startsWith("wb_"));
@@ -270,20 +277,20 @@ test("an expired access cookie with a live refresh cookie stays signed in: the p
     { "sign-in-email": user.address, "sign-in-password": user.password },
     "sign-in-submit",
   );
-  await expect(page.getByTestId("signed-in-panel")).toBeVisible();
+  await expectSignedIn(page);
   const before = (await context.cookies()).find((cookie) => cookie.name === "wb_access")!;
   const encode = (value: unknown) => Buffer.from(JSON.stringify(value)).toString("base64url");
   const expired = `${encode({ alg: "none" })}.${encode({ sub: user.id, exp: Math.floor(Date.now() / 1000) - 120 })}.x`;
   await context.addCookies([{ ...before, value: expired }]);
   await page.reload();
-  await expect(page.getByTestId("signed-in-panel")).toBeVisible();
+  await expectSignedIn(page);
   const after = (await context.cookies()).find((cookie) => cookie.name === "wb_access")!;
   expect(after.value).not.toBe(expired);
   expect(after.httpOnly).toBe(true);
   // A refresh token the service no longer knows ends the session: the cookies are cleared.
   await db.query("delete from auth.sessions where user_id = $1", [user.id]);
   await context.addCookies([{ ...after, value: expired }]);
-  await page.reload();
+  await page.goto("/bejelentkezes");
   await expect(page.getByTestId("sign-in-form")).toBeVisible();
   expect(
     (await context.cookies()).filter(
@@ -319,12 +326,12 @@ test("two people signed in at once in two browser contexts keep independent sess
         { "sign-in-email": user.address, "sign-in-password": user.password },
         "sign-in-submit",
       );
-      await expect(pages[index]!.getByTestId("signed-in-panel")).toBeVisible();
+      await expectSignedIn(pages[index]!);
     }
     await pages[0]!.getByTestId("sign-out-button").click();
     await expect(pages[0]!.getByTestId("sign-in-form")).toBeVisible();
     await pages[1]!.reload();
-    await expect(pages[1]!.getByTestId("signed-in-panel")).toBeVisible();
+    await expectSignedIn(pages[1]!);
     const sessions = await db.query("select user_id from auth.sessions where user_id = any($1)", [
       [first.id, second.id],
     ]);
@@ -422,7 +429,7 @@ test("an invitation link: the valid page, the rule error, acceptance and the not
     { "accept-invitation-password": password() },
     "accept-invitation-submit",
   );
-  await expect(page.getByTestId("signed-in-panel")).toBeVisible();
+  await expectSignedIn(page);
   const accounts = await db.query("select count(*)::int as n from accounts where email = $1", [
     address,
   ]);
@@ -518,7 +525,7 @@ test("password reset: the request, the neutral confirmation, the new-password pa
   await noSeriousViolations(page, "new password rule error");
   const newPassword = password();
   await fillAndSubmit(page, { "set-password-input": newPassword }, "set-password-submit");
-  await expect(page.getByTestId("signed-in-panel")).toBeVisible();
+  await expectSignedIn(page);
 
   await page.context().clearCookies();
   await page.goto(target);
@@ -539,7 +546,7 @@ test("password reset: the request, the neutral confirmation, the new-password pa
     { "sign-in-email": user.address, "sign-in-password": newPassword },
     "sign-in-submit",
   );
-  await expect(page.getByTestId("signed-in-panel")).toBeVisible();
+  await expectSignedIn(page);
 });
 
 test("the new-password route without a usable link shows the not-valid page with a way to ask for a new one", async ({

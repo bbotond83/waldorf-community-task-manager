@@ -1,6 +1,21 @@
 # API Documentation
 
-Full rescan 2026-10-12 (HEAD `80bd4f4`), focused update 2026-10-27 (HEAD `5d2b484`, intent `denied-audit-ratelimit`). The focused update rewrote "Database-facing contracts". The HTTP, server-action and application-port sections are kept from 2026-10-12 and were not re-scanned (the synthetic routes and ports they describe may since have changed).
+Full rescan 2026-10-12 (HEAD `80bd4f4`), focused update 2026-10-27 (HEAD `5d2b484`, intent `denied-audit-ratelimit`), focused update 2026-11-02 (HEAD `3456409`, intent `empty-nav-after-login`; new section "Sign-in and landing contracts (2026-11-02)"). Revision 2 on 2026-11-02 (same intent, owner asked to also scan the audit area) re-read the audit migrations 20261012, 20261013, 20261015, 20261019, 20261044 and 20261045, `supabase/config.toml` and the database test support, `audit`, `audit-purge` and `migrations` tests; sections marked "(2026-11-02, audit re-verified)" come from it. It extended the table of platform functions below. The 2026-10-27 update rewrote "Database-facing contracts". The HTTP, server-action and application-port sections are kept from 2026-10-12 and were not re-scanned (the synthetic routes and ports they describe may since have changed).
+
+## Sign-in and landing contracts (2026-11-02)
+
+| Surface | Contract |
+|---|---|
+| `signInAction(previous: FormState, formData)` (`app/bejelentkezes/actions.ts`) | Reads `email`, `password`. Configuration problem: `{status:"error", message: COPY.signIn.temporary}`. Failure: `signInFormState(result, email)` (generic invalid, locked, temporary). Success: writes `wb_access` and `wb_refresh`, then `redirect("/bejelentkezes")`. Never returns credentials. |
+| `signOutAction()` (`app/_identity/actions.ts`) | Ends this browser's session (scope local), clears both cookies, `redirect("/bejelentkezes")`; clears the cookies even when the service is unreachable. |
+| `GET /bejelentkezes` | Dynamic. Signed out: form plus forgot-password link. Signed in: `signed-in-panel` (heading "Be van jelentkezve", status message, sign-out). |
+| `GET /` | Dynamic. Runtime misconfiguration: configuration-error panel. `resolveProductionHome()` `ready`: redirect to the role home. Else panel for `signed-out` (link to `/bejelentkezes`), `no-role`, `unavailable`. |
+| `resolveProductionHome(): ProductionHome` | `{state:"ready", path} | {state:"signed-out"} | {state:"no-role"} | {state:"unavailable"}`; path is the home of the strongest role. |
+| Role homes | super admin and group admin `/admin`; parent `/szulo/ertesitesek`; teacher `/teacher/schedule`. |
+| Other redirects to `/bejelentkezes` | `app/jelszo-visszaallitas/uj/actions.ts:38` (after new password), `app/meghivas/[token]/actions.ts:41,43` (after invitation acceptance, with or without tokens). |
+| Redirects to `/` | Admin and teacher layouts and the teacher schedule pages when signed out. |
+
+`proxy.ts` matcher: every path except `api`, `_next/static`, `_next/image`, `favicon.ico`, `sitemap.xml`, `robots.txt` and prefetch requests. The 2026-10-12 routes `/api/synthetic/session` and `/api/synthetic/reset` and the profile-picker flow are not part of this area at this commit.
 
 ## HTTP route handlers (2026-10-12)
 
@@ -39,11 +54,21 @@ Full rescan 2026-10-12 (HEAD `80bd4f4`), focused update 2026-10-27 (HEAD `5d2b48
 | `platform_finish_operation(p_operation, p_key, p_fingerprint, p_action, p_target_type, p_target_id, p_organization_id, p_group_id, p_state, p_reference, p_code, p_details) returns jsonb` | 20261013:82-95 | For `success` or `denied` calls `platform_audit_write` (return value discarded); always calls `platform_idempotency_store`; returns `platform_result(p_state, p_reference, p_code)`. |
 | `identity_deny(p_operation, p_key, p_fingerprint, p_action, p_target_type, p_target_id, p_organization_id, p_group_id, p_details) returns jsonb` | 20261015:120-126 | `platform_finish_operation(..., 'denied', null, 'authorization_denied', p_details)`. |
 | `platform_idempotency_check(p_operation, p_key, p_fingerprint) returns jsonb` | 20261013:31-48 | Advisory transaction lock on `current_schema()|account|operation|key`; returns `{status: new | replay | conflict, ...}`. |
-| `audit_purge() returns integer` | 20261044, capped in 20261045:15-32 | System caller only (`service_role` execute grant); deletes at most 5000 events older than 365 days, oldest first. |
+| `audit_purge() returns integer` | 20261044, capped in 20261045:15-32 | System caller only (`service_role` execute grant; `42501` for any other caller); deletes at most 5000 events older than 365 days, oldest first; returns the count; writes no event. |
+| `identity_housekeeping() returns jsonb` | 20261044:40-74, redefined 20261045:37-76 | System caller only (otherwise `denied` / `admin_access_required`). Returns `success` / `done` plus `attempts_removed`, `users_removed`, `invitations_removed`, `invitations_expired`, `reservations_released`, `import_runs_expired`, `audit_events_purged` and (since 20261045) `audit_purge_failed`. |
+| `current_session_is_active() returns boolean` | 20261015:9-22 | True for a live session of an active account within 30 days of inactivity; executable by `authenticated`. |
+| `platform_idempotency_store(p_operation, p_key, p_fingerprint, p_state, p_reference) returns void` | 20261013:53-80 | Stores for 24 hours; replaces an expired row; `22023` for a state outside the five storable ones; `23505` when an unexpired record exists. |
+| `platform_cleanup_expired() returns integer` | 20261013:98-105 | Deletes expired idempotency rows; not executable by any application role since 20261019:38 (run through the owner connection). |
+| `platform_audit_write` after 20261046 | 20261046 (header read, not analyzed) | Same signature; returns null and writes nothing for a denied event over the limit of 20 per account per 60 minutes. |
 
 ### Audit table contract (`audit_events`)
 - Columns, checks and indexes: see `architecture.md` "Platform audit write". Outcomes: `success`, `denied`. Actions (after 20261014): `role.grant`, `role.revoke`, `role.first_super_admin`, `approval.approve`, `approval.reject`, `import.commit`, `lifecycle.anonymize`, `lifecycle.delete`, `lifecycle.hold_place`, `lifecycle.hold_release`, `account.deactivate`, `account.reactivate`.
 - Rights: `select` granted to `authenticated` under policy `audit_events_admin_read` (super admin of the organization, or group admin of the event's group; 20261015:152-163). No insert, update or delete right for any application role; update and delete also refused by trigger.
+
+### Execute rights (2026-11-02, audit re-verified)
+- `authenticated`: `lifecycle_hold_place`, `lifecycle_hold_release`, `current_session_is_active`, `identity_account_visible`, `identity_can_manage_scope` among the audit-area functions; the application functions of later units carry their own grants.
+- `service_role` (the sign-in service's key): exactly `sign_in_lockout_check`, `sign_in_attempt_record`, `sign_in_attempt_clear`, `invitation_lookup`, `invitation_reserve`, `invitation_release`, `invitation_accept`, `account_recovery_check`, `sessions_remove`, `identity_housekeeping` (20261019:63-67), plus `audit_purge` (20261044) and whatever later files grant; it has no table or sequence rights.
+- `anon`: none. PUBLIC: removed on existing functions by the 20261019 sweep; later functions must restate the revoke.
 
 ### Public audited functions that can write a denied event
 `lifecycle_hold_place`, `lifecycle_hold_release` (20261013; `authenticated`), the invitation functions (20261017, 20261021, 20261030, 20261033) and the grant and account-change functions (20261018, 20261033). Their argument lists were not re-documented in this focused update.
