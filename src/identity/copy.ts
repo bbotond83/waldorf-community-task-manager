@@ -12,9 +12,6 @@ export const COPY = {
     submit: "Bejelentkezés",
     pending: "Bejelentkezés folyamatban…",
     forgotLink: "Elfelejtett jelszó",
-    signedInHeading: "Be van jelentkezve",
-    signedInMessage:
-      "A bejelentkezés sikerült. A kijelentkezés gombbal fejezheti be a munkamenetet.",
     invalid: "Hibás e-mail-cím vagy jelszó.",
     locked: "Túl sok sikertelen próbálkozás. Próbálja újra 15 perc múlva.",
     temporary: "Átmeneti hiba történt. Próbálja újra.",

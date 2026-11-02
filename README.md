@@ -109,7 +109,8 @@ npm run dev
 ```
 
 Open `http://127.0.0.1:3000`: the first page points to the sign-in screen (`/bejelentkezes`). Sign in with a seeded
-account to see the pages of its role. A missing or invalid setting stops startup with a message that names the setting.
+account: after a successful sign-in the app opens the home page of the role (administrators `/admin`, teachers
+`/teacher/schedule`, parents `/szulo/ertesitesek`), and a signed-in visit to the sign-in screen is sent there too. A missing or invalid setting stops startup with a message that names the setting.
 `.env.example` lists every setting name, with no values. If the development watcher reports `EMFILE: too many open
 files, watch`, start it with `WATCHPACK_POLLING=true npm run dev`.
 

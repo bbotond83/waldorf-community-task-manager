@@ -1,0 +1,33 @@
+{
+  "stage": "code-generation",
+  "upstream_ids": [
+    "FR1.1",
+    "FR1.2",
+    "FR1.3",
+    "FR2.1",
+    "FR2.2",
+    "FR2.3",
+    "FR3.1",
+    "FR4.1",
+    "FR4.2",
+    "FR4.3",
+    "NFR1",
+    "NFR2",
+    "NFR3"
+  ],
+  "coverage": [
+    { "id": "FR1.1", "status": "OK", "target": "app/bejelentkezes/actions.ts" },
+    { "id": "FR1.2", "status": "OK", "target": "tests/browser/visual-overhaul.spec.ts" },
+    { "id": "FR1.3", "status": "OK", "target": "app/page.tsx" },
+    { "id": "FR2.1", "status": "OK", "target": "app/bejelentkezes/page.tsx" },
+    { "id": "FR2.2", "status": "OK", "target": "tests/integration/identity-screens.test.tsx" },
+    { "id": "FR2.3", "status": "OK", "target": "src/identity/copy.ts" },
+    { "id": "FR3.1", "status": "OK", "target": "tests/browser/visual-overhaul.spec.ts" },
+    { "id": "FR4.1", "status": "OK", "target": "tests/integration/identity-actions.test.ts" },
+    { "id": "FR4.2", "status": "OK", "target": "tests/integration/identity-screens.test.tsx" },
+    { "id": "FR4.3", "status": "OK", "target": "tests/browser/support/seeded-schema.ts" },
+    { "id": "NFR1", "status": "OK", "target": "app/bejelentkezes/actions.ts" },
+    { "id": "NFR2", "status": "OK", "target": "tests/browser/visual-overhaul.spec.ts" },
+    { "id": "NFR3", "status": "OK", "target": "src/identity/copy.ts" }
+  ]
+}

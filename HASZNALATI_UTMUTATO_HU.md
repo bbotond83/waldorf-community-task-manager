@@ -59,9 +59,9 @@ Molnár) tartozik, a Süni csoportba a 2., 4. és 6. A `parent-N` fiók az N-edi
 ## 4. Bejelentkezés és kijelentkezés
 
 1. Nyisd meg a **Bejelentkezés** oldalt, írd be az e-mail-címet és a jelszót, majd kattints a **Bejelentkezés**
-   gombra. A sikeres belépés után a **Be van jelentkezve** üzenet jelenik meg. Ha a főoldalt nyitod meg, a program
-   rögtön a szerepköröd kezdőoldalára visz: szülőnél **Értesítések**, óvónőnél **Beosztás**, adminisztrátornál
-   **Áttekintés**. Nincs külön üdvözlő oldal.
+   gombra. A sikeres belépés után a program rögtön a szerepköröd kezdőoldalára visz: szülőnél **Értesítések**,
+   óvónőnél **Beosztás**, adminisztrátornál **Áttekintés**. Ugyanide jutsz, ha bejelentkezve nyitod meg a
+   Bejelentkezés oldalt vagy a főoldalt. Nincs külön üdvözlő oldal.
 2. Próbálj hibás jelszót beírni: **Hibás e-mail-cím vagy jelszó.** üzenetet kapsz. Öt egymás utáni hibás próbálkozás
    után a belépés egy időre zárolódik (**Túl sok sikertelen próbálkozás. Próbálja újra 15 perc múlva.**). A zárolás
    magától megszűnik.

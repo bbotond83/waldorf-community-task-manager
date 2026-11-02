@@ -12,7 +12,8 @@ import { signIn } from "../../src/identity/sign-in.ts";
 /**
  * The sign-in server action (W1). The screen never calls the sign-in service or the database itself: this
  * action does, and answers with a Hungarian message for every outcome. Credentials are read from the form,
- * used once and never returned.
+ * used once and never returned. After a successful sign-in it sends the person to `/`, which routes to the
+ * home page of their role; the target is a fixed path, never an address taken from the request.
  */
 export async function signInAction(_previous: FormState, formData: FormData): Promise<FormState> {
   const email = String(formData.get("email") ?? "");
@@ -42,5 +43,5 @@ export async function signInAction(_previous: FormState, formData: FormData): Pr
   );
   if (result.state !== "success") return signInFormState(result, email);
   writeTokenPair(await cookies(), result.data, runtime.settings.appPublicUrl);
-  redirect("/bejelentkezes");
+  redirect("/");
 }

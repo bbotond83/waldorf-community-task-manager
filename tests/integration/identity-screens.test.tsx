@@ -265,21 +265,27 @@ describe("SignOutButton (BR2.8)", () => {
 });
 
 describe("pages", () => {
-  it("shows the sign-in form to a signed-out person and the sign-out control to a signed-in one", async () => {
+  it("shows the sign-in form to a signed-out person", async () => {
     mocks.session.mockResolvedValue({ status: "signed-out", clearCookies: false });
     const out = renderToStaticMarkup(await SignInPage());
     expect(out).toContain('data-testid="sign-in-form"');
     expect(out).toContain(COPY.signIn.forgotLink);
+  });
+
+  it("shows the sign-in form when the session is unavailable", async () => {
+    mocks.session.mockResolvedValue({ status: "unavailable" });
+    const html = renderToStaticMarkup(await SignInPage());
+    expect(html).toContain('data-testid="sign-in-form"');
+  });
+
+  it("sends a signed-in person to the home route instead of showing the form", async () => {
     mocks.session.mockResolvedValue({
       status: "signed-in",
       accountId: "a",
       sessionId: "s",
       accessToken: "t",
     });
-    const inn = renderToStaticMarkup(await SignInPage());
-    expect(inn).toContain('data-testid="signed-in-panel"');
-    expect(inn).toContain(COPY.signIn.signedInHeading);
-    expect(inn).not.toContain('data-testid="sign-in-form"');
+    await expect(SignInPage()).rejects.toMatchObject({ digest: "NEXT_REDIRECT;replace;/" });
   });
 
   it("renders the reset request page with its heading, explanation and way back", () => {

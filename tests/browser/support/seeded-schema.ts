@@ -59,17 +59,36 @@ export function bindSeededSchema(options: BrowserSchemaOptions = {}): () => Brow
 }
 
 /**
- * Signs in through the real sign-in screen and waits for the signed-in confirmation (the page the sign-in action
- * returns to). Answers how long the sign-in took in milliseconds, for the timing check.
+ * Waits until the person is signed in: the browser has left the sign-in page (the sign-in action and the sign-in
+ * page both send a signed-in person to the home page of their role) and holds the session cookie. It does not
+ * look at the role home itself, because an account without a linked record gets an access-denied page there.
+ */
+export async function expectSignedIn(page: Page): Promise<void> {
+  await expect(page).not.toHaveURL(/\/bejelentkezes(\?|$)/);
+  await expect
+    .poll(async () =>
+      (await page.context().cookies()).some((cookie) => cookie.name === "wb_access"),
+    )
+    .toBe(true);
+}
+
+/**
+ * Signs in through the real sign-in screen and waits until the role home page has opened. Answers how long the
+ * sign-in took in milliseconds, for the timing check.
  */
 export async function signInAs(page: Page, account: SeedAccount): Promise<number> {
   await page.goto("/bejelentkezes");
-  if (await page.getByTestId("signed-in-panel").isVisible()) await signOut(page);
+  // An existing session sends the visit away from the sign-in page: end it first, then ask for the form again.
+  if (!(await page.getByTestId("sign-in-form").isVisible())) {
+    await signOut(page);
+    await page.goto("/bejelentkezes");
+  }
   await page.getByTestId("sign-in-email").fill(account.email);
   await page.getByTestId("sign-in-password").fill(account.password);
   const started = Date.now();
   await page.getByTestId("sign-in-submit").click();
-  await expect(page.getByTestId("signed-in-panel")).toBeVisible();
+  await expectSignedIn(page);
+  await expect(page.getByTestId("sign-out-button").first()).toBeVisible();
   return Date.now() - started;
 }
 

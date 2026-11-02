@@ -16,7 +16,7 @@ import {
   stackSettings,
   uuid,
 } from "../database/stack-support.ts";
-import { bindSeededSchema } from "./support/seeded-schema.ts";
+import { bindSeededSchema, expectSignedIn } from "./support/seeded-schema.ts";
 
 /**
  * Directory and coordination on a production build against the real local stack (U3, steps 28 to 30):
@@ -259,7 +259,7 @@ async function openSession(
     page.waitForResponse((response) => response.request().method() === "POST"),
     page.getByTestId("sign-in-submit").click(),
   ]);
-  await expect(page.getByTestId("signed-in-panel")).toBeVisible();
+  await expectSignedIn(page);
   return { context, page };
 }
 
@@ -646,7 +646,7 @@ test("an invited new parent is linked to the family and sees the tasks of its gr
     page.waitForResponse((response) => response.request().method() === "POST"),
     page.getByTestId("accept-invitation-submit").click(),
   ]);
-  await expect(page.getByTestId("signed-in-panel")).toBeVisible();
+  await expectSignedIn(page);
 
   const linked = await oneValue<{ account_id: string | null }>(
     "select account_id from parents where id = $1",
