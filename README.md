@@ -7,6 +7,9 @@ signs in with an e-mail address and a password.
 
 - Code and technical artifacts: English. User-facing UI: Hungarian.
 - MVP: users, families, children, school years, groups, tasks, events, signups, swaps, cancellations, notifications, and one-time Excel import.
+- A personal learning project, built to help one kindergarten parent community with its task planning. Every name,
+  address and telephone number in this repository is invented. If you run it for real people, you handle their (and
+  their children's) personal data and are responsible for data protection (GDPR) yourself. See [SECURITY.md](./SECURITY.md).
 - For a Hungarian hands-on walkthrough and test checklist, see [HASZNALATI_UTMUTATO_HU.md](./HASZNALATI_UTMUTATO_HU.md).
 
 ## Prerequisites
@@ -179,8 +182,8 @@ After a change is merged to `main`, CI rebuilds the application with build-only 
 `SHA256SUMS`. Download it from the workflow run's **Artifacts** section and run `sha256sum -c SHA256SUMS` in the
 extracted directory to check the files. Evidence expires after 14 days.
 
-These files are unsigned build records. They do not provide cryptographic provenance attestations. The workflow uses
-ordinary artifact storage because GitHub's attestation service does not support this user-owned private repository.
+These files are unsigned build records. They do not provide cryptographic provenance attestations; signed attestations
+are not set up. The workflow uses ordinary Actions artifact storage.
 
 ## Deployment boundary
 
@@ -194,7 +197,7 @@ gates pass.
 The real parent workbook must never be committed. It is listed in `.gitignore`, the privacy scan fails when a workbook
 or other file with personal data is tracked, and the report
 [`verification/reports/u5-workbook-and-known-limits.md`](./verification/reports/u5-workbook-and-known-limits.md) states
-the open history item and the known limits.
+how the git history was cleaned and the known limits.
 
 ## AI DLC Version
 
@@ -222,3 +225,9 @@ cluster. Sandbox environments must permit PostgreSQL shared memory.
 
 This proves actual disposable PostgreSQL behavior for the declared supported schema. It does not prove compatibility with
 an unlinked deployment, issuer configuration or privileged production writer.
+
+## License
+
+The code of this project is released under the [MIT License](./LICENSE). The AI-DLC workflow files in `.claude/`,
+`.codex/`, `.agents/` and `.aidlc-archive/` come from [awslabs/aidlc-workflows](https://github.com/awslabs/aidlc-workflows),
+which is published under the MIT-0 licence. Third-party packages keep their own licences.

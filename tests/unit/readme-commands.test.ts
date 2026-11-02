@@ -86,10 +86,11 @@ describe("the Hungarian testing guide", () => {
 describe("the report on the workbook and the known limits", () => {
   const report = readFileSync("verification/reports/u5-workbook-and-known-limits.md", "utf8");
 
-  it("states that the real workbook is still in git history until the owner rewrites it (NFR1.69)", () => {
-    expect(report).toContain("still in git history");
-    expect(report).toContain("history");
+  it("states that the real workbook is not in this repository's git history and the archive stays private (NFR1.69)", () => {
+    expect(report).toContain("not in the history of this repository");
+    expect(report).toContain("rewritten history");
     expect(report).toMatch(/owner/);
+    expect(report).toMatch(/never make that archive public/);
   });
 
   it("lists each known limit (NFR6.30)", () => {

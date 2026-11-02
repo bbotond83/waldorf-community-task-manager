@@ -3,21 +3,18 @@
 Written for the owner of the repository at the end of unit U5 "Seed and test migration". It answers FR11.1, FR11.2,
 NFR1.69 and NFR6.30. It names no person, family or contact value, and the workbook itself was not opened to write it.
 
-## 1. The real workbook is still in git history
+## 1. The real workbook and the git history
 
 - The file `source-materials/waldorf-community-app/Ovis tábla v2.xlsx` holds real personal data of parents and children.
-- **Today it is not tracked** and it is listed in `.gitignore`: a new commit cannot contain it by accident, and the privacy
+- **It is not tracked** and it is listed in `.gitignore`: a new commit cannot contain it by accident, and the privacy
   scan (`npm run scan:privacy`, part of `npm run verify:security` and `npm run verify:local`) fails for any tracked
   workbook or other file with personal data.
-- **It is still in the history.** `git log --all -- "source-materials/waldorf-community-app/Ovis tábla v2.xlsx"` lists two
-  commits that touch it (the one that added it with the first inception artifacts, and the one that stopped tracking
-  it). Anyone who has a clone, or who can read the remote repository, can still recover the file from the history.
-- **Open privacy item for the owner (FR11.2).** Removing it from the whole history and replacing the remote copy is a
-  step only the owner can take: it rewrites every commit id, so every clone must be replaced afterwards, and it needs
-  the owner's access to the remote repository. This unit did not rewrite history and did not touch the remote. Until
-  the owner has done it, treat the repository as holding personal data and do not make it public or share clones.
-  After the rewrite, ask everybody to delete their old clones, and check the hosting service's cached copies and any
-  forks.
+- **It is not in the history of this repository.** This public repository was created in November 2026 from a
+  rewritten history: every commit that had ever touched the workbook was rewritten to leave it out, so all commit ids
+  differ from the earlier private repository. `git log --all -- "source-materials/waldorf-community-app/Ovis tábla v2.xlsx"`
+  lists nothing.
+- The owner keeps the earlier history in a separate private archive. Never copy the workbook into a clone of this
+  repository, and never make that archive public.
 - Tests and the seed never read the workbook. The seed uses invented data only (Hungarian names, `@example.test`
   addresses and example telephone numbers that the privacy allowlist allows).
 
