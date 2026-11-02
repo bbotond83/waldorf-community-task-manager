@@ -23,6 +23,8 @@ import {
 
 const router = vi.hoisted(() => ({ push: vi.fn() }));
 vi.mock("next/navigation", () => ({ useRouter: () => router }));
+vi.mock("server-only", () => ({}));
+vi.mock("../../app/_identity/actions.ts", () => ({ signOutAction: vi.fn() }));
 
 describe("AsyncStatePanel", () => {
   it("renders authorized success data", () => {
@@ -164,6 +166,33 @@ describe("administrator shared presentation", () => {
     const back = screen.getByTestId("admin-access-state-home-link");
     expect(back).toHaveTextContent("Vissza a beosztáshoz");
     expect(back).toHaveAttribute("href", "/teacher/schedule");
+  });
+
+  it("explains a denial and offers sign-out, in the full page and embedded forms", () => {
+    const { unmount } = render(<AdminAccessState kind="denied" />);
+    expect(screen.getByTestId("access-guidance")).toBeInTheDocument();
+    expect(screen.getByTestId("sign-out-button")).toBeInTheDocument();
+    unmount();
+    render(<AdminAccessState kind="denied" embedded />);
+    expect(screen.getByTestId("access-guidance")).toBeInTheDocument();
+    expect(screen.getByTestId("sign-out-button")).toBeInTheDocument();
+  });
+
+  it("offers sign-out without the explanation on a configuration failure", () => {
+    render(<AdminAccessState kind="configuration-error" />);
+    expect(screen.queryByTestId("access-guidance")).not.toBeInTheDocument();
+    expect(screen.getByTestId("sign-out-button")).toBeInTheDocument();
+  });
+
+  it("hides the back link inside the admin area and shows it elsewhere", () => {
+    const { unmount } = render(<AdminAccessState kind="denied" homePath="/admin" />);
+    expect(screen.queryByTestId("admin-access-state-home-link")).not.toBeInTheDocument();
+    unmount();
+    render(<AdminAccessState kind="denied" homePath="/szulo/ertesitesek" />);
+    expect(screen.getByTestId("admin-access-state-home-link")).toHaveAttribute(
+      "href",
+      "/szulo/ertesitesek",
+    );
   });
 
   it("renders a safe configuration failure", () => {

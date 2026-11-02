@@ -91,6 +91,7 @@ function tag(name: string, projectName: string): string {
 async function newUser(
   address: string,
   grant?: { role: string; scopeType: string; scope: string },
+  options: { linkParent?: boolean } = {},
 ) {
   const secret = password();
   const created = await admin.createUser({
@@ -117,7 +118,7 @@ async function newUser(
       [created.value.id],
     );
     // A parent's home page needs the parent record linked to the account; without it the page denies access.
-    if (grant.role === "parent") {
+    if (grant.role === "parent" && options.linkParent !== false) {
       await db.query(
         "insert into parents (organization_id, family_id, account_id, display_name) values ($1, $2, $3, 'Teszt Szülő')",
         [ORGANIZATION, grant.scope, created.value.id],
@@ -590,4 +591,30 @@ test("the screens work with the keyboard alone", async ({ page }, testInfo) => {
       "sign-in-forgot-link",
     ]),
   );
+});
+
+test("Nincs jogosultság: an account with a parent role but no linked record can read why and sign out", async ({
+  page,
+}, testInfo) => {
+  const user = await newUser(
+    tag("norecord", testInfo.project.name),
+    { role: "parent", scopeType: "family", scope: FAMILY },
+    { linkParent: false },
+  );
+  await page.goto("/bejelentkezes");
+  await fillAndSubmit(
+    page,
+    { "sign-in-email": user.address, "sign-in-password": user.password },
+    "sign-in-submit",
+  );
+  await expect(page.getByTestId("parent-access-denied")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Nincs jogosultság", exact: true })).toBeVisible();
+  await expect(page.getByTestId("access-guidance")).toHaveText(COPY.noAccess.guidance);
+  // The link back would only reload this same screen, so it is not offered.
+  await expect(page.getByTestId("parent-access-home-link")).toHaveCount(0);
+  await noSeriousViolations(page, "no access");
+
+  await page.getByTestId("sign-out-button").click();
+  await expect(page).toHaveURL(/\/bejelentkezes$/);
+  await expect(page.getByTestId("sign-in-form")).toBeVisible();
 });

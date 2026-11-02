@@ -1,0 +1,31 @@
+{
+  "stage": "code-generation",
+  "upstream_ids": [
+    "FR1.1",
+    "FR1.2",
+    "FR1.3",
+    "FR2.1",
+    "FR2.2",
+    "FR3.1",
+    "FR4",
+    "NFR1",
+    "NFR2",
+    "NFR3",
+    "NFR4",
+    "NFR5"
+  ],
+  "coverage": [
+    { "id": "FR1.1", "status": "OK", "target": "app/_identity/AccessStateExit.tsx" },
+    { "id": "FR1.2", "status": "OK", "target": "tests/integration/access-state-exit.test.tsx" },
+    { "id": "FR1.3", "status": "OK", "target": "tests/integration/parent-components.test.tsx" },
+    { "id": "FR2.1", "status": "OK", "target": "tests/integration/admin-components.test.tsx" },
+    { "id": "FR2.2", "status": "OK", "target": "src/identity/copy.ts" },
+    { "id": "FR3.1", "status": "OK", "target": "app/szulo/_components/ParentAccessState.tsx" },
+    { "id": "FR4", "status": "OK", "target": "tests/coverage/parent-pages.test.tsx" },
+    { "id": "NFR1", "status": "OK", "target": "tests/browser/identity.spec.ts" },
+    { "id": "NFR2", "status": "OK", "target": "src/identity/copy.ts" },
+    { "id": "NFR3", "status": "OK", "target": "tests/coverage/production-inventory.test.ts" },
+    { "id": "NFR4", "status": "OK", "target": "tests/coverage/parent-pages.test.tsx" },
+    { "id": "NFR5", "status": "OK", "target": "app/_identity/AccessStateExit.tsx" }
+  ]
+}

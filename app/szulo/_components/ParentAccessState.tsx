@@ -1,4 +1,8 @@
 import { BackToHomeLink } from "../../../src/runtime/BackToHomeLink.tsx";
+import { AccessStateExit } from "../../_identity/AccessStateExit.tsx";
+
+/** Every page under this path renders this same screen, so a link back into it would only loop. */
+const PARENT_AREA = "/szulo";
 
 export function ParentAccessState({
   kind,
@@ -28,11 +32,14 @@ export function ParentAccessState({
           ? "A helyi futtatási beállítás nem érhető el."
           : "A kért tartalom nem érhető el ezzel a profillal."}
       </p>
-      <BackToHomeLink
-        homePath={homePath}
-        label="Vissza a biztonságos kezdőoldalra"
-        testId="parent-access-home-link"
-      />
+      {homePath?.startsWith(PARENT_AREA) ? null : (
+        <BackToHomeLink
+          homePath={homePath}
+          label="Vissza a biztonságos kezdőoldalra"
+          testId="parent-access-home-link"
+        />
+      )}
+      <AccessStateExit explain={kind === "denied"} />
     </section>
   );
 }

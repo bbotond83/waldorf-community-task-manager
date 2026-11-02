@@ -1,9 +1,12 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { ParentAccessState } from "../../app/szulo/_components/ParentAccessState.tsx";
 import { ParentMutationForm } from "../../app/szulo/_components/ParentMutationForm.tsx";
 import { ParentStatePanel } from "../../app/szulo/_components/ParentStatePanel.tsx";
 import { denied, empty, retryableFailure, success } from "../../src/application/index.ts";
+
+vi.mock("server-only", () => ({}));
+vi.mock("../../app/_identity/actions.ts", () => ({ signOutAction: vi.fn() }));
 
 describe("ParentStatePanel", () => {
   it("renders authorized content", () => {
@@ -188,5 +191,33 @@ describe("ParentAccessState", () => {
       "href",
       "/teacher/schedule",
     );
+  });
+
+  it("explains a denial and offers sign-out (FR1, FR2)", () => {
+    render(<ParentAccessState kind="denied" />);
+    expect(screen.getByTestId("access-guidance")).toBeInTheDocument();
+    expect(screen.getByTestId("sign-out-button")).toBeInTheDocument();
+  });
+
+  it("offers sign-out without the explanation on a configuration error (FR2.1)", () => {
+    render(<ParentAccessState kind="configuration-error" />);
+    expect(screen.queryByTestId("access-guidance")).not.toBeInTheDocument();
+    expect(screen.getByTestId("sign-out-button")).toBeInTheDocument();
+  });
+
+  it("offers no sign-out to a signed-out visitor (FR1.3)", () => {
+    render(<ParentAccessState kind="signed-out" />);
+    expect(screen.queryByTestId("sign-out-button")).not.toBeInTheDocument();
+  });
+
+  it("hides the back link when it would only reload this screen (FR3)", () => {
+    render(<ParentAccessState kind="denied" homePath="/szulo/ertesitesek" />);
+    expect(screen.queryByTestId("parent-access-home-link")).not.toBeInTheDocument();
+    expect(screen.getByTestId("sign-out-button")).toBeInTheDocument();
+  });
+
+  it("keeps the back link when it leads elsewhere (FR3.1)", () => {
+    render(<ParentAccessState kind="denied" homePath="/admin" />);
+    expect(screen.getByTestId("parent-access-home-link")).toHaveAttribute("href", "/admin");
   });
 });

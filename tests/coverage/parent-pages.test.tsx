@@ -234,6 +234,18 @@ it("withholds notifications content without session", async () => {
   expect(output).not.toContain('name="idempotencyKey"');
   expect(output).not.toContain("protectedReason");
 });
+it("gives a parent with a role but no linked record the guidance and a way to sign out", async () => {
+  // Regression: this screen had no sign-out, and its back link reloaded the same screen.
+  const Layout = (await import("../../app/szulo/layout.tsx")).default;
+  signIn("parent");
+  requestWorld.access.parent.parent = undefined;
+  const output = html(await Layout({ children: "Owned child" }));
+  expect(output).toContain("Nincs jogosultság");
+  expect(output).not.toContain("Owned child");
+  expect(output).toContain('data-testid="access-guidance"');
+  expect(output).toContain('data-testid="sign-out-button"');
+  expect(output).not.toContain("parent-access-home-link");
+});
 it("renders role layout, denial and configuration error", async () => {
   const Layout = (await import("../../app/szulo/layout.tsx")).default;
   signIn("parent");
