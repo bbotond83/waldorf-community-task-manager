@@ -1,4 +1,8 @@
 import { BackToHomeLink } from "../../../src/runtime/BackToHomeLink.tsx";
+import { AccessStateExit } from "../../_identity/AccessStateExit.tsx";
+
+/** Every page under this path renders this same screen, so a link back into it would only loop. */
+const ADMIN_AREA = "/admin";
 
 type AdminAccessStateProps = Readonly<{
   kind: "denied" | "configuration-error";
@@ -25,11 +29,14 @@ export function AdminAccessState({
           ? "Ehhez a művelethez nincs megfelelő jogosultság."
           : (message ?? "Ellenőrizze a helyi futtatási beállításokat.")}
       </p>
-      <BackToHomeLink
-        homePath={homePath}
-        label="Vissza a kezdőlapra"
-        testId="admin-access-state-home-link"
-      />
+      {homePath?.startsWith(ADMIN_AREA) ? null : (
+        <BackToHomeLink
+          homePath={homePath}
+          label="Vissza a kezdőlapra"
+          testId="admin-access-state-home-link"
+        />
+      )}
+      <AccessStateExit explain={isDenied} />
     </>
   );
   return embedded ? (

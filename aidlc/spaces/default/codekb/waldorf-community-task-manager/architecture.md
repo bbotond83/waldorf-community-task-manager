@@ -1,6 +1,6 @@
 # Architecture Analysis
 
-Full rescan 2026-10-12 (HEAD `80bd4f4`), focused update 2026-10-27 (HEAD `5d2b484`, intent `denied-audit-ratelimit`), focused update 2026-11-02 (HEAD `3456409`, intent `empty-nav-after-login`: sign-in, shell and navigation area, new section "Sign-in, session and landing (2026-11-02)" and interaction diagram 7). Revision 2 on 2026-11-02 (same intent, owner asked to also scan the audit area) re-read the audit migrations 20261012, 20261013, 20261015, 20261019, 20261044 and 20261045, `supabase/config.toml` and the database test support, `audit`, `audit-purge` and `migrations` tests; sections marked "(2026-11-02, audit re-verified)" come from it. It added the sections "Session gate and actor choke point", "Privilege model", "Audit purge and housekeeping" and "Local stack configuration" and corrected the migration count. The 2026-10-27 update rewrote "Database Layer" and added "Platform audit write" and interaction diagram 6. Every other section is kept from 2026-10-12 and describes the synthetic prototype as it was then; it is stale wherever the U1 to U5 backend work changed the application (not re-scanned).
+Full rescan 2026-10-12 (HEAD `80bd4f4`), focused update 2026-10-27 (HEAD `5d2b484`, intent `denied-audit-ratelimit`), focused update 2026-11-02 (HEAD `3456409`, intent `empty-nav-after-login`: sign-in, shell and navigation area, section "Sign-in, session and landing (2026-11-02)" and interaction diagram 7). Revision 2 on 2026-11-02 (same intent, owner asked to also scan the audit area) re-read the audit migrations 20261012, 20261013, 20261015, 20261019, 20261044 and 20261045, `supabase/config.toml` and the database test support, `audit`, `audit-purge` and `migrations` tests; sections marked "(2026-11-02, audit re-verified)" come from it. Focused update 2026-11-02 (HEAD `1070fd6`, intent `no-access-signout`): the "Nincs jogosultság" pages and the sign-out reuse path; new section "Denied pages and sign-out reuse (2026-11-02, after 1070fd6)" and interaction diagram 8; the sign-in landing facts that commit `1070fd6` changed are corrected in the sign-in section and in diagram 7. The 2026-10-27 update rewrote "Database Layer" and added "Platform audit write" and interaction diagram 6. Every other section is kept from 2026-10-12 and describes the synthetic prototype as it was then; it is stale wherever the U1 to U5 backend work changed the application (not re-scanned).
 
 ## System Overview
 
@@ -41,14 +41,31 @@ Text fallback: browser to pages and server actions; resolvers call `src/applicat
 The synthetic mode, the `waldorf_local_session` cookie and the profile picker described in the 2026-10-12 sections below no longer exist in this area; the application is production-only and signs people in with the Supabase sign-in service.
 
 - **Composition**: `composeRuntime()` (`src/runtime/composition.ts`) validates the settings and always imports `production/composition.ts`; `RuntimeComposition.authenticationBoundary` is `"supabase-session"` and `services.forRequest(accessToken)` builds the parent, admin and teacher facades on a database client acting as that person (`src/runtime/production/services.ts`).
-- **Session**: cookies `wb_access` and `wb_refresh` (httpOnly, sameSite lax, 30 days; `src/identity/cookies.ts`). `proxy.ts` renews or clears them per request and sets the CSP nonce; it does no role routing. Pages read the session through `currentSession()` (`app/_identity/current-session.ts`, never refreshes, expired reads as signed out) and `productionRequest()` (memoised with `cache`, returns `ready | signed-out | unavailable`).
+- **Session**: cookies `wb_access` and `wb_refresh` (httpOnly, sameSite lax, 30 days; `src/identity/cookies.ts`). `proxy.ts` renews or clears them per request and sets the CSP nonce (including `form-action 'self'`); it does no role routing. Pages read the session through `currentSession()` (`app/_identity/current-session.ts`, never refreshes, expired reads as signed out) and `productionRequest()` (memoised with `cache`, returns `ready | signed-out | unavailable`).
 - **Role resolution**: `resolveParentAccess`, `resolveAdminAccess`, `resolveTeacherAccess` (`src/runtime/production/access.ts`) read the account's grants as the person and return `success` with a `ShellProfile {label, scopeSummary, homePath, navigation}`, or `denied` (carrying `homePath` of the strongest role held, order super admin, group admin, teacher, parent), `signed-out` or `unavailable`. `HOME`: parent `/szulo/ertesitesek`, teacher `/teacher/schedule`, group admin and super admin `/admin`.
-- **Home resolution**: `resolveProductionHome()` (`app/_identity/production-home.ts`) returns `ready {path} | signed-out | no-role | unavailable`. Only `app/page.tsx` (`/`) uses it: `ready` redirects to the path; the other states render panels (sign-in link, no-role, unavailable). It uses `resolveAdminAccess` as the generic resolver.
-- **Shell**: the role layouts `app/admin/layout.tsx`, `app/szulo/layout.tsx`, `app/teacher/layout.tsx` resolve their access and wrap pages in `AppShell` (`src/runtime/AppShell.tsx`): skip link, header (brand link to `profile.homePath`, role label, scope summary, `headerAction` = `SignOutButton`), `AppNav` only when `profile.navigation.length > 0`, then the main content. Admin and teacher layouts `redirect("/")` when signed out; the parent layout renders an access panel instead. The menu lists live in `src/runtime/navigation.ts`; `TEACHER_NAVIGATION` is empty by design.
+- **Home resolution**: `resolveProductionHome()` (`app/_identity/production-home.ts`) returns `ready {path} | signed-out | no-role | unavailable`. `app/page.tsx` (`/`) uses it: `ready` redirects to the path; the other states render panels (sign-in link, no-role with a sign-out button, unavailable). It uses `resolveAdminAccess` as the generic resolver.
+- **Shell**: the role layouts `app/admin/layout.tsx`, `app/szulo/layout.tsx`, `app/teacher/layout.tsx` resolve their access and wrap pages in `AppShell` (`src/runtime/AppShell.tsx`): skip link, header (brand link to `profile.homePath`, role label, scope summary, `headerAction` = `SignOutButton` through `shellHeaderAction()` in `app/_identity/shell-action.tsx`), `AppNav` only when `profile.navigation.length > 0`, then the main content. Admin and teacher layouts `redirect("/")` when signed out; the parent layout renders an access panel instead. The menu lists live in `src/runtime/navigation.ts`; `TEACHER_NAVIGATION` is empty by design.
 - **Sign-in screen (`/bejelentkezes`)**: not inside any role layout, so it has no shell. `SignInPage` shows the form for a signed-out visitor and, for a signed-in one, only `signed-in-panel` (heading, message, `SignOutButton`).
-- **Gap found (2026-11-02, cause of the reported defect)**: `signInAction` (`app/bejelentkezes/actions.ts:44-45`) writes the cookies and `redirect("/bejelentkezes")`, so the freshly signed-in person lands on the shell-less panel; nothing calls `resolveProductionHome()` for them. Password reset (`app/jelszo-visszaallitas/uj/actions.ts:38`) and invitation acceptance (`app/meghivas/[token]/actions.ts:41,43`) use the same destination. Sign-out also redirects to `/bejelentkezes`, which is correct (signed out).
+- **Landing after sign-in (2026-11-02, after 1070fd6)**: the gap found on 2026-11-02 at HEAD `3456409` is closed. `signInAction` (`app/bejelentkezes/actions.ts`) now writes the cookies and ends with `redirect("/")`; `/` calls `resolveProductionHome()` and redirects to the role home inside the role layout's `AppShell`. At `3456409` the same action redirected to `/bejelentkezes` (shell-less panel); that text is kept in diagram 7's history below. Whether password reset (`app/jelszo-visszaallitas/uj/actions.ts`) and invitation acceptance (`app/meghivas/[token]/actions.ts`) were changed in `1070fd6` was not re-read in this run (the handoff names only the sign-in action); sign-out still ends on `/bejelentkezes`, which is correct (signed out).
 
-## Runtime Composition (2026-10-12, superseded by the section above)
+## Denied pages and sign-out reuse (2026-11-02, after 1070fd6)
+
+Intent `no-access-signout` asks that a person who lands on "Nincs jogosultság" can sign out and gets a short Hungarian explanation. Read-only findings from the focused scan:
+
+- **Five renderings of "Nincs jogosultság", no shared component**:
+  1. `app/szulo/_components/ParentAccessState.tsx`: shown by `app/szulo/layout.tsx` instead of the shell. Non-signed-out branch: `<section id="hozzaferes-megtagadva" tabIndex={-1} data-testid="parent-access-denied">`, one `<h1>Nincs jogosultság</h1>`, one paragraph "A kért tartalom nem érhető el ezzel a profillal.", and a `BackToHomeLink` (`data-testid="parent-access-home-link"`, label "Vissza a biztonságos kezdőoldalra"). The same component serves kinds `denied`, `configuration-error` (text "A helyi futtatási beállítás nem érhető el.") and `signed-out`. No `AppShell`, so no header sign-out. This is the likely landing for an account with the parent role but no linked `parents` record, or whose grant scope does not match the record's family (`resolveParentAccess` returns `denied`).
+  2. `app/admin/_components/AdminAccessState.tsx`: shown by `app/admin/layout.tsx`; testids `admin-denied`, `admin-access-state-home-link`.
+  3. `app/teacher/_components/TeacherAccessState.tsx`: shown by `app/teacher/layout.tsx`; testids `teacher-denied`, `teacher-access-home-link`; its link goes to `/`.
+  4. A `TeacherStatePanel` heading with the same words (teacher schedule state).
+  5. The static page `app/hozzaferes-megtagadva/page.tsx` (`data-testid="access-denied-state"`, link `access-denied-home-link`): no code in `app/` or `src/` redirects to it; only `tests/coverage/app-entrypoints.test.tsx` renders it. Possibly legacy; reachable by typing the URL, where a signed-out visitor sees it.
+- **Layout contract**: the three role layouts render the access state outside `AppShell`, because the shell needs a `ShellProfile` that a denied person does not have. Introducing the shell for the denied case is not advised; an in-page sign-out is the way.
+- **Sign-out reuse path (no new action needed)**: component `SignOutButton` (`app/_identity/SignOutButton.tsx`, `"use client"`, no props): `<form action={signOutAction} data-testid="sign-out-form">` with a submit button (`className="secondary-button"`, `data-testid="sign-out-button"`, label and pending text from `COPY.signOut` in `src/identity/copy.ts`: "Kijelentkezés" / "Kijelentkezés folyamatban…"). Action `signOutAction` (`app/_identity/actions.ts`, `"use server"`): reads the token cookies, calls `endSession` with scope local, emits the `sign_out` event, clears both cookies through `clearTokenPair` and always ends with `redirect("/bejelentkezes")`; it clears the cookies even when the configuration is missing or the service is unreachable. Already used the same way in two places: the `no-role` branch of `app/page.tsx` (a `role="status"` paragraph with `data-testid="production-no-role"` and "Ehhez a fiókhoz még nem tartozik szerepkör. Kérje az adminisztrátort, hogy hívja meg.", then `<SignOutButton />`), which is the closest existing pattern for "explanation plus sign-out", and the `AppShell` header for the role layouts.
+- **Session and request safety**: nothing page-specific is needed. Cookies are httpOnly, `proxy.ts` renews them per request and sets a nonce CSP with `form-action 'self'`, and a Next.js server action carries the built-in same-origin check.
+- **Back-link loop (concern)**: `deniedFor` in `src/runtime/production/access.ts` sets the denied result's `homePath` to the strongest role's home. For a parent with the role but no linked record that is `/szulo/ertesitesek`, the page already shown, so "Vissza a biztonságos kezdőoldalra" reloads the same denied page. The teacher link goes to `/`, which redirects to the role home and loops the same way for any role holder without a usable page. The design stage should decide whether to keep, reword or hide that link for the dead-end case; the explanation text must not promise that the link helps.
+- **Shared `ParentAccessState` concerns**: the same markup is shown to a teacher or admin who opens a parent page (existing browser specs assert that a teacher on `/szulo/feladatok` or `/admin` sees "Nincs jogosultság" and can click "Vissza a beosztáshoz") and to the `configuration-error` kind. A sign-out button is harmless there, but new explanation text must be correct for those cases or be limited to the `denied` kind with no usable home. Existing testids and link labels must stay stable. Changing only the parent page leaves the admin and teacher pages without sign-out; scope is a decision for the design stage (a small shared presentational piece is allowed, not required at Minimal depth).
+- **Accessibility and focus**: the denied sections carry `id="hozzaferes-megtagadva"` and `tabIndex={-1}` as focus targets (`focusTarget: "#hozzaferes-megtagadva"` in `src/application/results.ts` and `facade-pipeline.ts`, referenced from the handoff, those files not opened). Keep the id and the single `<h1>`. The parent denied element is a `<section>` without a `<main>` landmark; axe results for the critical flow (no serious or critical violations) must be checked when a form is added. Styling classes `secondary-button` and `centered-panel` exist in `app/globals.css`.
+
+## Runtime Composition (2026-10-12, superseded by the sections above)
 
 - `composeRuntime(env)` (`src/runtime/composition.ts`) is async, called on essentially every request, and dynamic-imports one of two compositions. Result type is a discriminated union `mode: "synthetic" | "production"`.
 - Production composition was then a stub (`authenticationBoundary: "supabase-unlinked"`).
@@ -85,6 +102,7 @@ Database path (2026-10-27): a named function computes a SHA-256 request fingerpr
 - Key for a per-account limit: `actor_account_id`, which is the session's `auth.uid()` or the nil system account. A row's time is the transaction start (`now()`).
 - Verified again 2026-11-02: `platform_actor_role` calls `platform_actor_account` first, so a caller without an active session raises `42501` and never reaches the insert; the actor key for any limit is therefore a live session's `auth.uid()` or the nil system account.
 - `platform_finish_operation` ignores the audit write's return value (`perform`) and builds its result from its own arguments, so a write that is skipped changes neither the returned envelope nor the stored idempotency record.
+- Note (2026-11-02, intent `no-access-signout`): the web-side "Nincs jogosultság" pages above are not audit events; a `denied` role resolution in `src/runtime/production/access.ts` writes nothing to `audit_events`.
 
 ## Session gate and actor choke point (2026-11-02, audit re-verified)
 
@@ -131,17 +149,19 @@ Kept for context; most items were addressed by intent `261012-real-backend-local
 - Facade pipeline with idempotency and projection guard around every operation.
 - Database (2026-10-27): one audited-operation pattern for all units (idempotency check, authorization, change, `platform_finish_operation`); the actor is never a parameter (BR3.9); the audit write is in the change's transaction (BR3.3); forward-only, schema-neutral migrations so parallel test workers each own a schema.
 - ADR-style rule: no executable deployment workflows until a deployable app and target exist.
+- Web (2026-11-02, after 1070fd6): one sign-out path (`SignOutButton` calling `signOutAction`) is reused by the shell header, the `/` no-role panel and the sign-in page; denied states render outside the shell and are therefore the places that lack it.
 
 ## Improvement Opportunities (observations)
 
-- 2026-11-02: the landing after sign-in is decided by the sign-in action (self-redirect) and by the sign-in page (dead-end panel) rather than by the one resolver that already knows the role home (`resolveProductionHome`); the home resolution has a single caller (`app/page.tsx`).
+- 2026-11-02 (intent `no-access-signout`): five separate "Nincs jogosultság" renderings with slightly different copy and link wording and no shared presentational component; the denied "back" link can point at the page itself; `app/hozzaferes-megtagadva/page.tsx` has no inbound redirect and may be legacy; `react`, `react-dom`, `zod` and several dev tools are pinned to `latest` in `package.json`.
+- 2026-11-02: the landing after sign-in was decided by the sign-in action (self-redirect) and by the sign-in page (dead-end panel) rather than by the resolver that already knows the role home; closed by commit `1070fd6` (the action now redirects to `/`).
 - 2026-10-12: Family A/B duplication; sync ports versus async facades; hardcoded session secret (not re-verified).
 - 2026-11-02 (audit re-verified): the limit that 2026-10-27 observed missing is now merged as 20261046 (header read, not analyzed); the files analyzed here, 20261012 to 20261045, predate it. Other observations from this re-read: a failing purge is visible only through the `audit_purge_failed` flag; the one-time privilege sweep in 20261019 does not cover later functions, so each new file must restate its own revoke.
 - 2026-10-27 (since addressed by 20261046): denied events have no volume limit per account, so one account can grow `audit_events` without bound until the 365-day purge (intent `denied-audit-ratelimit`); there is no outcome-aware index for counting an account's recent denials; count-then-insert logic needs a per-account advisory lock if the cap must hold under concurrent calls.
 
 ## Interaction Diagrams
 
-Diagrams 1 to 5 are from 2026-10-12 and show the in-memory prototype; diagram 6 is from 2026-10-27; diagram 7 is from 2026-11-02.
+Diagrams 1 to 5 are from 2026-10-12 and show the in-memory prototype; diagram 6 is from 2026-10-27; diagram 7 is from 2026-11-02 and was updated after `1070fd6`; diagram 8 is from 2026-11-02 (intent `no-access-signout`).
 
 ### 1. Parent signs up for a task (2026-10-12)
 
@@ -249,7 +269,7 @@ sequenceDiagram
 
 Text: the named function checks idempotency, finds the caller not authorized and returns through `platform_finish_operation`. That function writes the denied audit event through `platform_audit_write` (actor and role taken from the session), stores the `denied` result for 24-hour replay and returns the envelope. The gateway maps `denied` to `authorization_denied`. A replay with the same key returns the stored `denied` result without a new audit event. `identity_deny` is a one-line wrapper that makes the same `platform_finish_operation` call.
 
-### 7. Sign-in today and the role home reached from `/` (2026-11-02)
+### 7. Sign-in and the role home reached from `/` (2026-11-02, updated after 1070fd6)
 
 ```mermaid
 sequenceDiagram
@@ -257,7 +277,6 @@ sequenceDiagram
   participant SF as SignInForm (client)
   participant SA as signInAction
   participant SI as signIn (src/identity)
-  participant SP as SignInPage /bejelentkezes
   participant HP as HomePage /
   participant PH as resolveProductionHome
   participant RL as Role layout + AppShell
@@ -266,11 +285,7 @@ sequenceDiagram
   SA->>SI: signIn(credentials)
   SI-->>SA: success with token pair
   SA->>SA: writeTokenPair (wb_access, wb_refresh)
-  SA-->>P: redirect /bejelentkezes
-  P->>SP: GET /bejelentkezes
-  SP->>SP: currentSession is signed-in
-  SP-->>P: signed-in-panel only (no shell, no menu)
-  Note over P,HP: Only when the person opens "/"
+  SA-->>P: redirect /
   P->>HP: GET /
   HP->>PH: resolve home
   PH-->>HP: ready, path of strongest role
@@ -279,4 +294,34 @@ sequenceDiagram
   RL-->>P: AppShell with header, sign-out and the role menu
 ```
 
-Text: after a successful sign-in the action stores the cookies and redirects to the sign-in page itself, which shows only the signed-in panel. The role home and menu appear only after a separate request to `/`, where `resolveProductionHome` finds the strongest role and redirects to its home inside the role layout's `AppShell`.
+Text: after a successful sign-in the action stores the cookies and redirects to `/`, where `resolveProductionHome` finds the strongest role and redirects to its home inside the role layout's `AppShell`. At HEAD `3456409` the action redirected to `/bejelentkezes`, which showed only the shell-less signed-in panel; commit `1070fd6` removed that dead end.
+
+### 8. Parent with a role but no linked record, denied page and sign-out (2026-11-02)
+
+```mermaid
+sequenceDiagram
+  actor P as Parent account without parents record
+  participant HP as HomePage /
+  participant PH as resolveProductionHome
+  participant PL as app/szulo/layout.tsx
+  participant PA as resolveParentAccess
+  participant AS as ParentAccessState kind denied
+  participant SB as SignOutButton
+  participant SO as signOutAction
+  P->>HP: GET / (after sign-in)
+  HP->>PH: resolve home
+  PH-->>HP: ready, /szulo/ertesitesek
+  HP-->>P: redirect /szulo/ertesitesek
+  P->>PL: GET /szulo/ertesitesek
+  PL->>PA: resolveParentAccess
+  PA-->>PL: denied, homePath /szulo/ertesitesek
+  PL->>AS: render (no AppShell)
+  AS-->>P: Nincs jogosultság, explanation, home link (loops)
+  Note over AS,SB: Sign-out control to be added here by reusing SignOutButton
+  P->>SB: submit sign-out form
+  SB->>SO: server action
+  SO->>SO: endSession (local), clearTokenPair, sign_out event
+  SO-->>P: redirect /bejelentkezes
+```
+
+Text: the person signs in and is redirected to the parent home, where the layout resolves access, gets `denied` and renders the access state without the shell. The only link points at the same page. Adding the existing `SignOutButton` (same form and action the `/` no-role panel uses) gives a way out: the action clears the session cookies and redirects to the sign-in page. The sequence of the first half is from the code read in this run (not executed).

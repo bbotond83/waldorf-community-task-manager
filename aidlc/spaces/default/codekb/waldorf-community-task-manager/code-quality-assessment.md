@@ -1,16 +1,40 @@
 # Code Quality Assessment
 
-Full rescan 2026-10-12 (HEAD `80bd4f4`), focused update 2026-10-27 (HEAD `5d2b484`, intent `denied-audit-ratelimit`), focused update 2026-11-02 (HEAD `3456409`, intent `empty-nav-after-login`; section "Sign-in, shell and navigation area (2026-11-02)"). Revision 2 on 2026-11-02 (same intent, owner asked to also scan the audit area) re-read the audit migrations 20261012, 20261013, 20261015, 20261019, 20261044 and 20261045, `supabase/config.toml` and the database test support, `audit`, `audit-purge` and `migrations` tests; sections marked "(2026-11-02, audit re-verified)" come from it. The section "Database layer and audit area" was re-verified and extended. Both focused updates were read-only (no test, build or program run) and added "Database layer and audit area"; the 2026-10-12 sections below record results executed then and are not current (per project rule, current executable results are authoritative over these counts).
+Full rescan 2026-10-12 (HEAD `80bd4f4`), focused update 2026-10-27 (HEAD `5d2b484`, intent `denied-audit-ratelimit`), focused update 2026-11-02 (HEAD `3456409`, intent `empty-nav-after-login`; section "Sign-in, shell and navigation area (2026-11-02)"). Revision 2 on 2026-11-02 (same intent, owner asked to also scan the audit area) re-read the audit migrations 20261012, 20261013, 20261015, 20261019, 20261044 and 20261045, `supabase/config.toml` and the database test support, `audit`, `audit-purge` and `migrations` tests; sections marked "(2026-11-02, audit re-verified)" come from it. The section "Database layer and audit area" was re-verified and extended. Focused update 2026-11-02 (HEAD `1070fd6`, intent `no-access-signout`): new section "Denied pages and sign-out area (2026-11-02, after 1070fd6)"; the sign-in defect findings below describe `3456409` and are marked as fixed by `1070fd6`. All focused updates were read-only (no test, build or program run); the 2026-10-12 sections below record results executed then and are not current (per project rule, current executable results are authoritative over these counts).
 
-## Sign-in, shell and navigation area (2026-11-02)
+## Denied pages and sign-out area (2026-11-02, after 1070fd6)
+
+Read-only run; nothing executed (no tests, build or server), so test results are not re-measured.
+
+### Findings
+1. **No exit on the denied pages**: `ParentAccessState`, `AdminAccessState`, `TeacherAccessState` and `app/hozzaferes-megtagadva/page.tsx` render outside `AppShell` and have no sign-out. The tools to add one already exist (`SignOutButton`, `signOutAction`, used in `app/page.tsx` and the shell header) and need no change. After `1070fd6` more accounts reach the parent denied page right after sign-in (role without linked record), and `signInAs` in the browser support would start to succeed for such an account only if the denied page gains a `sign-out-button`.
+2. **Back-link loop**: `deniedFor` in `src/runtime/production/access.ts` returns the strongest role's `homePath`; for a parent without a linked record that is the page being shown, so "Vissza a biztonságos kezdőoldalra" reloads the same denied page. The teacher link to `/` redirects and loops the same way for a role holder without a usable page.
+3. **Duplication**: five separate "Nincs jogosultság" renderings with similar markup and slightly different copy and link text; no shared presentational component. Page structure varies in testids (`parent-access-denied`, `admin-denied`, `teacher-denied`, `access-denied-state`).
+4. **Shared component risk**: `ParentAccessState kind="denied"` is also what a teacher or admin sees on a parent page, and the `configuration-error` kind reuses the markup. New explanation text must be correct for all of them or be limited to the case with no usable home. Existing specs (`navigation-polish.spec.ts`, `teacher-web.spec.ts`) click "Vissza a beosztáshoz" on the denied page, so labels and testids must stay stable.
+5. **Possible dead page**: `app/hozzaferes-megtagadva/page.tsx` has no inbound redirect in `app/` or `src/`; only a coverage test renders it. Confirm the owner means the parent denied page.
+6. **Accessibility**: the parent denied element is a `<section>` without a `<main>` landmark; it carries `id="hozzaferes-megtagadva"` and `tabIndex={-1}` as the focus target. Adding a form and button must keep the single `<h1>` and pass axe (serious and critical violations block the critical flow).
+7. **Dependency pinning**: `react`, `react-dom`, `zod` and several dev tools are `latest` in `package.json`.
+8. **Test gaps**: no test asserts that a denied page offers sign-out; no browser test models "role but no linked parent record" (the seeded accounts were not checked); component tests for the denied states exist for parent and admin only by heading, home-link testid and href.
+
+### Ratings (code-analysis guide scale)
+| Aspect | Rating | Evidence |
+|---|---|---|
+| Naming clarity | good | `ParentAccessState`, `SignOutButton`, `resolveParentAccess`, kebab-case testids with area prefixes |
+| Function size | good | components under 50 lines (handoff) |
+| Error handling | good | explicit `denied / signed-out / unavailable` result states; sign-out tolerates missing configuration |
+| Test presence | good | component, page, layout, sign-out and browser tests exist for this area; gaps in finding 8 |
+| Duplication | fair | five denied renderings, three role resolvers with a shared load pattern |
+| Dead code | fair | `app/hozzaferes-megtagadva/page.tsx` possibly unreachable |
+
+## Sign-in, shell and navigation area (2026-11-02, state at 3456409)
 
 Read-only run; nothing executed (no tests, build or server), so test results below are not re-measured.
 
 ### Findings
-1. **Defect located (not fixed here)**: `signInAction` redirects to `/bejelentkezes` (`app/bejelentkezes/actions.ts:45`) and `SignInPage` renders a shell-less `signed-in-panel` for a signed-in visitor (`app/bejelentkezes/page.tsx:19-24`). The role home resolver exists and works (`app/_identity/production-home.ts`, used by `app/page.tsx:16-17`) but the sign-in flow never calls it. The role shells, menus and role access resolvers are correct for all four roles.
+1. **Defect located (fixed by `1070fd6`)**: `signInAction` redirected to `/bejelentkezes` (`app/bejelentkezes/actions.ts:45`) and `SignInPage` renders a shell-less `signed-in-panel` for a signed-in visitor (`app/bejelentkezes/page.tsx:19-24`). The role home resolver exists and works (`app/_identity/production-home.ts`, used by `app/page.tsx:16-17`) but the sign-in flow never called it. Commit `1070fd6` changed the redirect to `/`. The role shells, menus and role access resolvers are correct for all four roles.
 2. **Intended emptiness**: `TEACHER_NAVIGATION` is `[]` (`src/runtime/navigation.ts:13-14`), so a teacher home page shows header and sign-out but no menu. Not a defect.
-3. **Tests pin the defect**: `identity-actions.test.ts:122` expects the redirect `/bejelentkezes`; `identity-screens.test.tsx:268-282` expects the signed-in panel; `signInAs` (`tests/browser/support/seeded-schema.ts:72`) and 12 spec lines wait for `signed-in-panel`. A fix must change these together; no test covers "after sign-in the person sees their role menu".
-4. **Shared destination**: password reset (`jelszo-visszaallitas/uj/actions.ts:38`) and invitation acceptance (`meghivas/[token]/actions.ts:41,43`) also end on `/bejelentkezes`, with tests at `identity-actions.test.ts:243,282,299`.
+3. **Tests pinned the defect** (at `3456409`): `identity-actions.test.ts:122` expected the redirect `/bejelentkezes`; `identity-screens.test.tsx:268-282` expects the signed-in panel; `signInAs` (`tests/browser/support/seeded-schema.ts:72`) and 12 spec lines waited for `signed-in-panel`. `1070fd6` updated the affected tests per its title; not re-read here.
+4. **Shared destination**: password reset (`jelszo-visszaallitas/uj/actions.ts:38`) and invitation acceptance (`meghivas/[token]/actions.ts:41,43`) also ended on `/bejelentkezes` at `3456409`, with tests at `identity-actions.test.ts:243,282,299`.
 5. **Inconsistency**: signed-out handling differs by area (admin and teacher `redirect("/")`; parent renders `ParentAccessState`).
 6. **Naming**: `resolveProductionHome` relies on `resolveAdminAccess` being the generic resolver (its `denied` carries the strongest role's home); this is documented in a comment but easy to misread.
 
@@ -54,7 +78,7 @@ Read-only run; nothing executed (no tests, build or server), so test results bel
 4. D4 `lifecycle_hold_place` and `_release` compute the request fingerprint from the arguments before authorization; a denied call is stored for replay, which is intended (BR3.6) but means the denied result of a later-authorized caller is replayed for 24 hours per key.
 5. D5 Test code: `useSchema` / `bindSchema` duplicate one function; `stack-support.ts` mixes pure helpers and database access (247 lines, acceptable).
 6. D6 The published store was stale by one migration: 20261046 exists at HEAD; items A1, A3 and A5 below describe the state before it and are addressed by it per its header (not analyzed here).
-7. No finding in the audit area touches the sign-in redirect defect of this intent.
+7. No finding in the audit area touches the sign-in redirect defect or the denied pages.
 
 ### Technical debt and risks for intent `denied-audit-ratelimit` (2026-10-27, state before 20261046)
 1. A1 No volume limit on denied events per account; `audit_events` growth from repeated denials is bounded only by the 365-day purge.
@@ -76,7 +100,7 @@ Read-only run; nothing executed (no tests, build or server), so test results bel
 | Database | `node:test`, `psql` | 1 file, 9 cases | Superseded by the 55-file real-stack suite above |
 | Accessibility | `@axe-core/playwright` | serious/critical violations block | Synthetic data |
 
-Coverage: 80/80/80 lines/branches/functions with an honest denominator (`tests/coverage/support/production-coverage-reporter.ts`).
+Coverage: 80/80/80 lines/branches/functions with an honest denominator (`tests/coverage/support/production-coverage-reporter.ts`); config in `vitest.config.ts` (istanbul, includes `app/**`, `src/**`, `proxy.ts`).
 
 ## Lint, format, types (2026-10-12)
 
@@ -85,11 +109,11 @@ Coverage: 80/80/80 lines/branches/functions with an honest denominator (`tests/c
 ## CI
 
 - 2026-10-12: job `validate` runs `npm ci`, Playwright install, `npm run verify:local`; job `build_evidence` builds, CycloneDX SBOM, build tarball, metadata, SHA256SUMS, 14-day private artifacts (not cryptographic attestations). Actions pinned by SHA.
-- 2026-10-27 skim: `validate` now starts the local Supabase stack (`npm run db:start`) before `npm run verify:local` and stops it after; `verify:local` runs every `test:database:*` script and the shuffled order run.
+- 2026-10-27 skim: `validate` now starts the local Supabase stack (`npm run db:start`) before `npm run verify:local` and stops it after; `verify:local` runs every `test:database:*` script and the shuffled order run. At `1070fd6` (commit `3456409`) CI runs every browser on every run.
 
 ## Documentation
 
-`README.md`, Hungarian user guide, `verification/RUNBOOK.md`, `AUTHORIZATION.md`, PRD. SQL migrations carry purposeful header comments with rule ids and forward-only notes (2026-10-27).
+`README.md` (sections "Run the application locally" and "Test phases and quality checks"), Hungarian user guide, `verification/RUNBOOK.md`, `AUTHORIZATION.md`, PRD. SQL migrations carry purposeful header comments with rule ids and forward-only notes (2026-10-27). Identity code carries doc comments with requirement ids (BR/FR).
 
 ## Technical debt and risks recorded 2026-10-12 (not re-verified)
 

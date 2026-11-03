@@ -136,5 +136,13 @@
     "scope": "bugfix",
     "status": "complete",
     "request": "784d5129"
+  },
+  {
+    "uuid": "01a19d29-8fb3-72d3-b8a1-87de70e6b4f9",
+    "slug": "no-access-signout",
+    "dirName": "261102-no-access-signout",
+    "scope": "express",
+    "status": "complete",
+    "request": "201f5366"
   }
 ]

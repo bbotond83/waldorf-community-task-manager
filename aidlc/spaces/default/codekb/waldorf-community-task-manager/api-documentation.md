@@ -1,21 +1,33 @@
 # API Documentation
 
-Full rescan 2026-10-12 (HEAD `80bd4f4`), focused update 2026-10-27 (HEAD `5d2b484`, intent `denied-audit-ratelimit`), focused update 2026-11-02 (HEAD `3456409`, intent `empty-nav-after-login`; new section "Sign-in and landing contracts (2026-11-02)"). Revision 2 on 2026-11-02 (same intent, owner asked to also scan the audit area) re-read the audit migrations 20261012, 20261013, 20261015, 20261019, 20261044 and 20261045, `supabase/config.toml` and the database test support, `audit`, `audit-purge` and `migrations` tests; sections marked "(2026-11-02, audit re-verified)" come from it. It extended the table of platform functions below. The 2026-10-27 update rewrote "Database-facing contracts". The HTTP, server-action and application-port sections are kept from 2026-10-12 and were not re-scanned (the synthetic routes and ports they describe may since have changed).
+Full rescan 2026-10-12 (HEAD `80bd4f4`), focused update 2026-10-27 (HEAD `5d2b484`, intent `denied-audit-ratelimit`), focused update 2026-11-02 (HEAD `3456409`, intent `empty-nav-after-login`; section "Sign-in and landing contracts (2026-11-02)"). Revision 2 on 2026-11-02 (same intent, owner asked to also scan the audit area) re-read the audit migrations 20261012, 20261013, 20261015, 20261019, 20261044 and 20261045, `supabase/config.toml` and the database test support, `audit`, `audit-purge` and `migrations` tests; sections marked "(2026-11-02, audit re-verified)" come from it. It extended the table of platform functions below. Focused update 2026-11-02 (HEAD `1070fd6`, intent `no-access-signout`): the sign-in redirect row corrected and the section "Denied pages and sign-out contracts (2026-11-02, after 1070fd6)" added. The 2026-10-27 update rewrote "Database-facing contracts". The HTTP, server-action and application-port sections are kept from 2026-10-12 and were not re-scanned (the synthetic routes and ports they describe may since have changed).
 
 ## Sign-in and landing contracts (2026-11-02)
 
 | Surface | Contract |
 |---|---|
-| `signInAction(previous: FormState, formData)` (`app/bejelentkezes/actions.ts`) | Reads `email`, `password`. Configuration problem: `{status:"error", message: COPY.signIn.temporary}`. Failure: `signInFormState(result, email)` (generic invalid, locked, temporary). Success: writes `wb_access` and `wb_refresh`, then `redirect("/bejelentkezes")`. Never returns credentials. |
-| `signOutAction()` (`app/_identity/actions.ts`) | Ends this browser's session (scope local), clears both cookies, `redirect("/bejelentkezes")`; clears the cookies even when the service is unreachable. |
+| `signInAction(previous: FormState, formData)` (`app/bejelentkezes/actions.ts`) | Reads `email`, `password`. Configuration problem: `{status:"error", message: COPY.signIn.temporary}`. Failure: `signInFormState(result, email)` (generic invalid, locked, temporary). Success: writes `wb_access` and `wb_refresh`, then `redirect("/")` (since `1070fd6`; `redirect("/bejelentkezes")` at `3456409`). Never returns credentials. |
+| `signOutAction()` (`app/_identity/actions.ts`) | Ends this browser's session (scope local), emits the `sign_out` event, clears both cookies, `redirect("/bejelentkezes")`; clears the cookies even when the service is unreachable. |
 | `GET /bejelentkezes` | Dynamic. Signed out: form plus forgot-password link. Signed in: `signed-in-panel` (heading "Be van jelentkezve", status message, sign-out). |
-| `GET /` | Dynamic. Runtime misconfiguration: configuration-error panel. `resolveProductionHome()` `ready`: redirect to the role home. Else panel for `signed-out` (link to `/bejelentkezes`), `no-role`, `unavailable`. |
+| `GET /` | Dynamic. Runtime misconfiguration: configuration-error panel. `resolveProductionHome()` `ready`: redirect to the role home. Else panel for `signed-out` (link to `/bejelentkezes`), `no-role` (`production-no-role` paragraph plus sign-out), `unavailable`. |
 | `resolveProductionHome(): ProductionHome` | `{state:"ready", path} | {state:"signed-out"} | {state:"no-role"} | {state:"unavailable"}`; path is the home of the strongest role. |
 | Role homes | super admin and group admin `/admin`; parent `/szulo/ertesitesek`; teacher `/teacher/schedule`. |
-| Other redirects to `/bejelentkezes` | `app/jelszo-visszaallitas/uj/actions.ts:38` (after new password), `app/meghivas/[token]/actions.ts:41,43` (after invitation acceptance, with or without tokens). |
+| Other redirects to `/bejelentkezes` | `app/jelszo-visszaallitas/uj/actions.ts:38` (after new password), `app/meghivas/[token]/actions.ts:41,43` (after invitation acceptance, with or without tokens) as read at `3456409`; whether `1070fd6` changed them was not re-read. |
 | Redirects to `/` | Admin and teacher layouts and the teacher schedule pages when signed out. |
 
 `proxy.ts` matcher: every path except `api`, `_next/static`, `_next/image`, `favicon.ico`, `sitemap.xml`, `robots.txt` and prefetch requests. The 2026-10-12 routes `/api/synthetic/session` and `/api/synthetic/reset` and the profile-picker flow are not part of this area at this commit.
+
+## Denied pages and sign-out contracts (2026-11-02, after 1070fd6)
+
+| Surface | Contract |
+|---|---|
+| `resolveParentAccess` / `resolveAdminAccess` / `resolveTeacherAccess` (`src/runtime/production/access.ts`) | Return `success {profile: ShellProfile}`, `denied {homePath}`, `signed-out` or `unavailable`. `denied` for a parent: role held but no linked `parents` record, or grant scope not matching the record's family. `homePath` is the home of the strongest role held (`deniedFor`), so it can equal the page being rendered. |
+| `ParentAccessState({kind})` (`app/szulo/_components/ParentAccessState.tsx`) | Kinds `denied`, `configuration-error`, `signed-out`. Denied/configuration-error markup: `section#hozzaferes-megtagadva[tabIndex=-1][data-testid=parent-access-denied]`, `<h1>Nincs jogosultság</h1>`, paragraph (denied: "A kért tartalom nem érhető el ezzel a profillal."; configuration-error: "A helyi futtatási beállítás nem érhető el."), `BackToHomeLink` (`parent-access-home-link`, "Vissza a biztonságos kezdőoldalra"). |
+| `AdminAccessState`, `TeacherAccessState` | Same heading; testids `admin-denied` / `admin-access-state-home-link` and `teacher-denied` / `teacher-access-home-link` (teacher link to `/`). |
+| `GET /hozzaferes-megtagadva` | Static page, `access-denied-state`, link `access-denied-home-link`; no code redirects to it. |
+| `SignOutButton` | `"use client"`, no props. Renders `<form action={signOutAction} data-testid="sign-out-form">`; submit button class `secondary-button`, `data-testid="sign-out-button"`; texts from `COPY.signOut` ("Kijelentkezés", pending "Kijelentkezés folyamatban…"). |
+| Request safety | httpOnly cookies, `proxy.ts` CSP with `form-action 'self'`, Next.js server-action same-origin check; no extra token needed for a sign-out on a denied page. |
+| Focus targets | `focusTarget: "#hozzaferes-megtagadva"` in `src/application/results.ts` and `facade-pipeline.ts` (handoff; not opened). Keep the id and the single `<h1>`. |
 
 ## HTTP route handlers (2026-10-12)
 
@@ -24,7 +36,7 @@ Full rescan 2026-10-12 (HEAD `80bd4f4`), focused update 2026-10-27 (HEAD `5d2b48
 | `/api/readiness` | GET | Returns `{status, mode, marker: "waldorf-local-ready"}`; used by Playwright `webServer`, `scripts/start-smoke.mjs` |
 | `/api/synthetic/session` | POST form `profileId` | Same-origin check, sets signed cookie `waldorf_local_session`, 303 redirect; `profileId=""` clears the cookie |
 | `/api/synthetic/reset` | POST | 404 unless synthetic mode; resets the in-memory stores |
-| `/munkatars/beosztas`, `/munkatars/beosztas/[id]` | GET | Legacy redirects to `/teacher/schedule` |
+| `/munkatars/beosztas`, `/munkatars/beosztas/[id]` | GET | Legacy redirects to `/teacher/schedule` (`app/munkatars/beosztas/route.ts` still exists at 2026-11-02) |
 
 `proxy.ts` adds a per-request CSP nonce; its matcher excludes `/api`. No authentication happens in the proxy.
 
@@ -78,4 +90,4 @@ Full rescan 2026-10-12 (HEAD `80bd4f4`), focused update 2026-10-27 (HEAD `5d2b48
 
 ## Configuration contract (2026-10-12)
 
-`APP_RUNTIME_MODE` (`synthetic` | `production`); synthetic: `APP_SYNTHETIC_FIXTURE_VERSION`; production: `APP_SESSION_SECRET`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`. Other variables: `APP_HOST`, `APP_PORT`, `SYNTHETIC_TEST_COPIES`, `APP_LOGIN_TEST_DIST_DIR`, `NODE_ENV`. Not re-scanned; the local backend work likely changed it.
+`APP_RUNTIME_MODE` (`synthetic` | `production`); synthetic: `APP_SYNTHETIC_FIXTURE_VERSION`; production: `APP_SESSION_SECRET`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`. Other variables: `APP_HOST`, `APP_PORT`, `SYNTHETIC_TEST_COPIES`, `APP_LOGIN_TEST_DIST_DIR`, `NODE_ENV`. Not re-scanned; the local backend work likely changed it. For local runs the README (read 2026-11-02, handoff) names `APP_SESSION_SECRET`, `APP_PUBLIC_URL="http://127.0.0.1:3000"` and `SMTP_FROM` plus the values in `.env.database.local` (not opened).

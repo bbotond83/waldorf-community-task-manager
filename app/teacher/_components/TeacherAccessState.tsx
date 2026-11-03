@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AccessStateExit } from "../../_identity/AccessStateExit.tsx";
 
 export function TeacherAccessState({
   kind,
@@ -20,6 +21,7 @@ export function TeacherAccessState({
       <Link href="/" data-testid="teacher-access-home-link">
         Vissza a biztonságos kezdőoldalra
       </Link>
+      {signedOut ? null : <AccessStateExit explain={kind === "denied"} />}
     </main>
   );
 }

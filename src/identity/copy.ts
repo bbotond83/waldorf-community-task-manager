@@ -22,6 +22,10 @@ export const COPY = {
     label: "Kijelentkezés",
     pending: "Kijelentkezés folyamatban…",
   },
+  noAccess: {
+    guidance:
+      "Ehhez a fiókhoz nem tartozik megfelelő profil. Kérje a csoport adminisztrátorát, hogy kapcsolja össze a fiókját, vagy jelentkezzen ki, és lépjen be másik fiókkal.",
+  },
   reset: {
     requestTitle: "Jelszó-visszaállítás",
     requestHeading: "Jelszó-visszaállítás",

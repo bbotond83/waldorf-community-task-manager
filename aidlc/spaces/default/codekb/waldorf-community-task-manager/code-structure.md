@@ -1,6 +1,6 @@
 # Code Structure
 
-Full rescan 2026-10-12 (HEAD `80bd4f4`), focused update 2026-10-27 (HEAD `5d2b484`, intent `denied-audit-ratelimit`), focused update 2026-11-02 (HEAD `3456409`, intent `empty-nav-after-login`; new section "Sign-in and shell files (2026-11-02)"). The 2026-10-27 update rewrote "SQL migrations" and added "Database tests"; the `supabase/` and `tests/` rows of the layout table are updated. Other sections are kept from 2026-10-12 and do not show modules added since (for example `src/data/`, `src/identity/`, `scripts/db/`), which were not re-scanned.
+Full rescan 2026-10-12 (HEAD `80bd4f4`), focused update 2026-10-27 (HEAD `5d2b484`, intent `denied-audit-ratelimit`), focused update 2026-11-02 (HEAD `3456409`, intent `empty-nav-after-login`; new section "Sign-in and shell files (2026-11-02)"), focused update 2026-11-02 (HEAD `1070fd6`, intent `no-access-signout`; the sign-in rows corrected and the section "Denied pages and tests (2026-11-02, after 1070fd6)" added). The 2026-10-27 update rewrote "SQL migrations" and added "Database tests"; the `supabase/` and `tests/` rows of the layout table are updated. Other sections are kept from 2026-10-12 and do not show modules added since (for example `src/data/`, `src/identity/`, `scripts/db/`), which were not re-scanned.
 
 ## Top-level layout
 
@@ -15,7 +15,7 @@ Full rescan 2026-10-12 (HEAD `80bd4f4`), focused update 2026-10-27 (HEAD `5d2b48
 | `verification/` | Manifests: `authorization-matrix.json`, `fixtures.json`, `scenarios.json`, `sensitive-fields.json`, `evidence.schema.json`, `AUTHORIZATION.md`, `RUNBOOK.md`, `reports/` |
 | `source-materials/waldorf-community-app/` | PRD and workbook `Ovis tabla v2.xlsx` (17 sheets) |
 | `.github/workflows/ci.yml` | CI |
-| Config files | `package.json`, `tsconfig.json`, `eslint.config.mjs`, `vitest.config.ts`, `playwright*.config.ts`, `.nvmrc` (24), `.npmrc`, `.env.example` |
+| Config files | `package.json`, `tsconfig.json`, `eslint.config.mjs`, `vitest.config.ts`, `playwright*.config.ts`, `.prettierrc.json`, `.nvmrc` (24), `.npmrc`, `.env.example` |
 | Docs | `README.md`, `HASZNALATI_UTMUTATO_HU.md`, `AGENTS.md` |
 
 ## src modules: ports and adapters (2026-10-12)
@@ -27,7 +27,7 @@ Counts: LOC (non-test) / src files / tests, as of 2026-10-12.
 - Ports: `AdminApplicationPort.execute({actorId, operation, scope, payload})`, `ParentApplicationPort`, `TeacherApplicationPort.getSchedule`, `SessionGateway`, `AuthorizationVersionPort`, `IdempotencyStore`, `EventPublisher`, `EvidencePort`, `Clock`, `IdGenerator`.
 
 ### src/runtime (514 / 10 / 1) - wired
-- `config.ts`, `composition.ts`, `types.ts`, `production/composition.ts`, `synthetic/{composition,profiles,access-state}.ts`, `session/session.ts`, `security/origin.ts`, UI shell components.
+- `config.ts`, `composition.ts`, `types.ts`, `production/composition.ts`, `synthetic/{composition,profiles,access-state}.ts`, `session/session.ts`, `security/origin.ts`, UI shell components. (Synthetic parts gone at 2026-11-02; see "Sign-in and shell files".)
 
 ### src/parent-web, src/admin-core, src/admin-advanced, src/teacher-web - wired synthetic adapters
 - In-memory ports on `globalThis[Symbol.for(...)]` stores with fixtures (see `component-inventory.md`).
@@ -50,8 +50,8 @@ Counts: LOC (non-test) / src files / tests, as of 2026-10-12.
 |---|---|---|
 | `app/bejelentkezes/page.tsx` | Controller (page) | Sign-in screen; form for signed-out, `signed-in-panel` for signed-in |
 | `app/bejelentkezes/SignInForm.tsx` | Controller (client component) | `useActionState(signInAction)`, client-side required-field checks, error live region |
-| `app/bejelentkezes/actions.ts` | Controller (server action) | `signInAction`: runs `signIn`, writes cookies, `redirect("/bejelentkezes")` |
-| `app/page.tsx` | Controller (page) | `/`: composes the runtime, redirects a signed-in person to the role home or shows sign-in, no-role, unavailable panels |
+| `app/bejelentkezes/actions.ts` | Controller (server action) | `signInAction`: runs `signIn`, writes cookies, then `redirect("/")` (since `1070fd6`; `redirect("/bejelentkezes")` at `3456409`) |
+| `app/page.tsx` | Controller (page) | `/`: composes the runtime, redirects a signed-in person to the role home or shows sign-in, no-role (with `SignOutButton`), unavailable panels |
 | `app/_identity/current-session.ts` | Service | Real session for pages (no refresh) |
 | `app/_identity/production-request.ts` | Service | Memoised `ready / signed-out / unavailable` plus per-request facades |
 | `app/_identity/production-home.ts` | Service | `resolveProductionHome()` |
@@ -59,14 +59,34 @@ Counts: LOC (non-test) / src files / tests, as of 2026-10-12.
 | `proxy.ts` | Middleware | CSP nonce and session cookie renewal or clearing; no role routing |
 | `src/runtime/navigation.ts` | Configuration | Four constant menu lists (parent 3, teacher 0, group admin 5, super admin 9) |
 | `src/runtime/AppShell.tsx`, `AppNav.tsx`, `shell-profile.ts` | UI shell | Header, sign-out slot, menu (shown only when non-empty), `ShellProfile` type |
+| `src/runtime/BackToHomeLink.tsx`, `BrandMark.tsx` | UI | Link back to a home path; brand mark (2026-11-02, after 1070fd6) |
 | `src/runtime/production/access.ts` | Service | `resolveParentAccess`, `resolveAdminAccess`, `resolveTeacherAccess`, `HOME`, `HOME_ORDER`, `deniedFor` |
 | `src/runtime/production/{composition,services}.ts`, `src/runtime/composition.ts` | Configuration | Production-only composition and per-request facades |
-| `src/identity/*` | Service | Sign-in, sessions, cookies, refresh, invitations, reset, accounts, copy (Hungarian texts), events; each with a colocated `*.test.ts` |
-| `tests/browser/support/seeded-schema.ts` | Test support | `bindSeededSchema`, `signInAs` (waits for `signed-in-panel`), `signOut`, `signInAndOpen` |
+| `src/identity/*` | Service | Sign-in, sessions, cookies, refresh, invitations, reset, accounts, copy (Hungarian texts, `COPY.signOut`), events; each with a colocated `*.test.ts` |
+| `tests/browser/support/seeded-schema.ts` | Test support | `bindSeededSchema`, `signInAs`, `signOut`, `signInAndOpen`, `expectSignedIn`, `SERIOUS` |
 | `tests/browser/support/{projects,dates,scenarios}.ts` | Test support | Schema and port per browser project, dates, scenarios |
 | `tests/integration/*.test.ts(x)` | Test | Vitest tests with mocked `next/*`; sign-in behaviour pinned in `identity-actions`, `identity-screens`, `production-home`, `identity-proxy` |
 
-Route notes: `app/szulo/` has no root page (parent home is `/szulo/ertesitesek`); `app/teacher/schedule/` holds the teacher's only page; `/hozzaferes-megtagadva` is the generic denied page. The `app/belepes` route and `app/api/synthetic/*` listed in the 2026-10-12 inventory are not present at this commit.
+Route notes: `app/szulo/` has no root page (parent home is `/szulo/ertesitesek`); `app/teacher/schedule/` holds the teacher's only page; `/hozzaferes-megtagadva` is a static denied page that no code in `app/` or `src/` redirects to. The `app/belepes` route and `app/api/synthetic/*` listed in the 2026-10-12 inventory are not present at this commit.
+
+## Denied pages and tests (2026-11-02, after 1070fd6)
+
+| Path | Classification | Role |
+|---|---|---|
+| `app/szulo/layout.tsx` | Controller (layout) | Resolves parent access; renders `ParentAccessState` (denied, configuration-error, signed-out) instead of the shell, or `AppShell` |
+| `app/szulo/_components/ParentAccessState.tsx` | UI | The "Nincs jogosultság" page of the parent area (no sign-out) |
+| `app/szulo/_lib/session.ts` | Service | Parent session resolver |
+| `app/admin/layout.tsx`, `app/admin/_components/AdminAccessState.tsx`, `app/admin/_lib/session.ts` | Controller, UI, Service | Same pattern for admins; signed-out redirects to `/` |
+| `app/teacher/layout.tsx`, `app/teacher/_components/TeacherAccessState.tsx`, `app/teacher/_lib/session.ts` | Controller, UI, Service | Same pattern for teachers; link goes to `/` |
+| `app/hozzaferes-megtagadva/page.tsx` | Controller (static page) | Generic denied page; no inbound redirect |
+| `tests/integration/parent-components.test.tsx`, `admin-components.test.tsx` | Test | `describe("ParentAccessState")` and the `AdminAccessState` block: heading, home-link testid and href |
+| `tests/integration/identity-screens.test.tsx` | Test | `describe("SignOutButton (BR2.8)")`: mocks `app/_identity/actions`, submits `sign-out-form` |
+| `tests/integration/production-home.test.tsx` | Test | No-role panel shows `sign-out-button`; mocks `signOutAction`, `server-only`, `next/navigation` |
+| `tests/coverage/parent-pages.test.tsx`, `app-entrypoints.test.tsx` | Test | Layout denial with `requestWorld.signIn("teacher")`; static denied page render |
+| `tests/support/request-world.ts` | Test support | `requestWorld.signIn(role)`, `access.parent.grants`, `access.parent.parent` |
+| `tests/browser/*.spec.ts` | Test | Denied pages reached by heading name; axe via `SERIOUS` |
+
+Conventions seen (handoff, 2026-11-02): colocated `*.test.ts` for `src/`; page and component tests under `tests/integration` and `tests/coverage`; `data-testid` on every asserted or interactive element (kebab-case, area-prefixed); Hungarian text, English identifiers; identity copy in `COPY`, role-page copy inline; Prettier width 100, double quotes, semicolons, trailing commas; ESLint with zero warnings; strict TypeScript.
 
 ## SQL migrations (2026-10-27)
 

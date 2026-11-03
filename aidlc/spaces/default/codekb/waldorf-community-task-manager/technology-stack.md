@@ -1,6 +1,6 @@
 # Technology Stack
 
-Full rescan 2026-10-12 (HEAD `80bd4f4`), focused update 2026-10-27 (HEAD `5d2b484`, intent `denied-audit-ratelimit`), focused update 2026-11-02 (HEAD `3456409`, intent `empty-nav-after-login`; section "Web layer facts (2026-11-02)"). Revision 2 on 2026-11-02 (same intent, owner asked to also scan the audit area) re-read the audit migrations 20261012, 20261013, 20261015, 20261019, 20261044 and 20261045, `supabase/config.toml` and the database test support, `audit`, `audit-purge` and `migrations` tests; sections marked "(2026-11-02, audit re-verified)" come from it. It extended "Database and test stack" with the config facts. The 2026-10-27 update rewrote "Database and test stack"; the other sections are kept from 2026-10-12 and the dependency list there is known to be stale (for example `pg` is now used by the database tests; no `package.json` dependency audit was done in this run).
+Full rescan 2026-10-12 (HEAD `80bd4f4`), focused update 2026-10-27 (HEAD `5d2b484`, intent `denied-audit-ratelimit`), focused update 2026-11-02 (HEAD `3456409`, intent `empty-nav-after-login`; section "Web layer facts (2026-11-02)"). Revision 2 on 2026-11-02 (same intent, owner asked to also scan the audit area) re-read the audit migrations 20261012, 20261013, 20261015, 20261019, 20261044 and 20261045, `supabase/config.toml` and the database test support, `audit`, `audit-purge` and `migrations` tests; sections marked "(2026-11-02, audit re-verified)" come from it. It extended "Database and test stack" with the config facts. Focused update 2026-11-02 (HEAD `1070fd6`, intent `no-access-signout`): section "Web layer facts" refreshed from `package.json`, configs and README as read in that run. The 2026-10-27 update rewrote "Database and test stack"; the other sections are kept from 2026-10-12 and the dependency list there is known to be stale (for example `pg` is now used by the database tests; no `package.json` dependency audit was done).
 
 ## Languages and runtime
 
@@ -17,9 +17,15 @@ Full rescan 2026-10-12 (HEAD `80bd4f4`), focused update 2026-10-27 (HEAD `5d2b48
 - Database tests also rely on direct inserts into the sign-in service's `auth.users` and `auth.sessions` tables (`stack-support.ts` `ensureAccount`), `set local role` and `request.jwt.claims` to act as `anon`, `authenticated` or `service_role`, and session-level advisory locks to serialise files per schema.
 - PostgreSQL features in use around the audit log: `gen_random_uuid()`, `sha256()`, `hashtextextended()` with `pg_advisory_xact_lock`, row-level security, `security definer` functions with `set search_path from current`, transaction-local settings (`set_config(..., true)`), BEFORE triggers.
 
-## Web layer facts (2026-11-02)
+## Web layer facts (2026-11-02, refreshed after 1070fd6)
 
-Read from `package.json` and the source (no install or run). Declared: `next` 16.4.2, `react` `latest`, `zod` `latest`, `@supabase/supabase-js` 2.117.3, `typescript` ^5.9.0, `vitest` 4.1.12, `@playwright/test` `latest`. Used APIs: App Router server components and actions, `next/navigation` `redirect`, `next/headers` `cookies`, React 19 `useActionState`, `useFormStatus`, `cache`; `server-only` guards on `app/_identity`. `proxy.ts` is Next 16's request proxy file (the former middleware). Session cookies are plain httpOnly cookies holding the sign-in service's tokens. Integration tests mock `next/headers`, `next/navigation` and `server-only` in Vitest; browser specs use Playwright against the local Supabase stack with one schema per browser project.
+Read from `package.json`, config files and the source (no install or run). Declared: `next` 16.4.2, `react` `latest`, `react-dom` `latest`, `zod` `latest`, `@supabase/supabase-js` 2.117.3, `typescript` ^5.9, `vitest` 4.1.12 (+ jsdom, `@testing-library/react`, jest-dom), `@playwright/test` and `@axe-core/playwright`, ESLint with `eslint-config-next` (core-web-vitals and typescript), Prettier. Used APIs: App Router server components and actions, `next/navigation` `redirect`, `next/headers` `cookies`, React 19 `useActionState`, `useFormStatus`, `cache`; `server-only` guards on `app/_identity`. `proxy.ts` is Next 16's request proxy file (the former middleware). Session cookies are plain httpOnly cookies holding the sign-in service's tokens. Integration tests mock `next/headers`, `next/navigation` and `server-only` in Vitest; browser specs use Playwright against the local Supabase stack with one schema per browser project.
+
+Quality tooling and commands (handoff, from `package.json` and README; not executed):
+- Formatter and linter: Prettier (`.prettierrc.json`: width 100, double quotes, semicolons, trailing commas), ESLint with `--max-warnings=0`; `npm run format:check`, `npm run lint`, `npm run typecheck` (`next typegen && tsc --noEmit`).
+- Tests: `npm test` (domain, scripts, delivery), `npm run test:delivery` (Vitest "delivery" project, jsdom, setup `tests/setup.ts`, `tests/unit`, `tests/integration`, `tests/coverage`), `npm run test:coverage` (istanbul over `app/**`, `src/**`, `proxy.ts`; thresholds 80% lines, branches and functions; the domain part has the same floors), `npm run test:browser` / `npm run test:a11y` (need `npm run build`, the local stack and the seeded schemas; `VERIFY_BROWSER_PROJECTS=chromium` narrows the run).
+- Local run: `npm run db:start`, load `.env.database.local`, export `APP_SESSION_SECRET`, `APP_PUBLIC_URL`, `SMTP_FROM`, `npm run db:seed`, `npm run dev`, open `http://127.0.0.1:3000` (`WATCHPACK_POLLING=true` if the watcher reports `EMFILE`).
+- CI: `.github/workflows/ci.yml`, job `validate` runs `npm run verify:local` (all browsers), second job builds the SBOM and unsigned build evidence.
 
 ## Runtime dependencies (2026-10-12)
 
@@ -39,7 +45,7 @@ vitest 4.1.11, Playwright 1.62.1 with `@axe-core/playwright`, Testing Library, j
 
 ## npm scripts of note
 
-`dev`, `build`, `start`, `test` (domain, scripts, delivery), `test:database:*` (above), `db:*` (start, stop, migrate, worker, first-super-admin, seed, seed:large, reset), `verify:local`, `lint`, `format`, `typecheck`.
+`dev`, `build`, `start`, `test` (domain, scripts, delivery), `test:database:*` (above), `db:*` (start, stop, migrate, worker, first-super-admin, seed, seed:large, reset), `verify:local`, `lint`, `format`, `format:check`, `typecheck`, `test:coverage`, `test:browser`, `test:a11y`.
 
 ## Platform and services
 
@@ -48,4 +54,4 @@ vitest 4.1.11, Playwright 1.62.1 with `@axe-core/playwright`, Testing Library, j
 
 ## Security headers and browser policy (2026-10-12)
 
-CSP with nonce and `strict-dynamic` (proxy), `X-Frame-Options`, `nosniff`, referrer and permissions policies.
+CSP with nonce and `strict-dynamic` (proxy), `X-Frame-Options`, `nosniff`, referrer and permissions policies. `form-action 'self'` confirmed in `proxy.ts` (2026-11-02, handoff).

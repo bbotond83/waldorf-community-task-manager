@@ -1,6 +1,6 @@
 # Dependencies
 
-Full rescan 2026-10-12 (HEAD `80bd4f4`), focused update 2026-10-27 (HEAD `5d2b484`, intent `denied-audit-ratelimit`), focused update 2026-11-02 (HEAD `3456409`, intent `empty-nav-after-login`; section "Sign-in and shell dependencies (2026-11-02)"). Revision 2 on 2026-11-02 (same intent, owner asked to also scan the audit area) re-read the audit migrations 20261012, 20261013, 20261015, 20261019, 20261044 and 20261045, `supabase/config.toml` and the database test support, `audit`, `audit-purge` and `migrations` tests; sections marked "(2026-11-02, audit re-verified)" come from it. The 2026-10-27 update added "Database object dependencies of the audit write" and "Database test dependencies"; the module topology is kept from 2026-10-12 and does not show `src/data`, `src/identity` or `scripts/db`.
+Full rescan 2026-10-12 (HEAD `80bd4f4`), focused update 2026-10-27 (HEAD `5d2b484`, intent `denied-audit-ratelimit`), focused update 2026-11-02 (HEAD `3456409`, intent `empty-nav-after-login`; section "Sign-in and shell dependencies (2026-11-02)"). Revision 2 on 2026-11-02 (same intent, owner asked to also scan the audit area) re-read the audit migrations 20261012, 20261013, 20261015, 20261019, 20261044 and 20261045, `supabase/config.toml` and the database test support, `audit`, `audit-purge` and `migrations` tests; sections marked "(2026-11-02, audit re-verified)" come from it. Focused update 2026-11-02 (HEAD `1070fd6`, intent `no-access-signout`): the sign-in section corrected and "Denied pages and sign-out dependencies (2026-11-02, after 1070fd6)" added. The 2026-10-27 update added "Database object dependencies of the audit write" and "Database test dependencies"; the module topology is kept from 2026-10-12 and does not show `src/data`, `src/identity` or `scripts/db`.
 
 ## External dependencies
 
@@ -47,9 +47,32 @@ flowchart TB
   Proxy["proxy.ts"] --> Identity
 ```
 
-Text: the sign-in page and action depend on `src/identity` only; they have no edge to `production-home` or the role access resolvers, which is why nothing routes a freshly signed-in person to their home. `app/page.tsx` is the only consumer of `production-home`. The role layouts use `production-request` and `access` for the profile and `AppShell` for the menu. `proxy.ts` depends on the cookie names and refresh logic of `src/identity`.
+Text (corrected after `1070fd6`): at `3456409` the sign-in page and action depended on `src/identity` only and nothing routed a freshly signed-in person to their home. Since `1070fd6` the sign-in action redirects to `/`, so the flow reaches `production-home` through the `/` request (an HTTP redirect, not an import edge; whether the action module gained an import was not re-read). `app/page.tsx` consumes `production-home`. The role layouts use `production-request` and `access` for the profile and `AppShell` for the menu. `proxy.ts` depends on the cookie names and refresh logic of `src/identity`.
 
-Test dependencies: `tests/browser/*.spec.ts` -> `tests/browser/support/seeded-schema.ts` -> `scripts/db/{seed,reset,seed-support}` and `projects.ts`; `signInAs` appears on about 34 lines of the browser specs and support files (grep count, includes its definition and imports). `tests/integration/*` mock `next/headers`, `next/navigation`, `server-only` and the `app/_identity` modules.
+Test dependencies: `tests/browser/*.spec.ts` -> `tests/browser/support/seeded-schema.ts` -> `scripts/db/{seed,reset,seed-support}` and `projects.ts`; `signInAs` is used across the browser specs. `tests/integration/*` mock `next/headers`, `next/navigation`, `server-only` and the `app/_identity` modules.
+
+## Denied pages and sign-out dependencies (2026-11-02, after 1070fd6)
+
+```mermaid
+flowchart TB
+  PL["app/szulo/layout.tsx"] --> PA["resolveParentAccess (src/runtime/production/access)"]
+  PL --> PAS["ParentAccessState"]
+  PL --> Shell["AppShell"]
+  AL["app/admin/layout.tsx"] --> AAS["AdminAccessState"]
+  TL["app/teacher/layout.tsx"] --> TAS["TeacherAccessState"]
+  PAS --> BTH["src/runtime/BackToHomeLink"]
+  AAS --> BTH
+  TAS --> BTH
+  Shell --> SHA["app/_identity/shell-action (headerAction)"]
+  SHA --> SOB["app/_identity/SignOutButton"]
+  Home["app/page.tsx no-role branch"] --> SOB
+  SOB --> SOA["app/_identity/actions signOutAction"]
+  SOB --> Copy["src/identity/copy COPY.signOut"]
+  SOA --> Sess["src/identity session.endSession, cookies.clearTokenPair"]
+  SOA --> Redirect["redirect /bejelentkezes"]
+```
+
+Text: `SignOutButton` is already shared by the shell header (through `shellHeaderAction`) and the `/` no-role panel; the three access-state components do not use it. They all depend on `BackToHomeLink`, whose target comes from the access resolver's denied `homePath`. A change to `ParentAccessState` therefore touches `app/szulo/` only if the button is imported directly (`../../_identity/SignOutButton.tsx`); a shared presentational component would add a new edge from all three role areas. `ParentAccessState` is also used for the `configuration-error` and `signed-out` kinds and is rendered by tests in `tests/integration/parent-components.test.tsx` and `tests/coverage/parent-pages.test.tsx`. Test mocks to reuse: `vi.mock("../../app/_identity/actions.ts", () => ({ signOutAction: vi.fn() }))`, `vi.mock("server-only", () => ({}))`, `vi.mock("next/navigation", ...)` and the request-world mock of `production-request.ts`.
 
 ## Database object dependencies of the audit write (2026-10-27)
 
