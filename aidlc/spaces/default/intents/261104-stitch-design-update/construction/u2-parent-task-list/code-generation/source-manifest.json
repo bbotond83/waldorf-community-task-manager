@@ -1,0 +1,11 @@
+{
+  "stage": "code-generation",
+  "unit": "u2-parent-task-list",
+  "version": 1,
+  "writes": [
+    { "path": "app/globals.css" },
+    { "path": "app/szulo/feladatok/page.tsx" },
+    { "path": "DESIGN.md" },
+    { "path": "tests/browser/parent-list-style.spec.ts" }
+  ]
+}

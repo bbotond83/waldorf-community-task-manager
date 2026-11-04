@@ -1,14 +1,16 @@
 # Code Structure
 
-Full rescan 2026-10-12 (HEAD `80bd4f4`), focused update 2026-10-27 (HEAD `5d2b484`, intent `denied-audit-ratelimit`), focused update 2026-11-02 (HEAD `3456409`, intent `empty-nav-after-login`; new section "Sign-in and shell files (2026-11-02)"), focused update 2026-11-02 (HEAD `1070fd6`, intent `no-access-signout`; the sign-in rows corrected and the section "Denied pages and tests (2026-11-02, after 1070fd6)" added). The 2026-10-27 update rewrote "SQL migrations" and added "Database tests"; the `supabase/` and `tests/` rows of the layout table are updated. Other sections are kept from 2026-10-12 and do not show modules added since (for example `src/data/`, `src/identity/`, `scripts/db/`), which were not re-scanned.
+Full rescan 2026-10-12 (HEAD `80bd4f4`), focused update 2026-10-27 (HEAD `5d2b484`, intent `denied-audit-ratelimit`), focused update 2026-11-02 (HEAD `3456409`, intent `empty-nav-after-login`; new section "Sign-in and shell files (2026-11-02)"), focused update 2026-11-02 (HEAD `1070fd6`, intent `no-access-signout`; the sign-in rows corrected and the section "Denied pages and tests (2026-11-02, after 1070fd6)" added), focused update 2026-11-04 (HEAD `251c4b3`, intent `stitch-design-update`; new sections "app/ file map for the restyle (2026-11-04)" and "Browser test layout (2026-11-04)"; rows for files changed by `78a0ab5` corrected in place). The 2026-10-27 update rewrote "SQL migrations" and added "Database tests"; the `supabase/` and `tests/` rows of the layout table are updated. Other sections are kept from 2026-10-12 and do not show modules added since (for example `src/data/`, `src/identity/`, `scripts/db/`), which were not re-scanned.
 
 ## Top-level layout
 
 | Path | Contents |
 |---|---|
-| `app/` | Next.js App Router: pages, layouts, server actions, API routes, `_lib` resolvers, `globals.css` |
+| `app/` | Next.js App Router: pages, layouts, server actions, API routes, `_lib` resolvers, `globals.css` (2026-11-04: 99 tracked files, 29 pages, 5 layouts) |
 | `src/` | Domain and application modules (14 modules at the 2026-10-12 scan; later additions not re-scanned) |
 | `proxy.ts`, `next.config.ts` | CSP nonce proxy; security headers |
+| `public/brand/` | (2026-11-04) `logo.png` (used by `BrandMark`), `cover.jpg` (referenced by no code) |
+| `DESIGN.md` | (2026-11-04) the visual system in words for design tools; says the CSS wins and "No webfonts" |
 | `supabase/` | (2026-10-27) `config.toml` (local stack), `roles.sql`, `templates/` (Hungarian recovery e-mail), `migrations/` (39 SQL files) |
 | `tests/` | `unit`, `integration`, `coverage`, `browser` (Playwright), `database` (2026-10-27: 55 files against the real local stack), plus `support` helpers |
 | `scripts/` | `start-smoke.mjs`, `validate-runtime-config.ts`, `validate-toolchain.mjs`, `verification/*`; `db/*` (stack, migrate, worker, seed, reset, shuffled tests; skimmed 2026-10-27) |
@@ -17,6 +19,112 @@ Full rescan 2026-10-12 (HEAD `80bd4f4`), focused update 2026-10-27 (HEAD `5d2b48
 | `.github/workflows/ci.yml` | CI |
 | Config files | `package.json`, `tsconfig.json`, `eslint.config.mjs`, `vitest.config.ts`, `playwright*.config.ts`, `.prettierrc.json`, `.nvmrc` (24), `.npmrc`, `.env.example` |
 | Docs | `README.md`, `HASZNALATI_UTMUTATO_HU.md`, `AGENTS.md` |
+
+## app/ file map for the restyle (2026-11-04, after 251c4b3)
+
+Classification per the code-analysis guide. "Look" lists the CSS classes a file puts on screen; those are the hooks a restyle edits. Route names are Hungarian, identifiers English.
+
+### Root and shared
+
+| Path | Classification | Look (classes) |
+|---|---|---|
+| `app/layout.tsx` | Configuration | imports `globals.css`; `<html lang="hu">`; the one place a font would be attached |
+| `app/globals.css` | Static/Asset | 1418 lines, the whole look (map below) |
+| `app/page.tsx` | Controller | `centered-panel`, `button-link` (signed-out panel, no-role panel with `SignOutButton`, unavailable alert) |
+| `app/_identity/SignOutButton.tsx` | Controller (client) | `secondary-button` |
+| `app/_identity/AccessStateExit.tsx` | UI (2026-11-04, from `78a0ab5`) | explanation `p[data-testid=access-guidance]` plus `SignOutButton` |
+| `app/_identity/shell-action.tsx` | Service | gives `SignOutButton` to the shell header |
+| `app/hozzaferes-megtagadva/page.tsx` | Controller | `centered-panel`, `BrandMark` |
+
+### Sign-in family (outside any role layout, no shell)
+
+| Path | Look |
+|---|---|
+| `app/bejelentkezes/page.tsx` | `main.centered-panel.parent-public-page`, `skip-link`, `BrandMark`, `h1`, forgot link |
+| `app/bejelentkezes/SignInForm.tsx` | `form.parent-form.identity-form`; error `p[role=alert]` (live region); inputs with `aria-invalid` and `aria-describedby`; submit `button` (disabled while pending) |
+| `app/jelszo-visszaallitas/page.tsx`, `RequestResetForm.tsx`, `uj/page.tsx`, `uj/SetPasswordForm.tsx` | same classes |
+| `app/meghivas/[token]/page.tsx`, `AcceptInvitationForm.tsx` | same classes |
+
+### Parent area (`app/szulo`, layout wraps `AppShell` or `ParentAccessState`)
+
+| Path | Page name | Look (classes) |
+|---|---|---|
+| `layout.tsx` | | shell or `centered-panel` access state |
+| `ertesitesek/page.tsx` | "Értesítések" (home) | `parent-page`, `eyebrow`, `parent-collection`, `parent-card notification-card[ notification-card-read]`, `parent-card-link`, `delivery-note` |
+| `feladatok/page.tsx` | "Családi feladatok" | `parent-page`, `eyebrow`, `form.parent-filter`, `filter-field`, `filter-actions`, `parent-collection`, `parent-card`, `parent-card-link`, `parent-state-badge` (with `StatusBadge`), empty state via `parent-state` |
+| `feladatok/[id]/page.tsx` | "Feladat részletei" | `parent-page`, `eyebrow`, `parent-detail-grid`, `parent-notice`, `parent-page-actions`, `parent-note-panel`, `form-hint`, `ParentMutationForm` |
+| `feladatok/[id]/csere/page.tsx` | "Cserekérelem" | `parent-page`, `parent-form`, `swap-partner-list`, `parent-collection`, `parent-card`, `parent-notice`, `form-hint` |
+| `feladatok/[id]/lemondas/page.tsx` | "Lemondási kérelem" | `parent-page`, `parent-form`, `form-hint` |
+| `cserek/page.tsx` | "Cserék és kérelmek" | `parent-page`, `eyebrow`, `SwapRequestsBoard` |
+| `_components/ParentMutationForm.tsx` | client form | `parent-form`, result `div.parent-action-state.parent-action-state-<state>` with `role` and focus |
+| `_components/ParentStatePanel.tsx` | state panel | `parent-state` (heading "Nincs megjeleníthető elem" or "Hiba történt") |
+| `_components/PendingRequestNotice.tsx` | notice | `parent-notice parent-pending-notice` |
+| `_components/NotificationReadForm.tsx` | client form | `notification-read-form`, `notification-read-label`, `notification-read-state`, `visually-hidden` |
+| `_components/SwapRequestsBoard.tsx` | board | `parent-collection`, `parent-card swap-request-card`, `swap-request-form`, `swap-request-text`, `swap-request-actions`, `secondary-button`, `parent-action-state` |
+| `_components/ParentAccessState.tsx` | access state | `centered-panel`, uses `AccessStateExit` (2026-11-04) |
+
+There is no `app/szulo/page.tsx` and no "Saját vállalásaim" page.
+
+### Teacher area (`app/teacher`)
+
+| Path | Look |
+|---|---|
+| `layout.tsx` | shell or `TeacherAccessState` (`centered-panel teacher-state`) |
+| `schedule/page.tsx` ("Beosztás") | `teacher-page`, `eyebrow`, filter (`ScheduleFilter`: `teacher-filter`, `filter-field`, `filter-actions`, `button-link button-link-secondary`), `ScheduleCollection` |
+| `schedule/_components/ScheduleCollection.tsx` | `teacher-table-wrapper` + `teacher-table` (desktop), `teacher-card-list` + `teacher-card` (under 44rem), links `teacher-row-link`, `teacher-card-link`; `StatusBadge` |
+| `schedule/[id]/page.tsx` | `teacher-page`, `teacher-detail-grid`, back link |
+| `_components/TeacherStatePanel.tsx`, `FocusedStateSection.tsx`, `error.tsx`, `loading.tsx` | `teacher-state[ teacher-state-error]`, `button-link button-link-secondary` |
+
+### Admin area (`app/admin`)
+
+| Path | Look |
+|---|---|
+| `layout.tsx`, `_components/AdminAccessState.tsx` | shell, or `centered-panel admin-state` / `admin-page admin-state` |
+| `page.tsx` ("Áttekintés") | `admin-page`, `admin-dashboard-grid`, `admin-dashboard-panel dashboard-link` |
+| `jovahagyasok/page.tsx` ("Jóváhagyások") | `admin-page`, `AdminFilterBar` (`admin-filter`, `filter-field`, `filter-actions`), `ResponsiveCollection` (`admin-collection`, `admin-card`, `admin-card-link`, `admin-state-badge` with `StatusBadge`), `AdminPagination` |
+| `jovahagyasok/[id]/page.tsx` ("Kérelem elbírálása") | `admin-page`, `admin-detail-grid`, `admin-safe-reason`, `AdminMutationForm` (`admin-form`, `admin-action-state`, fieldset with two radios), `form-hint` |
+| `nyilvantartasok/*`, `feladatok/*`, `archivum/*` | `admin-page`, list and form components as above, `admin-page-actions`, `button-link` |
+| `import`, `emlekeztetok`, `adatvedelem`, `beallitasok` | `advanced-*`, `import-stepper`, `blocked-panel`, `success-panel` |
+| `_components/*` | `AdminMutationForm` (`admin-form`, field errors `admin-field-error`), `RecordFields`, `TaskFields`, `ImportWorkflow`, `DeveloperDetails` (`developer-details`), `AdminBackLink` (`admin-back-link`) |
+
+### Other routes
+
+`app/api/readiness/route.ts` (GET, 200 `ready` or 503), `app/munkatars/beosztas/route.ts` and `[id]/route.ts` (307 to `/teacher/schedule`). Server actions: `app/szulo/actions.ts` (8), `app/admin/actions.ts` (7), `app/admin/advanced-actions.ts` (9), `app/bejelentkezes/actions.ts`, `app/_identity/actions.ts`, and one each in `jelszo-visszaallitas`, `jelszo-visszaallitas/uj`, `meghivas/[token]`. Resolvers: `_lib/session.ts` and `_lib/facade.ts` in each of `szulo`, `teacher`, `admin`.
+
+### `app/globals.css` map (line ranges at 251c4b3)
+
+| Lines | Content |
+|---|---|
+| 1-28 | `:root` tokens and the system font stack |
+| 30-105 | reset-like base: `*`, `html`, `body` (gradient), `a`, `button`, `summary`, `:focus-visible`, `[tabindex="-1"]`, `.skip-link` |
+| 107-262 | page widths (`.centered-panel`, `.app-shell` live; `.selector-page` dead), `.eyebrow`, `h1`, dead `.profile-grid`, `.profile-card*`, `.selector-hero*`, then `.brand-link`, `.brand-mark`, `.centered-panel`, `.site-header*`, `.profile-summary` |
+| 289-329 | `.secondary-button`, `.button-link`, `.button-link-secondary` |
+| 331-415 | navigation: `.navigation-panel`, `nav ul`, `nav a`, `.nav-button` states, `.visually-hidden` |
+| 417-480 | admin page, dashboard panels, `.dashboard-link` |
+| 476-535 | shared filter grid and `.filter-field`, `.filter-actions` |
+| 537-736 | admin form, collection, cards, status badge, action states, developer details, pagination, fieldsets |
+| 737-837 | advanced panels, import stepper, blocked and success panels, 44rem rule |
+| 839-1151 | parent: page, filter/form, cards, notices, detail grid, swap list, swap requests, notification cards |
+| 1153-1325 | teacher: page, filter, table, cards, detail grid, state |
+| 1327-1401 | responsive rules at `44rem` and `20rem`, `prefers-reduced-motion`, table cell wrapping |
+| 1403-1418 | identity form alerts and invalid field |
+
+## Browser test layout (2026-11-04, after 251c4b3)
+
+`tests/browser/` holds 13 specs and 4 support modules (17 tracked files). Each spec calls `bindSeededSchema()` (a comment in `seeded-schema.ts` says a test, `tests/browser/support/uses-seeded-schema.test.ts`, enforces it; that file is not among the tracked files of this directory), so it runs on the database schema of its Playwright project (`projects.ts`: chromium `worker_1` port 3100, firefox `worker_2` 3101, mobile-chrome `worker_3` 3102).
+
+| Spec | Declared tests | Restyle-relevant content |
+|---|---|---|
+| `visual-overhaul.spec.ts` | 7 (+ loops) | sign-in at 320 and 375 px: no overflow, no clipped child; keyboard sign-in; heading focus with outline `none`; brand link; admin card to approvals; whole parent card click; sign-in stable when images fail; role landings with axe |
+| `navigation-polish.spec.ts` | 11 (+ loops over 4 roles) | menu on every page, current item, 44 px links, 320 px overflow, notification card padding and checkbox 44 px, focus ring >= 3 px, Hungarian status words |
+| `list-polish.spec.ts` | 17 | labels above fields (8 forms, 320 and 1280 px), filter button alignment, create links look like "Szűrés", status icons, dropdown symbols, back links, axe |
+| `functional-fixes.spec.ts` | 17 | read versus unread notification colour, notification flow, pending request flow, axe on four screens |
+| `parent-web.spec.ts` | 10 | sign-up, full duty, swap, cancellation, notification read, allergen note, privacy, keyboard/zoom/axe flow |
+| `teacher-web.spec.ts` | 9 | schedule, filters, mobile cards, 44 px link, zoom 2, axe |
+| `identity.spec.ts` | 11 | sign-in, reset, invitation, sign-out, "Nincs jogosultság" with sign-out, axe |
+| `admin-core.spec.ts`, `admin-advanced.spec.ts`, `directory-coordination.spec.ts`, `notifications-import.spec.ts`, `runtime-foundation.spec.ts`, `sign-in-timing.spec.ts` | 7, 7, 9, 9, 4, 2 | admin flows, import, reminders, directory, root page axe, sign-in timing; two of them use wcag22aa tags |
+
+Support modules: `projects.ts`, `seeded-schema.ts` (`bindSeededSchema`, `signInAs`, `signOut`, `signInAndOpen`, `expectSignedIn`, `SERIOUS`), `scenarios.ts` (`requestCancellation`, `signUpForDecorating`, `addCleaningNotice`, `withOtherPage`), `dates.ts`.
 
 ## src modules: ports and adapters (2026-10-12)
 
@@ -48,7 +156,7 @@ Counts: LOC (non-test) / src files / tests, as of 2026-10-12.
 
 | Path | Classification | Role |
 |---|---|---|
-| `app/bejelentkezes/page.tsx` | Controller (page) | Sign-in screen; form for signed-out, `signed-in-panel` for signed-in |
+| `app/bejelentkezes/page.tsx` | Controller (page) | Sign-in screen; form for signed-out, `signed-in-panel` for signed-in (2026-11-04: a signed-in visitor is redirected to `/`; no panel) |
 | `app/bejelentkezes/SignInForm.tsx` | Controller (client component) | `useActionState(signInAction)`, client-side required-field checks, error live region |
 | `app/bejelentkezes/actions.ts` | Controller (server action) | `signInAction`: runs `signIn`, writes cookies, then `redirect("/")` (since `1070fd6`; `redirect("/bejelentkezes")` at `3456409`) |
 | `app/page.tsx` | Controller (page) | `/`: composes the runtime, redirects a signed-in person to the role home or shows sign-in, no-role (with `SignOutButton`), unavailable panels |
@@ -74,7 +182,7 @@ Route notes: `app/szulo/` has no root page (parent home is `/szulo/ertesitesek`)
 | Path | Classification | Role |
 |---|---|---|
 | `app/szulo/layout.tsx` | Controller (layout) | Resolves parent access; renders `ParentAccessState` (denied, configuration-error, signed-out) instead of the shell, or `AppShell` |
-| `app/szulo/_components/ParentAccessState.tsx` | UI | The "Nincs jogosultság" page of the parent area (no sign-out) |
+| `app/szulo/_components/ParentAccessState.tsx` | UI | The "Nincs jogosultság" page of the parent area (no sign-out at `1070fd6`; 2026-11-04: ends with `AccessStateExit`) |
 | `app/szulo/_lib/session.ts` | Service | Parent session resolver |
 | `app/admin/layout.tsx`, `app/admin/_components/AdminAccessState.tsx`, `app/admin/_lib/session.ts` | Controller, UI, Service | Same pattern for admins; signed-out redirects to `/` |
 | `app/teacher/layout.tsx`, `app/teacher/_components/TeacherAccessState.tsx`, `app/teacher/_lib/session.ts` | Controller, UI, Service | Same pattern for teachers; link goes to `/` |
@@ -86,7 +194,7 @@ Route notes: `app/szulo/` has no root page (parent home is `/szulo/ertesitesek`)
 | `tests/support/request-world.ts` | Test support | `requestWorld.signIn(role)`, `access.parent.grants`, `access.parent.parent` |
 | `tests/browser/*.spec.ts` | Test | Denied pages reached by heading name; axe via `SERIOUS` |
 
-Conventions seen (handoff, 2026-11-02): colocated `*.test.ts` for `src/`; page and component tests under `tests/integration` and `tests/coverage`; `data-testid` on every asserted or interactive element (kebab-case, area-prefixed); Hungarian text, English identifiers; identity copy in `COPY`, role-page copy inline; Prettier width 100, double quotes, semicolons, trailing commas; ESLint with zero warnings; strict TypeScript.
+Conventions seen (handoff, 2026-11-02): colocated `*.test.ts` for `src/`; page and component tests under `tests/integration` and `tests/coverage`; `data-testid` on every asserted or interactive element (kebab-case, area-prefixed); Hungarian text, English identifiers; identity copy in `COPY`, role-page copy inline; Prettier width 100, double quotes, semicolons, trailing commas; ESLint with zero warnings; strict TypeScript. (2026-11-04: confirmed in `app/` and `tests/browser/`; no `TODO`, `FIXME`, `eslint-disable` or `@ts-ignore` there; component and test-id names are stable hooks the browser specs use.)
 
 ## SQL migrations (2026-10-27)
 
@@ -138,3 +246,4 @@ Conventions seen (handoff, 2026-11-02): colocated `*.test.ts` for `src/`; page a
 - Result-state returns instead of exceptions for expected failures; in SQL, `platform_result(state, reference, code)`; unexpected failures raise with SQLSTATE codes (`28000`, `42501`, `22023`, `23505`).
 - SQL (2026-10-27): `create or replace function ... language plpgsql security definer set search_path from current`, followed by `revoke all on function ... from public, anon, authenticated, service_role` and explicit grants.
 - Hungarian route names and UI copy; English identifiers.
+- UI (2026-11-04): pages are `<section className="<area>-page" data-testid="...">`; each page header is `<p className="eyebrow">` plus `<h1 tabIndex={-1}>` (list and home pages add `autoFocus`); every interactive or asserted element has a kebab-case `data-testid`; list items are one whole-card link; result panels carry `role`, `aria-live` and `tabIndex={-1}` so focus can move to them; icons are decorative SVG with `aria-hidden`.

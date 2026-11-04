@@ -19,6 +19,7 @@
     "start": "next start --hostname ${APP_HOST:-127.0.0.1} --port ${APP_PORT:-3000}",
     "typecheck": "next typegen && tsc --noEmit --incremental false",
     "lint": "eslint app src/application src/data src/identity src/import-parser src/runtime tests scripts *.config.* proxy.ts --max-warnings=0",
+    "lint:css": "stylelint app/globals.css --max-warnings=0",
     "format": "prettier --write app src/application src/data src/identity src/import-parser src/runtime tests scripts verification *.config.* README.md",
     "format:check": "prettier --check app src/application src/data src/identity src/import-parser src/runtime tests scripts verification *.config.* README.md",
     "test:domain": "node --experimental-strip-types --test \"src/**/*.test.ts\"",
@@ -64,9 +65,9 @@
     "@supabase/supabase-js": "2.117.3",
     "next": "16.4.2",
     "nodemailer": "10.2.1",
-    "react": "latest",
-    "react-dom": "latest",
-    "zod": "latest"
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "zod": "4.6.7"
   },
   "overrides": {
     "@next/eslint-plugin-next": {
@@ -74,8 +75,8 @@
     }
   },
   "devDependencies": {
-    "@axe-core/playwright": "latest",
-    "@playwright/test": "latest",
+    "@axe-core/playwright": "4.13.0",
+    "@playwright/test": "1.62.1",
     "@testing-library/jest-dom": "latest",
     "@testing-library/react": "latest",
     "@types/node": "^24.0.0",
@@ -90,6 +91,8 @@
     "jsdom": "latest",
     "pg": "8.23.1",
     "prettier": "latest",
+    "stylelint": "18.0.0",
+    "stylelint-config-standard": "41.0.0",
     "supabase": "2.120.0",
     "typescript": "^5.9.0",
     "vitest": "4.1.12"

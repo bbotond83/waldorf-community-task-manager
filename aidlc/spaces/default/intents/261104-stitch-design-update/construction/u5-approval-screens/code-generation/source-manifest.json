@@ -1,0 +1,13 @@
+{
+  "stage": "code-generation",
+  "unit": "u5-approval-screens",
+  "version": 1,
+  "writes": [
+    { "path": "app/globals.css" },
+    { "path": "app/admin/jovahagyasok/page.tsx" },
+    { "path": "app/admin/jovahagyasok/[id]/page.tsx" },
+    { "path": "DESIGN.md" },
+    { "path": "tests/browser/teacher-style.spec.ts" },
+    { "path": "tests/browser/admin-approvals-style.spec.ts" }
+  ]
+}

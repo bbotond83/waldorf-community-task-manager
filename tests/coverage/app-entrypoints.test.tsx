@@ -9,6 +9,10 @@ import { requestWorld, type RoleKey } from "../support/request-world.ts";
 
 vi.mock("server-only", () => ({}));
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
+// next/font/local is a build-time transform; outside the Next.js build the call is replaced by the class it would give.
+vi.mock("next/font/local", () => ({
+  default: (options: { variable: string }) => ({ variable: `font${options.variable}` }),
+}));
 vi.mock("../../app/_identity/production-request.ts", async () =>
   (await import("../support/request-world.ts")).requestWorldModule(),
 );
@@ -113,7 +117,11 @@ it("returns the readiness status without a mode, and safe error codes", async ()
 });
 
 it("renders Hungarian root and safe denied navigation", () => {
-  expect(renderToStaticMarkup(<Root>Owned child</Root>)).toContain('lang="hu"');
+  const markup = renderToStaticMarkup(<Root>Owned child</Root>);
+  expect(markup).toContain('lang="hu"');
+  // The four self-hosted font files are exposed as classes on <html>.
+  for (const variable of ["vollkorn-latin", "vollkorn-latin-ext", "karla-latin", "karla-latin-ext"])
+    expect(markup).toContain(`font--font-${variable}`);
   expect(renderToStaticMarkup(<Denied />)).toContain('href="/"');
 });
 

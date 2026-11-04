@@ -1,0 +1,1 @@
+export APP_SESSION_SECRET=$(openssl rand -hex 32) SUPABASE_URL=http://127.0.0.1:54321 SUPABASE_ANON_KEY=build-only-public-key-placeholder && npm run lint && npm run lint:css && npm run format:check && npm run typecheck && npm run test:coverage && npm run build && npm run smoke:start

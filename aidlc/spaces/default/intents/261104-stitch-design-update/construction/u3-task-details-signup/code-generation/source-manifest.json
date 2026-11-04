@@ -1,0 +1,11 @@
+{
+  "stage": "code-generation",
+  "unit": "u3-task-details-signup",
+  "version": 1,
+  "writes": [
+    { "path": "app/globals.css" },
+    { "path": "app/szulo/feladatok/[id]/page.tsx" },
+    { "path": "DESIGN.md" },
+    { "path": "tests/browser/parent-detail-style.spec.ts" }
+  ]
+}

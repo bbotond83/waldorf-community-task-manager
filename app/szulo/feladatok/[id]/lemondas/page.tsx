@@ -21,11 +21,20 @@ export default async function CancellationRequestPage({
     dutyId: id,
   });
   return (
-    <section className="parent-page" data-testid="cancellation-request-page">
-      <a href={`/szulo/feladatok/${id}`} data-testid="cancellation-back-link">
+    <section
+      className="parent-page parent-cancellation-page"
+      data-testid="cancellation-request-page"
+    >
+      <a
+        href={`/szulo/feladatok/${id}`}
+        className="parent-back-link"
+        data-testid="cancellation-back-link"
+      >
         Vissza a feladathoz
       </a>
-      <h1 tabIndex={-1}>Lemondási kérelem</h1>
+      <header className="parent-detail-header">
+        <h1 tabIndex={-1}>Lemondási kérelem</h1>
+      </header>
       <ParentStatePanel
         result={result}
         emptyMessage="A megbízás nem érhető el."
@@ -73,7 +82,7 @@ export default async function CancellationRequestPage({
               </p>
             </ParentMutationForm>
           ) : (
-            <p data-testid="cancellation-ineligible-state">
+            <p className="parent-notice" data-testid="cancellation-ineligible-state">
               Ehhez a feladathoz nincs lemondható saját megbízás.
             </p>
           )

@@ -1,0 +1,12 @@
+{
+  "stage": "code-generation",
+  "unit": "u4-cancellation",
+  "version": 1,
+  "writes": [
+    { "path": "app/globals.css" },
+    { "path": "app/szulo/feladatok/[id]/lemondas/page.tsx" },
+    { "path": "app/szulo/_components/PendingRequestNotice.tsx" },
+    { "path": "DESIGN.md" },
+    { "path": "tests/browser/parent-cancellation-style.spec.ts" }
+  ]
+}

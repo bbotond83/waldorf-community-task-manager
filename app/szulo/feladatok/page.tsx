@@ -57,11 +57,20 @@ export default async function ParentDutiesPage({
       <ParentStatePanel result={result} emptyMessage="Nincs kapcsolt feladat." testId="duties">
         {(model) => {
           const duties = model.duties.filter((duty) => !allapot || duty.state === allapot);
-          if (!duties.length) return <p data-testid="duties-filter-empty">Nincs találat.</p>;
+          if (!duties.length)
+            return (
+              <p className="parent-empty" data-testid="duties-filter-empty">
+                Nincs találat.
+              </p>
+            );
           return (
             <ul className="parent-collection" data-testid="duty-list">
               {duties.map((duty) => (
-                <li className="parent-card" key={duty.id} data-testid={`duty-card-${duty.id}`}>
+                <li
+                  className="parent-card parent-duty-card"
+                  key={duty.id}
+                  data-testid={`duty-card-${duty.id}`}
+                >
                   <a
                     className="parent-card-link"
                     href={`/szulo/feladatok/${duty.id}${allapot ? `?allapot=${encodeURIComponent(allapot)}` : ""}`}

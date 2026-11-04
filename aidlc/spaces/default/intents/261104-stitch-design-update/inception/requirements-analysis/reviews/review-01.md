@@ -1,0 +1,22 @@
+## Review
+
+**Verdict:** READY
+**Reviewer:** aidlc-product-lead-agent
+**Date:** 2026-11-04T07:54:34Z
+**Iteration:** 1
+**Verdict Dictated:** no
+
+### Findings
+
+| ID | Severity | Location | Finding | Required action | Status |
+|---|---|---|---|---|---|
+| R-01 | Major | aidlc/spaces/default/intents/261104-stitch-design-update/inception/requirements-analysis/requirements.md > FR3.1 to FR3.6 and FR2.4 | The requirements say "ten starred Stitch screens" but never list which ten, or which flow each belongs to. FR3.1 to FR3.6 name flows, and the number of screens each covers is not stated. "Teacher and admin approvals" (FR3.6) is the vaguest. Engineering and the owner cannot tell when a flow is complete or whether all ten are covered. | Add a short table of the ten starred screens (Stitch screen name) mapped to FR3.1 to FR3.6 and to the app route each replaces. State that a flow is done when the owner approves its screenshots against those screens. | New |
+| R-02 | Major | aidlc/spaces/default/intents/261104-stitch-design-update/inception/requirements-analysis/requirements.md > FR3.5 (Q1 A) | "Saját vállalásaim is shown on the existing parent task list as the parent's own signups" does not say whether the list already shows the parent's own signups. If it does not, showing them (a new section, tab or filter) is a new feature and contradicts the UI-only constraint. FR3.5 also shares the route with FR3.2 and has no pass/fail criterion. | State what exists today on `/szulo/feladatok` for own signups. Then give a testable criterion, for example "the Stitch own-signups view is rendered from data the page already loads, with no new query, filter or route". If it needs new behaviour, record that as a decision for the owner. | New |
+| R-03 | Major | aidlc/spaces/default/intents/261104-stitch-design-update/inception/requirements-analysis/requirements.md > FR1.1 to FR1.4 | Nothing requires the self-hosted font files to cover Hungarian characters, including the long accented letters ő and ű. Webfont files subset to basic Latin would silently fall back for those letters, which is a real risk because all copy is Hungarian. FR1.4 covers only a failed load. | Add a requirement that the bundled Vollkorn and Karla files include the Latin-extended glyphs for Hungarian. Add a pass/fail check, for example "every Hungarian accented letter renders in the chosen font, not the fallback". | New |
+| R-04 | Minor | aidlc/spaces/default/intents/261104-stitch-design-update/inception/requirements-analysis/requirements.md > FR2.1, FR2.2, FR3.1 to FR3.4, FR3.6 | Several requirements ("defined once", "main type sizes become named values", "restyled") have no pass/fail beyond owner approval. | Add a one-line check to each, for example "no font-family or colour literal outside the `:root` tokens" or "owner approves screenshots at 320 px and desktop". | New |
+| R-05 | Minor | aidlc/spaces/default/intents/261104-stitch-design-update/inception/requirements-analysis/requirements.md > FR5.1 | "Hungarian text stays unchanged" has no rule for the case where the Stitch design shows different wording, for example the "Saját vállalásaim" title or button labels. | Say that the app's existing copy wins over Stitch text, and that any wording difference is listed for the owner at screenshot review rather than changed. | New |
+| R-06 | Minor | aidlc/spaces/default/intents/261104-stitch-design-update/inception/requirements-analysis/requirements.md > FR6.2 and Assumptions | FR6.2 states "pinned to the versions currently installed" as fact, but the Assumptions section lists the same point as unconfirmed. The Intent analysis tag "[Q5 of practices-discovery, memory:M1]" does not match the source register. | Tag FR6.2 as an assumption, or remove the duplicate from the Assumptions list. Correct the tag in Intent analysis to `[memory:M1]`. | New |
+
+### Summary
+
+The Q1 to Q6 answers (all A) are correctly reflected: parent task list, both fonts, `next/font/local`, accessibility wins, no individual restyle of other screens, and dead CSS removed. Scope stays UI-only, Hungarian copy and accessibility are kept, and assumptions are tagged as assumptions. IDs are stable and traced to the request and team practices, with no contradictions. The three Major gaps are clarifications, with workarounds at the gate: the screen-to-flow mapping, the FR3.5 ambiguity, and Hungarian glyph coverage in the fonts.

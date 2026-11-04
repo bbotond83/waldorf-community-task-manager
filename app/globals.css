@@ -16,15 +16,28 @@
   --color-focus: #1f4e79;
   --color-border: #d9c4a9;
   --color-border-strong: #8a7762;
-  --shadow: 0 12px 36px rgb(71 52 34 / 12%);
+  --shadow: 0 12px 36px rgb(43 33 24 / 8%);
+  --shadow-hover: 0 16px 40px rgb(43 33 24 / 12%);
   --radius: 1rem;
-  font-family:
-    ui-sans-serif,
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    sans-serif;
+  --radius-pill: 999px;
+
+  /*
+   * Type. The two families are the self-hosted fonts that app/layout.tsx loads (Vollkorn for headings, Karla for
+   * text); each has a latin and a latin-ext file, then a system font that shows while they load.
+   */
+  --font-heading:
+    var(--font-vollkorn-latin), var(--font-vollkorn-latin-ext), "Georgia", "Times New Roman", serif;
+  --font-body:
+    var(--font-karla-latin), var(--font-karla-latin-ext), system-ui, -apple-system,
+    "BlinkMacSystemFont", "Segoe UI", sans-serif;
+  --text-headline-xl: clamp(2rem, 5vw, 3.5rem);
+  --text-headline-lg: clamp(1.75rem, 3.5vw, 2.25rem);
+  --text-headline-md: 1.5rem;
+  --text-headline-sm: 1.25rem;
+  --text-body: 1rem;
+  --text-label: 1rem;
+  --text-eyebrow: 0.82rem;
+  font-family: var(--font-body);
 }
 
 * {
@@ -32,17 +45,31 @@
 }
 
 html {
-  background: var(--color-background);
+  /* On the root so the warm glow also fills the strip above a page whose first child has a top margin. */
+  background:
+    radial-gradient(ellipse at top left, rgb(152 69 47 / 8%) 0%, transparent 60%),
+    var(--color-background);
 }
 
 body {
   margin: 0;
   min-height: 100vh;
   color: var(--color-text);
-  background:
-    radial-gradient(circle at top left, rgb(184 102 60 / 18%), transparent 30rem),
-    var(--color-background);
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  font-weight: 400;
   line-height: 1.55;
+}
+
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+label {
+  font-size: var(--text-label);
+  font-weight: 600;
 }
 
 a {
@@ -63,15 +90,23 @@ summary {
 
 button {
   border: 0;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   padding: 0.75rem 1.1rem;
   color: white;
   background: var(--color-primary);
+  font-weight: 600;
   cursor: pointer;
+  transition:
+    transform 120ms ease,
+    background-color 120ms ease;
 }
 
 button:hover {
   background: var(--color-primary-dark);
+}
+
+button:active {
+  transform: translateY(1px);
 }
 
 :focus-visible {
@@ -104,19 +139,16 @@ button:hover {
   transform: translateY(0);
 }
 
-.selector-page,
 .centered-panel,
 .app-shell {
   width: min(72rem, calc(100% - 2rem));
   margin-inline: auto;
 }
 
-.selector-page,
 .centered-panel {
   padding-block: clamp(3rem, 8vw, 7rem);
 }
 
-.selector-heading,
 .centered-panel {
   max-width: 48rem;
 }
@@ -124,8 +156,8 @@ button:hover {
 .eyebrow {
   margin: 0 0 0.5rem;
   color: var(--color-primary-dark);
-  font-size: 0.82rem;
-  font-weight: 750;
+  font-size: var(--text-eyebrow);
+  font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -137,17 +169,27 @@ p {
   overflow-wrap: break-word;
 }
 
+h1,
+h2,
+h3 {
+  font-family: var(--font-heading);
+}
+
 h1 {
-  font-size: clamp(2rem, 5vw, 4rem);
+  font-size: var(--text-headline-xl);
+  font-weight: 700;
   line-height: 1.08;
   margin-block: 0 1rem;
 }
 
-.profile-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
-  gap: 1rem;
-  margin-block: 2rem;
+h2,
+h3 {
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+h2 {
+  font-size: var(--text-headline-md);
 }
 
 .centered-panel {
@@ -157,86 +199,22 @@ h1 {
   box-shadow: var(--shadow);
 }
 
-.profile-grid form {
-  display: flex;
-}
-
-.profile-card {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.35rem;
-  width: 100%;
-  min-height: 7.5rem;
-  padding: 1.25rem;
-  color: var(--color-text);
-  font: inherit;
-  text-align: left;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  background: var(--color-surface);
-  transition:
-    transform 120ms ease,
-    box-shadow 120ms ease,
-    border-color 120ms ease;
-}
-
-.profile-card:hover,
 .parent-card:hover,
 .admin-card:hover,
 .teacher-card:hover,
 .dashboard-link:hover {
   border-color: var(--color-primary);
   background: var(--color-info-bg);
+  box-shadow: var(--shadow-hover);
   transform: translateY(-2px);
 }
 
-.profile-card:active,
 .parent-card:active,
 .admin-card:active,
 .teacher-card:active,
 .dashboard-link:active {
   transform: translateY(0);
   background: var(--color-danger-bg);
-}
-
-.profile-card-name {
-  color: var(--color-primary-dark);
-  font-size: 1.35rem;
-  font-weight: 750;
-  line-height: 1.2;
-  hyphens: manual;
-  overflow-wrap: break-word;
-}
-
-.profile-card-summary {
-  color: var(--color-muted);
-}
-
-.selector-hero {
-  position: relative;
-  overflow: hidden;
-  aspect-ratio: 16 / 9;
-  max-height: 22rem;
-  width: 100%;
-  margin-bottom: 1.5rem;
-  border-radius: var(--radius);
-  background: var(--color-info-bg);
-  box-shadow: var(--shadow);
-}
-
-.selector-hero img.selector-cover {
-  object-fit: cover;
-}
-
-.selector-hero .brand-mark {
-  position: absolute;
-  left: 1rem;
-  bottom: 1rem;
-  padding: 0.35rem;
-  border-radius: 50%;
-  background: var(--color-surface);
 }
 
 .brand-link {
@@ -282,14 +260,28 @@ h1 {
   margin: 0;
 }
 
+.profile-summary strong {
+  font-family: var(--font-heading);
+  font-size: var(--text-headline-sm);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
 .profile-summary span {
   color: var(--color-muted);
 }
 
 .secondary-button {
   color: var(--color-primary-dark);
-  border: 1px solid var(--color-primary);
   background: transparent;
+  /* The outline is drawn inside, so a secondary button is exactly as tall as a primary one. */
+  box-shadow: inset 0 0 0 1px var(--color-primary);
+}
+
+.secondary-button:hover,
+.secondary-button:active {
+  color: var(--color-primary-dark);
+  background: var(--color-info-bg);
 }
 
 /* A link that looks and behaves like the primary button (same pill, 44 px, states). */
@@ -299,11 +291,12 @@ h1 {
   justify-content: center;
   min-height: 44px;
   border: 0;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   padding: 0.75rem 1.1rem;
   color: white;
   background: var(--color-primary);
   font: inherit;
+  font-weight: 600;
   text-decoration: none;
   cursor: pointer;
 }
@@ -621,10 +614,17 @@ nav a:hover {
   padding: 0.75rem;
   background: var(--color-info-bg);
 }
-.admin-action-state-terminal,
-.admin-action-state-denied {
+.admin-action-state-validation,
+.admin-action-state-denied,
+.admin-action-state-conflict,
+.admin-action-state-invalidated,
+.admin-action-state-terminal {
   border-left-color: var(--color-primary);
   background: var(--color-danger-bg);
+}
+.admin-action-state-success {
+  border-left-color: var(--color-success);
+  background: var(--color-success-bg);
 }
 .admin-page-actions {
   display: flex;
@@ -848,8 +848,7 @@ nav a:hover {
 .parent-form,
 .parent-card,
 .parent-state,
-.parent-note-panel,
-.parent-detail-grid > div {
+.parent-note-panel {
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
   background: var(--color-surface);
@@ -864,7 +863,7 @@ nav a:hover {
 }
 
 .parent-form label {
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .parent-form input,
@@ -964,30 +963,343 @@ nav a:hover {
   background: var(--color-danger-bg);
 }
 
-.parent-detail-grid {
+/*
+ * Parent task list (U2 of the Stitch restyle). The duty card is a cream panel with a resting shadow; its title is
+ * Vollkorn, its date Karla, and its status a pill whose colours follow the meaning (done, waiting, failed) and keep
+ * the icon beside the word. The hover and pressed states come from the shared `.parent-card` rules above. Scoped
+ * to `.parent-duty-card` so the notification and swap cards keep their own look.
+ */
+.parent-duty-card {
+  box-shadow: var(--shadow);
+  transition:
+    transform 120ms ease,
+    border-color 120ms ease,
+    background-color 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.parent-duty-card .parent-card-link {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
-  gap: 1rem;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: center;
+  justify-items: start;
+  gap: 0.4rem;
+  padding: 1.25rem;
+}
+
+.parent-duty-card .parent-card-link h2 {
+  margin: 0;
+  max-width: 100%;
+  font-size: var(--text-headline-sm);
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.parent-duty-card .parent-card-link p {
+  margin: 0;
+  max-width: 100%;
+  color: var(--color-muted);
+  font-size: var(--text-body);
+}
+
+.parent-duty-card .parent-state-badge,
+.parent-detail-grid .status-badge,
+.teacher-page .status-badge,
+.admin-card .status-badge,
+.admin-approvals-page .status-badge {
+  max-width: 100%;
+  margin-top: 0.35rem;
+  border: 1px solid color-mix(in srgb, currentcolor 35%, transparent);
+  border-radius: var(--radius-pill);
+  padding: 0.2rem 0.75rem;
+  color: var(--color-muted);
+  background: var(--color-info-bg);
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.parent-duty-card .parent-state-badge:has(.status-badge-icon-positive),
+.parent-detail-grid .status-badge:has(.status-badge-icon-positive),
+.teacher-page .status-badge:has(.status-badge-icon-positive),
+.admin-card .status-badge:has(.status-badge-icon-positive),
+.admin-approvals-page .status-badge:has(.status-badge-icon-positive) {
+  color: var(--color-success);
+  background: var(--color-success-bg);
+}
+
+.parent-duty-card .parent-state-badge:has(.status-badge-icon-pending),
+.parent-detail-grid .status-badge:has(.status-badge-icon-pending),
+.teacher-page .status-badge:has(.status-badge-icon-pending),
+.admin-card .status-badge:has(.status-badge-icon-pending),
+.admin-approvals-page .status-badge:has(.status-badge-icon-pending) {
+  /* Ochre text on this wash is only 3.9:1; the dark terracotta text passes 4.5:1, the icon stays ochre. */
+  color: var(--color-primary-dark);
+  background: var(--color-info-bg);
+}
+
+.parent-duty-card .parent-state-badge:has(.status-badge-icon-negative),
+.parent-detail-grid .status-badge:has(.status-badge-icon-negative),
+.teacher-page .status-badge:has(.status-badge-icon-negative),
+.admin-card .status-badge:has(.status-badge-icon-negative),
+.admin-approvals-page .status-badge:has(.status-badge-icon-negative) {
+  color: var(--color-primary);
+  background: var(--color-danger-bg);
+}
+
+/* Wide enough: the status pill sits at the top right of the card, beside the title. */
+@media (min-width: 36rem) {
+  .parent-duty-card .parent-card-link {
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 1rem;
+    align-items: start;
+  }
+
+  .parent-duty-card .parent-card-link h2 {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .parent-duty-card .parent-card-link p {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .parent-duty-card .parent-state-badge {
+    grid-column: 2;
+    grid-row: 1;
+    margin-top: 0;
+  }
+}
+
+/* The status filter: a cream panel; the label sits above its field in Karla 600. The shared `.filter-field` and
+   `.filter-actions` rules are left alone because the admin and teacher lists use them too. */
+.parent-filter {
+  padding: 1.25rem;
+}
+
+.parent-filter .filter-field label {
+  font-family: var(--font-body);
+  font-weight: 600;
+}
+
+.parent-filter .filter-field select {
+  color: var(--color-text);
+  background: var(--color-surface);
+}
+
+/* Notices and the "no match" message: a cream panel with a bar on the left (blue for a notice, terracotta for an error). */
+.parent-state {
+  padding: 1.25rem 1.5rem;
+}
+
+.parent-state h2 {
+  margin-block: 0 0.4rem;
+  font-size: var(--text-headline-sm);
+}
+
+.parent-state p {
+  margin: 0;
+}
+
+.parent-state[role="alert"] {
+  border-left-color: var(--color-primary);
+  background: var(--color-danger-bg);
+}
+
+.parent-empty {
+  margin-block: 1rem;
+  border: 1px solid var(--color-border);
+  border-left: 0.35rem solid var(--color-focus);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  background: var(--color-surface);
+  font-family: var(--font-heading);
+  font-size: var(--text-headline-sm);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+/*
+ * Task detail (U3 of the Stitch restyle). The three facts (time, place, status) read as one cream panel of rows: a small
+ * muted Karla label above a larger value, thin sand dividers between rows, and no card inside the card. The status keeps
+ * its icon and word and takes the same pill look as the task list (the selectors are shared with the U2 pill rules).
+ */
+.parent-back-link,
+.admin-back-link,
+.teacher-page > a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.parent-detail-header h1,
+.teacher-page header h1,
+.admin-approvals-page header h1 {
+  font-size: var(--text-headline-lg);
+  line-height: 1.15;
+}
+
+.parent-detail-grid,
+.teacher-detail-grid {
+  display: grid;
+  gap: 0;
+  margin: 0 0 1.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  box-shadow: var(--shadow);
 }
 
 .parent-detail-grid > div,
-.parent-note-panel {
-  padding: 1rem;
+.teacher-detail-grid > div {
+  min-width: 0;
+  padding: 1rem 1.25rem;
 }
 
-.parent-detail-grid dt {
-  font-weight: 750;
+.parent-detail-grid > div + div,
+.teacher-detail-grid > div + div {
+  border-top: 1px solid var(--color-border);
 }
 
-.parent-detail-grid dd {
-  margin: 0.25rem 0 0;
+.parent-detail-grid dt,
+.teacher-detail-grid dt {
+  color: var(--color-muted);
+  font-size: 0.9rem;
+  font-weight: 600;
 }
 
+.parent-detail-grid .status-badge,
+.teacher-page .status-badge,
+.admin-card .status-badge,
+.admin-approvals-page .status-badge {
+  margin-top: 0;
+}
+
+.parent-detail-grid dd,
+.teacher-detail-grid dd {
+  margin: 0.2rem 0 0;
+  font-size: 1.125rem;
+  overflow-wrap: break-word;
+}
+
+/* The follow-up actions (swap, cancellation): outlined pill buttons that wrap on a narrow screen. */
 .parent-page-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
   margin-block: 1rem;
+}
+
+.parent-page-actions a {
+  justify-content: center;
+  border: 2px solid var(--color-primary-dark);
+  border-radius: var(--radius-pill);
+  padding: 0.5rem 1.25rem;
+  color: var(--color-primary-dark);
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 120ms ease;
+}
+
+.parent-page-actions a:hover {
+  background: var(--color-info-bg);
+}
+
+/* The permitted allergen information: an amber-tinted callout with a Vollkorn heading and an ochre bar. */
+.parent-note-panel {
+  margin-block: 1rem;
+  border-left: 0.35rem solid var(--color-accent-ochre);
+  padding: 1rem 1.25rem;
+  background: var(--color-info-bg);
+}
+
+.parent-note-panel h2 {
+  margin: 0 0 0.4rem;
+  color: var(--color-primary-dark);
+  font-size: var(--text-headline-sm);
+}
+
+.parent-note-panel p {
+  margin: 0;
+}
+
+/*
+ * Forms and their messages (shared with the swap and cancellation pages). The form is a cream panel with a resting
+ * shadow; a confirmation is a green wash with a green bar, an error keeps the terracotta bar on the danger wash, and a
+ * notice is the information wash with a blue bar. Roles and the move of focus to the message are unchanged.
+ */
+.parent-form {
+  gap: 1rem;
+  padding: 1.25rem;
+  box-shadow: var(--shadow);
+}
+
+.parent-form button:disabled {
+  /* A pending send stays readable: dark fill, white words, a busy cursor (not only a grey-out). */
+  background: var(--color-muted);
+  cursor: progress;
+}
+
+.parent-form .form-hint {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.parent-notice,
+.parent-action-state {
+  margin-block: 1rem;
+  border-radius: 0.75rem;
+}
+
+.parent-notice {
+  background: var(--color-info-bg);
+  font-weight: 600;
+}
+
+.parent-notice p {
+  margin: 0;
+}
+
+.parent-notice p + p {
+  margin-top: 0.4rem;
+}
+
+.parent-form .parent-action-state {
+  margin-block: 0;
+}
+
+.parent-action-state strong {
+  font-family: var(--font-heading);
+  font-size: var(--text-headline-sm);
+  line-height: 1.3;
+}
+
+.parent-action-state ul {
+  margin: 0.5rem 0 0;
+  padding-left: 1.25rem;
+}
+
+.parent-action-state li a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+.parent-action-state-success {
+  border-left-color: var(--color-success);
+  background: var(--color-success-bg);
+}
+
+/*
+ * Cancellation request page (U4). The reason form reuses the shared form rules above; only the reason field is
+ * given a calmer, rounder box. The back link, the title and the follow-up pill link are the task-detail ones.
+ */
+.parent-cancellation-page .parent-form textarea {
+  min-height: 7rem;
+  border-radius: 0.75rem;
 }
 
 /* The swap partner list and the open requests of a family (BR32.7). */
@@ -1160,8 +1472,7 @@ nav a:hover {
 
 .teacher-filter,
 .teacher-state,
-.teacher-card,
-.teacher-detail-grid > div {
+.teacher-card {
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
   background: var(--color-surface);
@@ -1186,8 +1497,7 @@ nav a:hover {
   font-weight: 750;
 }
 
-.teacher-filter label,
-.teacher-detail-grid dt {
+.teacher-filter label {
   font-weight: 750;
 }
 
@@ -1288,33 +1598,23 @@ nav a:hover {
   margin-top: 0;
 }
 
-.teacher-card dl,
-.teacher-detail-grid {
+.teacher-card dl {
   display: grid;
   gap: 1rem;
 }
 
-.teacher-card dl div,
-.teacher-detail-grid > div {
+.teacher-card dl div {
   min-width: 0;
 }
 
-.teacher-card dt,
-.teacher-detail-grid dt {
+.teacher-card dt {
   font-weight: 750;
 }
 
-.teacher-card dd,
-.teacher-detail-grid dd {
+.teacher-card dd {
   margin: 0.25rem 0 0;
 }
 
-.teacher-detail-grid {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
-  margin-block: 1rem;
-}
-
-.teacher-detail-grid > div,
 .teacher-state {
   padding: 1rem;
 }
@@ -1322,6 +1622,244 @@ nav a:hover {
 .teacher-state-error {
   border-left: 0.35rem solid var(--color-primary);
   background: var(--color-danger-bg);
+}
+
+/*
+ * Teacher schedule and admin approvals (U5 of the Stitch restyle). Both screens reuse the shared look of the task pages:
+ * the cream panel with a resting shadow, Vollkorn titles, the muted Karla caps for table headers, and the status pill
+ * (its selectors are in the parent rules above). The filter, the admin card, the admin message states, the success
+ * link, the back link and the pager are shared by the other admin lists and forms, so they change for all of them; the
+ * detail panel and the decision form are scoped to `.admin-approvals-page`.
+ */
+.teacher-filter,
+.admin-filter {
+  padding: 1.25rem;
+  box-shadow: var(--shadow);
+}
+
+.teacher-filter legend {
+  font-family: var(--font-heading);
+  font-size: var(--text-headline-sm);
+  font-weight: 700;
+}
+
+.teacher-filter .filter-field label,
+.admin-filter .filter-field label {
+  font-weight: 600;
+}
+
+.teacher-filter .filter-field input,
+.teacher-filter .filter-field select,
+.admin-filter .filter-field input,
+.admin-filter .filter-field select {
+  color: var(--color-text);
+  background: var(--color-surface);
+}
+
+.teacher-table-wrapper {
+  box-shadow: var(--shadow);
+}
+
+.teacher-table caption {
+  padding: 1.25rem 1.25rem 0.85rem;
+  font-family: var(--font-heading);
+  font-size: var(--text-headline-sm);
+  font-weight: 700;
+}
+
+.teacher-table th,
+.teacher-table td {
+  padding: 0.85rem 1rem;
+}
+
+/* The status word never breaks inside the narrow last column. */
+.teacher-table .status-badge {
+  white-space: nowrap;
+}
+
+.teacher-table thead th {
+  color: var(--color-muted);
+  background: var(--color-info-bg);
+  font-size: var(--text-eyebrow);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.teacher-table a.teacher-row-link {
+  font-family: var(--font-heading);
+  font-weight: 700;
+}
+
+.teacher-card {
+  padding: 1.25rem;
+  box-shadow: var(--shadow);
+}
+
+.teacher-card h2 {
+  margin-bottom: 0.85rem;
+  font-size: var(--text-headline-sm);
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.teacher-card a.teacher-card-link {
+  font-family: var(--font-heading);
+  font-weight: 700;
+}
+
+.teacher-card dl {
+  gap: 0.85rem;
+}
+
+.teacher-card dt {
+  color: var(--color-muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.admin-card {
+  box-shadow: var(--shadow);
+}
+
+.admin-card .admin-card-link {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: center;
+  justify-items: start;
+  gap: 0.5rem;
+  padding: 1.25rem;
+}
+
+.admin-card .admin-card-link strong {
+  max-width: 100%;
+  font-family: var(--font-heading);
+  font-size: var(--text-headline-sm);
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+/* Wide enough: the state pill sits at the right of the card, beside the title. */
+@media (min-width: 36rem) {
+  .admin-card .admin-card-link {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: 1rem;
+  }
+}
+
+.admin-pagination span {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  padding-inline: 1rem;
+  color: var(--color-muted);
+  font-weight: 600;
+}
+
+.admin-pagination span[aria-current="page"] {
+  border-color: var(--color-primary-dark);
+  color: var(--color-primary-dark);
+}
+
+.admin-action-state {
+  border-radius: 0.75rem;
+  padding: 0.85rem 1rem;
+}
+
+.admin-action-state strong {
+  font-family: var(--font-heading);
+  font-size: var(--text-headline-sm);
+  line-height: 1.3;
+}
+
+.admin-action-state ul {
+  margin: 0.5rem 0 0;
+  padding-left: 1.25rem;
+}
+
+.admin-action-state li a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+/* The link in a confirmation: an outlined pill like the follow-up links of the task pages. */
+.admin-form-success-link {
+  justify-content: center;
+  border: 2px solid var(--color-primary-dark);
+  border-radius: var(--radius-pill);
+  padding: 0.5rem 1.25rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.admin-form-success-link:hover {
+  background: var(--color-info-bg);
+}
+
+.admin-approvals-page .admin-detail-grid {
+  gap: 1.5rem;
+}
+
+.admin-approvals-page .admin-detail-grid > section {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.5rem;
+  background: var(--color-surface);
+  box-shadow: var(--shadow);
+}
+
+.admin-approvals-page .admin-detail-grid > section h2 {
+  margin: 0 0 0.75rem;
+  font-size: var(--text-headline-sm);
+  font-weight: 700;
+}
+
+.admin-approvals-page .admin-detail-grid > section p {
+  margin: 0.5rem 0 0;
+}
+
+.admin-approvals-page .admin-detail-grid .status-badge {
+  vertical-align: middle;
+}
+
+.admin-approvals-page .admin-form {
+  gap: 1rem;
+  padding: 1.25rem;
+  box-shadow: var(--shadow);
+}
+
+.admin-approvals-page .admin-form label {
+  font-weight: 600;
+}
+
+.admin-approvals-page .admin-form fieldset {
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+}
+
+.admin-approvals-page .admin-form legend {
+  padding-inline: 0.25rem;
+  font-family: var(--font-heading);
+  font-size: var(--text-headline-sm);
+  font-weight: 700;
+}
+
+.admin-approvals-page .admin-form fieldset input[type="radio"] {
+  flex: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  accent-color: var(--color-primary);
+}
+
+.admin-approvals-page .admin-form .form-hint {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.admin-approvals-page .admin-form button:disabled {
+  background: var(--color-muted);
+  cursor: progress;
 }
 
 @media (max-width: 44rem) {
@@ -1371,8 +1909,6 @@ nav a:hover {
   /* No hover or press movement; colour changes still show the state. */
   .nav-button:hover,
   .nav-button:active,
-  .profile-card:hover,
-  .profile-card:active,
   .parent-card:hover,
   .parent-card:active,
   .admin-card:hover,
@@ -1380,6 +1916,7 @@ nav a:hover {
   .teacher-card:hover,
   .teacher-card:active,
   .button-link:active,
+  button:active,
   .notification-card:hover,
   .notification-card:active,
   .dashboard-link:hover,
