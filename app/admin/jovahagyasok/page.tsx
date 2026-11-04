@@ -29,7 +29,7 @@ export default async function ApprovalsPage({
         })
       : terminalFailure();
   return (
-    <section className="admin-page" data-testid="admin-approvals-page">
+    <section className="admin-page admin-approvals-page" data-testid="admin-approvals-page">
       <header>
         <p className="eyebrow">Adminisztráció</p>
         <h1 tabIndex={-1}>Jóváhagyások</h1>

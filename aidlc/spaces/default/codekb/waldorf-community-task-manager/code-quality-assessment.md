@@ -1,20 +1,50 @@
 # Code Quality Assessment
 
-Full rescan 2026-10-12 (HEAD `80bd4f4`), focused update 2026-10-27 (HEAD `5d2b484`, intent `denied-audit-ratelimit`), focused update 2026-11-02 (HEAD `3456409`, intent `empty-nav-after-login`; section "Sign-in, shell and navigation area (2026-11-02)"). Revision 2 on 2026-11-02 (same intent, owner asked to also scan the audit area) re-read the audit migrations 20261012, 20261013, 20261015, 20261019, 20261044 and 20261045, `supabase/config.toml` and the database test support, `audit`, `audit-purge` and `migrations` tests; sections marked "(2026-11-02, audit re-verified)" come from it. The section "Database layer and audit area" was re-verified and extended. Focused update 2026-11-02 (HEAD `1070fd6`, intent `no-access-signout`): new section "Denied pages and sign-out area (2026-11-02, after 1070fd6)"; the sign-in defect findings below describe `3456409` and are marked as fixed by `1070fd6`. All focused updates were read-only (no test, build or program run); the 2026-10-12 sections below record results executed then and are not current (per project rule, current executable results are authoritative over these counts).
+Full rescan 2026-10-12 (HEAD `80bd4f4`), focused update 2026-10-27 (HEAD `5d2b484`, intent `denied-audit-ratelimit`), focused update 2026-11-02 (HEAD `3456409`, intent `empty-nav-after-login`; section "Sign-in, shell and navigation area (2026-11-02)"). Revision 2 on 2026-11-02 (same intent, owner asked to also scan the audit area) re-read the audit migrations 20261012, 20261013, 20261015, 20261019, 20261044 and 20261045, `supabase/config.toml` and the database test support, `audit`, `audit-purge` and `migrations` tests; sections marked "(2026-11-02, audit re-verified)" come from it. The section "Database layer and audit area" was re-verified and extended. Focused update 2026-11-02 (HEAD `1070fd6`, intent `no-access-signout`): section "Denied pages and sign-out area (2026-11-02, after 1070fd6)"; the sign-in defect findings below describe `3456409` and are marked as fixed by `1070fd6`. Focused update 2026-11-04 (HEAD `251c4b3`, intent `stitch-design-update`): new section "Styling area (2026-11-04, after 251c4b3)"; finding 1 of the denied-pages section is marked as fixed by `78a0ab5`. All focused updates were read-only (no test, build or program run); the 2026-10-12 sections below record results executed then and are not current (per project rule, current executable results are authoritative over these counts).
+
+## Styling area (2026-11-04, after 251c4b3)
+
+Read-only run; nothing executed (no tests, build, linter or server), so test and coverage results are not re-measured. The area is the single stylesheet `app/globals.css` (1418 lines), the markup hooks the pages put on it, and the browser specs that assert on its output.
+
+### Findings
+1. **Dead CSS**: the profile-picker rules (`.selector-*`, `.profile-grid`, `.profile-card*`, about 100 lines between lines 107 and 240) have no markup using them. A restyle should delete them rather than restyle them; a grep for each class across `app/` and `src/` before deletion is the safe check.
+2. **No scale tokens**: 18 custom properties exist (16 colours, `--shadow`, `--radius`). Font sizes, spacing, line heights, border widths and the 44 px target size are repeated literals throughout the file, and the font stack is set once on `:root` with no variable. A new font pair (Vollkorn headings, Karla body) therefore needs new tokens or a single edit point, otherwise it will be repeated.
+3. **Grouped selectors couple areas**: hover and pressed rules list five card classes together, one filter grid rule covers four classes, and `.parent-form` is reused by the sign-in form while `.centered-panel` has 11 uses. Changing one member changes the others; per-flow restyling must check each group.
+4. **Triple declaration**: `.parent-card` is declared three times in different parts of the file; later declarations override earlier ones, so the effective value is only visible by reading all three.
+5. **Inconsistent empty and state treatments**: empty states, status badges (`status-badge`, `parent-state-badge`) and notification cards are styled with separate rule sets and slightly different spacing and colours.
+6. **Stale copy**: the dead profile-picker area carries (or carried) the wording "válasszon óvónői profilt", which no live screen uses; the live sign-in is `/bejelentkezes`.
+7. **Dependency pins**: `react`, `react-dom`, `zod`, `@axe-core/playwright` and `@playwright/test` are `latest`, so an axe rule update can turn a green accessibility check red without a code change (relevant to a colour change).
+8. **Test fragility against a restyle**: browser specs assert computed styles (heading outline `none` after focus, focus-ring width at least 3 px, create links looking like the "Szűrés" button, read versus unread notification background), sizes (44 px targets, notification label at least 44x44, title at least 12 px from the card edge), layout (label above control on 8 forms at 320 and 1280 px, filter alignment, no overflow at 320, 375 and zoom 2, sign-in heading Y position stable when images fail) and class hooks (`.admin-collection`, `.status-badge`, `.parent-state-badge`, `.button-link`, `.notification-card-read`, `.filter-field`, `.filter-actions`, `.teacher-table`). Renaming a class or changing a token can break these without a visible defect.
+9. **Accessibility contrast risk**: axe runs in about 40 places on serious and critical violations, and colour contrast is part of the default rules; two specs add the `wcag22aa` tags. A Stitch palette with lighter text, coloured buttons or tinted badges must be checked against 4.5:1 (text) and 3:1 (large text and controls) on every surface it is used on.
+10. **Documentation contradiction**: `DESIGN.md` (added by `251c4b3`) says "No webfonts; keep it that way". The intent adds webfonts, so the file must be updated with the change or it will mislead later work.
+11. **Missing screen**: "Saját vállalásaim" is named in the design flows but has no page, route or string in the code. The owner must map it to an existing screen (for example the parent's own signups list) or confirm it is out of scope under "no new features".
+12. **Formatting is automatic, linting is not**: Prettier formats and checks the CSS (width 100); ESLint and Stylelint do not cover it, so invalid or unused CSS is not caught by any gate except the browser specs.
+13. **Positive**: no `TODO`, `FIXME` or `eslint-disable` in the analysed area; the CSP (`font-src 'self'`) already allows self-hosted fonts.
+
+### Ratings (code-analysis guide scale)
+| Aspect | Rating | Evidence |
+|---|---|---|
+| Naming clarity | good | area-prefixed kebab-case classes (`parent-`, `teacher-`, `admin-`, `filter-`); stable `data-testid` hooks |
+| Function size | not applicable | stylesheet; the area has no functions of its own |
+| Error handling | not applicable | `prefers-reduced-motion` and 20rem breakpoint rules show care for edge cases |
+| Test presence | good | many computed-style, size, layout and axe checks in three browser projects; none cover the dead CSS |
+| Duplication | fair | repeated literals, triple `.parent-card`, shared selector groups |
+| Dead code | fair | about 100 lines of unused profile-picker CSS |
+| Token coverage | fair | colours tokenised; type, spacing and font family are not |
 
 ## Denied pages and sign-out area (2026-11-02, after 1070fd6)
 
 Read-only run; nothing executed (no tests, build or server), so test results are not re-measured.
 
 ### Findings
-1. **No exit on the denied pages**: `ParentAccessState`, `AdminAccessState`, `TeacherAccessState` and `app/hozzaferes-megtagadva/page.tsx` render outside `AppShell` and have no sign-out. The tools to add one already exist (`SignOutButton`, `signOutAction`, used in `app/page.tsx` and the shell header) and need no change. After `1070fd6` more accounts reach the parent denied page right after sign-in (role without linked record), and `signInAs` in the browser support would start to succeed for such an account only if the denied page gains a `sign-out-button`.
+1. **No exit on the denied pages** (fixed by `78a0ab5`, 2026-11-04: `AccessStateExit` adds sign-out and Hungarian guidance to the denied states): `ParentAccessState`, `AdminAccessState`, `TeacherAccessState` and `app/hozzaferes-megtagadva/page.tsx` rendered outside `AppShell` and had no sign-out. The tools to add one already exist (`SignOutButton`, `signOutAction`, used in `app/page.tsx` and the shell header) and need no change. After `1070fd6` more accounts reach the parent denied page right after sign-in (role without linked record), and `signInAs` in the browser support would start to succeed for such an account only if the denied page gains a `sign-out-button`.
 2. **Back-link loop**: `deniedFor` in `src/runtime/production/access.ts` returns the strongest role's `homePath`; for a parent without a linked record that is the page being shown, so "Vissza a biztonságos kezdőoldalra" reloads the same denied page. The teacher link to `/` redirects and loops the same way for a role holder without a usable page.
 3. **Duplication**: five separate "Nincs jogosultság" renderings with similar markup and slightly different copy and link text; no shared presentational component. Page structure varies in testids (`parent-access-denied`, `admin-denied`, `teacher-denied`, `access-denied-state`).
 4. **Shared component risk**: `ParentAccessState kind="denied"` is also what a teacher or admin sees on a parent page, and the `configuration-error` kind reuses the markup. New explanation text must be correct for all of them or be limited to the case with no usable home. Existing specs (`navigation-polish.spec.ts`, `teacher-web.spec.ts`) click "Vissza a beosztáshoz" on the denied page, so labels and testids must stay stable.
 5. **Possible dead page**: `app/hozzaferes-megtagadva/page.tsx` has no inbound redirect in `app/` or `src/`; only a coverage test renders it. Confirm the owner means the parent denied page.
 6. **Accessibility**: the parent denied element is a `<section>` without a `<main>` landmark; it carries `id="hozzaferes-megtagadva"` and `tabIndex={-1}` as the focus target. Adding a form and button must keep the single `<h1>` and pass axe (serious and critical violations block the critical flow).
 7. **Dependency pinning**: `react`, `react-dom`, `zod` and several dev tools are `latest` in `package.json`.
-8. **Test gaps**: no test asserts that a denied page offers sign-out; no browser test models "role but no linked parent record" (the seeded accounts were not checked); component tests for the denied states exist for parent and admin only by heading, home-link testid and href.
+8. **Test gaps**: no test asserts that a denied page offers sign-out (before `78a0ab5`); no browser test models "role but no linked parent record" (the seeded accounts were not checked); component tests for the denied states exist for parent and admin only by heading, home-link testid and href.
 
 ### Ratings (code-analysis guide scale)
 | Aspect | Rating | Evidence |
@@ -31,7 +61,7 @@ Read-only run; nothing executed (no tests, build or server), so test results are
 Read-only run; nothing executed (no tests, build or server), so test results below are not re-measured.
 
 ### Findings
-1. **Defect located (fixed by `1070fd6`)**: `signInAction` redirected to `/bejelentkezes` (`app/bejelentkezes/actions.ts:45`) and `SignInPage` renders a shell-less `signed-in-panel` for a signed-in visitor (`app/bejelentkezes/page.tsx:19-24`). The role home resolver exists and works (`app/_identity/production-home.ts`, used by `app/page.tsx:16-17`) but the sign-in flow never called it. Commit `1070fd6` changed the redirect to `/`. The role shells, menus and role access resolvers are correct for all four roles.
+1. **Defect located (fixed by `1070fd6`)**: `signInAction` redirected to `/bejelentkezes` (`app/bejelentkezes/actions.ts:45`) and `SignInPage` renders a shell-less `signed-in-panel` for a signed-in visitor (`app/bejelentkezes/page.tsx:19-24`). The role home resolver exists and works (`app/_identity/production-home.ts`, used by `app/page.tsx:16-17`) but the sign-in flow never called it. Commit `1070fd6` changed the redirect to `/`. The role shells, menus and role access resolvers are correct for all four roles. (2026-11-04: the sign-in page now redirects a signed-in visitor to `/`.)
 2. **Intended emptiness**: `TEACHER_NAVIGATION` is `[]` (`src/runtime/navigation.ts:13-14`), so a teacher home page shows header and sign-out but no menu. Not a defect.
 3. **Tests pinned the defect** (at `3456409`): `identity-actions.test.ts:122` expected the redirect `/bejelentkezes`; `identity-screens.test.tsx:268-282` expects the signed-in panel; `signInAs` (`tests/browser/support/seeded-schema.ts:72`) and 12 spec lines waited for `signed-in-panel`. `1070fd6` updated the affected tests per its title; not re-read here.
 4. **Shared destination**: password reset (`jelszo-visszaallitas/uj/actions.ts:38`) and invitation acceptance (`meghivas/[token]/actions.ts:41,43`) also ended on `/bejelentkezes` at `3456409`, with tests at `identity-actions.test.ts:243,282,299`.
@@ -104,7 +134,7 @@ Coverage: 80/80/80 lines/branches/functions with an honest denominator (`tests/c
 
 ## Lint, format, types (2026-10-12)
 
-- ESLint 9 flat config, `--max-warnings=0`; Prettier; `tsc --noEmit`. Other `src/*` modules were outside lint and format scope then.
+- ESLint 9 flat config, `--max-warnings=0`; Prettier; `tsc --noEmit`. Other `src/*` modules were outside lint and format scope then. (2026-11-04: Prettier also formats `app/globals.css`; ESLint does not lint CSS.)
 
 ## CI
 
@@ -113,7 +143,7 @@ Coverage: 80/80/80 lines/branches/functions with an honest denominator (`tests/c
 
 ## Documentation
 
-`README.md` (sections "Run the application locally" and "Test phases and quality checks"), Hungarian user guide, `verification/RUNBOOK.md`, `AUTHORIZATION.md`, PRD. SQL migrations carry purposeful header comments with rule ids and forward-only notes (2026-10-27). Identity code carries doc comments with requirement ids (BR/FR).
+`README.md` (sections "Run the application locally" and "Test phases and quality checks"), Hungarian user guide, `verification/RUNBOOK.md`, `AUTHORIZATION.md`, PRD. SQL migrations carry purposeful header comments with rule ids and forward-only notes (2026-10-27). Identity code carries doc comments with requirement ids (BR/FR). (2026-11-04: `DESIGN.md` describes the visual system and currently says "No webfonts".)
 
 ## Technical debt and risks recorded 2026-10-12 (not re-verified)
 
@@ -121,4 +151,4 @@ R1 first migration not applicable (since fixed, FR1.2); R2 thin SQL coverage (si
 
 ## Quality strengths
 
-Strict TypeScript; explicit result states in TypeScript and SQL; enforced coverage floor; pinned CI actions; secret scanning and SAST per team rules; accessibility checks in the critical browser flow; forward-only, schema-neutral, checksum-tracked migrations with real-stack tests (2026-10-27).
+Strict TypeScript; explicit result states in TypeScript and SQL; enforced coverage floor; pinned CI actions; secret scanning and SAST per team rules; accessibility checks in the critical browser flow; forward-only, schema-neutral, checksum-tracked migrations with real-stack tests (2026-10-27); a broad computed-style and layout browser suite guarding the visual contract (2026-11-04).

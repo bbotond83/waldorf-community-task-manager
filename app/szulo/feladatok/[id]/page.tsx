@@ -40,7 +40,7 @@ export default async function DutyDetailPage({
   return (
     <section className="parent-page" data-testid="duty-detail-page">
       {notification && <MarkNotificationRead notificationId={notification.id} />}
-      <a href={backHref} data-testid="duty-detail-back-link">
+      <a href={backHref} className="parent-back-link" data-testid="duty-detail-back-link">
         {notification ? "Vissza az értesítésekhez" : "Vissza a feladatokhoz"}
       </a>
       <ParentStatePanel
@@ -50,7 +50,7 @@ export default async function DutyDetailPage({
       >
         {(duty) => (
           <>
-            <header>
+            <header className="parent-detail-header">
               <p className="eyebrow">Feladat részletei</p>
               <h1 tabIndex={-1}>{duty.title}</h1>
             </header>

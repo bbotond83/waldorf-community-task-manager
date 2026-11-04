@@ -32,7 +32,7 @@ export default async function ApprovalDetailPage({
     }
   }
   return (
-    <section className="admin-page" data-testid="admin-approval-detail-page">
+    <section className="admin-page admin-approvals-page" data-testid="admin-approval-detail-page">
       <header>
         <AdminBackLink
           list="approvals"

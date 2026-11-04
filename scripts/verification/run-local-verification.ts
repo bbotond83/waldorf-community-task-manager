@@ -46,6 +46,8 @@ const commands = [
   { key: "manifests", args: ["run", "verify:manifests"] },
   { key: "format", args: ["run", "format:check"] },
   { key: "lint", args: ["run", "lint"] },
+  // The stylesheet check (app/globals.css); ESLint does not read CSS.
+  { key: "lint-css", args: ["run", "lint:css"] },
   { key: "typecheck", args: ["run", "typecheck"] },
   { key: "tests", args: ["test"] },
   { key: "database-roles", args: ["run", "test:database:roles"] },

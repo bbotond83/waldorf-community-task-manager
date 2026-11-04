@@ -17,7 +17,7 @@ export function PendingRequestPanel({
   return (
     <div data-testid={testId}>
       <PendingRequestNotice pending={pending} />
-      <p>
+      <p className="parent-page-actions">
         <a href={`/szulo/feladatok/${dutyId}`} data-testid={`${testId}-back-link`}>
           Vissza a feladathoz
         </a>

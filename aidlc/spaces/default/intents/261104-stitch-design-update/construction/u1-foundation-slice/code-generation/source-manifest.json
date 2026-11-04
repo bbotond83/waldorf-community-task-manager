@@ -1,0 +1,21 @@
+{
+  "stage": "code-generation",
+  "unit": "u1-foundation-slice",
+  "version": 1,
+  "writes": [
+    { "path": "package.json" },
+    { "path": "package-lock.json" },
+    { "path": "stylelint.config.mjs" },
+    { "path": "app/layout.tsx" },
+    { "path": "app/globals.css" },
+    { "path": "app/fonts/" },
+    { "path": "DESIGN.md" },
+    { "path": "scripts/verification/run-local-verification.ts" },
+    { "path": "tests/unit/css-lint.test.ts" },
+    { "path": "tests/unit/dependency-pins.test.ts" },
+    { "path": "tests/unit/fonts.test.ts" },
+    { "path": "tests/unit/design-tokens.test.ts" },
+    { "path": "tests/coverage/app-entrypoints.test.tsx" },
+    { "path": "tests/browser/sign-in-typography.spec.ts" }
+  ]
+}

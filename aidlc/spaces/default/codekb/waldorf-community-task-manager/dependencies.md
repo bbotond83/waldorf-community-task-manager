@@ -1,10 +1,36 @@
 # Dependencies
 
-Full rescan 2026-10-12 (HEAD `80bd4f4`), focused update 2026-10-27 (HEAD `5d2b484`, intent `denied-audit-ratelimit`), focused update 2026-11-02 (HEAD `3456409`, intent `empty-nav-after-login`; section "Sign-in and shell dependencies (2026-11-02)"). Revision 2 on 2026-11-02 (same intent, owner asked to also scan the audit area) re-read the audit migrations 20261012, 20261013, 20261015, 20261019, 20261044 and 20261045, `supabase/config.toml` and the database test support, `audit`, `audit-purge` and `migrations` tests; sections marked "(2026-11-02, audit re-verified)" come from it. Focused update 2026-11-02 (HEAD `1070fd6`, intent `no-access-signout`): the sign-in section corrected and "Denied pages and sign-out dependencies (2026-11-02, after 1070fd6)" added. The 2026-10-27 update added "Database object dependencies of the audit write" and "Database test dependencies"; the module topology is kept from 2026-10-12 and does not show `src/data`, `src/identity` or `scripts/db`.
+Full rescan 2026-10-12 (HEAD `80bd4f4`), focused update 2026-10-27 (HEAD `5d2b484`, intent `denied-audit-ratelimit`), focused update 2026-11-02 (HEAD `3456409`, intent `empty-nav-after-login`; section "Sign-in and shell dependencies (2026-11-02)"). Revision 2 on 2026-11-02 (same intent, owner asked to also scan the audit area) re-read the audit migrations 20261012, 20261013, 20261015, 20261019, 20261044 and 20261045, `supabase/config.toml` and the database test support, `audit`, `audit-purge` and `migrations` tests; sections marked "(2026-11-02, audit re-verified)" come from it. Focused update 2026-11-02 (HEAD `1070fd6`, intent `no-access-signout`): the sign-in section corrected and "Denied pages and sign-out dependencies (2026-11-02, after 1070fd6)" added. Focused update 2026-11-04 (HEAD `251c4b3`, intent `stitch-design-update`): new section "Style and font dependencies (2026-11-04, after 251c4b3)"; the denied-pages text is corrected in place for commit `78a0ab5`. The 2026-10-27 update added "Database object dependencies of the audit write" and "Database test dependencies"; the module topology is kept from 2026-10-12 and does not show `src/data`, `src/identity` or `scripts/db`.
 
 ## External dependencies
 
 See `technology-stack.md`. External services: Supabase (sign-in service, Postgres, RLS, data API; local stack in development and CI), Vercel (target, not wired), an e-mail provider (local mail catcher in development).
+
+## Style and font dependencies (2026-11-04, after 251c4b3)
+
+```mermaid
+flowchart TB
+  Layout["app/layout.tsx"] --> Css["app/globals.css"]
+  Layout -.-> FontFiles["font files, not present yet"]
+  Css --> Tokens["root tokens: 16 colours, shadow, radius, font stack"]
+  Css --> Classes["class families per area"]
+  Shell["src/runtime AppShell, AppNav, BrandMark, StatusBadge"] --> Classes
+  Pages["app pages and components"] --> Classes
+  Admin["admin-collection, status-badge, parent-state-badge, button-link, notification-card-read"] --> Specs
+  Classes --> Admin
+  Specs["tests/browser specs"] --> Hooks["class hooks, test ids, roles, text"]
+  Specs --> Geometry["computed size, colour, outline, overflow"]
+  Specs --> Axe["axe contrast and structure rules"]
+  Geometry --> Css
+  Axe --> Tokens
+  Proxy["proxy.ts CSP"] -->|font-src self, style-src unsafe-inline| FontFiles
+  Proxy --> Layout
+  Design["DESIGN.md"] -.->|describes| Css
+```
+
+Text: `app/layout.tsx` is the only importer of `app/globals.css`; every page, the shell components in `src/runtime` and the browser specs depend on its class names. Tokens feed the browser specs through colour contrast (axe) and through computed-colour comparisons; geometry checks (44 px, overflow, label position) depend on the layout rules. A font would be attached in `layout.tsx` (dashed edge: the files do not exist yet) and must satisfy the CSP set by `proxy.ts`. `DESIGN.md` describes the stylesheet in words (the CSS wins if they disagree). Coupling to watch: grouped selectors (hover/pressed state of five card classes, one filter grid for four classes), the shared `.parent-form` and `.centered-panel` classes used by several flows, and the reduced-motion list of hover classes. `src/runtime` components (outside the verified set) own markup with classes `site-header`, `navigation-panel`, `nav-button`, `status-badge*`, `brand-mark`, so a shell restyle edits CSS only if their markup stays as it is. No npm dependency is involved in styling today (no CSS tooling package, no font package); adding `@fontsource` packages would be a new runtime dependency, while `next/font/local` and `public/` files would not.
+
+Test dependencies on style: Vitest tests `tests/integration/app-nav.test.tsx`, `admin-components.test.tsx`, `status-badge.test.tsx`, `filter-clear-link.test.tsx` and `tests/coverage/admin-functional-fixes.test.tsx` match class names (grep only, not opened).
 
 ## Internal module dependency topology (2026-10-12)
 
@@ -47,9 +73,9 @@ flowchart TB
   Proxy["proxy.ts"] --> Identity
 ```
 
-Text (corrected after `1070fd6`): at `3456409` the sign-in page and action depended on `src/identity` only and nothing routed a freshly signed-in person to their home. Since `1070fd6` the sign-in action redirects to `/`, so the flow reaches `production-home` through the `/` request (an HTTP redirect, not an import edge; whether the action module gained an import was not re-read). `app/page.tsx` consumes `production-home`. The role layouts use `production-request` and `access` for the profile and `AppShell` for the menu. `proxy.ts` depends on the cookie names and refresh logic of `src/identity`.
+Text (corrected after `1070fd6`): at `3456409` the sign-in page and action depended on `src/identity` only and nothing routed a freshly signed-in person to their home. Since `1070fd6` the sign-in action redirects to `/`, so the flow reaches `production-home` through the `/` request (an HTTP redirect, not an import edge; whether the action module gained an import was not re-read). `app/page.tsx` consumes `production-home`. The role layouts use `production-request` and `access` for the profile and `AppShell` for the menu. `proxy.ts` depends on the cookie names and refresh logic of `src/identity`. (2026-11-04: the sign-in page imports `BrandMark`, `COPY`, `currentSession` and `SignInForm`, and redirects a signed-in visitor to `/`.)
 
-Test dependencies: `tests/browser/*.spec.ts` -> `tests/browser/support/seeded-schema.ts` -> `scripts/db/{seed,reset,seed-support}` and `projects.ts`; `signInAs` is used across the browser specs. `tests/integration/*` mock `next/headers`, `next/navigation`, `server-only` and the `app/_identity` modules.
+Test dependencies: `tests/browser/*.spec.ts` -> `tests/browser/support/seeded-schema.ts` -> `scripts/db/{seed,reset,seed-support}` and `projects.ts`; `signInAs` is used across the browser specs. `tests/integration/*` mock `next/headers`, `next/navigation`, `server-only` and the `app/_identity` modules. (2026-11-04: `scenarios.ts` also imports `tests/database/stack-support.ts` (`openDatabase`) to insert a second notification; `playwright.config.ts` imports `scripts/db/common.ts`, `scripts/verification/firefox-launch.ts` and `projects.ts`.)
 
 ## Denied pages and sign-out dependencies (2026-11-02, after 1070fd6)
 
@@ -63,16 +89,21 @@ flowchart TB
   PAS --> BTH["src/runtime/BackToHomeLink"]
   AAS --> BTH
   TAS --> BTH
+  PAS --> EXIT["app/_identity/AccessStateExit (2026-11-04)"]
+  AAS --> EXIT
+  TAS --> EXIT
+  EXIT --> SOB
   Shell --> SHA["app/_identity/shell-action (headerAction)"]
   SHA --> SOB["app/_identity/SignOutButton"]
   Home["app/page.tsx no-role branch"] --> SOB
   SOB --> SOA["app/_identity/actions signOutAction"]
   SOB --> Copy["src/identity/copy COPY.signOut"]
+  EXIT --> Copy2["src/identity/copy COPY.noAccess"]
   SOA --> Sess["src/identity session.endSession, cookies.clearTokenPair"]
   SOA --> Redirect["redirect /bejelentkezes"]
 ```
 
-Text: `SignOutButton` is already shared by the shell header (through `shellHeaderAction`) and the `/` no-role panel; the three access-state components do not use it. They all depend on `BackToHomeLink`, whose target comes from the access resolver's denied `homePath`. A change to `ParentAccessState` therefore touches `app/szulo/` only if the button is imported directly (`../../_identity/SignOutButton.tsx`); a shared presentational component would add a new edge from all three role areas. `ParentAccessState` is also used for the `configuration-error` and `signed-out` kinds and is rendered by tests in `tests/integration/parent-components.test.tsx` and `tests/coverage/parent-pages.test.tsx`. Test mocks to reuse: `vi.mock("../../app/_identity/actions.ts", () => ({ signOutAction: vi.fn() }))`, `vi.mock("server-only", () => ({}))`, `vi.mock("next/navigation", ...)` and the request-world mock of `production-request.ts`.
+Text: `SignOutButton` is shared by the shell header (through `shellHeaderAction`), the `/` no-role panel and, since `78a0ab5`, the three access-state components through `AccessStateExit` (2026-11-04; at `1070fd6` they did not use it). They all depend on `BackToHomeLink`, whose target comes from the access resolver's denied `homePath`. A change to `ParentAccessState` touches `app/szulo/` and `app/_identity/`. `ParentAccessState` is also used for the `configuration-error` and `signed-out` kinds and is rendered by tests in `tests/integration/parent-components.test.tsx` and `tests/coverage/parent-pages.test.tsx`. Test mocks to reuse: `vi.mock("../../app/_identity/actions.ts", () => ({ signOutAction: vi.fn() }))`, `vi.mock("server-only", () => ({}))`, `vi.mock("next/navigation", ...)` and the request-world mock of `production-request.ts`.
 
 ## Database object dependencies of the audit write (2026-10-27)
 
@@ -115,5 +146,5 @@ Text: denied events come only from `platform_finish_operation` (directly or thro
 
 - `src/runtime/synthetic/access-state.ts` imported by `src/admin-advanced` and session resolvers.
 - `tests/unit/current-role-references.test.ts` hashes `supabase/migrations/20260806_access_rls.sql` and reads an AI-DLC record manifest (that file was since edited to remove the reserved-word alias, per `migrations.test.ts` FR1.2).
-- `playwright.config.ts` starts `npm run start` on three ports with synthetic env.
-- Lint/format scopes cover `app src/application src/runtime tests scripts ...`; other `src/*` modules were outside both.
+- `playwright.config.ts` starts `npm run start` on three ports with synthetic env. (2026-11-04: it starts `npm run start` on three ports, one per browser project, with the production-mode environment listed in `api-documentation.md`; each server has its own database schema.)
+- Lint/format scopes cover `app src/application src/runtime tests scripts ...`; other `src/*` modules were outside both. (2026-11-04: the lint script covers `app src/application src/data src/identity src/import-parser src/runtime tests scripts *.config.* proxy.ts`; the format script covers the same folders plus `verification` and `README.md`.)

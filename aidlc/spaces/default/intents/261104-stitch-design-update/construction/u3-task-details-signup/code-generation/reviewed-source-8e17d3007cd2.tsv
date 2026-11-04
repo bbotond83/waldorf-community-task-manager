@@ -1,0 +1,5 @@
+manifest	05733068c70fc230381dbf1e76ae233ad01cb1637fed3ce1fbf2d7e160e7e788	-
+	DESIGN.md	100644	750b23824b00aef7e8c7fea37b716ca54a4fe4072b62b27ec3041281b599fae3
+	app/globals.css	100644	3e6afff29efc4fdc8eed32fc441d62610aaa2430789e5e894046b67f91ab30bd
+	app/szulo/feladatok/[id]/page.tsx	100644	91fdaa2abf2e2e2b9c90fe71a69bda770cede912bd8922f5fdcd2a9736d037c6
+	tests/browser/parent-detail-style.spec.ts	100644	b13ada3d3fa5fc8e2d4e230c7fb2011c177864fc2ded0f6ca2a00e5d67e582a5

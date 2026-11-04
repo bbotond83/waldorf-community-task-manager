@@ -1,0 +1,18 @@
+{
+  "stage": "code-generation",
+  "unit": "u2-parent-task-list",
+  "upstream_ids": [
+    "FR3.2", "FR3.5",
+    "FR5.1", "FR5.2", "FR5.3", "FR5.4", "FR5.5", "FR5.6"
+  ],
+  "coverage": [
+    { "id": "FR3.2", "status": "OK", "target": "app/globals.css" },
+    { "id": "FR3.5", "status": "OK", "target": "tests/browser/parent-list-style.spec.ts" },
+    { "id": "FR5.1", "status": "OK", "target": "tests/browser/parent-list-style.spec.ts" },
+    { "id": "FR5.2", "status": "OK", "target": "tests/browser/parent-list-style.spec.ts" },
+    { "id": "FR5.3", "status": "OK", "target": "tests/browser/parent-list-style.spec.ts" },
+    { "id": "FR5.4", "status": "OK", "target": "tests/browser/parent-list-style.spec.ts" },
+    { "id": "FR5.5", "status": "OK", "target": "tests/browser/parent-list-style.spec.ts" },
+    { "id": "FR5.6", "status": "OK", "target": "tests/browser/parent-list-style.spec.ts" }
+  ]
+}

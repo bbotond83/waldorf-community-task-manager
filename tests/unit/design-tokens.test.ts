@@ -141,4 +141,45 @@ describe("design tokens", () => {
     expect(heading).toContain("overflow-wrap: break-word");
     expect(heading).not.toContain("anywhere");
   });
+
+  it("names the heading and body font families and the main type sizes in :root (FR2.1)", () => {
+    for (const name of ["font-heading", "font-body"]) {
+      expect(root, name).toMatch(new RegExp(`--${name}:\\s*[^;]*var\\(--font-`));
+    }
+    expect(root).toMatch(/--font-heading:[^;]*serif/);
+    expect(root).toMatch(/--font-body:[^;]*sans-serif/);
+    for (const name of [
+      "text-headline-xl",
+      "text-headline-lg",
+      "text-headline-md",
+      "text-headline-sm",
+      "text-body",
+      "text-label",
+      "text-eyebrow",
+    ]) {
+      expect(root, name).toMatch(new RegExp(`--${name}:\\s*[^;]+;`));
+    }
+    expect(root).toMatch(/--shadow:[^;]*rgb\(43 33 24 \/ 8%\)/);
+    expect(root).toMatch(/--radius:\s*1rem/);
+  });
+
+  it("keeps the 16 colour tokens in the --name: #rrggbb form (FR2.2)", () => {
+    const colours = [...root.matchAll(/--(color-[a-z-]+):\s*([^;]+);/g)];
+    expect(colours).toHaveLength(16);
+    for (const [, name, value] of colours) expect(value, name).toMatch(/^#[0-9a-fA-F]{6}$/);
+  });
+
+  it("sets headings in the heading font and text in the body font", () => {
+    expect(css).toMatch(/h1\s*{[^}]*font-size:\s*var\(--text-headline-xl\)/);
+    expect(css).toMatch(/\.eyebrow\s*{[^}]*font-size:\s*var\(--text-eyebrow\)/);
+    expect(css).toMatch(/\.eyebrow\s*{[^}]*font-weight:\s*700/);
+  });
+
+  it("gives buttons the pressed 1px move and switches the move off for reduced motion (FR2.3)", () => {
+    expect(css).toMatch(/button:active\s*{\s*transform:\s*translateY\(1px\)/);
+    const reduced =
+      /@media \(prefers-reduced-motion: reduce\)\s*{([\s\S]*?)\n}\n/.exec(css)?.[1] ?? "";
+    expect(reduced).toContain("button:active");
+    expect(reduced).toMatch(/transform:\s*none\s*!important/);
+  });
 });
