@@ -152,5 +152,13 @@
     "scope": "classic",
     "status": "complete",
     "request": "cc3bfd94"
+  },
+  {
+    "uuid": "01a1b03f-1e1e-7825-a20c-bf5c42849287",
+    "slug": "signout-no-access",
+    "dirName": "261106-signout-no-access",
+    "scope": "express",
+    "status": "complete",
+    "request": "4a381341"
   }
 ]

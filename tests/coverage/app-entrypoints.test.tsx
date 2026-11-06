@@ -4,6 +4,7 @@ import Home from "../../app/page";
 import Root from "../../app/layout";
 import Invitation from "../../app/meghivas/[token]/page";
 import Denied from "../../app/hozzaferes-megtagadva/page";
+import { COPY } from "../../src/identity/copy.ts";
 import { GET } from "../../app/api/readiness/route";
 import { requestWorld, type RoleKey } from "../support/request-world.ts";
 
@@ -123,6 +124,13 @@ it("renders Hungarian root and safe denied navigation", () => {
   for (const variable of ["vollkorn-latin", "vollkorn-latin-ext", "karla-latin", "karla-latin-ext"])
     expect(markup).toContain(`font--font-${variable}`);
   expect(renderToStaticMarkup(<Denied />)).toContain('href="/"');
+});
+
+it("lets a person stuck on the no-access page sign out, with the Hungarian guidance", () => {
+  const markup = renderToStaticMarkup(<Denied />);
+  expect(markup).toContain('data-testid="sign-out-button"');
+  expect(markup).toContain('data-testid="access-guidance"');
+  expect(markup).toContain(COPY.noAccess.guidance);
 });
 
 it("shows the logo linking to the start page on the public pages", async () => {
