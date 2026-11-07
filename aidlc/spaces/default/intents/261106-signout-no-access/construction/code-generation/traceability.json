@@ -1,0 +1,31 @@
+{
+  "stage": "code-generation",
+  "upstream_ids": [
+    "FR1",
+    "FR1.1",
+    "FR1.2",
+    "FR2",
+    "FR2.1",
+    "FR3",
+    "FR4",
+    "FR5",
+    "NFR1",
+    "NFR2",
+    "NFR3",
+    "NFR4"
+  ],
+  "coverage": [
+    { "id": "FR1", "status": "OK", "target": "app/hozzaferes-megtagadva/page.tsx" },
+    { "id": "FR1.1", "status": "OK", "target": "app/hozzaferes-megtagadva/page.tsx" },
+    { "id": "FR1.2", "status": "OK", "target": "tests/browser/no-access.spec.ts" },
+    { "id": "FR2", "status": "OK", "target": "app/hozzaferes-megtagadva/page.tsx" },
+    { "id": "FR2.1", "status": "OK", "target": "tests/coverage/app-entrypoints.test.tsx" },
+    { "id": "FR3", "status": "OK", "target": "tests/coverage/app-entrypoints.test.tsx" },
+    { "id": "FR4", "status": "OK", "target": "tests/browser/no-access.spec.ts" },
+    { "id": "FR5", "status": "OK", "target": "app/_identity/AccessStateExit.tsx" },
+    { "id": "NFR1", "status": "OK", "target": "tests/browser/no-access.spec.ts" },
+    { "id": "NFR2", "status": "OK", "target": "app/hozzaferes-megtagadva/page.tsx" },
+    { "id": "NFR3", "status": "OK", "target": "tests/coverage/app-entrypoints.test.tsx" },
+    { "id": "NFR4", "status": "OK", "target": "tests/coverage/app-entrypoints.test.tsx" }
+  ]
+}

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BrandMark } from "../../src/runtime/BrandMark.tsx";
+import { AccessStateExit } from "../_identity/AccessStateExit.tsx";
 
 export default function AccessDeniedPage() {
   return (
@@ -10,6 +11,7 @@ export default function AccessDeniedPage() {
       <Link href="/" data-testid="access-denied-home-link">
         Vissza a biztonságos kezdőlapra
       </Link>
+      <AccessStateExit explain />
     </main>
   );
 }
