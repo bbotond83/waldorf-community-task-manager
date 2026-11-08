@@ -2,6 +2,7 @@ import { execFile } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { promisify } from "node:util";
 import type pg from "pg";
+import { escapeLikePattern } from "../../scripts/db/common.ts";
 import { connectPostgres } from "../../scripts/db/postgres.ts";
 import { createSeedAccountAdmin } from "../../scripts/db/seed/index.ts";
 import type { SeedDeps } from "../../scripts/db/seed.ts";
@@ -63,7 +64,7 @@ export async function schemaUsers(db: pg.Client, schema: string): Promise<unknow
   return (
     await db.query(
       "select id::text as id, lower(email) as email from auth.users where lower(email) like $1 escape '\\' order by email",
-      [`${schema.replace(/_/g, "\\_")}.%`],
+      [`${escapeLikePattern(schema)}.%`],
     )
   ).rows;
 }

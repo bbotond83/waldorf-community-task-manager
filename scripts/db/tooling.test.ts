@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
   describeFailure,
+  escapeLikePattern,
   formatEnvFile,
   formatSeconds,
   loadToolingSettings,
@@ -226,6 +227,22 @@ describe("shared tooling helpers", () => {
     assert.deepEqual(positional, ["worker_1"]);
     assert.equal(flags.get("reset"), true);
     assert.equal(flags.get("schema"), "worker_2");
+  });
+});
+
+describe("escapeLikePattern", () => {
+  it("leaves plain text alone", () => {
+    assert.equal(escapeLikePattern("worker1"), "worker1");
+  });
+
+  it("escapes the underscore and percent wildcards", () => {
+    assert.equal(escapeLikePattern("worker_1"), "worker\\_1");
+    assert.equal(escapeLikePattern("100%"), "100\\%");
+  });
+
+  it("escapes the escape character itself, before the wildcards", () => {
+    assert.equal(escapeLikePattern("a\\b"), "a\\\\b");
+    assert.equal(escapeLikePattern("a\\_b"), "a\\\\\\_b");
   });
 });
 

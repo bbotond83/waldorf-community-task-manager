@@ -3,6 +3,7 @@ import { fileURLToPath } from "node:url";
 import { redactSecrets } from "../../src/runtime/database/redact.ts";
 import {
   describeFailure,
+  escapeLikePattern,
   loadToolingSettings,
   type Log,
   parseArguments,
@@ -141,7 +142,7 @@ export async function resetWorkerData(client: SqlClient, worker: string): Promis
     await client.query(`truncate table ${list} restart identity cascade`);
   }
   await client.query("delete from auth.users where email like $1 escape '\\'", [
-    `${worker.replace(/_/g, "\\_")}.%`,
+    `${escapeLikePattern(worker)}.%`,
   ]);
 }
 

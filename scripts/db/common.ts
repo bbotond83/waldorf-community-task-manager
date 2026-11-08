@@ -116,6 +116,15 @@ export function loadToolingSettings(reader: EnvironmentReader): ToolingSettings 
 const LOCAL_HOSTS: ReadonlySet<string> = new Set(["127.0.0.1", "localhost", "[::1]", "::1"]);
 
 /**
+ * Escapes text for a SQL `like ... escape '\'` pattern so it matches literally: the escape character itself
+ * and the two wildcards (`%`, `_`) each get a backslash. The backslash must be escaped too, or a trailing one
+ * would swallow the character after it.
+ */
+export function escapeLikePattern(text: string): string {
+  return text.replace(/[\\%_]/g, "\\$&");
+}
+
+/**
  * The tooling (migrate, worker reset) drops and truncates data, so it only ever talks to a
  * database on this machine. Anything else is refused before a connection is made.
  */
