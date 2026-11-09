@@ -49,6 +49,9 @@ export function assertLocalStackPassword(databaseUrl: string): void {
   } catch {
     password = "";
   }
+  // Not password storage: this recognises the public, documented local-stack default so destructive tools refuse
+  // any other database. A fast hash is enough because nothing here protects a secret (code scanning alert 3 was
+  // dismissed as a false positive for this reason).
   const hash = createHash("sha256").update(password).digest("hex");
   if (hash !== LOCAL_STACK_DB_PASSWORD_HASH) {
     throw new ToolingError(
