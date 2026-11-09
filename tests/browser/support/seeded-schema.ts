@@ -73,6 +73,20 @@ export async function expectSignedIn(page: Page): Promise<void> {
 }
 
 /**
+ * Clears the browser's sign-in and opens a link as a stranger would. `expectSignedIn` returns as soon as the sign-in
+ * cookie exists, while the server redirect that follows may still be on its way, so the page first settles. The
+ * signed-in page is then left for a blank one before the cookie goes: without its cookie the page can send itself to
+ * the sign-in screen, and that navigation would abort the one the test starts. Either overlap shows up in Firefox as
+ * NS_BINDING_ABORTED.
+ */
+export async function openLinkSignedOut(page: Page, link: string): Promise<void> {
+  await page.waitForLoadState("networkidle");
+  await page.goto("about:blank");
+  await page.context().clearCookies();
+  await page.goto(link);
+}
+
+/**
  * Signs in through the real sign-in screen and waits until the role home page has opened. Answers how long the
  * sign-in took in milliseconds, for the timing check.
  */
