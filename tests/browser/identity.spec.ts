@@ -15,7 +15,7 @@ import {
   serviceKey,
   stackSettings,
 } from "../database/stack-support.ts";
-import { bindSeededSchema, expectSignedIn } from "./support/seeded-schema.ts";
+import { bindSeededSchema, expectSignedIn, openLinkSignedOut } from "./support/seeded-schema.ts";
 
 /**
  * The four identity screens and the sign-out control against the real local stack, with the automated
@@ -436,8 +436,7 @@ test("an invitation link: the valid page, the rule error, acceptance and the not
   ]);
   expect(accounts.rows[0].n).toBe(1);
 
-  await page.context().clearCookies();
-  await page.goto(link);
+  await openLinkSignedOut(page, link);
   await expect(page.getByTestId("real-invitation-not-valid-message")).toHaveText(
     COPY.invitation.notValid,
   );
@@ -528,8 +527,7 @@ test("password reset: the request, the neutral confirmation, the new-password pa
   await fillAndSubmit(page, { "set-password-input": newPassword }, "set-password-submit");
   await expectSignedIn(page);
 
-  await page.context().clearCookies();
-  await page.goto(target);
+  await openLinkSignedOut(page, target);
   await fillAndSubmit(page, { "set-password-input": password() }, "set-password-submit");
   await expect(page.getByTestId("set-password-error")).toHaveText(COPY.reset.notValid);
   await expect(page.getByTestId("set-password-request-link")).toBeVisible();
