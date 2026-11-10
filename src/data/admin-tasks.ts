@@ -122,7 +122,8 @@ export async function listTasks(
   };
   const [events, tasks] = await Promise.all([
     readTable(gateway, "events", EVENT_COLUMNS, refine),
-    readTable(gateway, "tasks", TASK_COLUMNS, refine),
+    // A rota duty is found through the rota screens, never in the task list or its form (BR24.4).
+    readTable(gateway, "tasks", TASK_COLUMNS, (query) => refine(query).eq("origin_kind", "manual")),
   ]);
   const items = [
     ...events.map((row) => ({ at: text(row, "starts_at"), item: eventItem(row) })),
@@ -143,7 +144,11 @@ async function findRow(
 ): Promise<Row | undefined> {
   if (!isUuid(id)) return undefined;
   const columns = table === "events" ? EVENT_COLUMNS : TASK_COLUMNS;
-  return (await readTable(gateway, table, columns, (query) => query.eq("id", id)))[0];
+  return (
+    await readTable(gateway, table, columns, (query) =>
+      table === "tasks" ? query.eq("id", id).eq("origin_kind", "manual") : query.eq("id", id),
+    )
+  )[0];
 }
 
 /** tasks.save: a task or an event; `kind` is needed to create, an existing id is looked up. */

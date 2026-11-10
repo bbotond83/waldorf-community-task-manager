@@ -18,6 +18,7 @@ const SCHEMAS = ["public", "worker_1", "worker_2", "worker_3", "worker_4"];
 const allIds = (plan: SeedPlan): string[] => [
   plan.organization.id,
   plan.schoolYear.id,
+  ...plan.breakWeeks.map((entry) => entry.id),
   ...plan.groups.map((entry) => entry.id),
   ...plan.families.map((entry) => entry.id),
   ...plan.memberships.map((entry) => entry.id),
@@ -210,6 +211,44 @@ describe("seed data: the 30-family set", () => {
       const count = large.children.filter((child) => child.familyId === family.id).length;
       assert.equal(count, number % 3 === 0 ? 2 : 1);
     }
+  });
+});
+
+describe("seed data: the school calendar", () => {
+  it("gives the year a changeover date after its end and invented break weeks on Mondays inside it", () => {
+    for (const size of ["small", "large"] as const) {
+      const { schoolYear, breakWeeks } = buildSeedPlan("public", size);
+      assert.equal(schoolYear.changeoverDate, "2027-07-01");
+      assert.ok(schoolYear.changeoverDate > schoolYear.endsOn);
+      assert.deepEqual(
+        breakWeeks.map((week) => week.weekStart),
+        ["2026-11-02", "2026-12-21", "2026-12-28", "2027-04-05"],
+      );
+      for (const week of breakWeeks) {
+        assert.equal(new Date(`${week.weekStart}T00:00:00Z`).getUTCDay(), 1, week.weekStart);
+        assert.ok(week.weekStart >= schoolYear.startsOn && week.weekStart <= schoolYear.endsOn);
+        assert.ok(week.label.length > 0);
+      }
+    }
+  });
+
+  it("seeds no rota plan: the owner makes the first draft on the planning screen", () => {
+    const plan = buildSeedPlan("public", "small") as unknown as Record<string, unknown>;
+    assert.equal("rotaPlan" in plan, false);
+    assert.equal("rotaWeeks" in plan, false);
+  });
+
+  it("gives the same break weeks to every schema, with ids of its own", () => {
+    const first = buildSeedPlan("worker_1", "small").breakWeeks;
+    const second = buildSeedPlan("worker_2", "small").breakWeeks;
+    assert.deepEqual(
+      first.map((week) => week.weekStart),
+      second.map((week) => week.weekStart),
+    );
+    assert.equal(
+      first.some((week) => second.some((other) => other.id === week.id)),
+      false,
+    );
   });
 });
 

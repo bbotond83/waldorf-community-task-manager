@@ -9,6 +9,10 @@ const RESOURCE_BY_ROUTE: Readonly<Record<string, string>> = {
   "/szulo/cserek": "swap_request",
   "/szulo/ertesitesek": "notification",
   "/szulo/munkacsoportok": "working_group",
+  "/szulo/beosztas": "rota",
+  "/teacher/beosztas": "rota",
+  "/admin/tanev": "school_calendar",
+  "/admin/beosztas": "rota_plan",
   "/teacher/schedule": "schedule",
   "/teacher/munkacsoportok": "working_group",
   "/admin": "dashboard",
@@ -70,14 +74,21 @@ describe("navigation and default pages follow the access rules", () => {
   });
 
   it("lists the agreed items in the agreed order", () => {
-    expect(labels("parent")).toEqual(["Értesítések", "Feladatok", "Cserék", "Munkacsoportok"]);
-    expect(labels("teacher")).toEqual(["Beosztás", "Munkacsoportok"]);
+    expect(labels("parent")).toEqual([
+      "Értesítések",
+      "Feladatok",
+      "Beosztás",
+      "Cserék",
+      "Munkacsoportok",
+    ]);
+    expect(labels("teacher")).toEqual(["Beosztás", "Takarítás", "Munkacsoportok"]);
     expect(labels("group-admin")).toEqual([
       "Áttekintés",
       "Feladatok és események",
       "Jóváhagyások",
       "Archívum",
       "Munkacsoportok",
+      "Beosztás",
     ]);
     expect(labels("super-admin")).toEqual([
       "Áttekintés",
@@ -86,6 +97,8 @@ describe("navigation and default pages follow the access rules", () => {
       "Jóváhagyások",
       "Archívum",
       "Munkacsoportok",
+      "Tanév",
+      "Beosztás",
       "Emlékeztetők",
       "Adatvédelem",
       "Beállítások",
@@ -94,6 +107,29 @@ describe("navigation and default pages follow the access rules", () => {
 
   it("gives the super admin every group admin item", () => {
     expect(labels("super-admin")).toEqual(expect.arrayContaining(labels("group-admin")));
+  });
+
+  it("sends the group admin to the parent rota overview and the super admin to the planning page (BR24.1)", () => {
+    const groupAdmin = roleProfile("group-admin").navigation.filter(
+      (item) => item.label === "Beosztás",
+    );
+    expect(groupAdmin.map((item) => item.href)).toEqual(["/szulo/beosztas"]);
+    expect(mayOpen("group_admin", "/szulo/beosztas")).toBe(true);
+    // The super admin's single "Beosztás" entry is the planning page, so the menu never holds two alike.
+    const superAdmin = roleProfile("super-admin").navigation.filter(
+      (item) => item.label === "Beosztás",
+    );
+    expect(superAdmin.map((item) => item.href)).toEqual(["/admin/beosztas"]);
+  });
+
+  it("keeps one clearly worded teacher entry per purpose and none that reads alike (review finding 3)", () => {
+    const teacher = roleProfile("teacher").navigation;
+    expect(teacher.map((item) => [item.label, item.href])).toEqual([
+      ["Beosztás", "/teacher/schedule"],
+      ["Takarítás", "/teacher/beosztas"],
+      ["Munkacsoportok", "/teacher/munkacsoportok"],
+    ]);
+    expect(teacher.filter((item) => /beoszt/i.test(item.label))).toHaveLength(1);
   });
 
   it("opens the agreed default page for every profile", () => {

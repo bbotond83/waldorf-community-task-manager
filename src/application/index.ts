@@ -26,6 +26,8 @@ export {
   UnsafeProjectionError,
 } from "./projection.ts";
 export * from "./results.ts";
+export { RotaApplicationFacade } from "./rota-facade.ts";
+export type { RotaApplicationPort } from "./rota-facade.ts";
 export { TeacherApplicationFacade } from "./teacher-facade.ts";
 export type { TeacherApplicationPort } from "./teacher-facade.ts";
 export type * from "./contracts.ts";

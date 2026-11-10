@@ -1,0 +1,26 @@
+## Review
+
+**Verdict:** READY
+**Reviewer:** aidlc-architecture-reviewer-agent
+**Iteration:** 1
+**Verdict Dictated:** no
+
+### Findings
+
+| ID | Severity | Location | Finding | Required action | Status |
+|---|---|---|---|---|---|
+| R-01 | Major | aidlc/spaces/default/intents/261108-ovis-tabla-workflow/construction/u2-first-rota-slice/nfr-design/performance-design.md > Writes (NFR9.2) | The design publishes with two set-based inserts "rather than a loop of calls to the single-duty function" and applies the duty function's checks "once to the set". The functional design says publishing creates each duty by calling duty_create per week, in ascending week order, and duty_create's "same origin returns the existing duty" behaviour is the shared contract U7, U8 and U9 rely on. The design therefore creates duties through a second code path that the shared function never runs. The performance reason is also weak, since about 40 calls cost almost nothing and the same file says the 5-second target has a wide margin. | Either keep the functional design and have publish call duty_create (and its place step) per week in ascending order, or state that the set-based insert is the one implementation inside duty_create and publish calls that set form. Record the choice, and make the NFR7.1 forced-failure test and the NFR7.3 duplicate test run through whichever path is chosen. | New |
+| R-02 | Major | aidlc/spaces/default/intents/261108-ovis-tabla-workflow/construction/u2-first-rota-slice/nfr-design/scalability-design.md > Concurrency (NFR5.5) | The lock order starts with "family rows ascending", but publish, discard and a hand change cannot know which families to lock before they read the plan's week rows, and those rows may change between that unlocked read and the later plan-row lock (a hand change can swap the family on a week). The design does not say which families are locked or how the set is fixed. Without that, either the order is broken (plan row first) or a family can change between the read and the lock. Making a draft, which has no plan row yet, is also not covered. Two simultaneous requests for a draft rely on a unique plan per school year, which the design does not name. | State exactly how the family set is chosen and locked. For example, lock every active family of the community ascending (about 20 rows), or lock the plan row first and write that down as the deliberate, noted exception to the team order. Name the unique index per school year that stops two drafts. Add the draft case to the "two people at once" tests. | New |
+| R-03 | Major | aidlc/spaces/default/intents/261108-ovis-tabla-workflow/construction/u2-first-rota-slice/nfr-design/security-design.md > Data Protection Design (NFR1.3); logical-components.md > Notifications | The design says the notice text "is built inside the publish transaction" from the receiver's own family's weeks. The functional design instead keeps the notice as a row (kind rota_published, target rota_plan) and builds the Hungarian text in notification_list when read. Today's notifications table is documented as holding "no name, contact or note". The design never covers the read side of the new kind: notification_list, notification_link (which builds '/szulo/feladatok/' plus the task id, so a missing task gives no link) and notification_mark_read all assume a task. NFR1.3 (no other family named) is therefore not tied to the function that actually produces the text. NFR11.2 mentions only reminder and task lookups. | Align NFR1.3 with the functional design: the row stores no text, and notification_list builds it from the receiver's own family's weeks in the plan. List the changes to notification_list, notification_link and notification_mark_read (title, link to the overview, a missing task) and the privacy test for each. If the owner wants stored text instead, change the functional design and its table-comment rule together. | New |
+| R-04 | Minor | aidlc/spaces/default/intents/261108-ovis-tabla-workflow/construction/u2-first-rota-slice/nfr-design/reliability-design.md > Transactions (NFR7.3, NFR7.4) | The migration list is incomplete against the existing schema. The assignments source check allows only parent_sign_up, admin_assign, swap and import, so the place source rota_publish needs a wider check. The "unique index on origin kind and id" must be partial (not manual), because manual duties have no origin id. The design calls the table "notices", but it is notifications. | Add the assignments source check, the partial unique index and the correct table name to the migration inventory, and add a migration test row for each. | New |
+| R-05 | Minor | aidlc/spaces/default/intents/261108-ovis-tabla-workflow/construction/u2-first-rota-slice/nfr-design/reliability-design.md > Transactions (NFR7.1) | The forced-failure test for publish is described, but a single database function has no hook to fail "after the duties are inserted". | Name the mechanism, for example a test-only failing notice row or a deliberately violated constraint, so the test can be written without changing production code. | New |
+
+> R-01 Not re-checked this round
+
+> R-02 Not re-checked this round
+
+> R-03 Not re-checked this round
+
+> R-04 Not re-checked this round
+
+> R-05 Not re-checked this round

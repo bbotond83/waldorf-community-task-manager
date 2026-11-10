@@ -34,6 +34,7 @@ test("signing out and signing in as another role clears the prior projection", a
   // The teacher's menu lists Beosztás and Munkacsoportok, and nothing of the parent's.
   await expect(page.getByTestId("app-shell-navigation").getByRole("link")).toHaveText([
     "Beosztás",
+    "Takarítás",
     "Munkacsoportok",
   ]);
   await expect(page.getByTestId("app-shell-navigation-parent-duties")).toHaveCount(0);

@@ -8,7 +8,7 @@ import { RetryableDataFailure, TerminalDataFailure } from "./errors.ts";
 import type { DataGateway } from "./gateway.ts";
 import { payloadNumber, payloadText, type Payload } from "./payload.ts";
 import { toItemsOutcome, toOutcome } from "./results.ts";
-import { flag, integer, isUuid, oneOf, text } from "./values.ts";
+import { flag, integer, isUuid, oneOf, optionalText, text } from "./values.ts";
 
 /**
  * Notifications and reminders on the real database (BR40.2 to BR40.8, BR42.1, BR42.3): the parent's own
@@ -57,6 +57,7 @@ export async function listNotifications(
           Object.freeze({
             id: text(row, "id"),
             title: text(row, "title"),
+            ...(optionalText(row, "text") ? { text: optionalText(row, "text") as string } : {}),
             link: text(row, "link"),
             isRead: flag(row, "is_read"),
             timing: oneOf(row, "timing", TIMINGS),

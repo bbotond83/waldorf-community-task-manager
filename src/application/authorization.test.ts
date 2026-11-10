@@ -100,6 +100,97 @@ describe("AuthorizationContract", () => {
     }
   });
 
+  it("lets every role read the rota overview, and only a parent or a super admin open a duty card (BR24.1, BR24.2)", async () => {
+    for (const [role, scope] of [
+      ["parent", familyScope],
+      ["group_admin", groupScope],
+      ["kindergarten_teacher", organizationScope],
+      ["super_admin", organizationScope],
+    ] as const) {
+      const session = makeSession(role, scope);
+      const overview = await contractFor(session).authorize(session, {
+        matrixRowId: "AUTH-ROTA-OVERVIEW",
+        action: "read",
+        resource: "rota",
+        scope,
+      });
+      assert.equal(overview.state, "success", `${role} overview`);
+      const card = await contractFor(session).authorize(session, {
+        matrixRowId: "AUTH-ROTA-DUTY",
+        action: "read",
+        resource: "rota_duty",
+        scope,
+      });
+      assert.equal(
+        card.state,
+        role === "parent" || role === "super_admin" ? "success" : "denied",
+        `${role} card`,
+      );
+    }
+  });
+
+  it("opens a duty card to a group admin only as a parent of the holding family (BR24.2)", async () => {
+    const alone = makeSession("group_admin", groupScope);
+    const both: SessionContext = {
+      ...alone,
+      grants: [
+        ...alone.grants,
+        ...sessionGrantBindings(alone.subjectId, "parent", [familyScope]).grants,
+      ],
+      roles: ["group_admin", "parent"],
+      scopes: [groupScope, familyScope],
+    };
+    const read = (session: SessionContext, scope: Scope) =>
+      contractFor(session).authorize(session, {
+        matrixRowId: "AUTH-ROTA-DUTY",
+        action: "read",
+        resource: "rota_duty",
+        scope,
+      });
+    assert.equal((await read(alone, groupScope)).state, "denied", "group admin grant alone");
+    assert.equal((await read(both, familyScope)).state, "success", "also a parent");
+    assert.equal(
+      (await read(both, { ...familyScope, id: "other" })).state,
+      "denied",
+      "other family",
+    );
+  });
+
+  it("limits the school calendar and the rota plan to a super admin (BR20.2, BR21.1)", async () => {
+    for (const [role, scope] of [
+      ["parent", familyScope],
+      ["group_admin", groupScope],
+      ["kindergarten_teacher", organizationScope],
+      ["super_admin", organizationScope],
+    ] as const) {
+      const session = makeSession(role, scope);
+      for (const resource of ["school_calendar", "rota_plan"]) {
+        const result = await contractFor(session).authorize(session, {
+          matrixRowId: "AUTH-SUPER-ROTA",
+          action: "manage",
+          resource,
+          scope,
+        });
+        assert.equal(
+          result.state,
+          role === "super_admin" ? "success" : "denied",
+          `${role} ${resource}`,
+        );
+      }
+    }
+  });
+
+  it("gives the rota rows no menu entry until their pages exist, so no role is sent to a missing page", async () => {
+    const session = makeSession("super_admin", organizationScope);
+    const navigation = await contractFor(session).navigation(session);
+    assert.equal(navigation.state, "success");
+    if (navigation.state !== "success") return;
+    assert.equal(
+      navigation.data.items.some((item) => /beosztas|tanev/.test(item.href)),
+      false,
+    );
+  });
+
   it("limits governance to Super Administrator", async () => {
     const kindergarten = makeSession("group_admin", groupScope);
     const denied = await contractFor(kindergarten).authorize(kindergarten, {

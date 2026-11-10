@@ -10,14 +10,25 @@ test.beforeEach(async () => world().reseed());
 const ROLES = ["parent-1", "group-admin-1", "teacher-1", "super-admin"] as const;
 type Tag = (typeof ROLES)[number];
 
-const PARENT_PAGES = ["/szulo/ertesitesek", "/szulo/feladatok", "/szulo/cserek"] as const;
+const PARENT_PAGES = [
+  "/szulo/ertesitesek",
+  "/szulo/feladatok",
+  "/szulo/cserek",
+  "/szulo/beosztas",
+] as const;
 const WORK_PAGES = [
   "/admin",
   "/admin/feladatok",
   "/admin/jovahagyasok",
   "/admin/archivum",
 ] as const;
-const SUPER_PAGES = ["/admin/emlekeztetok", "/admin/adatvedelem", "/admin/beallitasok"] as const;
+const SUPER_PAGES = [
+  "/admin/emlekeztetok",
+  "/admin/adatvedelem",
+  "/admin/beallitasok",
+  "/admin/tanev",
+  "/admin/beosztas",
+] as const;
 
 const ALLOWED: Record<Tag, readonly string[]> = {
   "parent-1": [...PARENT_PAGES, "/szulo/munkacsoportok"],
@@ -28,7 +39,7 @@ const ALLOWED: Record<Tag, readonly string[]> = {
     ...WORK_PAGES,
     "/admin/munkacsoportok",
   ],
-  "teacher-1": ["/teacher/schedule", "/teacher/munkacsoportok"],
+  "teacher-1": ["/teacher/schedule", "/teacher/munkacsoportok", "/teacher/beosztas"],
   "super-admin": [...WORK_PAGES, "/admin/nyilvantartasok", ...SUPER_PAGES, "/admin/munkacsoportok"],
 };
 
@@ -41,6 +52,7 @@ const ALL_ROUTES = [
   ...SUPER_PAGES,
   "/teacher/schedule",
   "/teacher/munkacsoportok",
+  "/teacher/beosztas",
 ];
 
 /** A whole area refuses with a heading; a page inside a person's own area with a line in its content. */

@@ -63,7 +63,7 @@ export async function writeSeedPlan(client: SqlClient, plan: SeedPlan): Promise<
     await insertRows(
       client,
       "school_years",
-      ["id", "organization_id", "name", "starts_on", "ends_on"],
+      ["id", "organization_id", "name", "starts_on", "ends_on", "changeover_date"],
       [
         [
           plan.schoolYear.id,
@@ -71,8 +71,21 @@ export async function writeSeedPlan(client: SqlClient, plan: SeedPlan): Promise<
           plan.schoolYear.name,
           plan.schoolYear.startsOn,
           plan.schoolYear.endsOn,
+          plan.schoolYear.changeoverDate,
         ],
       ],
+    );
+    await insertRows(
+      client,
+      "break_weeks",
+      ["id", "organization_id", "school_year_id", "week_start", "label"],
+      plan.breakWeeks.map((week) => [
+        week.id,
+        organization,
+        plan.schoolYear.id,
+        week.weekStart,
+        week.label,
+      ]),
     );
     await insertRows(
       client,

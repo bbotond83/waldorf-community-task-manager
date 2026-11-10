@@ -188,6 +188,7 @@ test("Teacher's menu lists Beosztás and Munkacsoportok, and the way back works 
   await page.goto("/teacher/schedule");
   await expect(page.getByTestId("app-shell-navigation").getByRole("link")).toHaveText([
     "Beosztás",
+    "Takarítás",
     "Munkacsoportok",
   ]);
   await expect(page.getByTestId("brand-link")).toHaveAttribute("href", "/teacher/schedule");

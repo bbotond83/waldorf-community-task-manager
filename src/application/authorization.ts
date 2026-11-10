@@ -85,6 +85,32 @@ export const AUTHORIZATION_MATRIX: readonly MatrixRow[] = Object.freeze([
     fields: [],
   },
   {
+    // The published rota: every signed-in role reads it (BR24.1). The menus are in `src/runtime/navigation.ts`.
+    id: "AUTH-ROTA-OVERVIEW",
+    roles: ["parent", "group_admin", "kindergarten_teacher", "super_admin"],
+    actions: ["read"],
+    resources: ["rota"],
+    fields: [],
+  },
+  {
+    // A duty card opens for a parent of the holding family and for a super admin; the database decides which (BR24.2).
+    // A group admin who is also a parent of that family holds the parent grant and opens it as a parent; a group
+    // admin grant alone gives no card.
+    id: "AUTH-ROTA-DUTY",
+    roles: ["parent", "super_admin"],
+    actions: ["read"],
+    resources: ["rota_duty"],
+    fields: [],
+  },
+  {
+    // The school calendar and the rota plan are a super admin's alone (BR20.2, BR21.1).
+    id: "AUTH-SUPER-ROTA",
+    roles: ["super_admin"],
+    actions: ["read", "create", "update", "delete", "manage"],
+    resources: ["school_calendar", "rota_plan"],
+    fields: [],
+  },
+  {
     id: "AUTH-SUPER-ADMIN",
     roles: ["super_admin"],
     actions: ["read", "create", "update", "delete", "manage"],

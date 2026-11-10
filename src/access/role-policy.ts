@@ -22,7 +22,10 @@ export function isValidScope(scope: Scope): boolean {
 }
 export function isRoleScope(role: unknown, scope: Scope): boolean {
   if (!isCurrentRole(role) || !isValidScope(scope)) return false;
-  return scope.type === (role === "parent" ? "family" : role === "group_admin" ? "group" : "organization");
+  return (
+    scope.type ===
+    (role === "parent" ? "family" : role === "group_admin" ? "group" : "organization")
+  );
 }
 export function scopeContains(grant: Scope, requested: Scope): boolean {
   return (
@@ -82,6 +85,8 @@ export function grantAllows(
   if (FAMILY_ONLY_ACTIONS.includes(request.action) && grant.role !== "parent") return false;
   // Every signed-in role reads the working groups (BR2.3).
   if (request.resource.kind === "working_group") return request.action === "read";
+  // Every signed-in role reads the published rota (BR24.1).
+  if (request.resource.kind === "rota") return request.action === "read";
   switch (grant.role) {
     case "super_admin":
       return true;
@@ -108,6 +113,10 @@ function parentCan({ action, resource }: AuthorizationRequest): boolean {
   if (resource.field && !TRACKING_FIELDS.has(resource.field)) return false;
   switch (resource.kind) {
     case "family":
+      return action === "read";
+    // A duty card of the family's own rota duty; the database checks that the family holds it (BR24.2). This also
+    // serves a group admin who is a parent: the parent grant carries the read, the group admin grant adds nothing.
+    case "rota_duty":
       return action === "read";
     case "assignment":
       return action === "read" || action === "create";

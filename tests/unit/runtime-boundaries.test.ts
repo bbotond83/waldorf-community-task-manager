@@ -108,8 +108,11 @@ describe("role navigation", () => {
   });
 
   it("gives the super admin the group menu, records and the three super admin pages, the teacher two items", () => {
+    // The group admin's own link to the parent overview has no twin: the super admin plans the rota instead.
     expect(SUPER_ADMIN_NAVIGATION.map((item) => item.id)).toEqual(
-      expect.arrayContaining(GROUP_ADMIN_NAVIGATION.map((item) => item.id)),
+      expect.arrayContaining(
+        GROUP_ADMIN_NAVIGATION.map((item) => item.id).filter((id) => id !== "admin-rota-overview"),
+      ),
     );
     expect(SUPER_ADMIN_NAVIGATION.map((item) => item.id).slice(-3)).toEqual([
       "admin-reminders",
@@ -119,11 +122,13 @@ describe("role navigation", () => {
     expect(SUPER_ADMIN_NAVIGATION.map((item) => item.id)).toContain("admin-records");
     expect(TEACHER_NAVIGATION.map((item) => item.id)).toEqual([
       "teacher-schedule",
+      "teacher-rota",
       "teacher-working-groups",
     ]);
     expect(PARENT_NAVIGATION.map((item) => item.id)).toEqual([
       "parent-notifications",
       "parent-duties",
+      "parent-rota",
       "parent-swaps",
       "parent-working-groups",
     ]);

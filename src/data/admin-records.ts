@@ -362,6 +362,8 @@ export async function saveRecord(
         starts_on:
           payloadText(payload, "startsOn") ?? (current ? text(current, "starts_on") : undefined),
         ends_on: payloadText(payload, "endsOn") ?? (current ? text(current, "ends_on") : undefined),
+        // Absent keeps the stored date; the database refuses a date before the year starts (BR20.3).
+        changeover_date: payloadText(payload, "changeoverDate"),
       });
       const envelope = await gateway.call(
         "structure_save",
