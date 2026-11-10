@@ -16,6 +16,7 @@ export {
   type AccessContext,
   type ParentLink,
 } from "./session.ts";
+export { createRotaPort } from "./rota.ts";
 export { createTeacherPort } from "./teacher-port.ts";
 export { createWorkingGroupPort } from "./working-groups.ts";
 

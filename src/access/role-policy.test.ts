@@ -130,6 +130,99 @@ test("authorization versions use the supported positive database range", () => {
     assert.equal(isAuthorizationVersion(value), false);
 });
 
+test("every signed-in role reads the published rota and nothing more of it (BR24.1)", () => {
+  const holders: [RoleGrant["role"], Scope][] = [
+    ["parent", family],
+    ["group_admin", group],
+    ["kindergarten_teacher", org],
+    ["super_admin", org],
+  ];
+  for (const [role, scope] of holders) {
+    const holder = grant(role, scope);
+    assert.equal(
+      grantAllows(holder, { action: "read", resource: { kind: "rota", scope } }),
+      true,
+      role,
+    );
+    for (const action of ["create", "update", "delete", "manage"] as const)
+      assert.equal(
+        grantAllows(holder, { action, resource: { kind: "rota", scope } }),
+        false,
+        `${role} ${action}`,
+      );
+  }
+});
+
+test("the school calendar and the rota plan belong to a super admin alone (BR20.2, BR21.1)", () => {
+  for (const kind of ["school_calendar", "rota_plan"]) {
+    for (const action of ["read", "create", "update", "delete", "manage"] as const)
+      assert.equal(
+        grantAllows(grant("super_admin", org), { action, resource: { kind, scope: org } }),
+        true,
+        `${kind} ${action}`,
+      );
+    for (const [role, scope] of [
+      ["parent", family],
+      ["group_admin", group],
+      ["kindergarten_teacher", org],
+    ] as const)
+      for (const action of ["read", "create", "update", "delete", "manage"] as const)
+        assert.equal(
+          grantAllows(grant(role, scope), { action, resource: { kind, scope } }),
+          false,
+          `${role} ${kind} ${action}`,
+        );
+  }
+});
+
+test("a duty card is read by a parent of the family and by a super admin, never changed (BR24.2)", () => {
+  assert.equal(
+    grantAllows(grant("parent", family), {
+      action: "read",
+      resource: { kind: "rota_duty", scope: family },
+    }),
+    true,
+  );
+  assert.equal(
+    grantAllows(grant("super_admin", org), {
+      action: "read",
+      resource: { kind: "rota_duty", scope: org },
+    }),
+    true,
+  );
+  for (const action of ["create", "update", "delete", "manage"] as const)
+    assert.equal(
+      grantAllows(grant("parent", family), {
+        action,
+        resource: { kind: "rota_duty", scope: family },
+      }),
+      false,
+      action,
+    );
+  assert.equal(
+    grantAllows(grant("kindergarten_teacher", org), {
+      action: "read",
+      resource: { kind: "rota_duty", scope: org },
+    }),
+    false,
+  );
+  assert.equal(
+    grantAllows(grant("group_admin", group), {
+      action: "read",
+      resource: { kind: "rota_duty", scope: group },
+    }),
+    false,
+  );
+  // A parent of another family cannot reach it through a scope that is not their own.
+  assert.equal(
+    grantAllows(grant("parent", family), {
+      action: "read",
+      resource: { kind: "rota_duty", scope: { ...family, id: "other" } },
+    }),
+    false,
+  );
+});
+
 test("Group admin preserves scoped queue/year reads without generic advanced dispatch", () => {
   const admin = grant("group_admin", group);
   for (const kind of ["admin_queue", "school_year"]) {

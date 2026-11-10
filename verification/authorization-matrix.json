@@ -162,6 +162,126 @@
       "effect": "allow"
     },
     {
+      "id": "AUTH-ROTA-OVERVIEW-PARENT-ALLOW",
+      "role": "parent",
+      "scope": "community",
+      "route": "/szulo/beosztas",
+      "actions": ["read"],
+      "resources": ["rota"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-ROTA-OVERVIEW-TEACHER-ALLOW",
+      "role": "kindergarten_teacher",
+      "scope": "community",
+      "route": "/teacher/beosztas",
+      "actions": ["read"],
+      "resources": ["rota"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-ROTA-OVERVIEW-GROUP-ADMIN-ALLOW",
+      "role": "group_admin",
+      "scope": "community",
+      "route": "/szulo/beosztas",
+      "actions": ["read"],
+      "resources": ["rota"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-ROTA-OVERVIEW-SUPER-ADMIN-ALLOW",
+      "role": "super_admin",
+      "scope": "community",
+      "route": "/admin/beosztas",
+      "actions": ["read"],
+      "resources": ["rota"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-ROTA-DUTY-PARENT-ALLOW",
+      "role": "parent",
+      "scope": "linked-family",
+      "route": "/szulo/beosztas/**",
+      "actions": ["read"],
+      "resources": ["rota_duty"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-ROTA-DUTY-OTHER-FAMILY-DENY",
+      "role": "parent",
+      "scope": "unrelated-family",
+      "route": "/szulo/beosztas/**",
+      "actions": ["read"],
+      "resources": ["rota_duty"],
+      "fields": [],
+      "effect": "deny"
+    },
+    {
+      "id": "AUTH-ROTA-DUTY-SUPER-ADMIN-ALLOW",
+      "role": "super_admin",
+      "scope": "organization",
+      "route": "/admin/beosztas/**",
+      "actions": ["read"],
+      "resources": ["rota_duty"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-ROTA-DUTY-GROUP-ADMIN-PARENT-ALLOW",
+      "role": "group_admin",
+      "scope": "linked-family",
+      "route": "/szulo/beosztas/**",
+      "actions": ["read"],
+      "resources": ["rota_duty"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-ROTA-DUTY-TEACHER-GROUP-ADMIN-DENY",
+      "role": "any_authenticated",
+      "scope": "teacher-or-group-admin-without-holding-family",
+      "route": "/szulo/beosztas/**",
+      "actions": ["read"],
+      "resources": ["rota_duty"],
+      "fields": [],
+      "effect": "deny"
+    },
+    {
+      "id": "AUTH-ROTA-DUTY-ADMIN-AREA-NON-SUPER-DENY",
+      "role": "any_authenticated",
+      "scope": "non-super-role",
+      "route": "/admin/beosztas/**",
+      "actions": ["read"],
+      "resources": ["rota_duty"],
+      "fields": [],
+      "effect": "deny"
+    },
+    {
+      "id": "AUTH-ROTA-PLANNING-SUPER-ADMIN-ALLOW",
+      "role": "super_admin",
+      "scope": "organization",
+      "route": "/admin/tanev|/admin/beosztas",
+      "actions": ["read", "create", "update", "delete", "manage"],
+      "resources": ["school_calendar", "rota_plan"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-ROTA-PLANNING-NON-SUPER-DENY",
+      "role": "any_authenticated",
+      "scope": "non-super-role",
+      "route": "/admin/tanev|/admin/beosztas",
+      "actions": ["read", "create", "update", "delete", "manage"],
+      "resources": ["school_calendar", "rota_plan"],
+      "fields": [],
+      "effect": "deny"
+    },
+    {
       "id": "AUTH-GROUP-ADMIN-OUT-OF-SCOPE-DENY",
       "role": "group_admin",
       "scope": "ungranted-group",

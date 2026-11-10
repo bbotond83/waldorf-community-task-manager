@@ -3,6 +3,7 @@ import {
   AuthorizationContract,
   FacadePipeline,
   ParentApplicationFacade,
+  RotaApplicationFacade,
   TeacherApplicationFacade,
   WorkingGroupApplicationFacade,
 } from "../../application/index.ts";
@@ -10,6 +11,7 @@ import {
   classifyDataFailure,
   createAdminPort,
   createParentPort,
+  createRotaPort,
   createTeacherPort,
   createVersionPort,
   createWorkingGroupPort,
@@ -30,6 +32,8 @@ export type RequestServices = Readonly<{
   admin: AdminApplicationFacade;
   teacher: TeacherApplicationFacade;
   workingGroups: WorkingGroupApplicationFacade;
+  /** The school calendar and the rota (U2); the screens that use it come after the owner's design approval. */
+  rota: RotaApplicationFacade;
 }>;
 
 export interface ProductionServices {
@@ -54,6 +58,7 @@ export function createProductionServices(database: DatabaseClient): ProductionSe
           pipeline,
           createWorkingGroupPort(asPerson),
         ),
+        rota: new RotaApplicationFacade(pipeline, createRotaPort(asPerson)),
       });
     },
   };

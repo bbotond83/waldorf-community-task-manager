@@ -88,7 +88,16 @@ export interface SeedPlan {
   schema: string;
   size: SeedSize;
   organization: { id: string; name: string };
-  schoolYear: { id: string; name: string; startsOn: string; endsOn: string };
+  schoolYear: {
+    id: string;
+    name: string;
+    startsOn: string;
+    endsOn: string;
+    /** The date a year's rota rows change over to the next year (BR20.3). */
+    changeoverDate: string;
+  };
+  /** Invented school-break weeks of the year, each the Monday of its week (BR20.1). No rota plan is seeded. */
+  breakWeeks: { id: string; weekStart: string; label: string }[];
   groups: { id: string; name: string; description: string }[];
   families: { id: string; name: string }[];
   memberships: { id: string; parentId: string; groupId: string }[];
@@ -299,6 +308,14 @@ export const SEED_STAFF_TAGS = {
   teacher1: "teacher-1",
 } as const;
 
+/** Invented break weeks of 2026-2027: the autumn, two winter and the spring break, by the Monday of each week. */
+const BREAK_WEEKS = [
+  { weekStart: "2026-11-02", label: "Őszi szünet" },
+  { weekStart: "2026-12-21", label: "Téli szünet" },
+  { weekStart: "2026-12-28", label: "Téli szünet" },
+  { weekStart: "2027-04-05", label: "Tavaszi szünet" },
+] as const;
+
 const pick = <T>(list: readonly T[], index: number): T => list[index % list.length]!;
 
 /**
@@ -314,7 +331,12 @@ export function buildSeedPlan(schema: string, size: SeedSize): SeedPlan {
     name: "2026-2027",
     startsOn: "2026-09-01",
     endsOn: "2027-06-30",
+    changeoverDate: "2027-07-01",
   };
+  const breakWeeks = BREAK_WEEKS.map((week, index) => ({
+    id: id(`break-week:${index + 1}`),
+    ...week,
+  }));
   const groups = WORKING_GROUPS.map((group, g) => ({ id: id(`group:${g + 1}`), ...group }));
   // Invented events and tasks hang on these groups; every family has one of them as its first parent's group.
   const activeGroups = groups.slice(0, shape.activeGroups);
@@ -561,6 +583,7 @@ export function buildSeedPlan(schema: string, size: SeedSize): SeedPlan {
     size,
     organization,
     schoolYear,
+    breakWeeks,
     groups,
     families,
     memberships,

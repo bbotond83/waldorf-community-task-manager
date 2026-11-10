@@ -462,6 +462,22 @@ test("a school year keeps its dates unless new ones are sent", async () => {
   assert.equal(fake.rpcCalls[1]?.args.p_kind, "school_year");
 });
 
+test("a school year sends the changeover date it is given and leaves it out otherwise (BR20.3)", async () => {
+  const { fake, run } = admin({
+    rpc: () => envelope("success", null, { version: 2 }, id(4)),
+    table: tables({ school_years: [YEAR] }),
+  });
+  await run(
+    "records.save",
+    { id: id(4), expectedVersion: 1, name: "2026/27", changeoverDate: "2027-07-15" },
+    KEY,
+  );
+  assert.equal(
+    (fake.rpcCalls[0]?.args.p_payload as Record<string, unknown>).changeover_date,
+    "2027-07-15",
+  );
+});
+
 test("a child is saved through its family, whose version is read first, and read back", async () => {
   const { fake, run } = admin({
     rpc: () => envelope("success", null, { version: 4 }, id(1)),
@@ -608,6 +624,7 @@ const TASK = {
   location: "Konyha",
   status: "open",
   version: 4,
+  origin_kind: "manual",
 };
 
 test("events and tasks are listed together, soonest first, with the screens' status words", async () => {
@@ -625,7 +642,17 @@ test("events and tasks are listed together, soonest first, with the screens' sta
     status: "cancelled",
     starts_at: "2026-11-04T10:00:00+00:00",
   };
-  const { run } = admin({ table: tables({ events: [EVENT], tasks: [TASK, closed, cancelled] }) });
+  // A rota duty is in the same table and never in the list or the form (BR24.4).
+  const rotaDuty = {
+    ...TASK,
+    id: id(24),
+    title: "Belső takarítás",
+    origin_kind: "rota_week",
+    starts_at: "2026-11-05T10:00:00+00:00",
+  };
+  const { run } = admin({
+    table: tables({ events: [EVENT], tasks: [TASK, closed, cancelled, rotaDuty] }),
+  });
   const outcome = await run("tasks.list", {});
   assert.equal(outcome.state, "success");
   if (outcome.state !== "success") return;

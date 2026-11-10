@@ -114,6 +114,22 @@ account: after a successful sign-in the app opens the home page of the role (adm
 `.env.example` lists every setting name, with no values. If the development watcher reports `EMFILE: too many open
 files, watch`, start it with `WATCHPACK_POLLING=true npm run dev`.
 
+### The school calendar and the cleaning rota
+
+Sign in as the super admin to plan the indoor-cleaning rota for the year. The seed gives the 2026-2027 year a changeover
+date and four invented break weeks, and no plan.
+
+| Screen                    | Address                                | Who                                  | What it does                                                                                                                                 |
+| ------------------------- | -------------------------------------- | ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| Tanév                     | `/admin/tanev`                         | super admin                          | year dates, changeover date, break weeks (add, remove), the list of school weeks                                                             |
+| Beosztás tervezése        | `/admin/beosztas`                      | super admin                          | make a draft, change a week, discard, publish; shows what blocks publishing and each family's count of weeks                                 |
+| Beosztás                  | `/szulo/beosztas`, `/teacher/beosztas` | parent, group administrator, teacher | the published rota: week cards on a phone, a table on a computer, a family filter; "Még nincs közzétett beosztás." until a plan is published |
+| Takarítási feladat (card) | `/szulo/beosztas/[id]`                 | the family that holds the week       | the family, the week, the fixed instruction and the note that there is no fixed day                                                          |
+
+A draft is visible to the super admin only. Publishing creates one duty and one place for each week and a notice for each
+parent. A published plan cannot be changed or discarded in this version; to start over on your computer, reset the local
+database (`npm run db:reset`, then `npm run db:seed`).
+
 Build and run the production-compatible output locally with the same environment:
 
 ```bash

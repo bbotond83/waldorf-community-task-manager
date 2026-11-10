@@ -91,12 +91,25 @@ function writers(functions: Map<string, Fn>): Set<string> {
  */
 const IMPORT_WITHOUT_NOTICES = ["import_commit", "import_recover"];
 
+/**
+ * The Ovis tábla work's U2 adds two callable functions that change places: publishing a rota (it creates a duty
+ * and a place for every filled week, and writes its own one notice per parent inside the same transaction) and the
+ * done mark (it changes no one's schedule and sends no notice). Both decide their own behaviour, so neither is a
+ * wrapped use case of the hand-off list; `tests/database/rota-plan.test.ts` proves them (BR23.4, BR26.2).
+ */
+const ROTA_DECIDED_ITSELF = ["rota_plan_publish", "place_mark_done"];
+
 test("the use cases U4 must connect to notifications are exactly the callable functions that change assignments", () => {
   const functions = definitions();
   assert.ok(functions.size > 80, "the migrations were read");
   const callable = callableBySignedInAccounts();
   const changing = [...writers(functions)]
-    .filter((name) => callable.has(name) && !IMPORT_WITHOUT_NOTICES.includes(name))
+    .filter(
+      (name) =>
+        callable.has(name) &&
+        !IMPORT_WITHOUT_NOTICES.includes(name) &&
+        !ROTA_DECIDED_ITSELF.includes(name),
+    )
     .sort();
   const listed = NOTIFICATION_USE_CASES.map((name) => name.replaceAll(".", "_")).sort();
   assert.deepEqual(listed, changing);
@@ -118,6 +131,7 @@ test("the internal helpers that change assignments are reached only through list
   const listed = new Set([
     ...NOTIFICATION_USE_CASES.map((name) => name.replaceAll(".", "_")),
     ...IMPORT_WITHOUT_NOTICES,
+    ...ROTA_DECIDED_ITSELF,
   ]);
   for (const helper of internal) {
     const callers = [...functions.values()].filter(
@@ -136,6 +150,8 @@ test("the internal helpers that change assignments are reached only through list
  * `tests/database/notifications-handoff.test.ts`.
  */
 const WITHOUT_BEHAVIOUR = ["swap_withdraw", "cancellation_request", "family_restore"];
+/** U2 puts a wrapper on these two that only refuses a rota duty (BR25.1); it still writes no notice and plans no job. */
+const ROTA_GUARD_ONLY = ["swap_withdraw", "cancellation_request"];
 /** The two decisions share one body; the wrapper is placed there. */
 const SHARED_BODY: Record<string, string> = {
   swap_decide: "coordination_decide",
@@ -151,8 +167,17 @@ test("every use case of the list and every extra function has a U4 hook, or is d
   for (const name of all) {
     assert.ok(functions.has(name), `${name} exists`);
     if (WITHOUT_BEHAVIOUR.includes(name)) {
-      assert.equal(functions.has(`${name}_core`), false, `${name} has no wrapper`);
+      if (!ROTA_GUARD_ONLY.includes(name)) {
+        assert.equal(functions.has(`${name}_core`), false, `${name} has no wrapper`);
+      }
       assert.doesNotMatch(functions.get(name)!.body, /notification_after_|reminder_plan/, name);
+      if (functions.has(`${name}_core`)) {
+        assert.doesNotMatch(
+          functions.get(`${name}_core`)!.body,
+          /notification_after_|reminder_plan/,
+          name,
+        );
+      }
       continue;
     }
     const hooked = SHARED_BODY[name] ?? name;

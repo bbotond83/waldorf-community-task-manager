@@ -60,7 +60,13 @@ test("a parent's family comes from the linked Parent and the matching family gra
   assert.equal(access.data.profile.homePath, "/szulo/ertesitesek");
   assert.deepEqual(
     access.data.profile.navigation.map((item) => item.href),
-    ["/szulo/ertesitesek", "/szulo/feladatok", "/szulo/cserek", "/szulo/munkacsoportok"],
+    [
+      "/szulo/ertesitesek",
+      "/szulo/feladatok",
+      "/szulo/beosztas",
+      "/szulo/cserek",
+      "/szulo/munkacsoportok",
+    ],
   );
 });
 
@@ -163,7 +169,7 @@ test("a teacher holds the community, and others are denied to the home of their 
     assert.equal(access.data.profile.label, "Óvónő");
     assert.deepEqual(
       access.data.profile.navigation.map((item) => item.label),
-      ["Beosztás", "Munkacsoportok"],
+      ["Beosztás", "Takarítás", "Munkacsoportok"],
     );
     assert.equal(access.data.applicationSession.roles[0], "kindergarten_teacher");
   }

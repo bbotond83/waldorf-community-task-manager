@@ -46,6 +46,7 @@ describe("seed writer", () => {
     assert.deepEqual(tables(calls), [
       "organizations",
       "school_years",
+      "break_weeks",
       "groups",
       "families",
       "accounts",

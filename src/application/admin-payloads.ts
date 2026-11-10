@@ -40,6 +40,8 @@ export type AdminRecordPayload = Readonly<{
   /** School year: the first and last day (YYYY-MM-DD). */
   startsOn?: string;
   endsOn?: string;
+  /** School year: the day the year changes over (YYYY-MM-DD); absent keeps the stored day (BR20.3). */
+  changeoverDate?: string;
   /** Child: the family it belongs to. */
   familyId?: string;
   /** Family: parents and children by id; those not listed stay as they are. */

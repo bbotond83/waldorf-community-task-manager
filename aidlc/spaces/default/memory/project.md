@@ -64,6 +64,10 @@
 - NEVER enable executable deployment workflows before a deployable application and linked target project exist. (affirmed 2026-08-12)
 - NEVER enable executable deployment workflows before a deployable application and linked target project exist. (affirmed 2026-11-04)
 
+- NEVER put the real workbook, or any real person's name or contact details, in the repository. (affirmed 2026-11-08)
+
+- NEVER use the anonymised workbook until the owner has checked the re-run anonymiser's output. (affirmed 2026-11-08)
+
 ## Mandated
 
 <!-- Populated by practices-discovery affirmation gate. -->
@@ -116,6 +120,14 @@ None. (affirmed 2026-10-06)
 
 - ALWAYS check app/globals.css with an automated style check. (affirmed 2026-11-04)
 
+- ALWAYS apply the rule to deploy eligible changes to staging automatically only once a hosted site exists. (affirmed 2026-11-08)
+
+- ALWAYS test each database rule against the fixed list (allowed, refused, out of reach, outdated screen, repeated click, two people at once). (affirmed 2026-11-08)
+
+- ALWAYS design new screens in Stitch before building them and compare the built screen with that design in the owner's screenshot review. (affirmed 2026-11-08)
+
+- ALWAYS run the one-off migration script's automatic checks only with an invented workbook, and use the owner-checked anonymised workbook only for trial runs on the owner's computer. (affirmed 2026-11-08)
+
 ## Corrections
 
 <!-- Project-specific corrections from human feedback. -->
@@ -132,3 +144,5 @@ None. (affirmed 2026-10-06)
 - When coarse XL units are chosen to limit construction rounds, split the largest unit by owning block in Functional Design (learned 2026-10-12) <!-- cid:261012-real-backend-local:units-generation:fc6df1e488571404b0291288bd9cbdc6cc1d22b2797da312c8afdd6d94abd383 -->
 - The Supabase CLI local stack publishes ports on all interfaces; always have the start command verify that no non-loopback address answers and require an explicit acknowledgement flag, and treat the stack's well-known default keys as reachable from the network while it runs (learned 2026-10-12) <!-- cid:261012-real-backend-local:code-generation:1f344c7035e1c5e20342afcff4e20c88fbd901503f7c9133673cbabceb5439ae -->
 - In a verification command, write export PATH=... before the && chain, because a leading PATH=... assignment applies only to the first command and later parts would run on the wrong Node version (learned 2026-10-12) <!-- cid:261012-real-backend-local:code-generation:381cbff5fad47f19462ab785735ce86ee8f3121cb7cdfeeb6e0f063dabf6adbc -->
+- Keep no isCoordinator field on WorkingGroupMembership: the unrevoked group-admin grant is the single record, because ADR-010 keeps grants in Identity and a second copy could disagree. (learned 2026-11-10) <!-- cid:261108-ovis-tabla-workflow:functional-design:7ecc29ad8f42f661eebe4eae86d9135c370af5819bc25cc8e8700b8333904632 -->
+- npm run verify:local needs the local settings loaded first: source .env.database.local and export APP_SESSION_SECRET, APP_PUBLIC_URL and SMTP_FROM, otherwise the build fails with an invalid APP_SESSION_SECRET error. (learned 2026-11-10) <!-- cid:261108-ovis-tabla-workflow:functional-design:b7c24f43b28a3d04c61ba3d31e5f45c81632cbe254e1cc1f2592e2c1a8b783c6 -->

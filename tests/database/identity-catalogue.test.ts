@@ -211,6 +211,35 @@ export const ELEVATED: Record<
   end_admin: INTERNAL,
   working_group_list: "authenticated",
   family_name_list: "authenticated",
+  // Ovis tábla U2 (C3, C4, C5, C18, BR20 to BR27). The calendar, the draft, the adjusting, the publishing and the
+  // reads are signed-in commands and lists that check their caller themselves; the school calendar helpers, the
+  // shared duty and place functions, the rota guard and the two renamed cores are internal.
+  break_week_add: "authenticated",
+  break_week_remove: "authenticated",
+  place_mark_done: "authenticated",
+  rota_plan_make: "authenticated",
+  rota_week_set: "authenticated",
+  rota_plan_discard: "authenticated",
+  rota_plan_publish: "authenticated",
+  school_calendar_get: "authenticated",
+  rota_plan_get: "authenticated",
+  rota_overview: "authenticated",
+  rota_duty_card: "authenticated",
+  school_year_for: INTERNAL,
+  school_weeks: INTERNAL,
+  changeover_date: INTERNAL,
+  rota_pick_school_year: INTERNAL,
+  rota_lock_families: INTERNAL,
+  duty_create: INTERNAL,
+  place_lock: INTERNAL,
+  place_exchange: INTERNAL,
+  place_reassign: INTERNAL,
+  place_release: INTERNAL,
+  duty_rota_managed: INTERNAL,
+  duty_rota_managed_places: INTERNAL,
+  duty_rota_managed_request: INTERNAL,
+  swap_withdraw_core: INTERNAL,
+  cancellation_request_core: INTERNAL,
   // U5 audit purge (NFR1.68): deletes audit events older than 365 days. Elevated because no application role holds
   // a delete right on the audit table; it checks that the caller is the system, sets the transaction-local purge
   // setting for its own transaction only, and is called by identity_housekeeping (the service-role key).
@@ -248,6 +277,9 @@ const POLICY_TEST_COVERAGE: Record<string, string> = {
   reminder_jobs: "notifications-schema.test.ts (no policy: no direct access for any role)",
   reminder_recipients: "notifications-schema.test.ts (no policy: no direct access for any role)",
   reminder_attempts: "notifications-schema.test.ts (no policy: no direct access for any role)",
+  break_weeks: "rota-plan.test.ts (BR27.2 table access)",
+  rota_plans: "rota-plan.test.ts (BR27.2 table access)",
+  rota_weeks: "rota-plan.test.ts (BR27.2 table access)",
 };
 
 /**
@@ -281,6 +313,9 @@ const PROBE_DECISION: Record<string, string> = {
   tasks: "none: U3 table, probe branch comes with the rewrite of scope_probe",
   change_requests: "none: U3 table, probe branch comes with the rewrite of scope_probe",
   contribution_notes: "none: U3 table, never a detail screen",
+  break_weeks: "none: U2 table, never a detail screen",
+  rota_plans: "none: U2 table, read through the plan and overview functions, never a detail screen",
+  rota_weeks: "none: U2 table, read through the plan and overview functions, never a detail screen",
   // U4 tables: a notification, a reminder job and its rows are never a detail screen of the probe.
   notifications: "none: U4 table, never a detail screen",
   reminder_jobs: "none: U4 table, never a detail screen",

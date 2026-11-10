@@ -1,0 +1,26 @@
+{
+  "stage": "code-generation",
+  "unit": "u1-community-foundation",
+  "version": 1,
+  "writes": [
+    { "path": "README.md" },
+    { "path": "next.config.ts" },
+    { "path": "package.json" },
+    { "path": "package-lock.json" },
+    { "path": "app/admin/" },
+    { "path": "app/szulo/" },
+    { "path": "app/teacher/" },
+    { "path": "app/globals.css" },
+    { "path": "scripts/db/" },
+    { "path": "scripts/verification/" },
+    { "path": "src/access/" },
+    { "path": "src/application/" },
+    { "path": "src/data/" },
+    { "path": "src/identity/copy.ts" },
+    { "path": "src/import-parser/" },
+    { "path": "src/runtime/" },
+    { "path": "supabase/migrations/20261047_community_foundation.sql" },
+    { "path": "tests/" },
+    { "path": "verification/" }
+  ]
+}

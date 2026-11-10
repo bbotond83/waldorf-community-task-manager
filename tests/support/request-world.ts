@@ -5,8 +5,11 @@ import {
   IdempotencyCoordinator,
   InMemoryIdempotencyStore,
   ParentApplicationFacade,
+  RotaApplicationFacade,
   TeacherApplicationFacade,
   WorkingGroupApplicationFacade,
+  type DomainOutcome,
+  type RotaApplicationPort,
 } from "../../src/application/index.ts";
 import { createVersionPort } from "../../src/data/index.ts";
 import type { RequestServices } from "../../src/runtime/production/services.ts";
@@ -23,6 +26,43 @@ import {
   TeacherPortDouble,
   type TeacherScenario,
 } from "./port-doubles.ts";
+
+const deniedOutcome = async <T>(): Promise<DomainOutcome<T>> => ({ state: "denied" });
+
+export const ROTA_CARD_DUTY_ID = "duty-card-1";
+
+/** A rota port with nothing published: the overview is empty, everything else is refused. */
+const ROTA_PORT_DOUBLE: RotaApplicationPort = {
+  calendar: deniedOutcome,
+  addBreakWeek: deniedOutcome,
+  removeBreakWeek: deniedOutcome,
+  plan: deniedOutcome,
+  makeDraft: deniedOutcome,
+  setWeek: deniedOutcome,
+  discard: deniedOutcome,
+  publish: deniedOutcome,
+  overview: async () => ({
+    state: "success",
+    data: { overviewState: "nothing_published", items: [] },
+  }),
+  // One card exists, so a page test sees what the policy lets through; every other id is refused.
+  dutyCard: async ({ dutyId }) =>
+    dutyId === ROTA_CARD_DUTY_ID
+      ? {
+          state: "success",
+          data: {
+            dutyId,
+            job: "indoor_cleaning",
+            title: "Benti takarítás",
+            familyDisplayName: "Minta család 1",
+            weekStart: "2026-11-09",
+            weekEnd: "2026-11-15",
+            noFixedDay: true,
+            isBreakWeek: false,
+          },
+        }
+      : { state: "denied" },
+};
 
 /**
  * The signed-in request of the page, action and boundary tests. It stands in for `productionRequest()` of
@@ -184,6 +224,8 @@ export function createRequestWorld() {
           },
         }),
       }),
+      // The rota screens come after the owner's design approval; until then nothing is planned or published.
+      rota: new RotaApplicationFacade(pipeline, ROTA_PORT_DOUBLE),
     });
   }
 

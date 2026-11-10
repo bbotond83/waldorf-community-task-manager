@@ -50,6 +50,9 @@ export default async function ParentNotificationsPage() {
                   data-testid={`notification-link-${notification.id}`}
                 >
                   <h2>{notification.title}</h2>
+                  {notification.text ? (
+                    <p data-testid={`notification-text-${notification.id}`}>{notification.text}</p>
+                  ) : null}
                   <p>{TIMING_LABEL[notification.timing]}</p>
                   <p className="delivery-note">{PROVIDER_LABEL[notification.providerStatus]}</p>
                   <strong>{notification.isRead ? "Olvasott" : "Olvasatlan"}</strong>

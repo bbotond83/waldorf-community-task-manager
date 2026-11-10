@@ -122,6 +122,7 @@ describe("the other new words of the screens", () => {
     expect(items.map((item) => [item.id, item.label, item.href])).toEqual([
       ["parent-notifications", "Értesítések", "/szulo/ertesitesek"],
       ["parent-duties", "Feladatok", "/szulo/feladatok"],
+      ["parent-rota", "Beosztás", "/szulo/beosztas"],
       ["parent-swaps", "Cserék", "/szulo/cserek"],
       ["parent-working-groups", "Munkacsoportok", "/szulo/munkacsoportok"],
     ]);

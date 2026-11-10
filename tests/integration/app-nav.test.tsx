@@ -65,12 +65,13 @@ describe("AppNav", () => {
 describe("AppNav for a parent", () => {
   const parentItems = roleProfile("parent").navigation;
 
-  it("lists Értesítések before Feladatok, then Cserék and Munkacsoportok", () => {
+  it("lists Értesítések before Feladatok, then Beosztás, Cserék and Munkacsoportok", () => {
     render(<AppNav items={parentItems} />);
     const links = screen.getAllByRole("link");
     expect(links.map((link) => link.textContent)).toEqual([
       "Értesítések",
       "Feladatok",
+      "Beosztás",
       "Cserék",
       "Munkacsoportok",
     ]);

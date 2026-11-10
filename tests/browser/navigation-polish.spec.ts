@@ -77,6 +77,12 @@ for (const profile of ROLES) {
     }
     for (const path of menuPages(profile)) {
       await page.goto(path);
+      if (profile.id === "group-admin" && path.startsWith("/szulo/")) {
+        // The group admin's link to the rota overview opens the parent view, which has the parent menu (as
+        // with the "Szülői nézet" switch); the page itself must still open for the group admin.
+        await expect(page.getByTestId("rota-overview-page")).toBeVisible();
+        continue;
+      }
       const links = page.getByTestId("app-shell-navigation").getByRole("link");
       await expect(links).toHaveText(expectedLabels);
       const current = page.getByTestId("app-shell-navigation").locator('[aria-current="page"]');
@@ -87,6 +93,8 @@ for (const profile of ROLES) {
         expect(box?.height ?? 0).toBeGreaterThanOrEqual(44);
       }
     }
+    // The last menu page of a group admin is the parent view, so go home before checking the logo link.
+    await page.goto(profile.homePath);
     await expect(page.getByTestId("brand-link")).toHaveAttribute("href", profile.homePath);
   });
 

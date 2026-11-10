@@ -160,5 +160,13 @@
     "scope": "express",
     "status": "complete",
     "request": "4a381341"
+  },
+  {
+    "uuid": "01a1ba89-cbcc-77bf-bdd2-88c5ffd02db6",
+    "slug": "ovis-tabla-workflow",
+    "dirName": "261108-ovis-tabla-workflow",
+    "scope": "classic",
+    "status": "in-flight",
+    "request": "b64789e2"
   }
 ]

@@ -82,6 +82,9 @@ export type AuthorizationMatrixRowId =
   | "AUTH-TEACHER-TRACKING"
   | "AUTH-GROUP-ADMIN-CORE"
   | "AUTH-WORKING-GROUPS"
+  | "AUTH-ROTA-OVERVIEW"
+  | "AUTH-ROTA-DUTY"
+  | "AUTH-SUPER-ROTA"
   | "AUTH-SUPER-ADMIN"
   | "AUTH-SUPER-GOVERNANCE";
 
@@ -140,6 +143,8 @@ export type DutyDetailModel = Readonly<{
 export type NotificationModel = Readonly<{
   id: string;
   title: string;
+  /** A line under the title where the title alone is not enough: the weeks of a published rota (BR23.4). */
+  text?: string;
   link: string;
   isRead: boolean;
   timing: "7-day" | "24-hour" | "within-threshold" | "stale" | "cancelled";
@@ -166,6 +171,106 @@ export type WorkingGroupItem = Readonly<{
   schoolYearName: string;
 }>;
 export type WorkingGroupListModel = Readonly<{ items: readonly WorkingGroupItem[] }>;
+
+/** The school year a calendar or plan screen is showing. */
+export type RotaSchoolYear = Readonly<{
+  id: string;
+  name: string;
+  startsOn?: string;
+  endsOn?: string;
+  changeoverDate?: string;
+  version?: number;
+}>;
+
+/** One school week of the calendar (BR20.4); a break week carries the id and version needed to remove it. */
+export type SchoolWeekItem = Readonly<{
+  weekStart: string;
+  isBreak: boolean;
+  breakWeekId?: string;
+  label?: string;
+  version?: number;
+}>;
+
+/** The calendar screen (W1): the year, its weeks, and the filled rota weeks that are now break weeks (BR20.5). */
+export type SchoolCalendarModel = Readonly<{
+  schoolYear?: RotaSchoolYear;
+  schoolYears: readonly Readonly<{ id: string; name: string }>[];
+  weeks: readonly SchoolWeekItem[];
+  warnings: readonly Readonly<{ weekStart: string; familyDisplayName: string }>[];
+  hasPlan: boolean;
+}>;
+
+/** One week of the plan being adjusted (BR21.2, BR22.1). */
+export type RotaPlanWeek = Readonly<{
+  id: string;
+  weekStart: string;
+  isBreak: boolean;
+  familyId?: string;
+  familyDisplayName?: string;
+  emptyReason?: "no_family" | "cleared";
+  changedByAdmin: boolean;
+  version: number;
+}>;
+
+export type RotaFamilyCount = Readonly<{
+  familyId: string;
+  displayName: string;
+  weeks: number;
+  aboveLowest: boolean;
+}>;
+
+/** The planning screen (W2 to W5): the draft or published plan, family counts, and what blocks publishing. */
+export type RotaPlanModel = Readonly<{
+  schoolYear?: RotaSchoolYear;
+  plan?: Readonly<{
+    id: string;
+    status: "draft" | "published";
+    version: number;
+    publishedAt?: string;
+  }>;
+  weekCount?: number;
+  weeks: readonly RotaPlanWeek[];
+  families: readonly RotaFamilyCount[];
+  changedWeeks: number;
+  blockers: Readonly<{
+    emptyWeeks: readonly string[];
+    breakWeeks: readonly string[];
+    ineligibleWeeks: readonly string[];
+  }>;
+  canPublish: boolean;
+}>;
+
+/** One week of the overview: only the family id and name, never a contact detail or a sharing choice (NFR1.2). */
+export type RotaOverviewItem = Readonly<{
+  job: "indoor_cleaning";
+  weekStart: string;
+  isBreak: boolean;
+  familyId?: string;
+  familyDisplayName?: string;
+  isOwn: boolean;
+  dutyId?: string;
+}>;
+
+export type RotaOverviewModel = Readonly<{
+  overviewState: "nothing_published" | "published";
+  schoolYear?: Readonly<{ id: string; name: string }>;
+  items: readonly RotaOverviewItem[];
+}>;
+
+/** The duty card (W7): the week, the family and the fixed text key; there is no fixed day (BR24.2). */
+export type RotaDutyCardModel = Readonly<{
+  dutyId: string;
+  job: "indoor_cleaning";
+  title: string;
+  familyDisplayName: string;
+  weekStart: string;
+  weekEnd: string;
+  noFixedDay: true;
+  isBreakWeek: boolean;
+}>;
+
+/** The result of a command: the changed record's id and its new version. */
+export type RotaChangeModel = Readonly<{ id: string; version?: number }>;
 
 /** What the task form offers: active families by name only (BR3.10). */
 export type FamilyNameListModel = Readonly<{

@@ -1,0 +1,214 @@
+{
+  "stage": "code-generation",
+  "unit": "u2-first-rota-slice",
+  "version": 1,
+  "writes": [
+    {
+      "path": "app/globals.css"
+    },
+    {
+      "path": "app/szulo/ertesitesek/page.tsx"
+    },
+    {
+      "path": "package.json"
+    },
+    {
+      "path": "README.md"
+    },
+    {
+      "path": "scripts/db/seed/data.test.ts"
+    },
+    {
+      "path": "scripts/db/seed/data.ts"
+    },
+    {
+      "path": "scripts/db/seed/write.test.ts"
+    },
+    {
+      "path": "scripts/db/seed/write.ts"
+    },
+    {
+      "path": "scripts/db/shuffled-tests.ts"
+    },
+    {
+      "path": "src/access/role-policy.test.ts"
+    },
+    {
+      "path": "src/access/role-policy.ts"
+    },
+    {
+      "path": "src/application/admin-payloads.ts"
+    },
+    {
+      "path": "src/application/authorization.test.ts"
+    },
+    {
+      "path": "src/application/authorization.ts"
+    },
+    {
+      "path": "src/application/contracts.ts"
+    },
+    {
+      "path": "src/application/index.ts"
+    },
+    {
+      "path": "src/data/admin-port.test.ts"
+    },
+    {
+      "path": "src/data/admin-records.ts"
+    },
+    {
+      "path": "src/data/admin-tasks.ts"
+    },
+    {
+      "path": "src/data/index.ts"
+    },
+    {
+      "path": "src/data/notification-use-cases.test.ts"
+    },
+    {
+      "path": "src/data/notifications.ts"
+    },
+    {
+      "path": "src/runtime/navigation.ts"
+    },
+    {
+      "path": "src/runtime/production/access.test.ts"
+    },
+    {
+      "path": "src/runtime/production/services.ts"
+    },
+    {
+      "path": "tests/browser/community-roles.spec.ts"
+    },
+    {
+      "path": "tests/browser/functional-fixes.spec.ts"
+    },
+    {
+      "path": "tests/browser/runtime-foundation.spec.ts"
+    },
+    {
+      "path": "tests/browser/navigation-polish.spec.ts"
+    },
+    {
+      "path": "tests/browser/teacher-web.spec.ts"
+    },
+    {
+      "path": "tests/browser/visual-overhaul.spec.ts"
+    },
+    {
+      "path": "tests/coverage/production-inventory.test.ts"
+    },
+    {
+      "path": "tests/coverage/rota-card-pages.test.tsx"
+    },
+    {
+      "path": "tests/database/identity-catalogue.test.ts"
+    },
+    {
+      "path": "tests/integration/app-nav.test.tsx"
+    },
+    {
+      "path": "tests/integration/copy.test.ts"
+    },
+    {
+      "path": "tests/integration/runtime-shell.test.tsx"
+    },
+    {
+      "path": "tests/support/request-world.ts"
+    },
+    {
+      "path": "tests/unit/navigation-access.test.ts"
+    },
+    {
+      "path": "tests/unit/runtime-boundaries.test.ts"
+    },
+    {
+      "path": "verification/AUTHORIZATION.md"
+    },
+    {
+      "path": "verification/authorization-matrix.json"
+    },
+    {
+      "path": "verification/reports/local-acceptance.json"
+    },
+    {
+      "path": "verification/reports/local-acceptance.md"
+    },
+    {
+      "path": "verification/reports/outstanding-targets.md"
+    },
+    {
+      "path": "app/_identity/rota-facade.ts"
+    },
+    {
+      "path": "app/admin/_components/RotaParts.tsx"
+    },
+    {
+      "path": "app/admin/_lib/rota-state.ts"
+    },
+    {
+      "path": "app/admin/beosztas/"
+    },
+    {
+      "path": "app/admin/rota-actions.ts"
+    },
+    {
+      "path": "app/admin/tanev/"
+    },
+    {
+      "path": "app/szulo/beosztas/"
+    },
+    {
+      "path": "app/teacher/beosztas/"
+    },
+    {
+      "path": "src/application/rota-facade.test.ts"
+    },
+    {
+      "path": "src/application/rota-facade.ts"
+    },
+    {
+      "path": "src/application/rota-format.test.ts"
+    },
+    {
+      "path": "src/application/rota-format.ts"
+    },
+    {
+      "path": "src/data/rota.test.ts"
+    },
+    {
+      "path": "src/data/rota.ts"
+    },
+    {
+      "path": "src/runtime/RotaOverview.tsx"
+    },
+    {
+      "path": "supabase/migrations/20261048_first_rota_slice.sql"
+    },
+    {
+      "path": "tests/browser/rota-screenshots.spec.ts"
+    },
+    {
+      "path": "tests/browser/rota-timing.spec.ts"
+    },
+    {
+      "path": "tests/browser/rota.spec.ts"
+    },
+    {
+      "path": "tests/database/rota-calendar.test.ts"
+    },
+    {
+      "path": "tests/database/rota-migration.test.ts"
+    },
+    {
+      "path": "tests/database/rota-plan.test.ts"
+    },
+    {
+      "path": "tests/database/rota-support.ts"
+    },
+    {
+      "path": "tests/integration/rota.test.tsx"
+    }
+  ]
+}

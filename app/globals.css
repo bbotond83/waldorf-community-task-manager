@@ -1990,3 +1990,308 @@ nav a:hover {
 .site-header-switch {
   white-space: nowrap;
 }
+
+/*
+ * The school calendar and the rota (U2). Admin: Tanév and Beosztás tervezése, cream panels side by side from 56rem.
+ * Parent: week cards on a phone, a table from 44rem. No card sits inside a card; every control is at least 44px.
+ */
+.admin-rota-grid {
+  display: grid;
+  gap: 1.5rem;
+  margin-block: 1.5rem;
+}
+
+.admin-rota-panel {
+  min-width: 0;
+  margin-block: 1.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  background: var(--color-surface);
+  box-shadow: var(--shadow);
+}
+
+.admin-rota-grid > .admin-rota-panel {
+  margin-block: 0;
+}
+
+.admin-rota-panel h2,
+.admin-rota-warning h2,
+.admin-rota-state h2 {
+  margin-block: 0 0.75rem;
+  font-size: var(--text-headline-sm);
+}
+
+.admin-rota-panel h3 {
+  margin-block: 1.25rem 0.5rem;
+  font-size: var(--text-headline-sm);
+}
+
+.admin-rota-panel .admin-form {
+  border: 0;
+  padding: 0;
+  background: none;
+}
+
+.admin-rota-warning,
+.admin-rota-state {
+  margin-block: 1.5rem;
+  border-left: 0.35rem solid var(--color-primary);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  background: var(--color-danger-bg);
+}
+
+.admin-rota-warning p,
+.admin-rota-warning ul {
+  margin-block: 0.25rem;
+}
+
+.admin-rota-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.admin-rota-head h2 {
+  margin: 0;
+}
+
+.admin-rota-head p {
+  margin: 0.25rem 0 0;
+}
+
+.admin-rota-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.admin-rota-actions .admin-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.admin-rota-breaks {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0 0 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.admin-rota-breaks li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 0.5rem;
+}
+
+.admin-rota-breaks .admin-form {
+  display: block;
+}
+
+.admin-rota-table-wrapper,
+.parent-rota-table-wrapper {
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.admin-rota-table,
+.parent-rota-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-rota-table th,
+.admin-rota-table td,
+.parent-rota-table th,
+.parent-rota-table td {
+  padding: 0.75rem;
+  border-top: 1px solid var(--color-border);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.admin-rota-table thead th,
+.parent-rota-table thead th {
+  border-top: 0;
+  background: var(--color-info-bg);
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}
+
+.parent-rota-table caption {
+  padding: 1rem;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  text-align: left;
+}
+
+.admin-rota-table th .form-hint {
+  display: block;
+  font-weight: 400;
+}
+
+.admin-rota-row-break,
+.parent-rota-week-break {
+  background: var(--color-info-bg);
+}
+
+.admin-rota-row-empty {
+  background: var(--color-danger-bg);
+}
+
+.admin-rota-table .admin-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.admin-rota-table select {
+  min-height: 44px;
+  max-width: 100%;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  background: var(--color-surface);
+}
+
+.admin-rota-counts {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.admin-rota-counts li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.25rem 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 0.5rem;
+}
+
+.admin-rota-uneven {
+  flex-basis: 100%;
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}
+
+.parent-rota-list {
+  display: grid;
+  gap: 1rem;
+  margin: 0 0 1.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.parent-rota-week {
+  display: grid;
+  gap: 0.35rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  background: var(--color-surface);
+}
+
+.parent-rota-week p {
+  margin: 0;
+}
+
+.parent-rota-week-own {
+  border-left: 0.35rem solid var(--color-primary);
+  box-shadow: var(--shadow);
+}
+
+.parent-rota-dates {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.parent-rota-job {
+  color: var(--color-muted);
+}
+
+.parent-rota-family {
+  font-family: var(--font-heading);
+  font-size: var(--text-headline-sm);
+  font-weight: 600;
+}
+
+.parent-rota-own {
+  margin-left: 0.35rem;
+  border-radius: var(--radius-pill);
+  padding: 0.1rem 0.6rem;
+  background: var(--color-primary);
+  color: white;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+}
+
+.parent-rota-phase {
+  color: var(--color-muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.parent-rota-week .button-link {
+  justify-self: start;
+}
+
+.parent-rota-row-own th,
+.parent-rota-row-own td {
+  background: var(--color-danger-bg);
+}
+
+.parent-rota-warning {
+  border-left-color: var(--color-primary);
+  background: var(--color-danger-bg);
+}
+
+.parent-rota-card-page .parent-notice {
+  margin-block: 1rem;
+  border-radius: var(--radius);
+  background: var(--color-info-bg);
+}
+
+/* The overview is cards on a phone and a table from 44rem; the planning panels sit side by side from 56rem. */
+.parent-rota-table-wrapper {
+  display: none;
+}
+
+@media (min-width: 44rem) {
+  .parent-rota-list {
+    display: none;
+  }
+
+  .parent-rota-table-wrapper {
+    display: block;
+  }
+}
+
+@media (min-width: 56rem) {
+  .admin-rota-grid {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    align-items: start;
+  }
+
+  .admin-rota-grid-wide {
+    grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
+  }
+}
