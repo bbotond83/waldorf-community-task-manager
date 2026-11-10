@@ -71,10 +71,10 @@ for (const schema of IDENTITY_SCHEMAS) {
       for (const table of TABLES) await db.query(`drop table if exists ${table} cascade`);
     };
 
-    it("has dropped both placeholder tables after the migrations and kept the import table for U4", async () => {
+    it("has dropped every placeholder table after the migrations", async () => {
       assert.equal(await exists("app_families"), false);
       assert.equal(await exists("app_assignments"), false);
-      assert.equal(await exists("app_import_runs"), true);
+      assert.equal(await exists("app_import_runs"), false);
     });
 
     it("leaves no function, policy, view or foreign key that names a placeholder table", async () => {

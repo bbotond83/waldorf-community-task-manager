@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { empty, success, type AdminItemModel } from "../../src/application/index.ts";
+import { COMMUNITY_GROUP } from "../../src/application/admin-payloads.ts";
 
 const world = vi.hoisted(() => ({
   request: { state: "signed-out" } as unknown,
@@ -184,19 +185,72 @@ describe("the choices of the extended admin forms", () => {
             }),
           ],
         }),
+      listFamilyNames: async () => success({ items: [{ id: "f-1", displayName: "Fenyő család" }] }),
     };
-    const lookups = await loadAdminLookups(facade as never, {} as never, {} as never);
+    const workingGroups = {
+      list: async () =>
+        success({
+          items: [
+            {
+              id: "g-1",
+              name: "Boróka",
+              description: "Kert.",
+              schoolYearId: "y-1",
+              schoolYearName: "2026/2027",
+            },
+            {
+              id: "g-2",
+              name: "Süni",
+              description: "Udvar.",
+              schoolYearId: "y-1",
+              schoolYearName: "2026/2027",
+            },
+          ],
+        }),
+    };
+    const lookups = await loadAdminLookups(
+      facade as never,
+      workingGroups as never,
+      {} as never,
+      {} as never,
+      [],
+    );
     expect(lookups).toEqual({
       schoolYears: [{ value: "y-1", label: "2026/2027" }],
-      groups: [{ value: "g-1", label: "Boróka" }],
+      groups: [
+        { value: COMMUNITY_GROUP, label: "Egész közösség" },
+        { value: "g-1", label: "Boróka" },
+        { value: "g-2", label: "Süni" },
+      ],
       families: [{ value: "f-1", label: "Fenyő család" }],
-      events: [{ value: "e-1", label: "Ünnep", groupId: "g-1" }],
+      events: [
+        { value: "e-1", label: "Ünnep", groupId: "g-1" },
+        { value: "e-3", label: "Csoport nélkül", groupId: COMMUNITY_GROUP },
+      ],
     });
+    const asGroupAdmin = await loadAdminLookups(
+      facade as never,
+      workingGroups as never,
+      {} as never,
+      {} as never,
+      ["g-2"],
+    );
+    expect(asGroupAdmin.groups).toEqual([{ value: "g-2", label: "Süni" }]);
+    expect(asGroupAdmin.schoolYears).toEqual([]);
   });
 
   it("offers nothing when a list cannot be read", async () => {
-    const facade = { listRecords: async () => empty(), listTasks: async () => empty() };
-    expect(await loadAdminLookups(facade as never, {} as never, {} as never)).toEqual(NO_LOOKUPS);
+    const facade = {
+      listRecords: async () => empty(),
+      listTasks: async () => empty(),
+      listFamilyNames: async () => empty(),
+    };
+    const workingGroups = { list: async () => empty() };
+    expect(
+      await loadAdminLookups(facade as never, workingGroups as never, {} as never, {} as never, [
+        "g-1",
+      ]),
+    ).toEqual(NO_LOOKUPS);
   });
 });
 

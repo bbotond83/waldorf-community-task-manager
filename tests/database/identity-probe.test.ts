@@ -10,7 +10,6 @@ import {
   DEACTIVATED,
   FAMILY_1,
   IDENTITY_SCHEMAS,
-  IMPORT_RUN_1,
   openIdentityDatabase,
   OTHER_ADMIN,
   OUTSIDER,
@@ -50,14 +49,14 @@ for (const schema of IDENTITY_SCHEMAS) {
             .answer as string,
       );
 
-    it("answers allowed for a family to its parent, its group's admin and a super admin", async () => {
-      for (const account of [PARENT_F1, ADMIN_G1, SUPER_ADMIN]) {
+    it("answers allowed for a family to its parent and a super admin (BR3.9)", async () => {
+      for (const account of [PARENT_F1, SUPER_ADMIN]) {
         assert.equal(await probe(account, "family", FAMILY_1), "allowed", account);
       }
     });
 
     it("answers denied for a family that exists in the caller's organization but outside their scope", async () => {
-      for (const account of [PARENT_F2, ADMIN_G2, TEACHER_G1, OUTSIDER]) {
+      for (const account of [PARENT_F2, ADMIN_G1, ADMIN_G2, TEACHER_G1, OUTSIDER]) {
         assert.equal(await probe(account, "family", FAMILY_1), "denied", account);
       }
     });
@@ -83,7 +82,7 @@ for (const schema of IDENTITY_SCHEMAS) {
       }
     });
 
-    it("supports assignments (group admins and super admins) and import runs (super admins only)", async () => {
+    it("supports assignments (group admins and super admins)", async () => {
       await seedGroupAssignment(db);
       assert.equal(await probe(ADMIN_G1, "assignment", ASSIGNMENT_1), "allowed");
       assert.equal(await probe(SUPER_ADMIN, "assignment", ASSIGNMENT_1), "allowed");
@@ -94,9 +93,6 @@ for (const schema of IDENTITY_SCHEMAS) {
         "denied",
         "teachers have no raw table access",
       );
-      assert.equal(await probe(SUPER_ADMIN, "import_run", IMPORT_RUN_1), "allowed");
-      assert.equal(await probe(ADMIN_G1, "import_run", IMPORT_RUN_1), "denied");
-      assert.equal(await probe(OTHER_ADMIN, "import_run", IMPORT_RUN_1), "not_found");
     });
 
     it("answers denied to a signed-out, deactivated or unregistered token, whatever the record", async () => {

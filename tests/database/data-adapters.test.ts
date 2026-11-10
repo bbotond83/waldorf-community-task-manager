@@ -2,7 +2,6 @@ import assert from "node:assert/strict";
 import { randomBytes } from "node:crypto";
 import { after, before, beforeEach, describe, it } from "node:test";
 import type pg from "pg";
-import { parseWorkbook } from "../../src/import-parser/workbook.ts";
 import type { AdminOperation } from "../../src/application/index.ts";
 import {
   BUSINESS_CODE_STATES,
@@ -31,7 +30,7 @@ import {
   FAMILY_2,
   FAMILY_NO_GROUP,
   GROUP_1,
-  GROUP_2,
+  GROUP_OTHER,
   nextKey,
   openDirectoryDatabase,
   ORGANIZATION,
@@ -49,7 +48,7 @@ import {
   TEACHER_G1,
   uuid,
 } from "./directory-support.ts";
-import { count } from "./identity-support.ts";
+import { count, FAMILY_ADMIN_G1 } from "./identity-support.ts";
 import { report, stackSettings } from "./stack-support.ts";
 
 const settings = stackSettings();
@@ -103,7 +102,6 @@ type AdminData = Item & {
   candidates: { id: string; eligibility: string; version: number }[];
   scopeId: string;
   openApprovals: number;
-  openImportConflicts: number;
   selectedRecipientId: string;
   remindersEnabled: boolean;
   outcome: string;
@@ -143,7 +141,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
       schema,
     });
     const service = createSignInService({ url: apiUrl, publicKey: settings.publicKey });
-    const production = createProductionServices(database, { parseWorkbook });
+    const production = createProductionServices(database);
     const tokens = new Map<string, string>();
 
     /** The services of a request signed in as the account, with a real token from the sign-in service. */
@@ -185,10 +183,10 @@ for (const schema of DIRECTORY_SCHEMAS) {
     });
     beforeEach(async () => {
       await seedCoordinationWorld(db, schema);
-      // Family 2 also belongs to group 1, so the two families can swap and compete for places there.
+      // A group administrator is also a parent (BR3.2): the first one holds the parent right of their own family.
       await db.query(
-        "insert into group_memberships (organization_id, family_id, group_id) values ($1, $2, $3), ($1, $4, $3)",
-        [ORGANIZATION, FAMILY_2, GROUP_1, FAMILY_NO_GROUP],
+        "insert into app_role_grants (subject_id, role, scope_type, scope_id, organization_id) values ($1, 'parent', 'family', $2, $3)",
+        [ADMIN_G1, FAMILY_ADMIN_G1, ORGANIZATION],
       );
     });
 
@@ -340,8 +338,8 @@ for (const schema of DIRECTORY_SCHEMAS) {
         );
         assert.deepEqual(parentAsAdmin, { state: "denied", homePath: "/szulo/ertesitesek" });
         const adminAsParent = await resolveParentAccess(
-          (await services("adminSame")).database,
-          ADMIN_G1,
+          (await services("adminOther")).database,
+          ADMIN_G2,
         );
         assert.deepEqual(adminAsParent, { state: "denied", homePath: "/admin" });
         const teacherAsAdmin = await resolveAdminAccess(
@@ -373,22 +371,23 @@ for (const schema of DIRECTORY_SCHEMAS) {
     });
 
     describe("the parent port", () => {
-      it("lists the family's tasks with their states, and no other family's", async () => {
+      it("lists every open task of the community with its state, whichever group owns it (BR4.1)", async () => {
         const f1 = await (await asParent("parent")).list();
         assert.equal(f1.state, "success");
         if (f1.state !== "success") return;
         const byTitle = Object.fromEntries(f1.data.duties.map((duty) => [duty.title, duty]));
         assert.equal(byTitle["Sütés"]?.state, "cancellation-pending");
         assert.equal(byTitle["Kerti munka"]?.state, "available");
-        assert.equal(byTitle["Díszítés"], undefined, "a task of another group is not listed");
+        assert.equal(byTitle["Díszítés"]?.state, "available", "a task of another group is listed");
+        assert.equal(byTitle["Idegen feladat"], undefined, "another community's task is not");
         const f2 = await (await asParent("parentOther")).list();
         assert.equal(f2.state, "success");
         if (f2.state === "success") {
-          assert.deepEqual(
-            f2.data.duties.map((duty) => duty.title).sort(),
-            ["Díszítés", "Kerti munka", "Sütés"],
-            "family 2 is a member of both groups",
-          );
+          assert.deepEqual(f2.data.duties.map((duty) => duty.title).sort(), [
+            "Díszítés",
+            "Kerti munka",
+            "Sütés",
+          ]);
         }
       });
 
@@ -596,7 +595,6 @@ for (const schema of DIRECTORY_SCHEMAS) {
         assert.deepEqual(group1.data, {
           scopeId: ORGANIZATION,
           openApprovals: 1,
-          openImportConflicts: 0,
         });
         const group2 = await admin("adminOther", "dashboard.get");
         assert.equal(group2.data.openApprovals, 0);
@@ -618,11 +616,12 @@ for (const schema of DIRECTORY_SCHEMAS) {
           assert.ok(titles.includes(title), title);
         }
         assert.ok(!titles.includes("Idegen család"), "another organization's family is not listed");
-        const small = await admin("adminSame", "records.list", { q: "fenyő" });
-        assert.ok(small.data.items.every((item) => /fenyő/i.test(item.title)));
-        assert.ok(
-          !small.data.items.some((item) => item.title === "Napraforgó család"),
-          "outside the reach",
+        const filtered = await admin("super", "records.list", { q: "fenyő" });
+        assert.ok(filtered.data.items.every((item) => /fenyő/i.test(item.title)));
+        assert.deepEqual(
+          await admin("adminSame", "records.list", { q: "fenyő" }),
+          { state: "empty" },
+          "the policies show a group admin no family record (BR3.9); the facade refuses them first",
         );
         assert.deepEqual(await admin("super", "records.list", { q: "nincs ilyen nev" }), {
           state: "empty",
@@ -632,7 +631,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
         assert.equal(one.data.title, "Fenyő család");
         assert.equal(one.data.state, "active");
         assert.equal(one.data.version, 1);
-        // The form's fields: kind, parents with their contact details, children and the groups of the family.
+        // The form's fields: kind, parents with their contact details and children.
         assert.equal(one.data.kind, "family");
         const names = one.data.details.parents.map((parent) => parent.displayName);
         assert.ok(names.includes("Fenyő Anna"), "the parents are listed");
@@ -643,8 +642,9 @@ for (const schema of DIRECTORY_SCHEMAS) {
         assert.equal(anna.email, "anna@example.test");
         assert.equal(anna.linked, true);
         assert.ok(one.data.details.children.some((child) => child.displayName === "Fenyő Gergő"));
-        assert.ok(one.data.details.groups.length >= 1);
-        // Group 2's admin does not reach the family without a place in group 2.
+        assert.deepEqual(await admin("adminSame", "records.get", { id: FAMILY_1 }), {
+          state: "denied",
+        });
         assert.deepEqual(await admin("adminOther", "records.get", { id: FAMILY_NO_GROUP }), {
           state: "denied",
         });
@@ -662,8 +662,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
           "the consenting parent is listed",
         );
         assert.equal(consenting.optionalProfile, undefined, "no text, no profile shown");
-        // A group admin in reach reads the same, and a profile with text still comes through.
-        assert.equal((await admin("adminSame", "records.get", { id: FAMILY_1 })).state, "success");
+        // A profile with text still comes through.
         await db.query("update parents set optional_profile = 'Szívesen főzök.' where id = $1", [
           PARENT_ROW_F1,
         ]);
@@ -675,8 +674,8 @@ for (const schema of DIRECTORY_SCHEMAS) {
         );
       });
 
-      it("saves a family with parents, contact details, a child and a group, then changes only its name", async () => {
-        const created = await admin("adminSame", "records.save", {
+      it("saves a family with parents, contact details and a child, then changes only its name (super admin, BR3.9)", async () => {
+        const created = await admin("super", "records.save", {
           id: "new",
           expectedVersion: 1,
           kind: "family",
@@ -692,7 +691,6 @@ for (const schema of DIRECTORY_SCHEMAS) {
             },
           ],
           children: [{ displayName: "Új Gyerek" }],
-          addGroupIds: [GROUP_1],
         });
         assert.equal(created.state, "success");
         const id = created.data.id as string;
@@ -701,11 +699,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
           await count(db, "parent_contacts", "contact_email = 'uj.anna@example.test'"),
           1,
         );
-        assert.equal(
-          await count(db, "group_memberships", `family_id = '${id}' and group_id = '${GROUP_1}'`),
-          1,
-        );
-        const renamed = await admin("adminSame", "records.save", {
+        const renamed = await admin("super", "records.save", {
           id,
           expectedVersion: created.data.version,
           title: "Új család 2",
@@ -718,11 +712,11 @@ for (const schema of DIRECTORY_SCHEMAS) {
         );
         assert.equal(await count(db, "children", `family_id = '${id}'`), 1, "the child stayed");
         refused(
-          await admin("adminSame", "records.save", { id, expectedVersion: 1, title: "Régi" }),
+          await admin("super", "records.save", { id, expectedVersion: 1, title: "Régi" }),
           "conflict",
           "VERSION_CONFLICT",
         );
-        const outside = await admin("adminOther", "records.save", {
+        const outside = await admin("adminSame", "records.save", {
           id,
           expectedVersion: 9,
           title: "x",
@@ -737,7 +731,6 @@ for (const schema of DIRECTORY_SCHEMAS) {
           kind: "family",
           displayName: "Hibás",
           parents: [{ displayName: "Hiba", email: "not an address" }],
-          addGroupIds: [GROUP_1],
         });
         assert.equal(bad.state, "validation");
         assert.deepEqual(bad.fieldErrors, { "parents.contact.email": "VAL-INVALID" });
@@ -763,6 +756,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
           expectedVersion: 1,
           kind: "group",
           name: "Méhecske",
+          description: "Méhecske munkacsoport.",
           schoolYearId: year.data.id,
         });
         assert.equal(group.state, "success");
@@ -792,7 +786,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
         });
         assert.equal(forbidden.state, "denied");
 
-        const child = await admin("adminSame", "records.save", {
+        const child = await admin("super", "records.save", {
           id: "new",
           kind: "child",
           familyId: FAMILY_1,
@@ -800,7 +794,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
         });
         assert.equal(child.state, "success");
         assert.equal(child.data.title, "Fenyő Hanna");
-        const edited = await admin("adminSame", "records.save", {
+        const edited = await admin("super", "records.save", {
           id: child.data.id,
           expectedVersion: child.data.version,
           title: "Fenyő Hanna 2",
@@ -808,7 +802,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
         assert.equal(edited.data.title, "Fenyő Hanna 2");
         assert.equal(
           (
-            await admin("adminSame", "records.archive", {
+            await admin("super", "records.archive", {
               id: child.data.id,
               expectedVersion: edited.data.version,
             })
@@ -817,8 +811,12 @@ for (const schema of DIRECTORY_SCHEMAS) {
         );
       });
 
-      it("archives a family, withdrawing its future places, and restores it", async () => {
-        const archived = await admin("adminSame", "records.archive", {
+      it("archives a family, withdrawing its future places, and restores it (super admin, BR3.9)", async () => {
+        assert.deepEqual(
+          await admin("adminSame", "records.archive", { id: FAMILY_1, expectedVersion: 1 }),
+          { state: "denied" },
+        );
+        const archived = await admin("super", "records.archive", {
           id: FAMILY_1,
           expectedVersion: 1,
         });
@@ -973,7 +971,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
           grants.data.grants.find((grant) => grant.role === "kindergarten_teacher"),
           "the teacher grant is listed",
         );
-        assert.equal(target.scopeLabel, "Boróka");
+        assert.equal(target.scopeLabel, "Teljes szervezet", "a teacher serves the whole community");
         const revoked = await admin("super", "governance.update", {
           id: target.id,
           expectedVersion: target.version,
@@ -1017,18 +1015,23 @@ for (const schema of DIRECTORY_SCHEMAS) {
         assert.deepEqual(await admin("super", "lifecycle.list", {}), { state: "empty" });
         assert.equal((await admin("adminSame", "lifecycle.list", {})).state, "denied");
       });
-
-      it("answers an upload with denied when the port was built without a workbook parser", async () => {
-        assert.deepEqual(await admin("super", "import.preview", {}), { state: "denied" });
-      });
     });
 
     describe("the teacher port", () => {
-      it("returns the schedule of a granted group with the people's names and nothing private", async () => {
+      it("returns the whole community, one group or community-wide items with the people's names and nothing private (BR3.7, W6)", async () => {
         const { database: asTeacher } = await services("teacher");
         const port = createTeacherPort(asTeacher);
-        const scope = { id: GROUP_1, type: "group" as const, organizationId: ORGANIZATION };
-        const outcome = await port.getSchedule({ actorId: TEACHER_G1, groupScope: scope });
+        const scope = {
+          id: ORGANIZATION,
+          type: "organization" as const,
+          organizationId: ORGANIZATION,
+        };
+        const groupView = { kind: "group" as const, groupId: GROUP_1 };
+        const outcome = await port.getSchedule({
+          actorId: TEACHER_G1,
+          scope,
+          view: groupView,
+        });
         assert.equal(outcome.state, "success");
         if (outcome.state !== "success") return;
         const titles = outcome.data.entries.map((entry) => entry.title);
@@ -1039,14 +1042,26 @@ for (const schema of DIRECTORY_SCHEMAS) {
         assert.equal(baking.currentStatusLabel, "Nyitott");
         assert.ok(!JSON.stringify(outcome).includes("example.test"), "no contact detail");
         assert.ok(!JSON.stringify(outcome).includes("mogyoró"), "no allergen note");
-        const other = await port.getSchedule({
-          actorId: TEACHER_G1,
-          groupScope: { ...scope, id: GROUP_2 },
-        });
-        assert.deepEqual(other, { state: "denied" });
+        const all = await port.getSchedule({ actorId: TEACHER_G1, scope, view: { kind: "all" } });
+        assert.equal(all.state === "success" && all.data.entries.length, 3);
+        assert.deepEqual(
+          await port.getSchedule({ actorId: TEACHER_G1, scope, view: { kind: "community" } }),
+          { state: "empty" },
+          "no community-wide item yet",
+        );
+        assert.deepEqual(
+          await port.getSchedule({
+            actorId: TEACHER_G1,
+            scope,
+            view: { kind: "group", groupId: GROUP_OTHER },
+          }),
+          { state: "denied" },
+          "another community's group",
+        );
         const range = await port.getSchedule({
           actorId: TEACHER_G1,
-          groupScope: scope,
+          scope,
+          view: groupView,
           from: "2000-01-01",
           to: "2000-01-02",
         });
@@ -1130,7 +1145,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
         }
       });
 
-      it("serves the admin facade, the teacher facade, and answers import with the empty state before any upload", async () => {
+      it("serves the admin facade and the teacher facade", async () => {
         const request = await services("super");
         const access = await resolveAdminAccess(request.database, SUPER_ADMIN);
         assert.equal(access.state, "success");
@@ -1146,17 +1161,13 @@ for (const schema of DIRECTORY_SCHEMAS) {
           {},
         );
         assert.equal(records.state, "success");
-        const importStatus = await request.admin.import.status(
-          access.data.applicationSession,
-          access.data.scope,
-        );
-        assert.equal(importStatus.state, "empty", "no run yet: the empty state, no fixture data");
         const teacher = await services("teacher");
         const teacherAccess = await resolveTeacherAccess(teacher.database, TEACHER_G1);
         assert.equal(teacherAccess.state, "success");
         if (teacherAccess.state !== "success") return;
         const schedule = await teacher.teacher.getSchedule(teacherAccess.data.applicationSession, {
-          groupScope: teacherAccess.data.applicationSession.scopes[0]!,
+          scope: teacherAccess.data.scope,
+          view: { kind: "all" },
         });
         assert.equal(schedule.state, "success");
       });
@@ -1212,7 +1223,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
 
         // Records and restore
         check(
-          await admin("adminSame", "records.save", {
+          await admin("super", "records.save", {
             id: FAMILY_1,
             expectedVersion: 99,
             title: "x",
@@ -1243,22 +1254,9 @@ for (const schema of DIRECTORY_SCHEMAS) {
           "conflict",
           "DUTY_ALREADY_ASSIGNED",
         );
-        await db.query("delete from group_memberships where family_id = $1 and group_id = $2", [
-          FAMILY_2,
-          GROUP_1,
-        ]);
-        check(
-          await f2.signUp(TASK_1, await version("tasks", TASK_1)),
-          "conflict",
-          "DUTY_INELIGIBLE",
-        );
         await db.query("update tasks set status = 'closed' where id = $1", [TASK_2]);
         check(await f2.signUp(TASK_2, await version("tasks", TASK_2)), "conflict", "DUTY_CLOSED");
         await db.query("update tasks set status = 'open' where id = $1", [TASK_2]);
-        await db.query(
-          "insert into group_memberships (organization_id, family_id, group_id) values ($1, $2, $3)",
-          [ORGANIZATION, FAMILY_2, GROUP_1],
-        );
 
         // Admin assignment
         const noGroup = FAMILY_NO_GROUP;
@@ -1270,19 +1268,6 @@ for (const schema of DIRECTORY_SCHEMAS) {
           }),
           "conflict",
           "ASSIGNMENT_CAPACITY_FULL",
-        );
-        await db.query("delete from group_memberships where family_id = $1 and group_id = $2", [
-          noGroup,
-          GROUP_1,
-        ]);
-        check(
-          await admin("super", "assignments.assign", {
-            id: TASK_2,
-            expectedVersion: await version("tasks", TASK_2),
-            familyId: noGroup,
-          }),
-          "conflict",
-          "ASSIGNMENT_INELIGIBLE",
         );
 
         // Cancellation and swap requests

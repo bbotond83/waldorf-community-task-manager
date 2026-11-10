@@ -8,7 +8,8 @@ import { createTeacherPort } from "./teacher-port.ts";
 
 const GROUP = "cccccccc-0000-4000-8000-000000000101";
 const ORGANIZATION = "aaaaaaaa-0000-4000-8000-000000000001";
-const scope = { id: GROUP, type: "group" as const, organizationId: ORGANIZATION };
+const scope = { id: ORGANIZATION, type: "organization" as const, organizationId: ORGANIZATION };
+const view = { kind: "group", groupId: GROUP } as const;
 
 const row = (extra: Record<string, unknown> = {}) => ({
   id: "cccccccc-0000-4000-8000-000000000811",
@@ -35,7 +36,8 @@ test("the schedule rows become tracking records of the organization and group as
   });
   const outcome = await teacher.getSchedule({
     actorId: "ignored",
-    groupScope: scope,
+    scope,
+    view,
     from: "2026-11-01",
     to: "2026-11-30",
   });
@@ -57,19 +59,24 @@ test("the schedule rows become tracking records of the organization and group as
   });
   assert.deepEqual(fake.rpcCalls[0], {
     name: "schedule_get",
-    args: { p_group_id: GROUP, p_from: "2026-11-01", p_to: "2026-11-30" },
+    args: { p_scope: "group", p_group_id: GROUP, p_from: "2026-11-01", p_to: "2026-11-30" },
   });
 });
 
 test("an open limit is sent as no limit", async () => {
   const { fake, port: teacher } = port({ rpc: () => envelope("success", null, { items: [] }) });
-  await teacher.getSchedule({ actorId: "a", groupScope: scope });
-  assert.deepEqual(fake.rpcCalls[0]?.args, { p_group_id: GROUP, p_from: null, p_to: null });
+  await teacher.getSchedule({ actorId: "a", scope, view: { kind: "all" } });
+  assert.deepEqual(fake.rpcCalls[0]?.args, {
+    p_scope: "all",
+    p_group_id: null,
+    p_from: null,
+    p_to: null,
+  });
 });
 
 test("no tasks in the range is the empty state", async () => {
   const { port: teacher } = port({ rpc: () => envelope("success", null, { items: [] }) });
-  assert.deepEqual(await teacher.getSchedule({ actorId: "a", groupScope: scope }), {
+  assert.deepEqual(await teacher.getSchedule({ actorId: "a", scope, view }), {
     state: "empty",
   });
 });
@@ -78,11 +85,15 @@ test("a group the teacher is not granted is denied, and so is an id that names n
   const { fake, port: teacher } = port({
     rpc: () => envelope("denied", "authorization_denied"),
   });
-  assert.deepEqual(await teacher.getSchedule({ actorId: "a", groupScope: scope }), {
+  assert.deepEqual(await teacher.getSchedule({ actorId: "a", scope, view }), {
     state: "denied",
   });
   assert.deepEqual(
-    await teacher.getSchedule({ actorId: "a", groupScope: { ...scope, id: "no-current-group" } }),
+    await teacher.getSchedule({
+      actorId: "a",
+      scope,
+      view: { kind: "group", groupId: "no-current-group" },
+    }),
     { state: "denied" },
   );
   assert.equal(fake.rpcCalls.length, 1, "the malformed id never reaches the database");
@@ -90,7 +101,7 @@ test("a group the teacher is not granted is denied, and so is an id that names n
 
 test("the database's own date check is passed on as a validation result", async () => {
   const { port: teacher } = port({ rpc: () => envelope("validation", "VAL-DATE-RANGE") });
-  const outcome = await teacher.getSchedule({ actorId: "a", groupScope: scope, from: "x" });
+  const outcome = await teacher.getSchedule({ actorId: "a", scope, view, from: "x" });
   assert.deepEqual(outcome, {
     state: "validation",
     fieldErrors: { range: "VAL-DATE-RANGE" },

@@ -68,16 +68,12 @@ test.beforeAll(async () => {
     [YEAR, ORGANIZATION],
   );
   await db.query(
-    "insert into groups (id, organization_id, school_year_id, name) values ($1, $2, $3, 'Boróka')",
+    "insert into groups (id, organization_id, school_year_id, name, description) values ($1, $2, $3, 'Boróka', 'A kert gondozása.')",
     [GROUP, ORGANIZATION, YEAR],
   );
   await db.query(
     "insert into families (id, organization_id, display_name) values ($1, $2, 'Fenyő család')",
     [FAMILY, ORGANIZATION],
-  );
-  await db.query(
-    "insert into group_memberships (organization_id, family_id, group_id) values ($1, $2, $3)",
-    [ORGANIZATION, FAMILY, GROUP],
   );
 });
 test.afterAll(async () => {
@@ -311,8 +307,8 @@ test("two people signed in at once in two browser contexts keep independent sess
   });
   const second = await newUser(tag("two", testInfo.project.name), {
     role: "kindergarten_teacher",
-    scopeType: "group",
-    scope: GROUP,
+    scopeType: "organization",
+    scope: ORGANIZATION,
   });
   const contexts: BrowserContext[] = [
     await browser.newContext({ baseURL }),

@@ -61,13 +61,13 @@ export const COPY = {
     roles: {
       parent: "Szülő",
       kindergarten_teacher: "Óvodapedagógus",
-      group_admin: "Csoportadminisztrátor",
+      group_admin: "Koordinátor",
       super_admin: "Szuperadminisztrátor",
     } as Readonly<Record<string, string>>,
     scopes: {
       family: "Család",
-      group: "Csoport",
-      organization: "Szervezet",
+      group: "Munkacsoport",
+      organization: "Közösség",
     } as Readonly<Record<string, string>>,
   },
   password: {

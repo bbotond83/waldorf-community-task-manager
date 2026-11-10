@@ -15,12 +15,9 @@ import {
   FAMILY_1,
   FAMILY_2,
   FAMILY_NO_GROUP,
-  GROUP_1,
-  GROUP_2,
   nextKey,
   OTHER_ADMIN,
   openDirectoryDatabase,
-  ORGANIZATION,
   OUTSIDER,
   PARENT_F1,
   PARENT_F2,
@@ -93,17 +90,12 @@ for (const schema of DIRECTORY_SCHEMAS) {
     const item = (result: Result) => result.item as Duty;
     const one = async (sql: string, values: unknown[] = []) =>
       (await db.query(sql, values)).rows[0] as Record<string, unknown>;
-    const membership = (family: string, group: string) =>
-      db.query(
-        "insert into group_memberships (organization_id, family_id, group_id) values ($1, $2, $3)",
-        [ORGANIZATION, family, group],
-      );
     const taskVersion = async (task: string) =>
       (await one("select version from tasks where id = $1", [task])).version as number;
     const places = async (task: string) =>
       count(db, "assignments", `task_id = '${task}' and status <> 'removed'`);
 
-    it("lists the tasks of the family's groups and its own places with the state, version and place, and nothing of other groups (BR31.11)", async () => {
+    it("lists every open task of the community, whichever group owns it, and the family's own places with the state, version and place (BR31.11, BR4.1)", async () => {
       const first = await list(PARENT_F1);
       assert.equal(first.state, "success");
       assert.deepEqual(
@@ -111,6 +103,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
         [
           ["Sütés", "cancellation-pending", true],
           ["Kerti munka", "available", false],
+          ["Díszítés", "available", false],
         ],
       );
       const own = items(first)[0]!;
@@ -132,7 +125,11 @@ for (const schema of DIRECTORY_SCHEMAS) {
       const other = await list(PARENT_F2);
       assert.deepEqual(
         items(other).map((duty) => [duty.id, duty.state]),
-        [[TASK_3, "assigned"]],
+        [
+          [TASK_1, "available"],
+          [TASK_2, "available"],
+          [TASK_3, "assigned"],
+        ],
       );
       assert.deepEqual(
         items(await list(CO_PARENT_F1)),
@@ -141,34 +138,28 @@ for (const schema of DIRECTORY_SCHEMAS) {
       );
     });
 
-    it("maps every state: available, full, ineligible, assigned, swap-pending and cancellation-pending", async () => {
+    it("maps every state: available, full, assigned, swap-pending and cancellation-pending", async () => {
+      const ownTask = async () =>
+        items(await list(PARENT_F2)).find((duty) => duty.id === TASK_3)!.state;
       // assigned: the second family's place; swap-pending and cancellation-pending by status
-      assert.equal(items(await list(PARENT_F2))[0]!.state, "assigned");
+      assert.equal(await ownTask(), "assigned");
       await db.query("update assignments set status = 'swap_pending' where id = $1", [
         ASSIGNMENT_F2_T3,
       ]);
-      assert.equal(items(await list(PARENT_F2))[0]!.state, "swap-pending");
+      assert.equal(await ownTask(), "swap-pending");
       assert.equal(items(await list(PARENT_F1))[0]!.state, "cancellation-pending");
       await db.query("update assignments set status = 'active' where id = $1", [ASSIGNMENT_F1_T1]);
       assert.equal(items(await list(PARENT_F1))[0]!.state, "assigned");
       // available, then full once the places are taken by other families
       assert.equal(items(await list(PARENT_F1))[1]!.state, "available");
-      await membership(FAMILY_2, GROUP_1);
       assert.equal((await signUp(PARENT_F2, TASK_2, 1)).state, "success");
       assert.equal(items(await list(PARENT_F1))[1]!.state, "full");
-      // A task of a group the family is not in, and holds no place on, is no longer readable at all (R-05):
-      // the detail follows the list, so the state "ineligible" cannot reach a parent through duty_get.
-      const hidden = await get(PARENT_F1, TASK_3);
-      assert.deepEqual([hidden.state, hidden.code], ["validation", "duty_not_found"]);
+      // A task of any working group is readable to every family (BR4.1).
+      assert.equal(item(await get(PARENT_F1, TASK_3)).state, "available");
       assert.equal(item(await get(PARENT_F1, TASK_2)).state, "full");
     });
 
-    it("answers the detail of a task outside the family's groups like a missing task, and keeps what the list shows (R-05)", async () => {
-      // Family 1 is in group 1 (tasks 1 and 2); task 3 ("Díszítés") belongs to group 2, where family 2 holds a place.
-      const outside = await get(PARENT_F1, TASK_3);
-      assert.deepEqual([outside.state, outside.code], ["validation", "duty_not_found"]);
-      assert.equal(JSON.stringify(outside).includes("Díszítés"), false);
-      assert.equal(JSON.stringify(outside).includes("Terem"), false);
+    it("answers a missing task and another community's task alike, and opens everything the list shows", async () => {
       assert.deepEqual(
         [await get(PARENT_F1, uuid(99999)), await get(PARENT_F1, TASK_OTHER)].map((result) => [
           result.state,
@@ -189,14 +180,6 @@ for (const schema of DIRECTORY_SCHEMAS) {
         "assigned",
         "its own place is readable",
       );
-      // Once the family joins the task's group the detail opens; leaving it closes it again.
-      await membership(FAMILY_1, GROUP_2);
-      assert.equal(item(await get(PARENT_F1, TASK_3)).state, "available");
-      await db.query(
-        "update group_memberships set status = 'ended', ended_at = now() where family_id = $1 and group_id = $2",
-        [FAMILY_1, GROUP_2],
-      );
-      assert.equal((await get(PARENT_F1, TASK_3)).code, "duty_not_found");
     });
 
     it("returns the detail with the allergen note and the own contribution note only to the assigned family (BR31.8, BR31.9)", async () => {
@@ -204,8 +187,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
       assert.equal(own.allergen_note, "mogyoró");
       assert.equal(own.own_contribution_note, "Almás pite");
       assert.equal(own.assignment_id, ASSIGNMENT_F1_T1);
-      // A family of the group without a place: no allergen note and no contribution note.
-      await membership(FAMILY_2, GROUP_1);
+      // A family without a place: no allergen note and no contribution note.
       const bystander = item(await get(PARENT_F2, TASK_1));
       assert.equal(bystander.state, "available");
       assert.equal(bystander.allergen_note ?? null, null);
@@ -246,7 +228,6 @@ for (const schema of DIRECTORY_SCHEMAS) {
     });
 
     it("signs a family up, raising the task version, with the parent who signed up (BR31.2)", async () => {
-      await membership(FAMILY_2, GROUP_1);
       const result = await signUp(PARENT_F2, TASK_2, 1);
       assert.equal(result.state, "success");
       assert.deepEqual([result.version, result.task_version], [1, 2]);
@@ -289,20 +270,12 @@ for (const schema of DIRECTORY_SCHEMAS) {
         "update tasks set starts_at = now() + interval '1 day', ends_at = now() + interval '2 days' where id = $1",
         [TASK_1],
       );
-      // 3. an existing place beats ineligibility (the membership ended)
-      await db.query(
-        "update group_memberships set status = 'ended', ended_at = now() where family_id = $1",
-        [FAMILY_1],
-      );
+      // 3. an existing place
       const already = await signUp(PARENT_F1, TASK_1, await taskVersion(TASK_1));
       assert.deepEqual([already.state, already.code], ["conflict", "DUTY_ALREADY_ASSIGNED"]);
-      // 4. ineligibility beats a full task
+      // 4. full (the working group plays no part, BR4.1)
       await db.query("update tasks set status = 'open' where id = $1", [TASK_2]);
       await db.query("update tasks set capacity = 1 where id = $1", [TASK_1]);
-      const ineligible = await signUp(PARENT_F2, TASK_1, await taskVersion(TASK_1));
-      assert.deepEqual([ineligible.state, ineligible.code], ["conflict", "DUTY_INELIGIBLE"]);
-      // 5. full
-      await membership(FAMILY_2, GROUP_1);
       const full = await signUp(PARENT_F2, TASK_1, await taskVersion(TASK_1));
       assert.deepEqual([full.state, full.code], ["conflict", "DUTY_FULL"]);
       assert.equal(await places(TASK_1), 1, "no refusal created a place");
@@ -322,7 +295,6 @@ for (const schema of DIRECTORY_SCHEMAS) {
     });
 
     it("returns the stored success for a repeated key and does not store a refusal (NFR6.11)", async () => {
-      await membership(FAMILY_2, GROUP_1);
       const key = nextKey("repeat");
       const first = await signUp(PARENT_F2, TASK_2, 1, key);
       const again = await signUp(PARENT_F2, TASK_2, 1, key);
@@ -339,7 +311,6 @@ for (const schema of DIRECTORY_SCHEMAS) {
     });
 
     it("lets an admin of the group give a place to a family of the group, with the same checks and no override (BR31.7)", async () => {
-      await membership(FAMILY_NO_GROUP, GROUP_1);
       const stale = await assign(ADMIN_G1, TASK_1, FAMILY_NO_GROUP, 5);
       assert.deepEqual([stale.state, stale.code], ["conflict", "VERSION_CONFLICT"]);
       const given = await assign(ADMIN_G1, TASK_1, FAMILY_NO_GROUP, 1);
@@ -356,10 +327,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
       });
       const twice = await assign(ADMIN_G1, TASK_1, FAMILY_NO_GROUP, 2);
       assert.deepEqual([twice.state, twice.code], ["conflict", "DUTY_ALREADY_ASSIGNED"]);
-      const ineligible = await assign(ADMIN_G1, TASK_1, FAMILY_2, 2);
-      assert.deepEqual([ineligible.state, ineligible.code], ["conflict", "ASSIGNMENT_INELIGIBLE"]);
       await db.query("update tasks set capacity = 2 where id = $1", [TASK_1]);
-      await membership(FAMILY_2, GROUP_1);
       const full = await assign(SUPER_ADMIN, TASK_1, FAMILY_2, 3);
       assert.deepEqual([full.state, full.code], ["conflict", "ASSIGNMENT_CAPACITY_FULL"]);
       assert.equal(await places(TASK_1), 2, "capacity is never exceeded");
@@ -367,7 +335,6 @@ for (const schema of DIRECTORY_SCHEMAS) {
     });
 
     it("refuses assigning to anyone who does not reach the group, and for a family or task of another organization", async () => {
-      await membership(FAMILY_NO_GROUP, GROUP_1);
       for (const account of [ADMIN_G2, PARENT_F1, CO_PARENT_F1, TEACHER_G1, OUTSIDER]) {
         const result = await assign(account, TASK_2, FAMILY_NO_GROUP, 1);
         assert.deepEqual([result.state, result.code], ["denied", "authorization_denied"], account);

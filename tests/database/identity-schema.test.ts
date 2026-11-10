@@ -94,6 +94,8 @@ for (const schema of IDENTITY_SCHEMAS) {
       for (const bad of [
         { role: "parent", scope_type: "group" },
         { role: "kindergarten_teacher", scope_type: "family" },
+        { role: "kindergarten_teacher", scope_type: "group", scope_id: GROUP_1 },
+        { role: "group_admin", scope_type: "group", scope_id: GROUP_1 },
         { role: "super_admin", scope_type: "organization", scope_id: GROUP_1 },
         { role: "teacher", scope_type: "group" },
       ]) {
@@ -108,8 +110,8 @@ for (const schema of IDENTITY_SCHEMAS) {
       await insertInvitation({
         email: "teacher@example.test",
         role: "kindergarten_teacher",
-        scope_type: "group",
-        scope_id: GROUP_1,
+        scope_type: "organization",
+        scope_id: ORGANIZATION,
       });
     });
 

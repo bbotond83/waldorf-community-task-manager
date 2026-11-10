@@ -106,8 +106,11 @@ describe("honest executable denominator", () => {
     // the 3 files of src/admin-experience (the archive presentation no screen used, with the sheet table kept above) and
     // src/application/session-facade.ts, which nothing used after the profile switch went: 220 - 4. The quiet stage of the
     // 2000-row import timing test then adds scripts/db/import-timing-stage.ts: 216 + 1. The shared exit block of
-    // the "Nincs jogosultság" screens (app/_identity/AccessStateExit.tsx) adds one more: 217 + 1.
-    expect(inventory.length).toBe(218);
+    // the "Nincs jogosultság" screens (app/_identity/AccessStateExit.tsx) adds one more: 217 + 1. The Ovis tábla work's
+    // U1 then removes the import (screen, actions, parser, adapters and timing stage: 14 production files) and adds the
+    // working-group list (src/runtime/WorkingGroupList.tsx, src/application/working-group-facade.ts,
+    // src/data/working-groups.ts and the three pages): 218 - 14 + 6.
+    expect(inventory.length).toBe(210);
     for (const path of [
       "src/runtime/AppNav.tsx",
       "src/runtime/StatusBadge.tsx",
@@ -121,7 +124,6 @@ describe("honest executable denominator", () => {
       "scripts/db/seed.ts",
       "scripts/db/reset.ts",
       "scripts/db/seed/data.ts",
-      "scripts/db/import-timing-stage.ts",
       "app/szulo/_components/MarkNotificationRead.tsx",
       "app/szulo/_components/PendingRequestNotice.tsx",
       "app/admin/_components/AdminBackLink.tsx",

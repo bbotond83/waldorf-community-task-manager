@@ -81,7 +81,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
       );
       assert.equal(
         await code(
-          "insert into groups (organization_id, school_year_id, name) values ($1, $2, 'BORÓKA')",
+          "insert into groups (organization_id, school_year_id, name, description) values ($1, $2, 'BORÓKA', 'Leírás')",
           [ORGANIZATION, YEAR_1],
         ),
         "23505",
@@ -93,7 +93,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
       );
       assert.equal(
         await code(
-          "insert into groups (organization_id, school_year_id, name) values ($1, $2, 'Boróka')",
+          "insert into groups (organization_id, school_year_id, name, description) values ($1, $2, 'Boróka', 'Leírás')",
           [ORGANIZATION, uuid(5101)],
         ),
         undefined,
@@ -105,15 +105,15 @@ for (const schema of DIRECTORY_SCHEMAS) {
       // a family of another organization: all refused by the database, not by a function.
       assert.equal(
         await code(
-          "insert into groups (organization_id, school_year_id, name) values ($1, $2, 'Új')",
+          "insert into groups (organization_id, school_year_id, name, description) values ($1, $2, 'Új', 'Leírás')",
           [ORGANIZATION, YEAR_OTHER],
         ),
         "23503",
       );
       assert.equal(
         await code(
-          "insert into group_memberships (organization_id, family_id, group_id) values ($1, $2, $3)",
-          [ORGANIZATION, FAMILY_NO_GROUP, GROUP_OTHER],
+          "insert into group_memberships (organization_id, parent_id, group_id) values ($1, $2, $3)",
+          [ORGANIZATION, PARENT_ROW_F1, GROUP_OTHER],
         ),
         "23503",
       );
@@ -170,35 +170,35 @@ for (const schema of DIRECTORY_SCHEMAS) {
       }
     });
 
-    it("allows one active membership per family and group, and keeps an ended one as history", async () => {
+    it("allows one active membership per parent and group, and keeps an ended one as history", async () => {
       assert.equal(
         await code(
-          "insert into group_memberships (organization_id, family_id, group_id) values ($1, $2, $3)",
-          [ORGANIZATION, FAMILY_1, GROUP_1],
+          "insert into group_memberships (organization_id, parent_id, group_id) values ($1, $2, $3)",
+          [ORGANIZATION, PARENT_ROW_F1, GROUP_1],
         ),
         "23505",
       );
       await db.query(
-        "update group_memberships set status = 'ended', ended_at = now() where family_id = $1 and group_id = $2",
-        [FAMILY_1, GROUP_1],
+        "update group_memberships set status = 'ended', ended_at = now() where parent_id = $1 and group_id = $2",
+        [PARENT_ROW_F1, GROUP_1],
       );
       await db.query(
-        "insert into group_memberships (organization_id, family_id, group_id) values ($1, $2, $3)",
-        [ORGANIZATION, FAMILY_1, GROUP_1],
+        "insert into group_memberships (organization_id, parent_id, group_id) values ($1, $2, $3)",
+        [ORGANIZATION, PARENT_ROW_F1, GROUP_1],
       );
       assert.equal(
         (
           await db.query(
-            "select count(*)::int as n from group_memberships where family_id = $1 and group_id = $2",
-            [FAMILY_1, GROUP_1],
+            "select count(*)::int as n from group_memberships where parent_id = $1 and group_id = $2",
+            [PARENT_ROW_F1, GROUP_1],
           )
         ).rows[0].n,
         2,
       );
       assert.equal(
         await code(
-          "update group_memberships set status = 'ended' where family_id = $1 and group_id = $2 and status = 'active'",
-          [FAMILY_1, GROUP_1],
+          "update group_memberships set status = 'ended' where parent_id = $1 and group_id = $2 and status = 'active'",
+          [PARENT_ROW_F1, GROUP_1],
         ),
         "23514",
         "an ended membership needs its end time",
@@ -311,9 +311,9 @@ for (const schema of DIRECTORY_SCHEMAS) {
       ).rows as { tablename: string; indexdef: string }[];
       const has = (table: string, fragment: string) =>
         indexes.some((row) => row.tablename === table && row.indexdef.includes(fragment));
-      assert.ok(has("group_memberships", "(family_id, status)"), "memberships by family");
+      assert.ok(has("group_memberships", "(parent_id, status)"), "memberships by parent");
       assert.ok(has("group_memberships", "(group_id, status)"), "memberships by group");
-      assert.ok(has("group_memberships", "(family_id, group_id)"), "one active membership");
+      assert.ok(has("group_memberships", "(parent_id, group_id)"), "one active membership");
       assert.ok(has("parents", "(family_id)"), "parents by family");
       assert.ok(has("parents", "(account_id)"), "parents by account");
       assert.ok(has("children", "(family_id)"), "children by family");
@@ -350,12 +350,12 @@ for (const schema of DIRECTORY_SCHEMAS) {
         otherOrganizationAdmin: 1,
       },
       groups: {
-        parent: 1,
-        coParent: 1,
-        parentOther: 1,
-        teacher: 1,
-        adminSame: 1,
-        adminOther: 1,
+        parent: 2,
+        coParent: 2,
+        parentOther: 2,
+        teacher: 2,
+        adminSame: 2,
+        adminOther: 2,
         super: 2,
         nogrant: 0,
         deactivated: 0,
@@ -367,9 +367,9 @@ for (const schema of DIRECTORY_SCHEMAS) {
         coParent: 1,
         parentOther: 1,
         teacher: 0,
-        adminSame: 1,
-        adminOther: 1,
-        super: 3,
+        adminSame: 0,
+        adminOther: 0,
+        super: 5,
         nogrant: 0,
         deactivated: 0,
         signedOut: 0,
@@ -377,11 +377,11 @@ for (const schema of DIRECTORY_SCHEMAS) {
       },
       group_memberships: {
         parent: 1,
-        coParent: 1,
+        coParent: 0,
         parentOther: 1,
         teacher: 0,
-        adminSame: 1,
-        adminOther: 1,
+        adminSame: 0,
+        adminOther: 0,
         super: 2,
         nogrant: 0,
         deactivated: 0,
@@ -393,9 +393,9 @@ for (const schema of DIRECTORY_SCHEMAS) {
         coParent: 4,
         parentOther: 1,
         teacher: 0,
-        adminSame: 4,
-        adminOther: 1,
-        super: 5,
+        adminSame: 0,
+        adminOther: 0,
+        super: 7,
         nogrant: 0,
         deactivated: 0,
         signedOut: 0,
@@ -406,8 +406,8 @@ for (const schema of DIRECTORY_SCHEMAS) {
         coParent: 2,
         parentOther: 1,
         teacher: 0,
-        adminSame: 2,
-        adminOther: 1,
+        adminSame: 0,
+        adminOther: 0,
         super: 3,
         nogrant: 0,
         deactivated: 0,
@@ -419,8 +419,8 @@ for (const schema of DIRECTORY_SCHEMAS) {
         coParent: 1,
         parentOther: 1,
         teacher: 0,
-        adminSame: 1,
-        adminOther: 1,
+        adminSame: 0,
+        adminOther: 0,
         super: 2,
         nogrant: 0,
         deactivated: 0,
@@ -471,7 +471,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
       }
     });
 
-    it("hides contact details from other families, teachers and other groups, and shows them to the family and admins in reach (BR30.5)", async () => {
+    it("hides contact details from other families, teachers and group admins, and shows them to the family and super admins (BR30.5, BR3.9)", async () => {
       const visibleTo = async (account: string) =>
         asActor(db, schema, authenticated(account), async () =>
           (await db.query("select parent_id from parent_contacts order by parent_id")).rows.map(
@@ -482,14 +482,15 @@ for (const schema of DIRECTORY_SCHEMAS) {
       assert.deepEqual(await visibleTo(CO_PARENT_F1), [PARENT_ROW_F1, PARENT_ROW_CO]);
       assert.deepEqual(await visibleTo(PARENT_F2), [PARENT_ROW_F2]);
       assert.deepEqual(await visibleTo(VIEWERS.teacher), []);
-      assert.deepEqual(await visibleTo(VIEWERS.adminOther), [PARENT_ROW_F2]);
+      assert.deepEqual(await visibleTo(VIEWERS.adminSame), []);
+      assert.deepEqual(await visibleTo(VIEWERS.adminOther), []);
       assert.deepEqual(
         await visibleTo(VIEWERS.otherOrganizationAdmin).then((rows) => rows.length),
         1,
       );
     });
 
-    it("keeps the optional profile out of the table rights and readable only by the parent and admins in reach, with consent (BR30.4)", async () => {
+    it("keeps the optional profile out of the table rights and readable only by the parent and super admins, with consent (BR30.4, BR3.9)", async () => {
       const selecting = await failureOf(() =>
         asActor(db, schema, authenticated(PARENT_F1), () =>
           db.query("select optional_profile from parents"),
@@ -506,12 +507,12 @@ for (const schema of DIRECTORY_SCHEMAS) {
               .profile as string | null,
         );
       assert.equal(await profileAs(PARENT_F1, PARENT_ROW_F1), "Szívesen főzök.");
-      assert.equal(await profileAs(VIEWERS.adminSame, PARENT_ROW_F1), "Szívesen főzök.");
       assert.equal(await profileAs(SUPER_ADMIN, PARENT_ROW_F1), "Szívesen főzök.");
       for (const account of [
         CO_PARENT_F1,
         PARENT_F2,
         VIEWERS.teacher,
+        VIEWERS.adminSame,
         VIEWERS.adminOther,
         VIEWERS.nogrant,
       ]) {
@@ -538,14 +539,15 @@ for (const schema of DIRECTORY_SCHEMAS) {
             (await db.query("select directory_parent_profile($1) as profile", [PARENT_ROW_F1]))
               .rows[0].profile as string | null,
         );
-      for (const account of [PARENT_F1, VIEWERS.adminSame, SUPER_ADMIN]) {
+      for (const account of [PARENT_F1, SUPER_ADMIN]) {
         assert.equal(await profileAs(account), "", account);
       }
-      // The rule of who may see it is unchanged: everyone else still gets nothing, not even an empty text.
+      // Everyone else gets nothing, not even an empty text.
       for (const account of [
         CO_PARENT_F1,
         PARENT_F2,
         VIEWERS.teacher,
+        VIEWERS.adminSame,
         VIEWERS.adminOther,
         VIEWERS.nogrant,
       ]) {
@@ -553,7 +555,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
       }
     });
 
-    it("hides an archived family from its own parents and keeps it for admins in reach (BR30.8)", async () => {
+    it("hides an archived family from its own parents and keeps it for super admins (BR30.8, BR3.9)", async () => {
       await db.query("update families set status = 'archived', archived_at = now() where id = $1", [
         FAMILY_1,
       ]);
@@ -561,9 +563,9 @@ for (const schema of DIRECTORY_SCHEMAS) {
       assert.equal(await countAs(db, schema, PARENT_F1, "parents"), 0);
       assert.equal(await countAs(db, schema, PARENT_F1, "children"), 0);
       assert.equal(await countAs(db, schema, PARENT_F1, "parent_contacts"), 0);
-      assert.equal(await countAs(db, schema, VIEWERS.adminSame, "families"), 1);
-      assert.equal(await countAs(db, schema, SUPER_ADMIN, "families"), 3);
-      // The group is still visible through the membership of the active family only.
+      assert.equal(await countAs(db, schema, VIEWERS.adminSame, "families"), 0);
+      assert.equal(await countAs(db, schema, SUPER_ADMIN, "families"), 5);
+      // A parent of an archived family reads no working group either, from the next request (BR3.11).
       assert.equal(await countAs(db, schema, PARENT_F1, "groups"), 0);
     });
 
@@ -615,7 +617,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
       assert.deepEqual(reached, { own: true, foreign_family: false, orphan: true });
     });
 
-    it("gives a group admin reach to a family only through an active membership of their group", async () => {
+    it("gives a group admin reach to no family, even one with a member of their group; a super admin reaches all (BR3.9)", async () => {
       const reach = (account: string, family: string) =>
         asActor(
           db,
@@ -625,24 +627,16 @@ for (const schema of DIRECTORY_SCHEMAS) {
             (await db.query("select directory_reaches_family($1, $2) as r", [ORGANIZATION, family]))
               .rows[0].r as boolean,
         );
-      assert.equal(await reach(VIEWERS.adminSame, FAMILY_1), true);
-      assert.equal(await reach(VIEWERS.adminSame, FAMILY_2), false);
-      assert.equal(await reach(VIEWERS.adminSame, FAMILY_NO_GROUP), false);
-      // A second, active membership in the other group gives the other group admin reach as well.
+      for (const family of [FAMILY_1, FAMILY_2, FAMILY_NO_GROUP]) {
+        assert.equal(await reach(VIEWERS.adminSame, family), false, family);
+        assert.equal(await reach(VIEWERS.adminOther, family), false, family);
+        assert.equal(await reach(SUPER_ADMIN, family), true, family);
+      }
       await db.query(
-        "insert into group_memberships (organization_id, family_id, group_id) values ($1, $2, $3)",
-        [ORGANIZATION, FAMILY_1, GROUP_2],
+        "insert into group_memberships (organization_id, parent_id, group_id) values ($1, $2, $3)",
+        [ORGANIZATION, PARENT_ROW_F1, GROUP_2],
       );
-      assert.equal(await reach(VIEWERS.adminOther, FAMILY_1), true);
-      await db.query(
-        "update group_memberships set status = 'ended', ended_at = now() where family_id = $1 and group_id = $2",
-        [FAMILY_1, GROUP_2],
-      );
-      assert.equal(
-        await reach(VIEWERS.adminOther, FAMILY_1),
-        false,
-        "an ended membership gives no reach",
-      );
+      assert.equal(await reach(VIEWERS.adminOther, FAMILY_1), false, "a membership gives no reach");
       assert.equal(await countAs(db, schema, CO_PARENT_F1, "children", `id = '${CHILD_F1}'`), 1);
     });
 

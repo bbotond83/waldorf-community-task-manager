@@ -1,5 +1,6 @@
 import "server-only";
 
+import type { Scope } from "../../../src/access/index.ts";
 import type { SessionContext } from "../../../src/application/index.ts";
 import { resolveTeacherAccess } from "../../../src/runtime/production/access.ts";
 import type { ShellProfile } from "../../../src/runtime/shell-profile.ts";
@@ -7,6 +8,7 @@ import { productionRequest } from "../../_identity/production-request.ts";
 
 export type TeacherSession = Readonly<{
   applicationSession: SessionContext;
+  scope: Scope;
   profile: ShellProfile;
 }>;
 
@@ -17,8 +19,7 @@ export type TeacherSessionResult =
   | { state: "configuration-error" };
 
 /**
- * The signed-in teacher of this request: the granted groups come from the person's role grants in the
- * database.
+ * The signed-in teacher of this request: the community comes from the person's role grant in the database.
  */
 export async function resolveTeacherSession(): Promise<TeacherSessionResult> {
   const request = await productionRequest();

@@ -30,7 +30,7 @@ test.describe("parent: notifications stay under Értesítések", () => {
     await page.goto("/");
     await expect(page).toHaveURL(/\/szulo\/ertesitesek$/);
     const links = page.getByTestId("app-shell-navigation").getByRole("link");
-    await expect(links).toHaveText(["Értesítések", "Feladatok", "Cserék"]);
+    await expect(links).toHaveText(["Értesítések", "Feladatok", "Cserék", "Munkacsoportok"]);
     await expect(page.getByTestId("app-shell-navigation-parent-notifications")).toHaveAttribute(
       "aria-current",
       "page",
@@ -395,6 +395,7 @@ test.describe("admin: empty forms and technical text", () => {
   test("technical text is only inside Fejlesztői részletek, which opens on request", async ({
     page,
   }) => {
+    await signInAs(page, world().account("super-admin"));
     for (const [path, texts] of [
       [`/admin/feladatok/${world().id("task:1:1")}`, ["Verzió:"]],
       [`/admin/nyilvantartasok/${world().id("family:1")}`, ["Verzió:"]],

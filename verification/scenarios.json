@@ -214,19 +214,6 @@
       "browsers": ["chromium", "firefox", "mobile-chrome"]
     },
     {
-      "id": "LOCAL-IMPORT",
-      "storyIds": ["US-LR-06d", "US-08", "US-09", "US-10"],
-      "requirementIds": ["FR-LR-10a", "FR-08", "FR-09", "FR-10", "FR-11", "FR-12a"],
-      "target": "local",
-      "command": "npm run test:browser",
-      "profile": "super-admin-local",
-      "route": "/admin/import",
-      "matrixRows": ["AUTH-SUPER-ADMIN-ALLOW", "AUTH-GRP-IMPORT-DENY"],
-      "expected": "PASS",
-      "evidence": "browser",
-      "browsers": ["chromium", "firefox", "mobile-chrome"]
-    },
-    {
       "id": "LOCAL-REMINDER-MONITORING",
       "storyIds": ["US-LR-06e"],
       "requirementIds": ["FR-LR-10a", "FR-14", "FR-17"],
@@ -276,7 +263,7 @@
       "target": "local",
       "command": "npm test",
       "profile": "super-admin-local",
-      "route": "/admin/import",
+      "route": "/admin/nyilvantartasok",
       "matrixRows": ["AUTH-SUPER-ADMIN-ALLOW"],
       "expected": "PASS",
       "evidence": "test"
@@ -407,19 +394,6 @@
       "evidence": "manifest"
     },
     {
-      "id": "NFR08-IMPORT",
-      "storyIds": ["US-LR-06d"],
-      "requirementIds": ["NFR-08"],
-      "target": "local",
-      "command": "npm run test:browser",
-      "profile": "super-admin-local",
-      "route": "/admin/import",
-      "matrixRows": ["AUTH-SUPER-ADMIN-ALLOW"],
-      "expected": "PASS",
-      "evidence": "browser",
-      "browsers": ["chromium", "firefox", "mobile-chrome"]
-    },
-    {
       "id": "NFR08-REMINDERS",
       "storyIds": ["US-LR-06e"],
       "requirementIds": ["NFR-08"],
@@ -490,7 +464,7 @@
       "target": "linked-target",
       "command": "future linked-target suite",
       "profile": "super-admin-local",
-      "route": "/admin/import",
+      "route": "/admin/adatvedelem",
       "matrixRows": ["AUTH-SUPER-ADMIN-ALLOW"],
       "expected": "OUTSTANDING",
       "evidence": "linked-target"

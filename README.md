@@ -6,7 +6,7 @@ catcher). On a developer machine the database runs in Docker. There is no demo m
 signs in with an e-mail address and a password.
 
 - Code and technical artifacts: English. User-facing UI: Hungarian.
-- MVP: users, families, children, school years, groups, tasks, events, signups, swaps, cancellations, notifications, and one-time Excel import.
+- MVP: users, families, children, school years, groups, tasks, events, signups, swaps, cancellations and notifications.
 - A personal learning project, built to help one kindergarten parent community with its task planning. Every name,
   address and telephone number in this repository is invented. If you run it for real people, you handle their (and
   their children's) personal data and are responsible for data protection (GDPR) yourself. See [SECURITY.md](./SECURITY.md).
@@ -73,11 +73,11 @@ The mail catcher shows every message the application sends (invitations, passwor
 The seed and the reset change only the local stack: they refuse any database whose address is not a loopback address
 or that does not identify itself as the local stack, and they change nothing when they refuse.
 
-| Command                 | What it does                                                                                                                                                                                                                                                                                                                                                                                                        |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `npm run db:seed`       | Fills one schema with invented data: the small set (2 groups, 6 families with parents and children, a super admin, two group admins, a teacher, a few events and tasks) and creates the sign-in accounts. One transaction: all of it or nothing. Running it again changes nothing.                                                                                                                                  |
-| `npm run db:seed:large` | The 30-family set made by the same rules (used by the timing tests).                                                                                                                                                                                                                                                                                                                                                |
-| `npm run db:reset`      | Empties one schema (every table except the workbook sheet list, the audit log included) and removes only the sign-in accounts whose address starts with `<schema>.`. For the default `public` schema it needs `--yes` (`npm run db:reset -- --yes`), because that is the data you work with; the test schemas need none. It first runs the expiry and reminder functions for the organizations still in the schema. |
+| Command                 | What it does                                                                                                                                                                                                                                                                                                                                                                                          |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run db:seed`       | Fills one schema with invented data: the small set (the six working groups, 6 families with parents and children, a super admin, two group admins who are also parents, one of them holding two groups, a teacher of the whole community, a few group and community-wide events and tasks) and creates the sign-in accounts. One transaction: all of it or nothing. Running it again changes nothing. |
+| `npm run db:seed:large` | The 30-family set made by the same rules (used by the timing tests).                                                                                                                                                                                                                                                                                                                                  |
+| `npm run db:reset`      | Empties one schema (every table, the audit log included) and removes only the sign-in accounts whose address starts with `<schema>.`. For the default `public` schema it needs `--yes` (`npm run db:reset -- --yes`), because that is the data you work with; the test schemas need none. It first runs the reminder function for the organizations still in the schema.                              |
 
 ### The schema selector
 
@@ -128,16 +128,15 @@ The phases run one after the other, and each one resets the schemas it uses, so 
 time. Unit and component tests need no stack: they use injected test doubles. Only the database tests and the browser
 specs use the stack.
 
-| Phase                   | Commands                                                                                                                                                              | Schemas                            |
-| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
-| Static checks           | `npm run format:check`, `npm run lint`, `npm run typecheck`                                                                                                           | none                               |
-| Stack-free tests        | `npm test` (domain, scripts and delivery tests), `npm run test:coverage` (at least 80% lines, branches and functions across all production source)                    | none                               |
-| Database tests          | `npm run test:database:roles`, `test:database:stack`, `test:database:identity`, `test:database:directory`, `test:database:notifications-import`, `test:database:seed` | `public`, `worker_1` to `worker_4` |
-| Shuffled database run   | `npm run test:database:shuffled` (every database test file in random order, to find hidden order dependence)                                                          | `worker_1` to `worker_4`           |
-| Import timing stage     | `npm run test:database:import-timing` (the 2000-row import test alone, with one retry after 30 s; skipped in the other database groups)                               | `worker_1` to `worker_4`           |
-| Build, bundle and smoke | `npm run build`, `npm run test:bundle` (the seed module and the service-role key are absent from the browser output), `npm run smoke:start`                           | none                               |
-| Browser phase           | `npm run test:browser` (all three browsers), `npm run test:a11y` (only the accessibility checks)                                                                      | `worker_1` to `worker_3`           |
-| Security scans          | `npm run verify:security` (privacy, secrets, SAST, no-deploy, dependency audit with high and critical blocking)                                                       | none                               |
+| Phase                   | Commands                                                                                                                                                       | Schemas                            |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
+| Static checks           | `npm run format:check`, `npm run lint`, `npm run typecheck`                                                                                                    | none                               |
+| Stack-free tests        | `npm test` (domain, scripts and delivery tests), `npm run test:coverage` (at least 80% lines, branches and functions across all production source)             | none                               |
+| Database tests          | `npm run test:database:roles`, `test:database:stack`, `test:database:identity`, `test:database:directory`, `test:database:notifications`, `test:database:seed` | `public`, `worker_1` to `worker_4` |
+| Shuffled database run   | `npm run test:database:shuffled` (every database test file in random order, to find hidden order dependence)                                                   | `worker_1` to `worker_4`           |
+| Build, bundle and smoke | `npm run build`, `npm run test:bundle` (the seed module and the service-role key are absent from the browser output), `npm run smoke:start`                    | none                               |
+| Browser phase           | `npm run test:browser` (all three browsers), `npm run test:a11y` (only the accessibility checks)                                                               | `worker_1` to `worker_3`           |
+| Security scans          | `npm run verify:security` (privacy, secrets, SAST, no-deploy, dependency audit with high and critical blocking)                                                | none                               |
 
 The pieces behind these commands can be run alone: `npm run test:domain` (the node test runner over `src/`),
 `npm run test:scripts` (the tooling tests), `npm run test:delivery` (the component and page tests),

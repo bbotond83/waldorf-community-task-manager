@@ -26,7 +26,8 @@ const groupScope: Scope = { id: "group-1", type: "group", organizationId: "org-1
 const familyScope: Scope = { id: "family-1", type: "family", organizationId: "org-1" };
 
 const parentSession = makeSession("parent", familyScope);
-const teacherSession = makeSession("kindergarten_teacher", groupScope);
+const teacherSession = makeSession("kindergarten_teacher", organizationScope);
+const allOfTheCommunity = { scope: organizationScope, view: { kind: "all" } } as const;
 const groupAdminSession = makeSession("group_admin", groupScope);
 const kindergartenSession = makeSession("super_admin", organizationScope);
 
@@ -123,7 +124,7 @@ describe("role application facades", () => {
     };
     const facade = new TeacherApplicationFacade(pipelineFor(teacherSession), port);
     const result = await facade.getSchedule(teacherSession, {
-      groupScope,
+      ...allOfTheCommunity,
       from: "2026-08-01",
       to: "2026-08-31",
     });
@@ -143,7 +144,7 @@ describe("role application facades", () => {
     const result = await new TeacherApplicationFacade(
       pipelineFor(teacherSession),
       port,
-    ).getSchedule(teacherSession, { groupScope, from: "invalid", to: "2026-08-31" });
+    ).getSchedule(teacherSession, { ...allOfTheCommunity, from: "invalid", to: "2026-08-31" });
     assert.equal(result.state, "validation");
     assert.equal(calls, 0);
   });
@@ -172,7 +173,7 @@ describe("role application facades", () => {
       }),
     };
     const facade = new TeacherApplicationFacade(pipelineFor(teacherSession), port);
-    const common = { groupScope, from: "2026-08-01", to: "2026-08-31" };
+    const common = { scope: organizationScope, from: "2026-08-01", to: "2026-08-31" };
     assert.equal(
       (await facade.getScheduleEntry(teacherSession, { ...common, entryId: "entry-1" })).state,
       "success",
@@ -183,34 +184,19 @@ describe("role application facades", () => {
     );
   });
 
-  it("denies Group Administrator import before invoking its port", async () => {
+  it("denies a Group Administrator family records before invoking the port (BR3.9)", async () => {
     const port = new FakeAdminPort();
     const result = await new AdminApplicationFacade(
       pipelineFor(groupAdminSession),
       port,
-    ).import.commit(groupAdminSession, {
+    ).saveRecord(groupAdminSession, {
       scope: groupScope,
-      id: "preview-1",
+      id: "family-1",
       expectedVersion: 1,
-      idempotencyKey: "import:key-0001",
+      idempotencyKey: "record:key-0001",
     });
     assert.equal(result.state, "denied");
     assert.equal(port.calls, 0);
-  });
-
-  it("allows Super Administrator import through the public port", async () => {
-    const port = new FakeAdminPort();
-    const result = await new AdminApplicationFacade(
-      pipelineFor(kindergartenSession),
-      port,
-    ).import.commit(kindergartenSession, {
-      scope: organizationScope,
-      id: "preview-1",
-      expectedVersion: 1,
-      idempotencyKey: "import:key-0002",
-    });
-    assert.equal(result.state, "success");
-    assert.equal(port.calls, 1);
   });
 
   it("exposes the complete administrator workflow surface through one port", async () => {
@@ -245,18 +231,8 @@ describe("role application facades", () => {
         ...command,
         idempotencyKey: "admin:key-0007",
       }),
-      facade.import.createPreview(kindergartenSession, {
-        ...command,
-        idempotencyKey: "admin:key-0008",
-      }),
-      facade.import.resolveConflict(kindergartenSession, {
-        ...command,
-        idempotencyKey: "admin:key-0009",
-      }),
-      facade.import.recover(kindergartenSession, {
-        ...command,
-        idempotencyKey: "admin:key-0010",
-      }),
+      facade.listFamilyNames(kindergartenSession, organizationScope),
+      facade.listArchive(kindergartenSession, organizationScope),
       facade.reminders.list(kindergartenSession, organizationScope),
       facade.reminders.retry(kindergartenSession, {
         ...command,

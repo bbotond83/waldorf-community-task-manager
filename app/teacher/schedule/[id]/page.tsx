@@ -1,15 +1,15 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { TeacherStatePanel } from "../../_components/TeacherStatePanel.tsx";
-import { resolveTeacherFacade } from "../../_lib/facade.ts";
+import { resolveTeacherFacade, resolveWorkingGroupFacade } from "../../_lib/facade.ts";
 import {
   parseTeacherFilters,
-  teacherDetailQuery,
   teacherFilterQuery,
+  teacherGroupLabel,
   teacherScheduleHref,
   type TeacherSearchParams,
 } from "../../_lib/filters.ts";
-import { teacherRange } from "../../_lib/schedule.ts";
+import { teacherGroupOptions, teacherRange } from "../../_lib/schedule.ts";
 import { resolveTeacherSession } from "../../_lib/session.ts";
 import { formatScheduleRange, TrackingFields } from "../_components/ScheduleCollection.tsx";
 
@@ -24,11 +24,18 @@ export default async function TeacherScheduleDetailPage({
   const session = await resolveTeacherSession();
   if (session.state === "signed-out") redirect("/");
   if (session.state !== "success") return null;
-  const filters = parseTeacherFilters(await searchParams, session.data.applicationSession);
-  const facade = await resolveTeacherFacade();
-  if (session.state !== "success" || !facade) return null;
-  const result = await facade.getScheduleEntry(session.data.applicationSession, {
-    groupScope: filters.groupScope,
+  const [facade, workingGroups] = await Promise.all([
+    resolveTeacherFacade(),
+    resolveWorkingGroupFacade(),
+  ]);
+  if (!facade || !workingGroups) return null;
+  const { applicationSession, scope } = session.data;
+  const filters = parseTeacherFilters(
+    await searchParams,
+    await teacherGroupOptions(workingGroups, applicationSession, scope),
+  );
+  const result = await facade.getScheduleEntry(applicationSession, {
+    scope,
     entryId: id,
     ...teacherRange(filters),
   });
@@ -37,9 +44,9 @@ export default async function TeacherScheduleDetailPage({
   const returnHref = canKeepContext
     ? teacherScheduleHref(teacherFilterQuery(filters))
     : "/teacher/schedule";
-  // The retry keeps the address as it is, including the group this entry belongs to.
-  const retryHref = `/teacher/schedule/${encodeURIComponent(id)}?${teacherDetailQuery(filters, filters.groupScope.id)}`;
-  const groupLabel = filters.groups.find(({ scope }) => scope.id === filters.groupId)?.label ?? "";
+  // The retry keeps the address as it is.
+  const query = teacherFilterQuery(filters);
+  const retryHref = `/teacher/schedule/${encodeURIComponent(id)}${query ? `?${query}` : ""}`;
 
   return (
     <section className="teacher-page" data-testid="teacher-schedule-detail-page">
@@ -70,8 +77,8 @@ export default async function TeacherScheduleDetailPage({
                 <dd>{entry.title}</dd>
               </div>
               <div>
-                <dt>Engedélyezett csoport</dt>
-                <dd>{groupLabel}</dd>
+                <dt>Munkacsoport</dt>
+                <dd>{teacherGroupLabel(filters, entry.groupId)}</dd>
               </div>
               <div>
                 <dt>Helyszín vagy lefedettség</dt>

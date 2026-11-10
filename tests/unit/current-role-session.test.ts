@@ -25,10 +25,7 @@ const grant = (role: string, scopeType: string, scopeId: string, extra: Row = {}
   organization_id: ORG,
   ...extra,
 });
-const TEACHER_GRANTS = [
-  grant("kindergarten_teacher", "group", "group-oak"),
-  grant("kindergarten_teacher", "group", "group-sunflower"),
-];
+const TEACHER_GRANTS = [grant("kindergarten_teacher", "organization", ORG)];
 
 type State = { active: boolean; version: number | null; grants: Row[]; parent?: boolean };
 function world(state: State): FakeHandlers {
@@ -73,8 +70,14 @@ describe("current role session", () => {
       ["super_admin", "organization", ORG],
     ] as const) {
       const admin = await resolveAdminAccess(
-        fakeData(world({ active: true, version: 1, grants: [grant(role, scopeType, scopeId)] }))
-          .database,
+        fakeData(
+          world({
+            active: true,
+            version: 1,
+            grants: [grant(role, scopeType, scopeId)],
+            parent: role === "group_admin",
+          }),
+        ).database,
         ACCOUNT,
         NOW,
       );
@@ -99,7 +102,7 @@ describe("current role session", () => {
     if (access.state !== "success") throw new Error("expected a teacher session");
     const session = access.data.applicationSession;
     expect(session.isActive).toBe(true);
-    expect(session.grants.map((entry) => entry.scope.id)).toEqual(["group-oak", "group-sunflower"]);
+    expect(session.grants.map((entry) => entry.scope.id)).toEqual([ORG]);
     expect(session.grants.every((entry) => entry.role === "kindergarten_teacher")).toBe(true);
     expect(session.roles).toEqual(["kindergarten_teacher"]);
   });
@@ -149,7 +152,7 @@ describe("current role session", () => {
   it("a malformed persisted role or scope cannot become teacher authority", async () => {
     for (const bad of [
       grant("unknown", "group", "group-oak"),
-      grant("kindergarten_teacher", "organization", ORG),
+      grant("kindergarten_teacher", "group", "group-oak"),
       grant("kindergarten_teacher", "tenant", "group-oak"),
     ]) {
       expect(await teacherAccess({ active: true, version: 1, grants: [bad] })).toEqual({
@@ -174,6 +177,7 @@ describe("current role session", () => {
       active: true,
       version: 1,
       grants: [grant("group_admin", "group", "group-boroka")],
+      parent: true,
     };
     const database = fakeData(world(state)).database;
     const before = await resolveAdminAccess(database, ACCOUNT, NOW);

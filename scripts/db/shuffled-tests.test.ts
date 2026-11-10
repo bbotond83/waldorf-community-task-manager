@@ -29,13 +29,13 @@ describe("shuffled database test run", () => {
     const scripts = JSON.parse(readFileSync(new URL("../../package.json", import.meta.url), "utf8"))
       .scripts as Record<string, string>;
     // U1's stack tests, U2's identity tests, U3's directory and coordination tests, U4's notification
-    // and import tests and U5's audit purge, seed, reset and timing tests; the bundle test needs a build, so it runs
+    // tests and U5's audit purge, seed, reset and timing tests; the bundle test needs a build, so it runs
     // after one.
     const listed = [
       scripts["test:database:stack"]!,
       scripts["test:database:identity"]!,
       scripts["test:database:directory"]!,
-      scripts["test:database:notifications-import"]!,
+      scripts["test:database:notifications"]!,
       scripts["test:database:seed"]!,
     ]
       .flatMap((script) => script.split(" "))

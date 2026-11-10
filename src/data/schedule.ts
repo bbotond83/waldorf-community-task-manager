@@ -19,7 +19,7 @@ export function toScheduleEntry(row: Row, organizationId: string): TrackingSourc
     id,
     sourceRecordId: id,
     organizationId,
-    groupId: text(row, "group_id"),
+    groupId: optionalText(row, "group_id") ?? null,
     startsAt: text(row, "starts_at"),
     endsAt: text(row, "ends_at"),
     title: text(row, "title"),

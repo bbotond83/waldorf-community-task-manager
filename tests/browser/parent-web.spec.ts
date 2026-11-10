@@ -58,9 +58,9 @@ test("a full duty and an unrelated one expose no signup action", async ({ page }
   await page.goto(`/szulo/feladatok/${world().id(DECORATING)}`);
   await expect(page.getByTestId("duty-full-state")).toBeVisible();
   await expect(page.getByTestId("signup-form-submit-button")).toHaveCount(0);
-  // A duty of the other group is not the family's at all.
+  // A duty of another working group is open to every family (BR4.1).
   await page.goto(`/szulo/feladatok/${world().id("task:2:1")}`);
-  await expect(page.getByTestId("signup-form-submit-button")).toHaveCount(0);
+  await expect(page.getByTestId("signup-form-submit-button")).toHaveCount(1);
 });
 
 test("swap request validates, succeeds once, and keeps protected reason out of the DOM", async ({
@@ -144,8 +144,8 @@ test("Parent sees permitted allergen text and edits only the own contribution no
   await expect(page.locator("body")).not.toContainText("telefonszám");
 });
 
-test("unrelated duty access is generic and privacy-safe", async ({ page }) => {
-  const foreign = world().id("task:2:1");
+test("an unknown duty is generic and privacy-safe", async ({ page }) => {
+  const foreign = "cccccccc-0000-4000-8000-00000000ffff";
   await page.goto(`/szulo/feladatok/${foreign}`);
   await expect(page.getByTestId("duty-detail-denied")).toContainText("nem érhető el");
   await expect(page.locator("body")).not.toContainText(foreign);

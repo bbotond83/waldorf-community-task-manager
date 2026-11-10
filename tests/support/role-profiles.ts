@@ -51,9 +51,9 @@ const SHELL_TEXT: Record<RoleProfile["id"], { label: string; scopeSummary: strin
   parent: { label: "Szülő", scopeSummary: "A család saját feladatai" },
   teacher: {
     label: "Óvónő",
-    scopeSummary: "A kijelölt csoportok beosztása, módosítás nélkül",
+    scopeSummary: "A közösség beosztása, módosítás nélkül",
   },
-  "group-admin": { label: "Csoportadminisztrátor", scopeSummary: "A kijelölt csoportok" },
+  "group-admin": { label: "Koordinátor", scopeSummary: "A saját munkacsoportok" },
   "super-admin": {
     label: "Szuperadminisztrátor",
     scopeSummary: "A szervezet és a szerepkörök kezelése",

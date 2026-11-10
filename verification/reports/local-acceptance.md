@@ -1,9 +1,9 @@
 # Local Acceptance Report
 
-- Git SHA: `8f1cefa195cb943b3746c1902f2939459e7149ad`
-- Manifest: `waldorf-scenarios-v1` (SHA-256 `0a911aa974ac3d0435e7613440f7ff48c8422e043c164873aa9af8119f4bf896`)
-- Generated from evidence completed at: `2026-10-27T08:26:15.825Z`
-- Results: 33 PASS, 0 FAIL, 6 OUTSTANDING
+- Git SHA: `d24ab2afb62af716605de693a4dc52a6e0a217c7`
+- Manifest: `waldorf-scenarios-v1` (SHA-256 `12e08838506acbefa0c4f745b80f5337ce602c91b0c055f947b8ac4d26f17751`)
+- Generated from evidence completed at: `2026-11-09T18:01:52.451Z`
+- Results: 31 PASS, 0 FAIL, 6 OUTSTANDING
 
 | Scenario | Target | Result | Tool | Artifact |
 |---|---|---|---|---|
@@ -23,7 +23,6 @@
 | LOCAL-ADMIN-TASKS | local | PASS | `npm run test:browser` | `.verification/logs/browser.log` |
 | LOCAL-ADMIN-ASSIGNMENTS | local | PASS | `npm run test:browser` | `.verification/logs/browser.log` |
 | LOCAL-ADMIN-APPROVAL | local | PASS | `npm run test:browser` | `.verification/logs/browser.log` |
-| LOCAL-IMPORT | local | PASS | `npm run test:browser` | `.verification/logs/browser.log` |
 | LOCAL-REMINDER-MONITORING | local | PASS | `npm run test:browser` | `.verification/logs/browser.log` |
 | LOCAL-PRIVACY-LIFECYCLE | local | PASS | `npm run test:browser` | `.verification/logs/browser.log` |
 | LOCAL-GOVERNANCE-REVOCATION | local | PASS | `npm run test:browser` | `.verification/logs/browser.log` |
@@ -37,7 +36,6 @@
 | NFR08-QUEUES-FILTERS | local | PASS | `npm run test:browser` | `.verification/logs/browser.log` |
 | NFR08-SCHOOL-YEAR-ARCHIVE | local | PASS | `npm run test:browser` | `.verification/logs/browser.log` |
 | NFR08-ROLE-RESOURCE-FIELD-PARITY | local | PASS | `npm run verify:manifests` | `.verification/logs/manifests.log` |
-| NFR08-IMPORT | local | PASS | `npm run test:browser` | `.verification/logs/browser.log` |
 | NFR08-REMINDERS | local | PASS | `npm run test:browser` | `.verification/logs/browser.log` |
 | NFR08-LIFECYCLE-RECOVERY | local | PASS | `npm run test:browser` | `.verification/logs/browser.log` |
 | SAFARI-DESKTOP-SMOKE | linked-target | OUTSTANDING | `manual Safari runbook` | `.verification/logs/outstanding.log` |

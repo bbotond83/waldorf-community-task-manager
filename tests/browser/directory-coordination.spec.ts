@@ -157,25 +157,21 @@ test.beforeAll(async () => {
     [G3, "Meghívott csoport"],
   ]) {
     await db.query(
-      "insert into groups (id, organization_id, school_year_id, name) values ($1, $2, $3, $4)",
+      "insert into groups (id, organization_id, school_year_id, name, description) values ($1, $2, $3, $4, 'Leírás.')",
       [id, ORG, YEAR, name],
     );
   }
-  for (const [id, name, group] of [
-    [F1, "Fenyő család", G1],
-    [F2, "Diófa család", G1],
-    [F4, "Meghívott család", G3],
-    [F5, "Hárs család", G2],
+  for (const [id, name] of [
+    [F1, "Fenyő család"],
+    [F2, "Diófa család"],
+    [F4, "Meghívott család"],
+    [F5, "Hárs család"],
   ]) {
     await db.query("insert into families (id, organization_id, display_name) values ($1, $2, $3)", [
       id,
       ORG,
       name,
     ]);
-    await db.query(
-      "insert into group_memberships (organization_id, family_id, group_id) values ($1, $2, $3)",
-      [ORG, id, group],
-    );
   }
   const task = (id: string, group: string, title: string, capacity: number, offset: number) =>
     db.query(
@@ -328,8 +324,8 @@ test("the people of the test world exist and the home page leads each to their o
   boss = await newUser("boss", { role: "super_admin", scopeType: "organization", scope: ORG });
   teacher = await newUser("teacher", {
     role: "kindergarten_teacher",
-    scopeType: "group",
-    scope: G1,
+    scopeType: "organization",
+    scope: ORG,
   });
   await db.query(
     "insert into assignments (id, organization_id, task_id, family_id, source) values ($1,$2,$3,$4,'admin_assign'), ($5,$2,$6,$7,'admin_assign'), ($8,$2,$9,$7,'admin_assign')",
@@ -526,7 +522,6 @@ test("the extended admin forms create a family and a task, refuse a wrong assign
   );
   await accessible(page, "family form errors");
   await page.getByTestId("admin-record-title-input").fill("Újfalusi család");
-  await page.getByTestId("admin-family-group-select").selectOption({ label: "Boróka" });
   await page.getByTestId("admin-parent-0-name-input").fill("Újfalusi Zoltán");
   await page.getByTestId("admin-parent-0-email-input").fill("rossz-cim");
   await page.getByTestId("admin-record-create-form-submit-button").click();
@@ -554,17 +549,12 @@ test("the extended admin forms create a family and a task, refuse a wrong assign
     contact_email: "zoltan@example.test",
     optional_profile: "Asztalos vagyok.",
   });
-  const member = await oneValue<{ n: number }>(
-    "select count(*)::int as n from group_memberships where family_id = $1 and group_id = $2 and status = 'active'",
-    [family.id, G1],
-  );
-  expect(member.n).toBe(1);
 
-  // The same family on its edit page, with the parent filled in and the membership to end.
+  // The same family on its edit page, with the parent filled in; a family has no working group (BR1.5).
   await page.goto(`/admin/nyilvantartasok/${family.id}`);
   await expect(page.getByTestId("admin-parent-0-name-input")).toHaveValue("Újfalusi Zoltán");
   await expect(page.getByTestId("admin-parent-0-consent-input")).toBeChecked();
-  await expect(page.getByLabel("Tagság megszüntetése: Boróka")).toBeVisible();
+  await expect(page.getByLabel("Tagság megszüntetése: Boróka")).toHaveCount(0);
   await accessible(page, "family edit form");
 
   // A school year form and a task form.
@@ -588,12 +578,12 @@ test("the extended admin forms create a family and a task, refuse a wrong assign
   );
   expect(created.starts_at.toISOString()).toBe("2027-03-10T08:00:00.000Z");
 
-  // Assignment: a family outside the group is refused with the Hungarian message; one in the group is placed.
+  // Assignment: any active family may be placed, whichever working group its parents belong to (BR4.2).
   await page.goto(`/admin/feladatok/${created.id}`);
   await page.getByTestId("admin-assignment-family-select").selectOption({ label: "Hárs család" });
   await page.getByTestId("admin-assignment-form-submit-button").click();
-  await expect(alertOf(page)).toContainText("nem jogosult erre a feladatra");
-  await accessible(page, "assignment refused");
+  await expect(page.getByTestId("admin-assignment-form-state-success")).toBeVisible();
+  await accessible(page, "assignment done");
   await page.getByTestId("admin-assignment-family-select").selectOption({ label: "Fenyő család" });
   await page.getByTestId("admin-assignment-form-submit-button").click();
   await expect(page.getByTestId("admin-assignment-form-state-success")).toBeVisible();
@@ -615,7 +605,7 @@ test("the extended admin forms create a family and a task, refuse a wrong assign
   await context.close();
 });
 
-test("an invited new parent is linked to the family and sees the tasks of its group", async ({
+test("an invited new parent is linked to the family and sees every open task of the community", async ({
   browser,
 }) => {
   const session = await service.passwordSignIn(boss.address, boss.password);
@@ -654,34 +644,32 @@ test("an invited new parent is linked to the family and sees the tasks of its gr
   );
   expect(linked.account_id).not.toBeNull();
 
-  // The new parent's home is the parent area, and the list is that of the family's group only.
+  // The new parent's home is the parent area, and the list holds every open task of the community (BR4.1).
   await page.goto("/");
   await expect(page).toHaveURL(/\/szulo\/ertesitesek$/);
   await page.goto("/szulo/feladatok");
   await expect(page.getByTestId(`duty-card-${T_G3}`)).toBeVisible();
-  await expect(page.getByTestId(`duty-card-${T_LAST}`)).toHaveCount(0);
-  await expect(page.getByTestId(`duty-card-${T_G2}`)).toHaveCount(0);
+  await expect(page.getByTestId(`duty-card-${T_G2}`)).toBeVisible();
   await accessible(page, "new parent task list");
   await context.close();
 });
 
-test("a teacher sees the schedule of the granted group only", async ({ browser }) => {
+test("a teacher sees the whole community's schedule and can narrow it to one working group (W6)", async ({
+  browser,
+}) => {
   const { context, page } = await openSession(browser, teacher);
   await page.goto("/teacher/schedule");
   await expect(page.getByRole("heading", { level: 1, name: "Beosztás" })).toBeVisible();
   await expect(page.getByTestId(`teacher-schedule-row-${T_LAST}`)).toBeVisible();
   await expect(page.getByTestId(`teacher-schedule-row-${T_SW1}`)).toBeVisible();
-  await expect(page.getByTestId(`teacher-schedule-row-${T_G2}`)).toHaveCount(0);
-  await expect(page.getByTestId(`teacher-schedule-row-${T_G3}`)).toHaveCount(0);
-  // No contact details, notes or other groups' families.
-  const text = await page.locator("main").innerText();
-  expect(text).not.toContain("Hárs család");
-  expect(text).not.toContain("@example.test");
+  await expect(page.getByTestId(`teacher-schedule-row-${T_G2}`)).toBeVisible();
+  await expect(page.getByTestId(`teacher-schedule-row-${T_G3}`)).toBeVisible();
+  // No contact details.
+  expect(await page.locator("main").innerText()).not.toContain("@example.test");
   await accessible(page, "teacher schedule");
 
-  // The address of a group the teacher is not granted gives no data.
   await page.goto(`/teacher/schedule?groupId=${G2}`);
-  await expect(page.getByTestId(`teacher-schedule-row-${T_G2}`)).toHaveCount(0);
-  expect(await page.locator("main").innerText()).not.toContain("Napraforgó-feladat");
+  await expect(page.getByTestId(`teacher-schedule-row-${T_G2}`)).toBeVisible();
+  await expect(page.getByTestId(`teacher-schedule-row-${T_LAST}`)).toHaveCount(0);
   await context.close();
 });

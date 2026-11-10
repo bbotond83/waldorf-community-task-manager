@@ -16,7 +16,6 @@ import {
   GROUP_1,
   GROUP_2,
   IDENTITY_SCHEMAS,
-  IMPORT_RUN_1,
   openIdentityDatabase,
   ORGANIZATION,
   OTHER_ADMIN,
@@ -130,8 +129,8 @@ for (const schema of IDENTITY_SCHEMAS) {
       app_role_grants: {
         parent: 1,
         teacher: 1,
-        adminSame: 5,
-        adminOther: 2,
+        adminSame: 1,
+        adminOther: 1,
         super: 9,
         nogrant: 0,
         deactivated: 0,
@@ -150,9 +149,9 @@ for (const schema of IDENTITY_SCHEMAS) {
       families: {
         parent: 1,
         teacher: 0,
-        adminSame: 1,
-        adminOther: 1,
-        super: 2,
+        adminSame: 0,
+        adminOther: 0,
+        super: 4,
         nogrant: 0,
         deactivated: 0,
         signedOut: 0,
@@ -167,21 +166,11 @@ for (const schema of IDENTITY_SCHEMAS) {
         deactivated: 0,
         signedOut: 0,
       },
-      app_import_runs: {
-        parent: 0,
-        teacher: 0,
-        adminSame: 0,
-        adminOther: 0,
-        super: 1,
-        nogrant: 0,
-        deactivated: 0,
-        signedOut: 0,
-      },
       accounts: {
         parent: 1,
         teacher: 1,
-        adminSame: 5,
-        adminOther: 2,
+        adminSame: 1,
+        adminOther: 1,
         super: 10,
         nogrant: 1,
         deactivated: 0,
@@ -190,8 +179,8 @@ for (const schema of IDENTITY_SCHEMAS) {
       invitations: {
         parent: 0,
         teacher: 0,
-        adminSame: 1,
-        adminOther: 1,
+        adminSame: 0,
+        adminOther: 0,
         super: 3,
         nogrant: 0,
         deactivated: 0,
@@ -234,8 +223,22 @@ for (const schema of IDENTITY_SCHEMAS) {
           [email, role, scopeType, scope, ORGANIZATION, tokenHashFor(label), by],
         );
       await invite("one@example.test", "parent", "family", FAMILY_1, SUPER_ADMIN, "i1");
-      await invite("two@example.test", "kindergarten_teacher", "group", GROUP_2, ADMIN_G2, "i2");
-      await invite("three@example.test", "group_admin", "group", GROUP_1, SUPER_ADMIN, "i3");
+      await invite(
+        "two@example.test",
+        "kindergarten_teacher",
+        "organization",
+        ORGANIZATION,
+        SUPER_ADMIN,
+        "i2",
+      );
+      await invite(
+        "three@example.test",
+        "super_admin",
+        "organization",
+        ORGANIZATION,
+        SUPER_ADMIN,
+        "i3",
+      );
       for (const group of [GROUP_1, GROUP_2, null]) {
         await db.query(
           "insert into audit_events (actor_account_id, actor_role, action, target_type, target_id, organization_id, group_id, outcome) values ($1, 'super_admin', 'role.grant', 'account', $2, $3, $4, 'success')",
@@ -283,19 +286,7 @@ for (const schema of IDENTITY_SCHEMAS) {
       }
     });
 
-    it("refuses writes to the import table to a token without an active session, and every direct write to the family and assignment tables to anyone", async () => {
-      const importRun =
-        "insert into app_import_runs (id, organization_id, scope_id) values (gen_random_uuid(), $1, $1)";
-      const live = await asActor(db, schema, authenticated(SUPER_ADMIN), () =>
-        db.query(importRun, [ORGANIZATION]),
-      );
-      assert.equal(live.rowCount, 1, importRun);
-      const dead = await failureOf(() =>
-        asActor(db, schema, authenticated(SUPER_ADMIN, uuid(9997)), () =>
-          db.query(importRun, [ORGANIZATION]),
-        ),
-      );
-      assert.equal(dead?.code, "42501", importRun);
+    it("refuses every direct write to the family and assignment tables to anyone", async () => {
       // Directory and Coordination tables are changed by their named functions only (U3 BR30.1).
       for (const sql of [
         "insert into families (organization_id, display_name) values ($1, 'Közvetlen család')",
@@ -367,7 +358,7 @@ for (const schema of IDENTITY_SCHEMAS) {
         families: (await db.query("select id from families")).rows.length,
       }));
       assert.deepEqual(own, { grants: 1, families: 0 });
-      assert.ok(FAMILY_2 && PARENT_F2 && IMPORT_RUN_1 && ASSIGNMENT_1);
+      assert.ok(FAMILY_2 && PARENT_F2 && ASSIGNMENT_1);
     });
 
     it("adds little time to an ordinary policy-filtered read (reported; fails above 200 ms)", async () => {

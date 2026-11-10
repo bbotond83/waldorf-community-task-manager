@@ -100,6 +100,11 @@ export function parseRecordExtras(
     const schoolYearId = text(formData, "schoolYearId");
     if (schoolYearId) payload.schoolYearId = schoolYearId;
     else if (creating) errors.schoolYearId = "Válassza ki a nevelési évet.";
+    const description = text(formData, "description");
+    if (!description) errors.description = "A leírás megadása kötelező.";
+    else if (description.length > 1000)
+      errors.description = "A leírás legfeljebb 1000 karakter lehet.";
+    else payload.description = description;
   }
   if (kind === "school-year") {
     const startsOn = text(formData, "startsOn");
@@ -123,13 +128,6 @@ export function parseRecordExtras(
     const parsed = parseParents(formData);
     Object.assign(errors, parsed.errors);
     payload.parents = parsed.parents;
-    const added = text(formData, "addGroupId");
-    if (added) payload.addGroupIds = [added];
-    else if (creating) errors.addGroupId = "Válassza ki a csoportot, amelynek a család tagja lesz.";
-    const ended = formData
-      .getAll("endGroupIds")
-      .filter((value): value is string => typeof value === "string" && value !== "");
-    if (ended.length > 0) payload.endGroupIds = ended;
   }
   return { payload, errors };
 }
@@ -149,7 +147,7 @@ export function parseTaskExtras(
 
   const groupId = text(formData, "groupId");
   if (groupId) payload.groupId = groupId;
-  else if (creating) errors.groupId = "Válassza ki a csoportot.";
+  else if (creating) errors.groupId = "Válassza ki a munkacsoportot.";
 
   const startsAt = readInstant(formData, "startsAt", "kezdési időpont", errors);
   const endsAt = readInstant(formData, "endsAt", "befejezési időpont", errors, startsAt);

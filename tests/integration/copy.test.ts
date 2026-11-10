@@ -3,7 +3,6 @@ import {
   ADMIN_CONFLICT_MESSAGES,
   mapApplicationResult,
 } from "../../app/admin/_lib/action-state.ts";
-import { IMPORT_MESSAGES } from "../../app/admin/_lib/import-messages.ts";
 import { mapParentResult, PARENT_CONFLICT_MESSAGES } from "../../app/szulo/_lib/action-state.ts";
 import { conflict, invalidated, success } from "../../src/application/index.ts";
 import { statusLabel } from "../../src/application/status-labels.ts";
@@ -15,7 +14,6 @@ const ENGLISH = /\b(the|and|error|failed|not|full|closed|swap|request|cannot|alr
 
 const PARENT_CODES = [
   "DUTY_FULL",
-  "DUTY_INELIGIBLE",
   "DUTY_CLOSED",
   "DUTY_ALREADY_ASSIGNED",
   "REQUEST_DUPLICATE",
@@ -27,7 +25,6 @@ const PARENT_CODES = [
 const ADMIN_CODES = [
   "RESTORE_CONFLICT",
   "VERSION_CONFLICT",
-  "ASSIGNMENT_INELIGIBLE",
   "ASSIGNMENT_CAPACITY_FULL",
   "MEMBERSHIP_DUPLICATE",
   "ACCOUNT_ALREADY_LINKED",
@@ -115,41 +112,6 @@ describe("every conflict code of the database adapters has a message on some scr
   });
 });
 
-describe("the messages of the import screen (BR42.2, BR42.3)", () => {
-  // The codes the import answers, as the table of BR42.3 lists them.
-  const IMPORT_CODES = [
-    "IMPORT_MALFORMED",
-    "IMPORT_OVERSIZED",
-    "IMPORT_MISSING_SHEET",
-    "IMPORT_MISSING_HEADER",
-    "IMPORT_UNSAFE_CELL",
-    "IMPORT_FINGERPRINT_CHANGED",
-    "IMPORT_CONFLICT_UNRESOLVED",
-    "IMPORT_CONFIRMATION_REQUIRED",
-    "IMPORT_MATCH_CHANGED",
-    "IMPORT_RECOVERY_NOT_AVAILABLE",
-    "IMPORT_RECOVERY_ACTION_INVALID",
-    "IMPORT_PREVIEW_STALE",
-  ] as const;
-
-  it.each(IMPORT_CODES)("%s has its own Hungarian message", (code) => {
-    const message = IMPORT_MESSAGES[code];
-    expect(message).toBeTruthy();
-    expect(message).not.toContain(code);
-    expect(message).not.toMatch(ENGLISH);
-  });
-
-  it("has exactly the codes of the table, every message different", () => {
-    expect(Object.keys(IMPORT_MESSAGES).sort()).toEqual([...IMPORT_CODES].sort());
-    expect(new Set(Object.values(IMPORT_MESSAGES)).size).toBe(IMPORT_CODES.length);
-  });
-
-  it("names the unsafe cell and the changed match in words an administrator can act on", () => {
-    expect(IMPORT_MESSAGES.IMPORT_UNSAFE_CELL).toContain("képlet");
-    expect(IMPORT_MESSAGES.IMPORT_MATCH_CHANGED).toContain("erősítse meg újra");
-  });
-});
-
 describe("the other new words of the screens", () => {
   it("has its own word for a closed task", () => {
     expect(statusLabel("closed")).toBe("Lezárva");
@@ -161,6 +123,7 @@ describe("the other new words of the screens", () => {
       ["parent-notifications", "Értesítések", "/szulo/ertesitesek"],
       ["parent-duties", "Feladatok", "/szulo/feladatok"],
       ["parent-swaps", "Cserék", "/szulo/cserek"],
+      ["parent-working-groups", "Munkacsoportok", "/szulo/munkacsoportok"],
     ]);
   });
 });

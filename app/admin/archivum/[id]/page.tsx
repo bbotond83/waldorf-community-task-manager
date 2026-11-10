@@ -15,8 +15,10 @@ export default async function ArchiveDetailPage({ params }: { params: Promise<{ 
   const facade = await resolveAdminFacade();
   const result =
     session.state === "success" && facade
-      ? await facade.getRecord(session.data.applicationSession, session.data.scope, "record", id)
+      ? await facade.getArchived(session.data.applicationSession, session.data.scope, id)
       : terminalFailure();
+  // Restoring a working group is a super admin's (BR2.5).
+  const canRestore = session.state === "success" && session.data.groupIds.length === 0;
   return (
     <section className="admin-page" data-testid="admin-archive-detail-page">
       <header>
@@ -35,19 +37,21 @@ export default async function ArchiveDetailPage({ params }: { params: Promise<{ 
             <p>
               Állapot: <StatusBadge {...statusDisplay(record.state)} />
             </p>
-            <AdminMutationForm
-              action={restoreRecordAction}
-              submitLabel="Visszaállítás"
-              testId="admin-record-restore-form"
-            >
-              <input type="hidden" name="id" value={record.id} />
-              <input type="hidden" name="expectedVersion" value={record.version ?? 1} />
-              <input
-                type="hidden"
-                name="idempotencyKey"
-                value={`record:restore:${record.id}:${randomUUID()}`}
-              />
-            </AdminMutationForm>
+            {canRestore && (
+              <AdminMutationForm
+                action={restoreRecordAction}
+                submitLabel="Visszaállítás"
+                testId="admin-record-restore-form"
+              >
+                <input type="hidden" name="id" value={record.id} />
+                <input type="hidden" name="expectedVersion" value={record.version ?? 1} />
+                <input
+                  type="hidden"
+                  name="idempotencyKey"
+                  value={`record:restore:${record.id}:${randomUUID()}`}
+                />
+              </AdminMutationForm>
+            )}
           </>
         )}
       </AsyncStatePanel>

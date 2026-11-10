@@ -9,4 +9,6 @@ export type ShellProfile = Readonly<{
   scopeSummary: string;
   homePath: string;
   navigation: readonly NavigationItem[];
+  /** For someone who is both a parent and an administrator: the way to the other menu (BR8.1). */
+  switchLink?: Readonly<{ label: string; href: string }>;
 }>;

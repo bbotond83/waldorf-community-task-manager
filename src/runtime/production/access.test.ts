@@ -60,7 +60,7 @@ test("a parent's family comes from the linked Parent and the matching family gra
   assert.equal(access.data.profile.homePath, "/szulo/ertesitesek");
   assert.deepEqual(
     access.data.profile.navigation.map((item) => item.href),
-    ["/szulo/ertesitesek", "/szulo/feladatok", "/szulo/cserek"],
+    ["/szulo/ertesitesek", "/szulo/feladatok", "/szulo/cserek", "/szulo/munkacsoportok"],
   );
 });
 
@@ -107,33 +107,64 @@ test("a super admin reaches the organization and ranks above a group admin grant
   assert.ok(access.data.profile.navigation.some((item) => item.href === "/admin/beallitasok"));
 });
 
-test("a group admin reaches the first of their groups in a stable order", async () => {
+test("a group admin holds all their groups, in a stable order, with an active linked parent (BR3.2)", async () => {
   const fake = fakeData(
-    world([grant("group_admin", "group", GROUP_A), grant("group_admin", "group", GROUP_B)]),
+    world([grant("group_admin", "group", GROUP_A), grant("group_admin", "group", GROUP_B)], {
+      parent: true,
+    }),
   );
   const access = await resolveAdminAccess(fake.database, ACCOUNT, NOW);
   assert.equal(access.state, "success");
   if (access.state !== "success") return;
   assert.equal(access.data.scope.id, GROUP_B);
-  assert.equal(access.data.profile.label, "Csoportadminisztrátor");
+  assert.deepEqual(access.data.groupIds, [GROUP_B, GROUP_A]);
+  assert.equal(access.data.profile.label, "Koordinátor");
   assert.ok(!access.data.profile.navigation.some((item) => item.href === "/admin/beallitasok"));
+  assert.ok(!access.data.profile.navigation.some((item) => item.href === "/admin/nyilvantartasok"));
+});
+
+test("a group admin right without an active linked parent reaches nothing (BR3.2)", async () => {
+  const fake = fakeData(world([grant("group_admin", "group", GROUP_A)]));
+  assert.equal((await resolveAdminAccess(fake.database, ACCOUNT, NOW)).state, "denied");
+});
+
+test("someone who is both a parent and an administrator can switch menus (BR8.1)", async () => {
+  const grants = [grant("group_admin", "group", GROUP_A), grant("parent", "family", FAMILY)];
+  const asAdmin = await resolveAdminAccess(
+    fakeData(world(grants, { parent: true })).database,
+    ACCOUNT,
+    NOW,
+  );
+  assert.equal(
+    asAdmin.state === "success" && asAdmin.data.profile.switchLink?.label,
+    "Szülői nézet",
+  );
+  const asParent = await resolveParentAccess(
+    fakeData(world(grants, { parent: true })).database,
+    ACCOUNT,
+    NOW,
+  );
+  assert.equal(asParent.state === "success" && asParent.data.profile.switchLink?.href, "/admin");
 });
 
 test("a teacher or a parent is not an admin", async () => {
-  const teacher = fakeData(world([grant("kindergarten_teacher", "group", GROUP_A)]));
+  const teacher = fakeData(world([grant("kindergarten_teacher", "organization", ORG)]));
   assert.deepEqual(await resolveAdminAccess(teacher.database, ACCOUNT, NOW), {
     state: "denied",
     homePath: "/teacher/schedule",
   });
 });
 
-test("a teacher holds a granted group, and others are denied to the home of their own role", async () => {
-  const fake = fakeData(world([grant("kindergarten_teacher", "group", GROUP_A)]));
+test("a teacher holds the community, and others are denied to the home of their own role", async () => {
+  const fake = fakeData(world([grant("kindergarten_teacher", "organization", ORG)]));
   const access = await resolveTeacherAccess(fake.database, ACCOUNT, NOW);
   assert.equal(access.state, "success");
   if (access.state === "success") {
     assert.equal(access.data.profile.label, "Óvónő");
-    assert.equal(access.data.profile.navigation.length, 0);
+    assert.deepEqual(
+      access.data.profile.navigation.map((item) => item.label),
+      ["Beosztás", "Munkacsoportok"],
+    );
     assert.equal(access.data.applicationSession.roles[0], "kindergarten_teacher");
   }
   const admin = fakeData(world([grant("super_admin", "organization", ORG)]));

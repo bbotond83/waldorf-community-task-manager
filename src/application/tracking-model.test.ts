@@ -56,14 +56,11 @@ it("Teacher source requires explicit metadata and nullable fields", () => {
     assert.equal(isTrackingSource({ ...row, [key as string]: value }), false);
   assert.equal(isTrackingSource(null), false);
 });
-it("Teacher scope checks organization as well as group", () => {
-  assert.ok(matchesTrackingScope(row, { id: "group", type: "group", organizationId: "org" }));
+it("Teacher scope is the whole community: only the organization is checked (BR3.7)", () => {
+  assert.ok(matchesTrackingScope(row, { id: "org", type: "organization", organizationId: "org" }));
+  assert.ok(matchesTrackingScope(row, { id: "other-group", type: "group", organizationId: "org" }));
   assert.equal(
-    matchesTrackingScope(row, { id: "group", type: "group", organizationId: "other" }),
-    false,
-  );
-  assert.equal(
-    matchesTrackingScope(row, { id: "group", type: "organization", organizationId: "org" }),
+    matchesTrackingScope(row, { id: "other", type: "organization", organizationId: "other" }),
     false,
   );
 });

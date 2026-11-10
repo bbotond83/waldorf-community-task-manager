@@ -42,10 +42,14 @@ export const FAMILY_1 = uuid(201);
 export const FAMILY_2 = uuid(202);
 export const ASSIGNMENT_1 = uuid(301);
 export const TASK_OF_ASSIGNMENT_1 = uuid(302);
-export const IMPORT_RUN_1 = uuid(401);
 export const YEAR_1 = uuid(501);
 export const PARENT_ROW_F1 = uuid(601);
 export const PARENT_ROW_F2 = uuid(603);
+/** The families and parents that make the two group admins "held by an active parent" (BR3.2). */
+export const FAMILY_ADMIN_G1 = uuid(203);
+export const FAMILY_ADMIN_G2 = uuid(204);
+export const PARENT_ROW_ADMIN_G1 = uuid(607);
+export const PARENT_ROW_ADMIN_G2 = uuid(608);
 
 export const ADMIN_G1 = "bbbbbbbb-0000-4000-8000-000000000011";
 export const ADMIN_G2 = "bbbbbbbb-0000-4000-8000-000000000012";
@@ -106,24 +110,32 @@ export async function seedIdentityWorld(db: pg.Client, schema: string): Promise<
     [YEAR_1, ORGANIZATION],
   );
   await db.query(
-    "insert into groups (id, organization_id, school_year_id, name) values ($1, $3, $4, 'Boróka'), ($2, $3, $4, 'Napraforgó')",
+    "insert into groups (id, organization_id, school_year_id, name, description) values ($1, $3, $4, 'Boróka', 'Az első csoport.'), ($2, $3, $4, 'Napraforgó', 'A második csoport.')",
     [GROUP_1, GROUP_2, ORGANIZATION, YEAR_1],
   );
   await db.query(
-    "insert into families (id, organization_id, display_name) values ($1, $3, 'Fenyő család'), ($2, $3, 'Napraforgó család')",
-    [FAMILY_1, FAMILY_2, ORGANIZATION],
-  );
-  await db.query(
-    "insert into group_memberships (organization_id, family_id, group_id) values ($1, $2, $3), ($1, $4, $5)",
-    [ORGANIZATION, FAMILY_1, GROUP_1, FAMILY_2, GROUP_2],
+    "insert into families (id, organization_id, display_name) values ($1, $3, 'Fenyő család'), ($2, $3, 'Napraforgó család'), ($4, $3, 'Első koordinátor család'), ($5, $3, 'Második koordinátor család')",
+    [FAMILY_1, FAMILY_2, ORGANIZATION, FAMILY_ADMIN_G1, FAMILY_ADMIN_G2],
   );
   await db.query(
     "insert into parents (id, organization_id, family_id, display_name, account_id, optional_profile, optional_profile_consent) values ($1, $3, $4, 'Fenyő Anna', $5, 'Szívesen főzök.', true), ($2, $3, $6, 'Napraforgó Csilla', $7, null, false)",
     [PARENT_ROW_F1, PARENT_ROW_F2, ORGANIZATION, FAMILY_1, PARENT_F1, FAMILY_2, PARENT_F2],
   );
   await db.query(
-    "insert into app_import_runs (id, organization_id, scope_id) values ($1, $2, $2)",
-    [IMPORT_RUN_1, ORGANIZATION],
+    "insert into parents (id, organization_id, family_id, display_name, account_id) values ($1, $3, $4, 'Első Koordinátor', $5), ($2, $3, $6, 'Második Koordinátor', $7)",
+    [
+      PARENT_ROW_ADMIN_G1,
+      PARENT_ROW_ADMIN_G2,
+      ORGANIZATION,
+      FAMILY_ADMIN_G1,
+      ADMIN_G1,
+      FAMILY_ADMIN_G2,
+      ADMIN_G2,
+    ],
+  );
+  await db.query(
+    "insert into group_memberships (organization_id, parent_id, group_id) values ($1, $2, $3), ($1, $4, $5)",
+    [ORGANIZATION, PARENT_ROW_F1, GROUP_1, PARENT_ROW_F2, GROUP_2],
   );
   const grant = (subject: string, role: string, scopeType: string, scope: string) =>
     db.query(
@@ -132,7 +144,7 @@ export async function seedIdentityWorld(db: pg.Client, schema: string): Promise<
     );
   await grant(ADMIN_G1, "group_admin", "group", GROUP_1);
   await grant(ADMIN_G2, "group_admin", "group", GROUP_2);
-  await grant(TEACHER_G1, "kindergarten_teacher", "group", GROUP_1);
+  await grant(TEACHER_G1, "kindergarten_teacher", "organization", ORGANIZATION);
   await grant(PARENT_F1, "parent", "family", FAMILY_1);
   await grant(PARENT_F2, "parent", "family", FAMILY_2);
   await grant(DEACTIVATED, "parent", "family", FAMILY_1);

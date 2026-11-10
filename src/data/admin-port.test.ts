@@ -67,7 +67,14 @@ function admin(handlers: FakeHandlers) {
 
 const FAMILY = { id: id(1), display_name: "Fenyő család", status: "active", version: 3 };
 const CHILD = { id: id(2), family_id: id(1), display_name: "Gergő", status: "active", version: 2 };
-const GROUP = { id: id(3), school_year_id: id(4), name: "Boróka", status: "active", version: 5 };
+const GROUP = {
+  id: id(3),
+  school_year_id: id(4),
+  name: "Boróka",
+  description: "A kert gondozása.",
+  status: "active",
+  version: 5,
+};
 const YEAR = {
   id: id(4),
   name: "2026/2027",
@@ -122,7 +129,7 @@ test("one record is found by id across the kinds, and an unknown id is denied", 
       state: "active",
       version: 5,
       kind: "group",
-      details: { schoolYearId: id(4) },
+      details: { schoolYearId: id(4), description: "A kert gondozása." },
     },
   });
   assert.deepEqual(await run("records.get", { id: id(9) }), { state: "denied" });
@@ -150,7 +157,7 @@ test("a school year and a child are read with the fields their forms edit", asyn
   }
 });
 
-test("a family is read with its active parents, their contact details, children and groups", async () => {
+test("a family is read with its active parents, their contact details and children", async () => {
   const { fake, run } = admin({
     // The profile text is read through its function, only for the parent who gave consent.
     rpc: (name, args) =>
@@ -199,11 +206,6 @@ test("a family is read with its active parents, their contact details, children 
         },
       ],
       children: [{ ...CHILD, status: "active" }],
-      group_memberships: [
-        { family_id: id(1), group_id: id(3), status: "active" },
-        { family_id: id(1), group_id: id(5), status: "ended" },
-      ],
-      groups: [GROUP],
     }),
   });
   const outcome = await run("records.get", { id: id(1) });
@@ -233,7 +235,6 @@ test("a family is read with its active parents, their contact details, children 
       },
     ],
     children: [{ id: id(2), version: 2, displayName: "Gergő" }],
-    groups: [{ id: id(3), name: "Boróka" }],
   });
   // Only the parent with consent had a profile asked for.
   assert.deepEqual(
@@ -278,7 +279,7 @@ test("a parent who consented but wrote no profile text is read without a profile
   );
 });
 
-test("a family without parents or groups is read with empty lists", async () => {
+test("a family without parents is read with empty lists", async () => {
   const { run } = admin({ table: tables({ families: [FAMILY] }) });
   const outcome = await run("records.get", { id: id(1) });
   assert.equal(outcome.state, "success");
@@ -286,12 +287,11 @@ test("a family without parents or groups is read with empty lists", async () => 
     assert.deepEqual((outcome.data as { details: unknown }).details, {
       parents: [],
       children: [],
-      groups: [],
     });
   }
 });
 
-test("a new family is saved with its parents, contact details, children and groups", async () => {
+test("a new family is saved with its parents, contact details and children", async () => {
   const { fake, run } = admin({
     rpc: () => envelope("success", null, { version: 1 }, id(10)),
     table: tables({}),
@@ -314,7 +314,6 @@ test("a new family is saved with its parents, contact details, children and grou
         },
       ],
       children: [{ displayName: "Új Gyerek" }],
-      addGroupIds: [id(3)],
     },
     KEY,
   );
@@ -338,7 +337,6 @@ test("a new family is saved with its parents, contact details, children and grou
           },
         ],
         children: [{ display_name: "Új Gyerek" }],
-        add_group_ids: [id(3)],
       },
     },
   });
@@ -403,7 +401,14 @@ test("a group is created in a school year and renamed without sending the school
   });
   const created = await run(
     "records.save",
-    { id: "new", expectedVersion: 1, kind: "group", name: "Napraforgó", schoolYearId: id(4) },
+    {
+      id: "new",
+      expectedVersion: 1,
+      kind: "group",
+      name: "Napraforgó",
+      description: "Rövid leírás.",
+      schoolYearId: id(4),
+    },
     KEY,
   );
   assert.equal(created.state, "success");
@@ -412,7 +417,12 @@ test("a group is created in a school year and renamed without sending the school
     args: {
       p_idempotency_key: KEY,
       p_kind: "group",
-      p_payload: { id: null, name: "Napraforgó", school_year_id: id(4) },
+      p_payload: {
+        id: null,
+        name: "Napraforgó",
+        description: "Rövid leírás.",
+        school_year_id: id(4),
+      },
     },
   });
   await run("records.save", { id: id(3), expectedVersion: 5, title: "Boróka 2" }, KEY);
@@ -420,6 +430,7 @@ test("a group is created in a school year and renamed without sending the school
     id: id(3),
     expected_version: 5,
     name: "Boróka 2",
+    description: "A kert gondozása.",
   });
 });
 
@@ -816,8 +827,8 @@ test("giving a place needs a chosen family and returns the task's new version", 
   );
 });
 
-test("an ineligible family and a full task keep the codes the old admin adapter used", async () => {
-  for (const code of ["ASSIGNMENT_INELIGIBLE", "ASSIGNMENT_CAPACITY_FULL", "VERSION_CONFLICT"]) {
+test("a full task and a stale version keep the codes the old admin adapter used", async () => {
+  for (const code of ["ASSIGNMENT_CAPACITY_FULL", "VERSION_CONFLICT"]) {
     const { run } = admin({ rpc: () => envelope("conflict", code) });
     assert.deepEqual(
       await run("assignments.assign", { id: id(21), expectedVersion: 4, familyId: id(1) }, KEY),
@@ -981,11 +992,11 @@ test("approval refusals keep their states and an unknown request is denied", asy
 
 test("the dashboard counts come from the database for the admin's scope", async () => {
   const { run } = admin({
-    rpc: () => envelope("success", null, { open_approvals: 3, open_import_conflicts: 0 }),
+    rpc: () => envelope("success", null, { open_approvals: 3 }),
   });
   assert.deepEqual(await run("dashboard.get"), {
     state: "success",
-    data: { scopeId: ORG, openApprovals: 3, openImportConflicts: 0 },
+    data: { scopeId: ORG, openApprovals: 3 },
   });
   const refused = admin({ rpc: () => envelope("denied", "authorization_denied") });
   assert.deepEqual(await refused.run("dashboard.get"), { state: "denied" });
@@ -1223,29 +1234,14 @@ test("lifecycle refusals keep their codes", async () => {
   }
 });
 
-test("an upload on a port built without a workbook parser is denied and reaches no database function", async () => {
-  const { fake, run } = admin({});
-  assert.deepEqual(await run("import.preview", {}), { state: "denied" });
-  assert.equal(fake.rpcCalls.length, 0);
-});
-
 test("an operation the adapter does not know is answered with denied and no call", async () => {
   const { fake, run } = admin({});
   assert.deepEqual(await run("nonsense.operation" as never, {}), { state: "denied" });
   assert.equal(fake.rpcCalls.length, 0);
 });
 
-test("the import and reminder operations are answered by the database (U4)", () => {
-  for (const operation of [
-    "import.preview",
-    "import.status",
-    "import.resolve",
-    "import.commit",
-    "import.recover",
-    "import.cancel",
-    "reminders.list",
-    "reminders.retry",
-  ] as const) {
+test("the reminder operations and the family name list are answered by the database", () => {
+  for (const operation of ["families.names", "reminders.list", "reminders.retry"] as const) {
     assert.ok(DATABASE_ADMIN_OPERATIONS.includes(operation), operation);
   }
 });

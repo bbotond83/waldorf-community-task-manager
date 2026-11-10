@@ -58,8 +58,8 @@ for (const schema of DIRECTORY_SCHEMAS) {
           [family, ORGANIZATION, `Verseny család ${index}`],
         );
         await db.query(
-          "insert into group_memberships (organization_id, family_id, group_id) values ($1, $2, $3)",
-          [ORGANIZATION, family, GROUP_1],
+          "insert into app_role_grants (subject_id, role, scope_type, scope_id, organization_id) values ($1, 'parent', 'family', $2, $3)",
+          [account, family, ORGANIZATION],
         );
         await db.query(
           "insert into parents (id, organization_id, family_id, display_name, account_id) values ($1, $2, $3, $4, $5)",
@@ -158,6 +158,10 @@ for (const schema of DIRECTORY_SCHEMAS) {
       // Two parents of one family, two keys, the same version: one place for the family.
       const family = uuid(8200 + 1);
       await db.query("update parents set family_id = $1 where id = $2", [family, uuid(8300 + 2)]);
+      await db.query("update app_role_grants set scope_id = $1 where subject_id = $2", [
+        family,
+        accounts[2],
+      ]);
       await db.query("delete from assignments where task_id = $1", [RACE_TASK]);
       const version = (await db.query("select version from tasks where id = $1", [RACE_TASK]))
         .rows[0].version as number;
@@ -177,6 +181,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
           .every((answer) =>
             ["DUTY_VERSION_STALE", "DUTY_ALREADY_ASSIGNED"].includes(answer.code ?? ""),
           ),
+        JSON.stringify(both),
       );
       assert.equal(
         await count(db, "assignments", `family_id = '${family}' and task_id = '${RACE_TASK}'`),

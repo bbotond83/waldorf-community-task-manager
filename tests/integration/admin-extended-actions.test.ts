@@ -59,7 +59,7 @@ beforeEach(() => {
 });
 
 describe("saveRecordAction with the extended record form", () => {
-  it("sends a family with its group, parents, contact details and consent", async () => {
+  it("sends a family with its parents, contact details and consent, with no group (BR1.5)", async () => {
     const result = await saveRecordAction(
       initial,
       form({
@@ -80,7 +80,6 @@ describe("saveRecordAction with the extended record form", () => {
     expect(input.payload).toEqual({
       title: "Fenyő család",
       kind: "family",
-      addGroupIds: ["g-1"],
       parents: [
         {
           displayName: "Fenyő Anna",
@@ -93,12 +92,12 @@ describe("saveRecordAction with the extended record form", () => {
     expect(world.revalidated).toEqual(["/admin/nyilvantartasok"]);
   });
 
-  it("ends a membership of a stored family and refreshes its page", async () => {
+  it("saves a stored family without any membership field and refreshes its page", async () => {
     await saveRecordAction(
       initial,
       form({ kind: "family", extended: "1", endGroupIds: ["g-1", "g-2"] }),
     );
-    expect(world.facade.saveRecord.mock.calls[0]![1].payload.endGroupIds).toEqual(["g-1", "g-2"]);
+    expect(world.facade.saveRecord.mock.calls[0]![1].payload).not.toHaveProperty("endGroupIds");
     expect(world.revalidated).toEqual(["/admin/nyilvantartasok", `/admin/nyilvantartasok/${ID}`]);
   });
 
@@ -117,7 +116,6 @@ describe("saveRecordAction with the extended record form", () => {
     expect(result).toMatchObject({
       state: "validation",
       fieldErrors: {
-        addGroupId: "Válassza ki a csoportot, amelynek a család tagja lesz.",
         "parent-0-email": "Adjon meg érvényes e-mail-címet.",
       },
     });

@@ -2,7 +2,6 @@ const SOFT_HYPHEN = "­";
 
 // Hungarian syllable boundaries for the fixed role names that are too long for narrow screens.
 const SYLLABLES: Readonly<Record<string, readonly string[]>> = {
-  Csoportadminisztrátor: ["Cso", "port", "ad", "mi", "niszt", "rá", "tor"],
   Szuperadminisztrátor: ["Szu", "per", "ad", "mi", "niszt", "rá", "tor"],
 };
 

@@ -104,7 +104,7 @@ function Form({ children, ...props }: { children: React.ReactNode; clearOnSucces
 }
 
 describe("the record form on the create page", () => {
-  it("starts as a family with its group and two parent blocks, all fields labelled", () => {
+  it("starts as a family with two parent blocks and no group field, all fields labelled (BR1.5)", () => {
     render(
       <Form>
         <RecordFields mode="create" lookups={LOOKUPS} />
@@ -112,13 +112,8 @@ describe("the record form on the create page", () => {
     );
     expect(screen.getByLabelText("Elem típusa")).toHaveValue("family");
     expect(screen.getByLabelText("A család neve")).toBeInTheDocument();
-    const group = screen.getByLabelText("Csoport");
-    expect(group).toBeRequired();
-    expect(
-      within(group)
-        .getAllByRole("option")
-        .map((option) => option.textContent),
-    ).toEqual(["Válasszon csoportot", "Boróka", "Napraforgó"]);
+    expect(screen.queryByLabelText("Csoport")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Munkacsoport")).not.toBeInTheDocument();
     const blocks = screen.getAllByRole("group", { name: /^Szülő \d \(új\)$/ });
     expect(blocks).toHaveLength(2);
     const first = within(blocks[0]!);
@@ -150,9 +145,10 @@ describe("the record form on the create page", () => {
     expect(screen.queryByLabelText("A szülő neve")).not.toBeInTheDocument();
 
     fireEvent.change(kind, { target: { value: "group" } });
-    expect(screen.getByLabelText("A csoport neve")).toBeInTheDocument();
+    expect(screen.getByLabelText("A munkacsoport neve")).toBeInTheDocument();
+    expect(screen.getByLabelText("Leírás")).toBeRequired();
     expect(screen.getByLabelText("Nevelési év")).toBeRequired();
-    expect(screen.getByText("A csoport nevelési éve később nem módosítható.")).toBeVisible();
+    expect(screen.getByText("A munkacsoport nevelési éve később nem módosítható.")).toBeVisible();
 
     fireEvent.change(kind, { target: { value: "school-year" } });
     expect(screen.getByLabelText("A nevelési év megnevezése")).toBeInTheDocument();
@@ -172,7 +168,6 @@ describe("the record form on the create page", () => {
       </Form>,
     );
     fireEvent.change(screen.getByLabelText("A család neve"), { target: { value: "Fenyő" } });
-    fireEvent.change(screen.getByLabelText("Csoport"), { target: { value: "g-2" } });
     const block = within(screen.getByTestId("admin-parent-block-0"));
     fireEvent.change(block.getByLabelText("A szülő neve"), { target: { value: "Anna" } });
     fireEvent.change(block.getByLabelText("E-mail-cím"), { target: { value: "rossz" } });
@@ -188,13 +183,12 @@ describe("the record form on the create page", () => {
     expect(email).toHaveAttribute("aria-invalid", "true");
     expect(email).toHaveAccessibleDescription("Adjon meg érvényes e-mail-címet.");
     expect(screen.getByLabelText("A család neve")).toHaveValue("Fenyő");
-    expect(screen.getByLabelText("Csoport")).toHaveValue("g-2");
 
     fireEvent.submit(screen.getByTestId("test-form"));
     await waitFor(() => expect(world.submitted).toHaveLength(2));
     const [first, second] = world.submitted.map((entry) => entry.data);
     expect(first!.get("title")).toBe("Fenyő");
-    expect(first!.get("addGroupId")).toBe("g-2");
+    expect(first!.has("addGroupId")).toBe(false);
     expect(first!.get("parent-0-name")).toBe("Anna");
     expect(String(first!.get("idempotencyKey"))).toMatch(/^record:[0-9a-f]{32}$/);
     expect(first!.get("idempotencyKey")).not.toBe(second!.get("idempotencyKey"));
@@ -235,7 +229,6 @@ describe("the record form on the edit page", () => {
         linked: false,
       },
     ],
-    groups: [{ id: "g-1", name: "Boróka" }],
   };
 
   it("shows a family's parents with their details, the consent and an empty block for a new one", () => {
@@ -272,25 +265,18 @@ describe("the record form on the edit page", () => {
     expect(document.querySelector('input[name="parent-0-version"]')).toHaveValue("4");
   });
 
-  it("offers to end a membership and to add only a group the family is not in", () => {
+  it("shows a family with no membership field: a family has no working group (BR1.5)", () => {
     render(
       <Form>
         <RecordFields mode="edit" kind="family" details={FAMILY_DETAILS} lookups={LOOKUPS} />
       </Form>,
     );
-    const ending = screen.getByLabelText("Tagság megszüntetése: Boróka");
-    expect(ending).toHaveAttribute("name", "endGroupIds");
-    expect(ending).toHaveAttribute("value", "g-1");
-    const add = screen.getByLabelText("Csoporttagság hozzáadása");
-    expect(add).not.toBeRequired();
-    expect(
-      within(add)
-        .getAllByRole("option")
-        .map((option) => option.textContent),
-    ).toEqual(["Nincs hozzáadás", "Napraforgó"]);
+    expect(screen.queryByLabelText("Tagság megszüntetése: Boróka")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Csoporttagság hozzáadása")).not.toBeInTheDocument();
+    expect(document.querySelector('[name="endGroupIds"]')).toBeNull();
   });
 
-  it("shows a school year's days, and a group or child without a year or family to change", () => {
+  it("shows a school year's days, and a group with its description and no year to change", () => {
     const { unmount } = render(
       <Form>
         <RecordFields
@@ -307,10 +293,17 @@ describe("the record form on the edit page", () => {
     unmount();
     const group = render(
       <Form>
-        <RecordFields mode="edit" kind="group" title="Boróka" lookups={LOOKUPS} />
+        <RecordFields
+          mode="edit"
+          kind="group"
+          title="Boróka"
+          details={{ description: "A kert gondozása." }}
+          lookups={LOOKUPS}
+        />
       </Form>,
     );
-    expect(screen.getByLabelText("A csoport neve")).toHaveValue("Boróka");
+    expect(screen.getByLabelText("A munkacsoport neve")).toHaveValue("Boróka");
+    expect(screen.getByLabelText("Leírás")).toHaveValue("A kert gondozása.");
     expect(screen.queryByLabelText("Nevelési év")).not.toBeInTheDocument();
     group.unmount();
     render(
@@ -389,7 +382,7 @@ describe("the task and event form", () => {
     expect(screen.getByLabelText("Típus")).toHaveValue("task");
     for (const label of [
       "Megnevezés",
-      "Csoport",
+      "Munkacsoport",
       "Esemény",
       "Kategória",
       "Férőhelyek száma",
@@ -408,7 +401,7 @@ describe("the task and event form", () => {
     expect(screen.getByLabelText("Férőhelyek száma")).toHaveAttribute("max", "50");
     const events = screen.getByLabelText("Esemény");
     expect(within(events).getAllByRole("option")).toHaveLength(3);
-    fireEvent.change(screen.getByLabelText("Csoport"), { target: { value: "g-1" } });
+    fireEvent.change(screen.getByLabelText("Munkacsoport"), { target: { value: "g-1" } });
     expect(
       within(events)
         .getAllByRole("option")
@@ -452,7 +445,7 @@ describe("the task and event form", () => {
       </AdminMutationForm>,
     );
     expect(screen.getByLabelText("Megnevezés")).toHaveValue("Sütés");
-    expect(screen.getByLabelText("Csoport")).toHaveValue("g-1");
+    expect(screen.getByLabelText("Munkacsoport")).toHaveValue("g-1");
     expect(screen.getByLabelText("Esemény")).toHaveValue("e-1");
     expect(screen.getByLabelText("Férőhelyek száma")).toHaveValue(3);
     expect(screen.getByLabelText("Kezdés (budapesti idő)")).toHaveValue("2026-11-05T09:00");
@@ -526,7 +519,7 @@ describe("the admin pages with real data", () => {
       state: "active",
       version: 3,
       kind: "family",
-      details: { parents: [], groups: [] },
+      details: { parents: [] },
     };
     await renderNode(
       RecordDetailPage({
@@ -600,8 +593,8 @@ describe("the admin pages with real data", () => {
     await detail(TASK);
     world.answer = {
       state: "conflict",
-      message: "A kiválasztott résztvevő nem jogosult erre a feladatra.",
-      code: "ASSIGNMENT_INELIGIBLE",
+      message: "A feladat vagy esemény elérte a kapacitását.",
+      code: "ASSIGNMENT_CAPACITY_FULL",
     };
     fireEvent.change(screen.getByLabelText("Család"), { target: { value: "f-2" } });
     fireEvent.submit(screen.getByTestId("admin-assignment-form"));

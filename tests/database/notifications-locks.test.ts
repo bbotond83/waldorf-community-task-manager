@@ -99,13 +99,18 @@ for (const schema of NOTIFICATION_SCHEMAS) {
         [FAMILY_A, FAMILY_B, ORGANIZATION],
       );
       await db.query(
-        "insert into group_memberships (organization_id, family_id, group_id) values ($1, $2, $4), ($1, $3, $4)",
-        [ORGANIZATION, FAMILY_A, FAMILY_B, GROUP_1],
+        `insert into app_role_grants (subject_id, role, scope_type, scope_id, organization_id)
+         values ($1, 'parent', 'family', $3, $5), ($2, 'parent', 'family', $4, $5)`,
+        [ACCOUNT_A, ACCOUNT_B, FAMILY_A, FAMILY_B, ORGANIZATION],
       );
       await db.query(
         `insert into parents (id, organization_id, family_id, display_name, account_id)
          values ($1, $3, $4, 'Zár Aranka', $5), ($2, $3, $6, 'Zár Berta', $7)`,
         [PARENT_A, PARENT_B, ORGANIZATION, FAMILY_A, ACCOUNT_A, FAMILY_B, ACCOUNT_B],
+      );
+      await db.query(
+        "insert into group_memberships (organization_id, parent_id, group_id) values ($1, $2, $4), ($1, $3, $4)",
+        [ORGANIZATION, PARENT_A, PARENT_B, GROUP_1],
       );
       await db.query(
         `insert into tasks (id, organization_id, group_id, title, capacity, starts_at, ends_at, location)
@@ -178,7 +183,7 @@ for (const schema of NOTIFICATION_SCHEMAS) {
       await holder.query("select 1 from tasks where id = $1 for update", [held]);
       const archive = settle(
         as(
-          ADMIN_G1,
+          SUPER_ADMIN,
           "family_archive($1, $2, $3)",
           [nextKey("fa"), FAMILY_B, await familyVersion(FAMILY_B)],
           connections[0]!,
@@ -280,7 +285,7 @@ for (const schema of NOTIFICATION_SCHEMAS) {
 
     it("takes the family row before it reads the parents, so a parent linked while the lifecycle waits loses the notices too (lifecycle.run)", async () => {
       const lateParent = uuid(9690);
-      const archived = await as(ADMIN_G1, "family_archive($1, $2, $3)", [
+      const archived = await as(SUPER_ADMIN, "family_archive($1, $2, $3)", [
         nextKey("fa"),
         FAMILY_A,
         await familyVersion(FAMILY_A),
@@ -357,7 +362,7 @@ for (const schema of NOTIFICATION_SCHEMAS) {
         );
         const archived = settle(
           as(
-            ADMIN_G1,
+            SUPER_ADMIN,
             "family_archive($1, $2, $3)",
             [nextKey("fa"), FAMILY_B, await familyVersion(FAMILY_B)],
             connections[0]!,
@@ -396,7 +401,7 @@ for (const schema of NOTIFICATION_SCHEMAS) {
           ),
           settle(
             as(
-              ADMIN_G1,
+              SUPER_ADMIN,
               "family_archive($1, $2, $3)",
               [nextKey("fa"), FAMILY_B, await familyVersion(FAMILY_B)],
               connections[0]!,
@@ -458,7 +463,7 @@ for (const schema of NOTIFICATION_SCHEMAS) {
         );
         const archived = settle(
           as(
-            ADMIN_G1,
+            SUPER_ADMIN,
             "family_archive($1, $2, $3)",
             [nextKey("fa"), FAMILY_B, await familyVersion(FAMILY_B)],
             connections[0]!,

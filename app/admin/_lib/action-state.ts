@@ -74,7 +74,6 @@ function translateFieldErrors(
 export const ADMIN_CONFLICT_MESSAGES: Readonly<Record<string, string>> = Object.freeze({
   RESTORE_CONFLICT: "Az elem nem állítható vissza, mert ütköző aktív elem létezik.",
   VERSION_CONFLICT: "Az adatok időközben megváltoztak. Töltse újra az oldalt.",
-  ASSIGNMENT_INELIGIBLE: "A kiválasztott résztvevő nem jogosult erre a feladatra.",
   ASSIGNMENT_CAPACITY_FULL: "A feladat vagy esemény elérte a kapacitását.",
   MEMBERSHIP_DUPLICATE: "A család már tagja ennek a csoportnak.",
   ACCOUNT_ALREADY_LINKED: "Ez a fiók már egy másik szülőhöz tartozik.",

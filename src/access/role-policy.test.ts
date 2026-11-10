@@ -32,7 +32,7 @@ test("each role requires its precise scope shape", () => {
       assert.equal(
         isRoleScope(role, scope),
         scope.type ===
-          (role === "parent" ? "family" : role === "super_admin" ? "organization" : "group"),
+          (role === "parent" ? "family" : role === "group_admin" ? "group" : "organization"),
       );
   assert.equal(isRoleScope("super_admin", { ...org, id: "elsewhere" }), false);
   assert.equal(isRoleScope("parent", { ...family, id: "" }), false);
@@ -43,7 +43,7 @@ test("same identifiers cannot cross organization or scope type", () => {
   assert.equal(scopeContains(org, group), true);
 });
 test("teacher tracking allows only safe scoped reads", () => {
-  const teacher = grant("kindergarten_teacher", group);
+  const teacher = grant("kindergarten_teacher", org);
   for (const action of ["create", "update", "delete", "manage"] as const)
     assert.equal(
       grantAllows(teacher, { action, resource: { kind: "schedule", scope: group } }),
@@ -104,9 +104,9 @@ test("retained role branches deny advanced group operations and private parent f
 });
 test("unknown, invalid and revoked grants never authorize", () => {
   for (const candidate of [
-    { ...grant("kindergarten_teacher", group), role: "unknown" } as unknown as RoleGrant,
-    { ...grant("kindergarten_teacher", org) },
-    { ...grant("kindergarten_teacher", group), revokedAt: "" },
+    { ...grant("kindergarten_teacher", org), role: "unknown" } as unknown as RoleGrant,
+    { ...grant("kindergarten_teacher", group) },
+    { ...grant("kindergarten_teacher", org), revokedAt: "" },
   ])
     assert.equal(
       grantAllows(candidate, { action: "read", resource: { kind: "schedule", scope: group } }),
@@ -114,12 +114,12 @@ test("unknown, invalid and revoked grants never authorize", () => {
     );
 });
 test("effective dedup preserves history and ignores revoked invalid rows", () => {
-  const original = grant("kindergarten_teacher", group);
+  const original = grant("kindergarten_teacher", org);
   const rows = [
     original,
     { ...original, id: "duplicate" },
     { ...original, id: "revoked", revokedAt: "2026" },
-    { ...original, id: "invalid", scope: org },
+    { ...original, id: "invalid", scope: group },
   ];
   assert.deepEqual(effectiveGrants(rows), [original]);
   assert.equal(rows.length, 4);

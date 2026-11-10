@@ -1,90 +1,60 @@
 import { expect, it } from "vitest";
-import { sessionGrantBindings } from "../../src/access/session-grants.ts";
-import type { SessionContext } from "../../src/application/index.ts";
 import { TEACHER_GROUPS } from "../support/port-doubles.ts";
 import {
+  COMMUNITY_FILTER,
   parseTeacherFilters,
-  teacherDetailQuery,
-  teacherGroupOptions,
   teacherFilterQuery,
+  teacherGroupLabel,
   teacherScheduleHref,
 } from "../../app/teacher/_lib/filters.ts";
-const session: SessionContext = {
-  subjectId: "teacher",
-  authorizationVersion: 1,
-  ...sessionGrantBindings(
-    "teacher",
-    "kindergarten_teacher",
-    TEACHER_GROUPS.map((group) => group.scope),
-  ),
-  roles: ["kindergarten_teacher"] as const,
-  scopes: TEACHER_GROUPS.map((group) => group.scope),
-};
-it("Teacher first visit is unfiltered: every granted group and no date limit", () => {
-  const filters = parseTeacherFilters({}, session);
+
+const groups = TEACHER_GROUPS.map((group) => ({ id: group.scope.id, label: group.label }));
+
+it("Teacher first visit is unfiltered: the whole community and no date limit (W6)", () => {
+  const filters = parseTeacherFilters({}, groups);
   expect(filters.groupId).toBe("");
   expect(filters.from).toBe("");
   expect(filters.to).toBe("");
-  expect(filters.groupScopes.map((scope) => scope.id)).toEqual(["group-oak", "group-sunflower"]);
+  expect(filters.view).toEqual({ kind: "all" });
+  expect(filters.groups).toEqual(groups);
 });
 it("Teacher empty filter fields mean the same as absent ones", () => {
-  const filters = parseTeacherFilters({ groupId: "", from: "", to: "" }, session);
+  const filters = parseTeacherFilters({ groupId: "", from: "", to: "" }, groups);
   expect(filters).toMatchObject({ groupId: "", from: "", to: "" });
-  expect(filters.groupScopes).toHaveLength(2);
+  expect(filters.view).toEqual({ kind: "all" });
 });
 it("Teacher a single date is a one-sided limit and a chosen group narrows the read", () => {
-  const onlyFrom = parseTeacherFilters({ from: "2026-08-14" }, session);
+  const onlyFrom = parseTeacherFilters({ from: "2026-08-14" }, groups);
   expect(onlyFrom).toMatchObject({ from: "2026-08-14", to: "" });
-  const onlyTo = parseTeacherFilters({ groupId: "group-sunflower", to: "2026-08-20" }, session);
+  const onlyTo = parseTeacherFilters({ groupId: "group-sunflower", to: "2026-08-20" }, groups);
   expect(onlyTo).toMatchObject({ groupId: "group-sunflower", from: "", to: "2026-08-20" });
-  expect(onlyTo.groupScopes.map((scope) => scope.id)).toEqual(["group-sunflower"]);
+  expect(onlyTo.view).toEqual({ kind: "group", groupId: "group-sunflower" });
+});
+it("Teacher the community filter reads only the community-wide items (W6)", () => {
+  const filters = parseTeacherFilters({ groupId: COMMUNITY_FILTER }, groups);
+  expect(filters.groupId).toBe(COMMUNITY_FILTER);
+  expect(filters.view).toEqual({ kind: "community" });
 });
 it("Teacher address query holds only filled values", () => {
-  expect(teacherFilterQuery(parseTeacherFilters({}, session))).toBe("");
+  expect(teacherFilterQuery(parseTeacherFilters({}, groups))).toBe("");
   expect(
     teacherFilterQuery(
-      parseTeacherFilters({ groupId: "group-oak", from: "2026-08-13", to: "2026-08-15" }, session),
+      parseTeacherFilters({ groupId: "group-oak", from: "2026-08-13", to: "2026-08-15" }, groups),
     ),
   ).toBe("groupId=group-oak&from=2026-08-13&to=2026-08-15");
   expect(teacherScheduleHref("")).toBe("/teacher/schedule");
   expect(teacherScheduleHref("from=2026-08-13")).toBe("/teacher/schedule?from=2026-08-13");
 });
-it("Teacher detail address names the entry's group and remembers the all-groups list", () => {
-  const all = parseTeacherFilters({ from: "2026-08-13" }, session);
-  const detailQuery = teacherDetailQuery(all, "group-sunflower");
-  expect(detailQuery).toBe("groupId=group-sunflower&from=2026-08-13&allGroups=1");
-  const detail = parseTeacherFilters(Object.fromEntries(new URLSearchParams(detailQuery)), session);
-  expect(detail.groupId).toBe("group-sunflower");
-  expect(teacherFilterQuery(detail)).toBe("from=2026-08-13");
-  const single = parseTeacherFilters({ groupId: "group-oak" }, session);
-  expect(teacherDetailQuery(single, "group-oak")).toBe("groupId=group-oak");
+it("Teacher entry labels name the entry's working group, or the whole community", () => {
+  const filters = parseTeacherFilters({}, groups);
+  expect(teacherGroupLabel(filters, "group-oak")).toBe("Tölgyfa csoport");
+  expect(teacherGroupLabel(filters, null)).toBe("Egész közösség");
+  expect(teacherGroupLabel(filters, "ismeretlen")).toBe("");
 });
-it("Teacher options exclude revoked inactive and other-subject grants", () => {
-  expect(teacherGroupOptions({ ...session, isActive: false })).toEqual([]);
-  expect(
-    teacherGroupOptions({
-      ...session,
-      grants: session.grants.map((grant) => ({ ...grant, revokedAt: "now" })),
-    }),
-  ).toEqual([]);
-  expect(
-    teacherGroupOptions({
-      ...session,
-      grants: session.grants.map((grant) => ({ ...grant, subjectId: "other" })),
-    }),
-  ).toEqual([]);
-});
-it("Teacher supplied wellformed ungranted group never selects a different group", () => {
-  const filters = parseTeacherFilters({ groupId: "group-ungranted" }, session);
-  expect(filters.groupScope.id).toBe("group-ungranted");
-  expect(filters.groupScopes.map((scope) => scope.id)).toEqual(["group-ungranted"]);
-  expect(filters.groups.map((group) => group.scope.id)).not.toContain("group-ungranted");
-});
-it("Teacher all-groups view never reaches a group outside the grants", () => {
-  const onlyOak = { ...session, grants: session.grants.filter((g) => g.scope.id === "group-oak") };
-  expect(parseTeacherFilters({}, onlyOak).groupScopes.map((scope) => scope.id)).toEqual([
-    "group-oak",
-  ]);
+it("Teacher a well-formed unknown group keeps its own value and never selects another group", () => {
+  const filters = parseTeacherFilters({ groupId: "group-unknown" }, groups);
+  expect(filters.view).toEqual({ kind: "group", groupId: "group-unknown" });
+  expect(filters.groups.map((group) => group.id)).not.toContain("group-unknown");
 });
 it("Teacher duplicate malformed and impossible filters become safe validation", () => {
   for (const params of [
@@ -94,40 +64,22 @@ it("Teacher duplicate malformed and impossible filters become safe validation", 
     { from: ["2026-08-12"] },
     { to: ["", "2026-08-12"] },
   ]) {
-    const filters = parseTeacherFilters(params, session);
+    const filters = parseTeacherFilters(params, groups);
     expect(filters.from).toBe("invalid");
     expect(filters.to).toBe("invalid");
     expect(JSON.stringify(filters)).not.toContain("script");
   }
 });
-it("Teacher no-grant context has no global fallback", () => {
-  const filters = parseTeacherFilters({}, { ...session, grants: [] });
-  expect(filters.groups).toEqual([]);
-  expect(filters.groupId).toBe("no-current-group");
-});
 it("Teacher address carries no test selector: fixture and scenario words change nothing", () => {
-  const plain = parseTeacherFilters({}, session);
+  const plain = parseTeacherFilters({}, groups);
   for (const params of [
     { fixture: "retryable" },
     { fixture: "unknown" },
     { scenario: "terminal" },
   ]) {
-    const filters = parseTeacherFilters(params, session);
+    const filters = parseTeacherFilters(params, groups);
     expect("scenario" in filters).toBe(false);
     expect(filters).toEqual(plain);
     expect(teacherFilterQuery(filters)).not.toMatch(/fixture|scenario/);
   }
-});
-it("Teacher current labels require matching org and deduplicate grants", () => {
-  expect(
-    teacherGroupOptions({ ...session, grants: [...session.grants, session.grants[0]!] }),
-  ).toHaveLength(2);
-  expect(
-    teacherGroupOptions({
-      ...session,
-      grants: [
-        { ...session.grants[0]!, scope: { ...session.grants[0]!.scope, organizationId: "other" } },
-      ],
-    })[0]?.label,
-  ).toBe("Engedélyezett csoport");
 });

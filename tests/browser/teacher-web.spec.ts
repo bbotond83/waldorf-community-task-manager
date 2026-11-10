@@ -38,9 +38,7 @@ test("Teacher filters, list, detail, and return preserve authorized context unde
   await expect(entry(page, testInfo.project.name, cleaning)).toBeVisible();
   await expect(entry(page, testInfo.project.name, baking)).toHaveCount(0);
   await entryOpen(page, testInfo.project.name, cleaning).click();
-  await expect(page.getByTestId("teacher-schedule-detail-fields")).toContainText(
-    "Engedélyezett csoport",
-  );
+  await expect(page.getByTestId("teacher-schedule-detail-fields")).toContainText("Játszókert");
   await expect(page.getByTestId("teacher-schedule-detail-fields")).toContainText("Takarítás");
   await page.getByTestId("teacher-schedule-detail-back-link").click();
   await expect(page.getByTestId("teacher-schedule-from-input")).toHaveValue(day);
@@ -60,16 +58,16 @@ test("empty state clears filters and invalid ranges never expose rows", async ({
   await expect(page.getByTestId("teacher-schedule-table")).toHaveCount(0);
 });
 
-test("out-of-scope group and crafted row are generically denied", async ({ page }) => {
-  const otherGroup = world().id("group:2");
+test("an unknown group and a crafted row are generically denied", async ({ page }) => {
+  const unknownGroup = "cccccccc-0000-4000-8000-00000000fffe";
   await page.goto(
-    `/teacher/schedule?groupId=${otherGroup}&from=${seedDay(0)}&to=${seedDay(EVENT_DAY + 2)}`,
+    `/teacher/schedule?groupId=${unknownGroup}&from=${seedDay(0)}&to=${seedDay(EVENT_DAY + 2)}`,
   );
   await expect(page.getByTestId("teacher-schedule-denied")).toContainText("nem érhető el");
   await expect(page.getByTestId("teacher-schedule-denied")).toBeFocused();
-  await expect(page.locator("body")).not.toContainText(otherGroup);
+  await expect(page.locator("body")).not.toContainText(unknownGroup);
 
-  const foreignTask = world().id("task:2:1");
+  const foreignTask = "cccccccc-0000-4000-8000-00000000ffff";
   await page.goto(`/teacher/schedule/${foreignTask}`);
   await expect(page.getByTestId("teacher-detail-denied")).toContainText("nem érhető el");
   await expect(page.locator("body")).not.toContainText(foreignTask);
@@ -150,7 +148,8 @@ test("Teacher old bookmarks redirect safely and destination independently denies
     `/teacher/schedule?groupId=${group}&from=${day}&to=${day}`,
   );
   await page.goto(`/munkatars/beosztas?csoport=${world().id("group:2")}&kezdet=bad`);
-  await expect(page.getByTestId("teacher-schedule-denied")).toBeVisible();
+  await expect(page.getByTestId("teacher-schedule-validation")).toBeVisible();
+  await expect(page.getByTestId("teacher-schedule-table")).toHaveCount(0);
   await page.goto(`/munkatars/beosztas?csoport=${group}&csoport=${world().id("group:2")}`);
   await expect(page.getByTestId("teacher-schedule-validation")).toBeVisible();
   await expect(page.getByTestId("teacher-schedule-table")).toHaveCount(0);
@@ -183,12 +182,14 @@ test("Teacher opens an entry with a click on any part of its row or card and by 
   await expect(page).toHaveURL(new RegExp(`/teacher/schedule/${baking}`));
 });
 
-test("Teacher has no menu and finds the way back to Beosztás from other pages", async ({
+test("Teacher's menu lists Beosztás and Munkacsoportok, and the way back works from other pages", async ({
   page,
 }) => {
   await page.goto("/teacher/schedule");
-  await expect(page.getByTestId("app-shell-navigation")).toHaveCount(0);
-  await expect(page.getByTestId("app-shell-navigation-toggle")).toHaveCount(0);
+  await expect(page.getByTestId("app-shell-navigation").getByRole("link")).toHaveText([
+    "Beosztás",
+    "Munkacsoportok",
+  ]);
   await expect(page.getByTestId("brand-link")).toHaveAttribute("href", "/teacher/schedule");
   await page.goto("/admin");
   await expect(page.getByRole("heading", { name: "Nincs jogosultság", exact: true })).toBeVisible();

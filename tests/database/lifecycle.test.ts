@@ -140,7 +140,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
     }
     /** An invitation of every status for a family's parents, with the parents' own e-mail addresses. */
     async function invite(
-      scope: { type: "family" | "group"; id: string },
+      scope: { type: "family" | "organization"; id: string },
       email: string,
       status: "pending" | "accepting" | "accepted" | "revoked" | "replaced",
       target: string | null = null,
@@ -175,14 +175,14 @@ for (const schema of DIRECTORY_SCHEMAS) {
       await invite(family, "anna@example.test", "revoked", PARENT_ROW_F1);
       await invite(family, "bela@example.test", "replaced", PARENT_ROW_CO);
       await invite(family, "old.address@example.test", "accepting", PARENT_ROW_F1);
-      // Not this family's: another family's invitation and a group invitation of a group admin.
+      // Not this family's: another family's invitation and a teacher invitation of the community.
       await invite({ type: "family", id: FAMILY_2 }, "other.family@example.test", "pending");
       await invite(
-        { type: "group", id: GROUP_1 },
+        { type: "organization", id: ORGANIZATION },
         "teacher.person@example.test",
         "pending",
         null,
-        "group_admin",
+        "kindergarten_teacher",
       );
     }
     async function rowsContaining(values: string[]) {
@@ -346,7 +346,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
         2,
         "only the other families' contacts remain",
       );
-      assert.equal(await count(db, "group_memberships", `family_id = '${FAMILY_1}'`), 0);
+      assert.equal(await count(db, "group_memberships", `parent_id = '${PARENT_ROW_F1}'`), 0);
       const parents = (
         await db.query(
           "select display_name, account_id, optional_profile, optional_profile_consent from parents where family_id = $1",
@@ -464,8 +464,8 @@ for (const schema of DIRECTORY_SCHEMAS) {
         [ORGANIZATION, FAMILY_NO_GROUP],
       );
       await db.query(
-        "insert into group_memberships (organization_id, family_id, group_id) values ($1, $2, $3)",
-        [ORGANIZATION, FAMILY_NO_GROUP, GROUP_1],
+        "insert into group_memberships (organization_id, parent_id, group_id) values ($1, $2, $3)",
+        [ORGANIZATION, uuid(620), GROUP_1],
       );
       const family = { type: "family" as const, id: FAMILY_NO_GROUP };
       await invite(family, "geza@example.test", "accepted", uuid(620));
@@ -508,15 +508,15 @@ for (const schema of DIRECTORY_SCHEMAS) {
         ["families", "id"],
         ["parents", "family_id"],
         ["children", "family_id"],
-        ["group_memberships", "family_id"],
       ] as const) {
         assert.equal(await count(db, table, `${column} = '${FAMILY_NO_GROUP}'`), 0, table);
       }
+      assert.equal(await count(db, "group_memberships", `parent_id = '${uuid(620)}'`), 0);
       assert.deepEqual(
         (await auditEvents(db)).map((event) => [event.action, event.target_id]),
         [["lifecycle.delete", FAMILY_NO_GROUP]],
       );
-      assert.equal(await count(db, "families"), 3, "the other families are untouched");
+      assert.equal(await count(db, "families"), 5, "the other families are untouched");
     });
 
     it("treats a family with only removed places as a family with history: anonymize, not delete (NFR3.10)", async () => {

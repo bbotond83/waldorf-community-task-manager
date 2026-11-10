@@ -36,4 +36,5 @@ export {
   validateMutationContext,
 } from "./validation.ts";
 export type { ValidationCode } from "./validation.ts";
-export { WorkbookUpload } from "./import-upload.ts";
+export { WorkingGroupApplicationFacade } from "./working-group-facade.ts";
+export type { WorkingGroupApplicationPort } from "./working-group-facade.ts";

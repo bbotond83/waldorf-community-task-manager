@@ -92,10 +92,10 @@ for (const schema of DIRECTORY_SCHEMAS) {
         "23514",
       );
       assert.equal(await failureOf(() => insertTask({ title: "" })).then((e) => e?.code), "23514");
-      // The event of another group cannot be used: the pair (event, group) must exist.
+      // A task has its event's scope (BR1.3): the database compares them, also when either is empty.
       assert.equal(
         await failureOf(() => insertTask({ event_id: EVENT_2 })).then((e) => e?.code),
-        "23503",
+        "23514",
       );
       const withEvent = await insertTask({ event_id: EVENT_1 });
       assert.equal(withEvent.rows[0].status, "open");

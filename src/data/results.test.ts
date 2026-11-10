@@ -35,7 +35,7 @@ test("every business code of BR32.8 keeps its state and code", () => {
       code,
     );
   }
-  assert.equal(Object.keys(BUSINESS_CODE_STATES).length, 24, "the table lists every code");
+  assert.equal(Object.keys(BUSINESS_CODE_STATES).length, 22, "the table lists every code");
 });
 
 test("a conflict or invalidation without a code still maps to its state", () => {

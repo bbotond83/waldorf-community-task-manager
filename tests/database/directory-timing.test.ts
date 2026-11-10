@@ -12,10 +12,12 @@ import {
   GROUP_1,
   nextKey,
   openDirectoryDatabase,
+  ORGANIZATION,
   PARENT_F1,
   seedDirectoryWorld,
   SUPER_ADMIN,
   TEACHER_G1,
+  uuid,
 } from "./directory-support.ts";
 import { count } from "./identity-support.ts";
 import { report } from "./stack-support.ts";
@@ -23,6 +25,7 @@ import { report } from "./stack-support.ts";
 const TYPICAL = { read: 300, action: 500, dashboard: 500 } as const;
 const CEILING_MS = 1500;
 const RUNS = 9;
+const COMMUNITY_TASKS = 60;
 
 /**
  * Timings of the main reads and actions on the 150-family data set (NFR3.5, NFR4.6 to NFR4.9): reported against
@@ -38,6 +41,19 @@ for (const schema of DIRECTORY_SCHEMAS) {
       db = await openDirectoryDatabase(schema);
       await seedDirectoryWorld(db, schema);
       await loadDataset(db);
+      // Community-wide tasks and events on top of the data set (NFR9.1, NFR9.2): they widen every list below.
+      await db.query(
+        `insert into events (organization_id, title, starts_at, ends_at)
+         select $1, 'Közös esemény ' || n, now() + (n || ' days')::interval, now() + (n || ' days')::interval + interval '2 hours'
+           from generate_series(1, 20) n`,
+        [ORGANIZATION],
+      );
+      await db.query(
+        `insert into tasks (organization_id, title, capacity, starts_at, ends_at, location)
+         select $1, 'Közös feladat ' || n, 8, now() + ((n % 60 + 1) || ' days')::interval, now() + ((n % 60 + 1) || ' days')::interval + interval '2 hours', 'Udvar'
+           from generate_series(1, ${COMMUNITY_TASKS}) n`,
+        [ORGANIZATION],
+      );
       await db.query("analyze");
       // Two tasks of group 1 (index 0 of the data set) that family 1 has no place on.
       freshTask = datasetTask(0);
@@ -83,13 +99,16 @@ for (const schema of DIRECTORY_SCHEMAS) {
       assert.equal(await count(db, "tasks", `title like 'Adat feladat%'`), DATASET.tasks);
       assert.equal(await count(db, "assignments", `source = 'admin_assign'`), DATASET.assignments);
       assert.equal(DATASET_GROUPS.length, DATASET.groups);
-      assert.equal(await count(db, "group_memberships", `family_id = '${datasetFamily(0)}'`), 1);
+      assert.equal(await count(db, "group_memberships", `parent_id = '${uuid(4000)}'`), 1);
     });
 
     it("lists a parent's tasks and opens one within the read targets (NFR4.6)", async () => {
       const list = await fn(PARENT_F1, "duty_list()");
       assert.equal(list.state, "success");
-      assert.ok((list.items as unknown[]).length >= 30, "the parent's group has its 30 tasks");
+      assert.ok(
+        (list.items as unknown[]).length >= DATASET.tasks + COMMUNITY_TASKS,
+        "every task of the community, the community-wide ones included (BR4.1)",
+      );
       await timed("parent task list", TYPICAL.read, () => fn(PARENT_F1, "duty_list()"));
       await timed("parent task detail", TYPICAL.read, () =>
         fn(PARENT_F1, "duty_get($1)", [freshTask]),
@@ -97,11 +116,34 @@ for (const schema of DIRECTORY_SCHEMAS) {
     });
 
     it("reads the teacher schedule of a group within the read target (NFR4.6)", async () => {
-      const schedule = await fn(TEACHER_G1, "schedule_get($1, null, null)", [GROUP_1]);
+      const schedule = await fn(TEACHER_G1, "schedule_get('group', $1, null, null)", [GROUP_1]);
       assert.equal(schedule.state, "success");
       assert.ok((schedule.items as unknown[]).length >= 30);
       await timed("teacher schedule", TYPICAL.read, () =>
-        fn(TEACHER_G1, "schedule_get($1, null, null)", [GROUP_1]),
+        fn(TEACHER_G1, "schedule_get('group', $1, null, null)", [GROUP_1]),
+      );
+    });
+
+    it("reads the whole community, the community-wide items, the working groups and the family names within the ceiling (NFR9.1, NFR9.2)", async () => {
+      const whole = await fn(TEACHER_G1, "schedule_get('all', null, null, null)");
+      assert.ok((whole.items as unknown[]).length >= DATASET.tasks + COMMUNITY_TASKS);
+      await timed("teacher schedule, whole community", TYPICAL.read, () =>
+        fn(TEACHER_G1, "schedule_get('all', null, null, null)"),
+      );
+      const communityWide = await fn(TEACHER_G1, "schedule_get('community', null, null, null)");
+      assert.equal((communityWide.items as unknown[]).length >= COMMUNITY_TASKS, true);
+      await timed("teacher schedule, community-wide", TYPICAL.read, () =>
+        fn(TEACHER_G1, "schedule_get('community', null, null, null)"),
+      );
+      await timed("working-group list", TYPICAL.read, () => fn(PARENT_F1, "working_group_list()"));
+      await timed("family name list", TYPICAL.read, () => fn(ADMIN_G1, "family_name_list()"));
+      await timed("super admin task list", TYPICAL.read, () =>
+        asActor(
+          db,
+          schema,
+          authenticated(SUPER_ADMIN),
+          async () => (await db.query("select * from tasks")).rows.length,
+        ),
       );
     });
 
@@ -144,24 +186,31 @@ for (const schema of DIRECTORY_SCHEMAS) {
       await timed("swap partner list", TYPICAL.read, () =>
         fn(PARENT_F1, "swap_candidates($1)", [mine.reference]),
       );
+      let lastRequest: { state: string; code: string | null } | undefined;
       const requested = await timed("swap request", TYPICAL.action, async () => {
         await db.query("update change_requests set status = 'withdrawn'");
         await db.query("update assignments set status = 'active' where id = $1", [mine.reference]);
         const own = (
           await db.query("select version from assignments where id = $1", [mine.reference])
         ).rows[0].version;
-        return fn(PARENT_F1, "swap_request($1, $2, $3, $4, $5)", [
+        lastRequest = await fn(PARENT_F1, "swap_request($1, $2, $3, $4, $5)", [
           nextKey("sw"),
           mine.reference,
           own,
           partner.assignment_id,
           partner.assignment_version,
         ]);
+        return lastRequest;
       });
       assert.ok(requested >= 0);
+      assert.equal(lastRequest?.state, "success", JSON.stringify(lastRequest));
       const open = (await db.query("select id from change_requests where status = 'open'")).rows[0]
         .id as string;
-      const decided = await fn(ADMIN_G1, "swap_decide($1, $2, true, null)", [nextKey("sd"), open]);
+      // The partner may hold a place in any working group now (BR4.3), so a super admin decides.
+      const decided = await fn(SUPER_ADMIN, "swap_decide($1, $2, true, null)", [
+        nextKey("sd"),
+        open,
+      ]);
       assert.equal(decided.state, "success");
       await timed("approval decision", TYPICAL.action, async () => {
         const mineNow = (
@@ -176,7 +225,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
           mineNow.id,
           mineNow.version,
         ]);
-        return fn(ADMIN_G1, "cancellation_decide($1, $2, false, null)", [
+        return fn(SUPER_ADMIN, "cancellation_decide($1, $2, false, null)", [
           nextKey("cd"),
           cancelled.reference,
         ]);

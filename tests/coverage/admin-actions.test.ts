@@ -102,7 +102,6 @@ it.each(["saveRecordAction", "saveTaskAction"] as const)(
 );
 it.each([
   ["full", "conflict"],
-  ["ineligible", "conflict"],
   // A transient source failure is retryable (the old demo classifier mis-labelled it terminal).
   ["retryable", "retryable"],
   ["terminal", "terminal"],
@@ -168,11 +167,6 @@ it("distinguishes rejected and already-decided approvals", async () => {
     ).outcome,
   ).toBe("already-decided");
 });
-function upload(bytes: number | undefined, name = "munkafuzet.xlsx") {
-  const data = form();
-  if (bytes !== undefined) data.set("workbook", new File([new Uint8Array(bytes)], name));
-  return data;
-}
 it("rejects unsigned callers at every advanced boundary", async () => {
   for (const action of Object.values(advanced))
     expect(
@@ -189,32 +183,8 @@ it("rejects unsigned callers at every advanced boundary", async () => {
 });
 it("returns field-specific advanced validation", async () => {
   signIn();
-  expect((await advanced.uploadImportWorkbookAction(initial, form())).fieldErrors).toHaveProperty(
-    "workbook",
-  );
-  expect((await advanced.resolveImportConflictAction(initial, form())).fieldErrors).toHaveProperty(
-    "resolution",
-  );
   expect((await advanced.saveAdvancedSettingsAction(initial, form())).fieldErrors).toHaveProperty(
     "recipientId",
-  );
-});
-it("refuses an empty or oversized workbook before the facade is called, and names the limit", async () => {
-  signIn();
-  expect((await advanced.uploadImportWorkbookAction(initial, upload(0))).fieldErrors).toEqual({
-    workbook: "Válasszon ki egy .xlsx munkafüzetet.",
-  });
-  const big = await advanced.uploadImportWorkbookAction(initial, upload(5 * 1024 * 1024 + 1));
-  expect(big.fieldErrors).toEqual({ workbook: "A munkafüzet legfeljebb 5 MB lehet." });
-  expect(boundary.revalidate).not.toHaveBeenCalled();
-});
-it("creates and rejects workbook previews through actual facade", async () => {
-  signIn();
-  expect((await advanced.uploadImportWorkbookAction(initial, upload(10))).state).toBe("success");
-  expect(boundary.revalidate).toHaveBeenCalledWith("/admin/import");
-  force("malformed");
-  expect((await advanced.uploadImportWorkbookAction(initial, upload(10))).code).toBe(
-    "IMPORT_MALFORMED",
   );
 });
 it("sends no scenario value in any admin payload, whatever the form carries", async () => {
@@ -242,13 +212,10 @@ it("sends no scenario value in any admin payload, whatever the form carries", as
 it("runs advanced mutation outcomes with real invalid identities", async () => {
   signIn();
   const actions = [
-    advanced.commitImportAction,
-    advanced.recoverImportAction,
     advanced.retryReminderAction,
     advanced.updateGrantAction,
     advanced.runLifecycleAction,
     advanced.saveAdvancedSettingsAction,
-    advanced.resolveImportConflictAction,
   ];
   for (let index = 0; index < actions.length; index++) {
     const result = await actions[index]!(

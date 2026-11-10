@@ -148,7 +148,6 @@ export const ELEVATED: Record<
   family_archive: "authenticated",
   family_restore: "authenticated",
   invitation_accept_parent: INTERNAL,
-  dashboard_import_conflicts: INTERNAL,
   dashboard_get: "authenticated",
   governance_revoke: "authenticated",
   //  governance_list: shows other accounts' authorization versions (their only reader is the account
@@ -200,28 +199,18 @@ export const ELEVATED: Record<
   event_save_core: INTERNAL,
   settings_save_core: INTERNAL,
   lifecycle_run_core: INTERNAL,
-  // U4 Import (BR42.4). Why each is elevated:
-  //  import_run_reached: the reader of the import policies (the super admin who started the run), called by the
-  //    policies of the run's rows, staged rows and conflicts;
-  //  import_preview_create, import_conflict_resolve, import_commit, import_recover, import_status, import_cancel,
-  //    import_mark_interrupted: the super admin's import use cases. They read and write the staged workbook rows
-  //    (personal data no role reads as a table except the starting super admin), match them against Directory and
-  //    Coordination by typed ids and contact e-mail addresses, and apply them through U3's save functions;
-  //  import_expire: a super admin of the organization marks runs older than seven days expired and deletes their
-  //    staged rows; import_expire_system is the same sweep for the system caller (seed, reset, housekeeping,
-  //    through the service-role key);
-  //  the other import_* functions (match, apply, model, helpers) are plain internal functions of the owner that only
-  //  these call; they are not security definer and no application role executes them.
-  import_run_reached: "authenticated",
-  import_preview_create: "authenticated",
-  import_conflict_resolve: "authenticated",
-  import_commit: "authenticated",
-  import_recover: "authenticated",
-  import_status: "authenticated",
-  import_cancel: "authenticated",
-  import_mark_interrupted: "authenticated",
-  import_expire: "authenticated",
-  import_expire_system: "service_role",
+  // Ovis tábla U1 (C2, BR2.3, BR3.10, NFR3.6). The callers' reach and the two new lists are readable by signed-in
+  // accounts and check their caller themselves; the linked-parent lookup and the admin-grant helpers are internal.
+  identity_linked_parent: INTERNAL,
+  current_parent_id: "authenticated",
+  current_family_id: "authenticated",
+  has_community_admin: "authenticated",
+  can_manage_group: "authenticated",
+  can_read_community: "authenticated",
+  grant_admin: INTERNAL,
+  end_admin: INTERNAL,
+  working_group_list: "authenticated",
+  family_name_list: "authenticated",
   // U5 audit purge (NFR1.68): deletes audit events older than 365 days. Elevated because no application role holds
   // a delete right on the audit table; it checks that the caller is the system, sets the transaction-local purge
   // setting for its own transaction only, and is called by identity_housekeeping (the service-role key).
@@ -234,7 +223,6 @@ const POLICY_TEST_COVERAGE: Record<string, string> = {
   invitations: "identity-session.test.ts (policy matrix)",
   app_role_grants: "identity-session.test.ts (policy matrix)",
   app_authorization_versions: "identity-session.test.ts (policy matrix)",
-  app_import_runs: "identity-session.test.ts (policy matrix)",
   audit_events: "identity-session.test.ts (policy matrix)",
   app_role_conversion_evidence: "identity-catalogue.test.ts (this file)",
   sign_in_attempts: "identity-lockout.test.ts (no access for any role)",
@@ -260,11 +248,6 @@ const POLICY_TEST_COVERAGE: Record<string, string> = {
   reminder_jobs: "notifications-schema.test.ts (no policy: no direct access for any role)",
   reminder_recipients: "notifications-schema.test.ts (no policy: no direct access for any role)",
   reminder_attempts: "notifications-schema.test.ts (no policy: no direct access for any role)",
-  sheet_registry: "import-schema.test.ts (role matrix)",
-  import_runs: "import-schema.test.ts (role matrix)",
-  import_rows: "import-schema.test.ts (role matrix)",
-  import_staged_rows: "import-schema.test.ts (role matrix: only the starting super admin)",
-  import_conflicts: "import-schema.test.ts (role matrix)",
 };
 
 /**
@@ -275,7 +258,6 @@ const POLICY_TEST_COVERAGE: Record<string, string> = {
 const PROBE_DECISION: Record<string, string> = {
   families: "family",
   assignments: "assignment",
-  app_import_runs: "import_run",
   accounts: "none: identity record, never a detail screen of the probe",
   invitations: "none: managed through the admin functions",
   app_role_grants: "none: managed through grant_change",
@@ -304,12 +286,6 @@ const PROBE_DECISION: Record<string, string> = {
   reminder_jobs: "none: U4 table, never a detail screen",
   reminder_recipients: "none: U4 table, never a detail screen",
   reminder_attempts: "none: U4 table, never a detail screen",
-  // U4 import tables: a run, its rows, staged rows and conflicts are read through the import functions only.
-  sheet_registry: "none: U4 table, a fixed list, never a detail screen",
-  import_runs: "none: U4 table, read through import_status, never a detail screen of the probe",
-  import_rows: "none: U4 table, never a detail screen",
-  import_staged_rows: "none: U4 table, personal data, never a detail screen",
-  import_conflicts: "none: U4 table, never a detail screen",
 };
 
 for (const schema of IDENTITY_SCHEMAS) {

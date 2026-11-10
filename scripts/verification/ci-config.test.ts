@@ -134,24 +134,18 @@ describe("CI workflow configuration (BR10.2, FR10.3)", () => {
     }
   });
 
-  it("runs the notifications and import database stage after the directory stage and keeps its files in the shuffled run (U4)", () => {
+  it("runs the notifications database stage after the directory stage and keeps its files in the shuffled run (U4)", () => {
     const pipeline = read("scripts/verification/run-local-verification.ts");
     assert.match(
       pipeline,
-      /key: "database-notifications-import", args: \["run", "test:database:notifications-import"\]/,
+      /key: "database-notifications", args: \["run", "test:database:notifications"\]/,
     );
-    assert.ok(
-      pipeline.indexOf("database-directory") < pipeline.indexOf("database-notifications-import"),
-    );
-    assert.ok(
-      pipeline.indexOf("database-notifications-import") < pipeline.indexOf("database-shuffled"),
-    );
-    assert.ok(
-      pipeline.indexOf("database-notifications-import") < pipeline.indexOf('key: "coverage"'),
-    );
+    assert.ok(pipeline.indexOf("database-directory") < pipeline.indexOf("database-notifications"));
+    assert.ok(pipeline.indexOf("database-notifications") < pipeline.indexOf("database-shuffled"));
+    assert.ok(pipeline.indexOf("database-notifications") < pipeline.indexOf('key: "coverage"'));
     const scripts = JSON.parse(read("package.json")).scripts as Record<string, string>;
     const shuffled = read("scripts/db/shuffled-tests.ts");
-    const files = scripts["test:database:notifications-import"]!.split(" ").filter((part) =>
+    const files = scripts["test:database:notifications"]!.split(" ").filter((part) =>
       part.startsWith("tests/database/"),
     );
     assert.ok(files.length >= 3, "the script names the notification test files");
@@ -165,18 +159,12 @@ describe("CI workflow configuration (BR10.2, FR10.3)", () => {
     ]) {
       assert.ok(files.includes(`tests/database/${file}.test.ts`), file);
     }
-    // The server-only parser folder is inside the lint and format scope (NFR2.27).
-    for (const name of ["lint", "format", "format:check"]) {
-      assert.ok(scripts[name]!.split(" ").includes("src/import-parser"), name);
-    }
   });
 
-  it("runs the seed database stage after the notifications and import stage and before the shuffled run (U5)", () => {
+  it("runs the seed database stage after the notifications stage and before the shuffled run (U5)", () => {
     const pipeline = read("scripts/verification/run-local-verification.ts");
     assert.match(pipeline, /key: "database-seed", args: \["run", "test:database:seed"\]/);
-    assert.ok(
-      pipeline.indexOf("database-notifications-import") < pipeline.indexOf("database-seed"),
-    );
+    assert.ok(pipeline.indexOf("database-notifications") < pipeline.indexOf("database-seed"));
     assert.ok(pipeline.indexOf("database-seed") < pipeline.indexOf("database-shuffled"));
     assert.ok(pipeline.indexOf("database-seed") < pipeline.indexOf('key: "coverage"'));
     const scripts = JSON.parse(read("package.json")).scripts as Record<string, string>;
@@ -242,24 +230,12 @@ describe("CI workflow configuration (BR10.2, FR10.3)", () => {
       assert.ok(keys.indexOf(key) < keys.indexOf("browser"), key);
     assert.deepEqual(
       keys.slice(
-        keys.indexOf("database-notifications-import"),
-        keys.indexOf("database-notifications-import") + 3,
+        keys.indexOf("database-notifications"),
+        keys.indexOf("database-notifications") + 3,
       ),
-      ["database-notifications-import", "database-seed", "database-shuffled"],
+      ["database-notifications", "database-seed", "database-shuffled"],
     );
     assert.equal(/APP_RUNTIME_MODE|APP_SYNTHETIC_FIXTURE_VERSION/.test(pipeline), false);
-  });
-
-  it("runs the 2000-row import timing test alone in its own database step after the shuffled run, with a retry", () => {
-    const pipeline = read("scripts/verification/run-local-verification.ts");
-    assert.match(
-      pipeline,
-      /key: "database-import-timing", args: \["run", "test:database:import-timing"\]/,
-    );
-    assert.ok(pipeline.indexOf("database-shuffled") < pipeline.indexOf("database-import-timing"));
-    assert.ok(pipeline.indexOf("database-import-timing") < pipeline.indexOf('key: "coverage"'));
-    const timing = read("tests/database/notifications-timing.test.ts");
-    assert.match(timing, /IMPORT_TIMING_STAGE === "1"/);
   });
 
   it("validates pull requests, the weekly and the manual runs with every browser, and records evidence on main", () => {

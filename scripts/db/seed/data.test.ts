@@ -19,7 +19,9 @@ const allIds = (plan: SeedPlan): string[] => [
   plan.organization.id,
   plan.schoolYear.id,
   ...plan.groups.map((entry) => entry.id),
-  ...plan.families.flatMap((entry) => [entry.id, entry.membershipId]),
+  ...plan.families.map((entry) => entry.id),
+  ...plan.memberships.map((entry) => entry.id),
+  ...plan.extraGrants.map((entry) => entry.id),
   ...plan.parents.map((entry) => entry.id),
   ...plan.children.map((entry) => entry.id),
   ...plan.accounts.flatMap((entry) => [entry.id, entry.grantId]),
@@ -31,15 +33,15 @@ const allIds = (plan: SeedPlan): string[] => [
 describe("seed data: the small set", () => {
   const plan = buildSeedPlan("public", "small");
 
-  it("has 2 groups, 6 families with parents and children, a super admin, two group admins and a teacher", () => {
+  it("has the six working groups, 6 families with parents and children, a super admin, two group admins and a teacher", () => {
     assert.deepEqual(describePlan(plan), {
-      groups: 2,
+      groups: 6,
       families: 6,
       parents: 12,
       children: 8,
       accounts: 10,
-      events: 2,
-      tasks: 6,
+      events: 3,
+      tasks: 8,
       assignments: 8,
     });
     assert.deepEqual(
@@ -64,6 +66,11 @@ describe("seed data: the small set", () => {
       } else if (account.role === "parent") {
         assert.equal(account.scopeType, "family");
         assert.ok(plan.families.some((family) => family.id === account.scopeId));
+      } else if (account.role === "kindergarten_teacher") {
+        assert.deepEqual(
+          [account.scopeType, account.scopeId],
+          ["organization", plan.organization.id],
+        );
       } else {
         assert.equal(account.scopeType, "group");
         assert.ok(plan.groups.some((group) => group.id === account.scopeId));
@@ -71,16 +78,20 @@ describe("seed data: the small set", () => {
     }
   });
 
-  it("links the first parent of every family to the family's account and no second parent", () => {
-    for (const family of plan.families) {
+  it("links the first parent of every family to the family's account, and the second parent of the first two families to a group admin", () => {
+    plan.families.forEach((family, index) => {
       const parents = plan.parents.filter((parent) => parent.familyId === family.id);
       assert.equal(parents.length, 2);
       const linked = parents.filter((parent) => parent.accountId !== null);
-      assert.equal(linked.length, 1);
       const account = plan.accounts.find((entry) => entry.id === linked[0]!.accountId);
       assert.equal(account?.scopeId, family.id);
       assert.equal(account?.role, "parent");
-    }
+      assert.equal(linked.length, index < 2 ? 2 : 1, family.name);
+      if (index < 2) {
+        const coParent = plan.accounts.find((entry) => entry.id === linked[1]!.accountId);
+        assert.equal(coParent?.role, "group_admin");
+      }
+    });
   });
 
   it("never fills a task beyond its capacity and never places a family on a task twice", () => {
@@ -102,11 +113,9 @@ describe("seed data: the small set", () => {
     for (const event of plan.events) assert.ok(event.endsAtHours >= event.startsAtHours);
   });
 
-  it("places only families of the task's group, and a sign-up carries the family's own parent", () => {
+  it("gives a sign-up the family's own parent", () => {
     for (const assignment of plan.assignments) {
-      const task = plan.tasks.find((entry) => entry.id === assignment.taskId)!;
       const family = plan.families.find((entry) => entry.id === assignment.familyId)!;
-      assert.equal(family.groupId, task.groupId);
       if (assignment.source === "parent_sign_up") {
         const parent = plan.parents.find((entry) => entry.id === assignment.parentId);
         assert.equal(parent?.familyId, family.id);
@@ -122,7 +131,14 @@ describe("seed data: the small set", () => {
     ) as { phoneNumbers: string[]; emailDomains: string[] };
     assert.deepEqual(
       plan.groups.map((entry) => entry.name),
-      ["Katica", "Süni"],
+      [
+        "Játszókert",
+        "Karbantartó",
+        "Ünnep-előkészítő",
+        "Kreatív-alkotó",
+        "Nagytakarítás szervezése",
+        "Állatgondozás",
+      ],
     );
     assert.ok(plan.tasks.some((entry) => entry.title === "Sütés"));
     assert.ok(plan.events.some((entry) => entry.title === "Őszi vásár"));
@@ -149,13 +165,31 @@ describe("seed data: the small set", () => {
 describe("seed data: the 30-family set", () => {
   const large = buildSeedPlan("worker_1", "large");
 
-  it("is the same rules at a larger size: 30 families over 3 groups, one account for every family", () => {
+  it("is the same rules at a larger size: 30 families and the six working groups, one account for every family", () => {
     assert.equal(large.families.length, 30);
-    assert.equal(large.groups.length, 3);
+    assert.equal(large.groups.length, 6);
     assert.equal(large.accounts.length, 1 + 2 + 1 + 30);
-    for (const group of large.groups) {
-      assert.equal(large.families.filter((family) => family.groupId === group.id).length, 10);
-    }
+    assert.equal(large.memberships.length, 30);
+  });
+
+  it("holds the role fixtures of the Unit: an administrator who is a parent, one of two groups, a community teacher (BR2.1)", () => {
+    const small = buildSeedPlan("worker_1", "small");
+    const admin1 = small.accounts.find((entry) => entry.tag === "group-admin-1")!;
+    const admin2 = small.accounts.find((entry) => entry.tag === "group-admin-2")!;
+    assert.ok(small.parents.some((parent) => parent.accountId === admin1.id));
+    assert.ok(
+      small.extraGrants.some((grant) => grant.subjectId === admin1.id && grant.role === "parent"),
+    );
+    assert.equal(
+      small.extraGrants.filter(
+        (grant) => grant.subjectId === admin2.id && grant.role === "group_admin",
+      ).length,
+      1,
+    );
+    const teacher = small.accounts.find((entry) => entry.tag === "teacher-1")!;
+    assert.deepEqual([teacher.scopeType, teacher.scopeId], ["organization", small.organization.id]);
+    assert.ok(small.tasks.some((task) => task.groupId === null));
+    assert.ok(small.events.some((event) => event.groupId === null));
   });
 
   it("keeps every rule of the small set: capacity, group reach and unique places", () => {

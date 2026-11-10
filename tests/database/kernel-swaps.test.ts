@@ -5,6 +5,7 @@ import {
   ADMIN_G1,
   ADMIN_G2,
   ASSIGNMENT_F1_T1,
+  ASSIGNMENT_F2_T3,
   ASSIGNMENT_OTHER,
   CO_PARENT_F1,
   callFunction,
@@ -28,6 +29,7 @@ import {
   SUPER_ADMIN,
   TASK_1,
   TASK_2,
+  TASK_3,
   TEACHER_G1,
   uuid,
 } from "./directory-support.ts";
@@ -62,12 +64,8 @@ for (const schema of DIRECTORY_SCHEMAS) {
     });
     beforeEach(async () => {
       await seedCoordinationWorld(db, schema);
-      // The swap world: family 1 holds an active place on task 1, family 2 (now also a member of group 1)
-      // an active place on task 2; the seeded cancellation request of family 1 is withdrawn.
-      await db.query(
-        "insert into group_memberships (organization_id, family_id, group_id) values ($1, $2, $3), ($1, $4, $3)",
-        [ORGANIZATION, FAMILY_2, GROUP_1, FAMILY_NO_GROUP],
-      );
+      // The swap world: family 1 holds an active place on task 1, family 2 an active place on task 2; the
+      // seeded cancellation request of family 1 is withdrawn.
       await db.query("update change_requests set status = 'withdrawn' where id = $1", [REQUEST_1]);
       await db.query("update assignments set status = 'active' where id = $1", [ASSIGNMENT_F1_T1]);
       await db.query("update tasks set capacity = 3 where id = $1", [TASK_2]);
@@ -148,14 +146,14 @@ for (const schema of DIRECTORY_SCHEMAS) {
       );
     }
 
-    it("lists only the other families' active places on other open tasks of the group, with title, date and family name (BR31.4)", async () => {
+    it("lists the other families' active places on other open tasks of any group, with title, date and family name (BR31.4, BR4.3)", async () => {
       await thirdFamily();
       const result = await candidates(PARENT_F1, ASSIGNMENT_F1_T1);
       assert.equal(result.state, "success");
       const items = result.items as Record<string, unknown>[];
       assert.deepEqual(
         items.map((entry) => entry.assignment_id),
-        [A_F3_T4, A_F2_T2],
+        [A_F3_T4, A_F2_T2, ASSIGNMENT_F2_T3],
         "in the order of the task start",
       );
       const partner = items.find((entry) => entry.assignment_id === A_F2_T2)!;
@@ -170,17 +168,17 @@ for (const schema of DIRECTORY_SCHEMAS) {
       assert.equal(partner.title, "Kerti munka");
       assert.equal(partner.family_display_name, "Napraforgó család");
       assert.equal(JSON.stringify(result).includes("csilla@example.test"), false);
-      // The family's own other places, pending places, started and other groups' tasks do not appear.
+      // The family's own other places, pending places and started tasks do not appear.
       await db.query("update assignments set status = 'swap_pending' where id = $1", [A_F3_T4]);
       assert.deepEqual(
         ((await candidates(PARENT_F1, ASSIGNMENT_F1_T1)).items as { assignment_id: string }[]).map(
           (entry) => entry.assignment_id,
         ),
-        [A_F2_T2],
+        [A_F2_T2, ASSIGNMENT_F2_T3],
       );
       await db.query(
-        "update tasks set starts_at = now() - interval '1 hour', ends_at = now() where id = $1",
-        [TASK_2],
+        "update tasks set starts_at = now() - interval '1 hour', ends_at = now() where id = any($1)",
+        [[TASK_2, TASK_3]],
       );
       assert.deepEqual((await candidates(PARENT_F1, ASSIGNMENT_F1_T1)).items, []);
     });
@@ -309,11 +307,6 @@ for (const schema of DIRECTORY_SCHEMAS) {
         "update tasks set starts_at = now() + interval '3 days', ends_at = now() + interval '4 days' where id = $1",
         [TASK_2],
       );
-      await db.query(
-        "update group_memberships set status = 'ended', ended_at = now() where family_id = $1 and group_id = $2",
-        [FAMILY_2, GROUP_1],
-      );
-      refused(await requestSwap(PARENT_F1), "conflict", "DUTY_INELIGIBLE");
       assert.equal(await count(db, "change_requests", "kind = 'swap'"), 0);
       assert.equal((await asg(ASSIGNMENT_F1_T1)).status, "active");
     });
@@ -457,14 +450,6 @@ for (const schema of DIRECTORY_SCHEMAS) {
           },
         ],
         [
-          "the family left the group",
-          () =>
-            db.query(
-              "update group_memberships set status = 'ended', ended_at = now() where family_id = $1 and group_id = $2",
-              [FAMILY_2, GROUP_1],
-            ),
-        ],
-        [
           "a duplicate place appeared",
           () =>
             db.query(
@@ -493,10 +478,6 @@ for (const schema of DIRECTORY_SCHEMAS) {
 
     async function beforeEachReset() {
       await seedCoordinationWorld(db, schema);
-      await db.query(
-        "insert into group_memberships (organization_id, family_id, group_id) values ($1, $2, $3), ($1, $4, $3)",
-        [ORGANIZATION, FAMILY_2, GROUP_1, FAMILY_NO_GROUP],
-      );
       await db.query("update change_requests set status = 'withdrawn' where id = $1", [REQUEST_1]);
       await db.query("update assignments set status = 'active' where id = $1", [ASSIGNMENT_F1_T1]);
       await db.query("update tasks set capacity = 3 where id = $1", [TASK_2]);
@@ -699,10 +680,6 @@ for (const schema of DIRECTORY_SCHEMAS) {
           await db.query(
             "insert into families (id, organization_id, display_name) values ($1, $3, 'X család'), ($2, $3, 'Y család')",
             [FAMILY_X, FAMILY_Y, ORGANIZATION],
-          );
-          await db.query(
-            "insert into group_memberships (organization_id, family_id, group_id) values ($1, $2, $4), ($1, $3, $4)",
-            [ORGANIZATION, FAMILY_X, FAMILY_Y, GROUP_1],
           );
           await db.query(
             "insert into parents (organization_id, family_id, display_name) values ($1, $2, 'X szülő'), ($1, $3, 'Y szülő')",

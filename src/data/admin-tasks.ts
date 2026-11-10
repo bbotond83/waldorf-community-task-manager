@@ -6,6 +6,7 @@ import type {
   DashboardModel,
   DomainOutcome,
 } from "../application/index.ts";
+import { COMMUNITY_GROUP } from "../application/admin-payloads.ts";
 import { APPROVAL_KIND_TITLES } from "./copy.ts";
 import type { DataGateway } from "./gateway.ts";
 import { defined, likePattern, payloadNumber, payloadText, type Payload } from "./payload.ts";
@@ -54,7 +55,7 @@ function taskItem(row: Row): AdminItemModel {
     version: integer(row, "version"),
     kind: "task" as const,
     details: Object.freeze({
-      groupId: text(row, "group_id"),
+      ...present(row, "group_id", "groupId"),
       ...present(row, "event_id", "eventId"),
       category: text(row, "category"),
       capacity: integer(row, "capacity"),
@@ -73,7 +74,7 @@ function eventItem(row: Row): AdminItemModel {
     version: integer(row, "version"),
     kind: "event" as const,
     details: Object.freeze({
-      groupId: text(row, "group_id"),
+      ...present(row, "group_id", "groupId"),
       startsAt: text(row, "starts_at"),
       endsAt: text(row, "ends_at"),
       ...present(row, "location", "location"),
@@ -95,6 +96,12 @@ async function readTable(
     refine(client.from(table).select(columns) as unknown as Filterable).limit(1000),
   );
   return asRows(data);
+}
+
+/** The group a save stores: the one the form chose, none for "whole community", or the stored one. */
+function groupOf(payload: Payload, stored: string | undefined): string | undefined {
+  const chosen = payloadText(payload, "groupId") ?? stored;
+  return chosen === COMMUNITY_GROUP ? undefined : chosen;
 }
 
 const TASK_COLUMNS =
@@ -166,7 +173,7 @@ export async function saveTask(
     const body = defined({
       id: creating ? null : id,
       expected_version: creating ? undefined : expectedVersion,
-      group_id: payloadText(payload, "groupId") ?? fromRow("group_id"),
+      group_id: groupOf(payload, fromRow("group_id")),
       title: payloadText(payload, "title")?.trim() ?? fromRow("title"),
       location: payloadText(payload, "location") ?? fromRow("location"),
       coordinator_name: payloadText(payload, "coordinatorName") ?? fromRow("coordinator_name"),
@@ -192,7 +199,7 @@ export async function saveTask(
   const body = defined({
     id: creating ? null : id,
     expected_version: creating ? undefined : expectedVersion,
-    group_id: payloadText(payload, "groupId") ?? fromRow("group_id"),
+    group_id: groupOf(payload, fromRow("group_id")),
     event_id: payloadText(payload, "eventId") ?? fromRow("event_id"),
     title: payloadText(payload, "title")?.trim() ?? fromRow("title"),
     category: payloadText(payload, "category") ?? fromRow("category"),
@@ -416,7 +423,6 @@ export async function getDashboard(
     Object.freeze({
       scopeId: scope.id,
       openApprovals: integer(asRow(result), "open_approvals"),
-      openImportConflicts: integer(asRow(result), "open_import_conflicts"),
     }),
   );
 }

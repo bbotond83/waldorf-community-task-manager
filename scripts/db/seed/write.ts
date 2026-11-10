@@ -77,20 +77,20 @@ export async function writeSeedPlan(client: SqlClient, plan: SeedPlan): Promise<
     await insertRows(
       client,
       "groups",
-      ["id", "organization_id", "school_year_id", "name"],
-      plan.groups.map((group) => [group.id, organization, plan.schoolYear.id, group.name]),
+      ["id", "organization_id", "school_year_id", "name", "description"],
+      plan.groups.map((group) => [
+        group.id,
+        organization,
+        plan.schoolYear.id,
+        group.name,
+        group.description,
+      ]),
     );
     await insertRows(
       client,
       "families",
       ["id", "organization_id", "display_name"],
       plan.families.map((family) => [family.id, organization, family.name]),
-    );
-    await insertRows(
-      client,
-      "group_memberships",
-      ["id", "organization_id", "family_id", "group_id"],
-      plan.families.map((family) => [family.membershipId, organization, family.id, family.groupId]),
     );
     await insertRows(
       client,
@@ -122,6 +122,17 @@ export async function writeSeedPlan(client: SqlClient, plan: SeedPlan): Promise<
     );
     await insertRows(
       client,
+      "group_memberships",
+      ["id", "organization_id", "parent_id", "group_id"],
+      plan.memberships.map((membership) => [
+        membership.id,
+        organization,
+        membership.parentId,
+        membership.groupId,
+      ]),
+    );
+    await insertRows(
+      client,
       "parent_contacts",
       ["parent_id", "organization_id", "contact_email", "contact_phone", "locality"],
       plan.parents.map((parent) => [
@@ -142,14 +153,24 @@ export async function writeSeedPlan(client: SqlClient, plan: SeedPlan): Promise<
       client,
       "app_role_grants",
       ["id", "subject_id", "role", "scope_type", "scope_id", "organization_id"],
-      plan.accounts.map((account) => [
-        account.grantId,
-        account.id,
-        account.role,
-        account.scopeType,
-        account.scopeId,
-        organization,
-      ]),
+      [
+        ...plan.accounts.map((account) => [
+          account.grantId,
+          account.id,
+          account.role,
+          account.scopeType,
+          account.scopeId,
+          organization,
+        ]),
+        ...plan.extraGrants.map((grant) => [
+          grant.id,
+          grant.subjectId,
+          grant.role,
+          grant.scopeType,
+          grant.scopeId,
+          organization,
+        ]),
+      ],
     );
     await insertRows(
       client,

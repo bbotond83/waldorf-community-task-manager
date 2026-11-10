@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { AdminItemDetails } from "../../../src/application/index.ts";
+import { COMMUNITY_GROUP } from "../../../src/application/admin-payloads.ts";
 import { isoToBudapestLocal } from "../../../src/application/budapest-time.ts";
 import type { AdminLookups } from "../_lib/lookups.ts";
 import { AdminSelectField, AdminTextField } from "./AdminMutationForm.tsx";
@@ -53,7 +54,10 @@ export function TaskFields({
   lookups: AdminLookups;
 }>) {
   const [chosen, setChosen] = useState<TaskFormKind>(storedKind ?? "task");
-  const [groupId, setGroupId] = useState(details?.groupId ?? "");
+  // A stored item with no group is community-wide.
+  const [groupId, setGroupId] = useState(
+    details?.groupId ?? (mode === "edit" ? COMMUNITY_GROUP : ""),
+  );
   const kind = mode === "edit" ? (storedKind ?? "task") : chosen;
   const events = lookups.events.filter((event) => !groupId || event.groupId === groupId);
   return (
@@ -84,11 +88,11 @@ export function TaskFields({
       <AdminSelectField
         id="groupId"
         name="groupId"
-        label="Csoport"
+        label="Munkacsoport"
         options={lookups.groups}
         value={groupId}
         onChange={setGroupId}
-        placeholder="Válasszon csoportot"
+        placeholder="Válasszon munkacsoportot"
         required
         testId="admin-task-group-select"
       />
@@ -101,7 +105,7 @@ export function TaskFields({
             options={events}
             defaultValue={details?.eventId}
             placeholder="Nem tartozik eseményhez"
-            hint="Csak a kiválasztott csoport eseményei választhatók."
+            hint="Csak a kiválasztott munkacsoport eseményei választhatók."
             testId="admin-task-event-select"
           />
           <AdminTextField

@@ -215,23 +215,6 @@ it("withholds archive detail content without session", async () => {
   expect(output).not.toContain('name="idempotencyKey"');
   expect(output).not.toContain("protectedReason");
 });
-it("renders permitted import with real projections", async () => {
-  signIn("super_admin");
-  const page = (await import("../../app/admin/import/page.tsx")).default as (
-    input: ReturnType<typeof props>,
-  ) => ReactNode | Promise<ReactNode>;
-  const output = html(await page(props("")));
-  expect(output.toLocaleLowerCase("hu")).toContain("import");
-  expect(output).not.toContain("protectedReason");
-});
-it("withholds import content without session", async () => {
-  const page = (await import("../../app/admin/import/page.tsx")).default as (
-    input: ReturnType<typeof props>,
-  ) => ReactNode | Promise<ReactNode>;
-  const output = html(await page(props("")));
-  expect(output).not.toContain('name="idempotencyKey"');
-  expect(output).not.toContain("protectedReason");
-});
 it("renders permitted reminders with real projections", async () => {
   signIn("super_admin");
   const page = (await import("../../app/admin/emlekeztetok/page.tsx")).default as (

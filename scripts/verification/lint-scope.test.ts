@@ -80,11 +80,4 @@ describe("lint and format scope guard (NFR2.10)", () => {
       assert.ok(pathsOf(scripts[name]!).includes("src/data"), name);
     assert.ok(existsSync(new URL("src/data", root)));
   });
-
-  it("includes the server-only import parser folder, the most security-sensitive new code (NFR2.27)", () => {
-    for (const name of SCOPED_SCRIPTS)
-      assert.ok(pathsOf(scripts[name]!).includes("src/import-parser"), name);
-    assert.ok(existsSync(new URL("src/import-parser", root)));
-    assert.equal((LEGACY_OUTSIDE_SCOPE as readonly string[]).includes("src/import-parser"), false);
-  });
 });

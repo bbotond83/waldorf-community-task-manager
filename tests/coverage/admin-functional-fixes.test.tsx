@@ -146,7 +146,6 @@ it.each([
   ["../../app/admin/beallitasok/page.tsx", ""],
   ["../../app/admin/jovahagyasok/[id]/page.tsx", "approval-csere"],
   ["../../app/admin/archivum/[id]/page.tsx", "year-2026"],
-  ["../../app/admin/import/page.tsx", ""],
 ])("offers no scenario control or hidden scenario field on %s", async (path, id) => {
   const doc = await render(path, id, { scenario: "conflict" });
   expect(doc.querySelectorAll('[name="scenario"], [id*="scenario"], [data-testid*="scenario"]')).toHaveLength(

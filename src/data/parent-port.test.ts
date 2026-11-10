@@ -160,7 +160,6 @@ test("every sign-up refusal keeps the state and code the screen maps", async () 
     ["invalidated", "DUTY_VERSION_STALE"],
     ["conflict", "DUTY_CLOSED"],
     ["conflict", "DUTY_ALREADY_ASSIGNED"],
-    ["conflict", "DUTY_INELIGIBLE"],
     ["conflict", "DUTY_FULL"],
   ];
   for (const [state, code] of cases) {

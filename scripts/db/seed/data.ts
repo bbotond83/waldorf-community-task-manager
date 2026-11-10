@@ -24,11 +24,51 @@ export const SEED_PASSWORDS: Readonly<Record<SeedRole, string>> = {
   parent: "Teszt-Szulo-2026",
 };
 
-/** The shape of each set: how many families and groups. The rules below do the rest. */
-export const SEED_SHAPES: Readonly<Record<SeedSize, { families: number; groups: number }>> = {
-  small: { families: 6, groups: 2 },
-  large: { families: 30, groups: 3 },
+/**
+ * The shape of each set: how many families, and how many of the working groups carry invented events and tasks.
+ * Every set holds all six working groups.
+ */
+export const SEED_SHAPES: Readonly<Record<SeedSize, { families: number; activeGroups: number }>> = {
+  small: { families: 6, activeGroups: 2 },
+  large: { families: 30, activeGroups: 3 },
 };
+
+/**
+ * The six working groups of a fresh install for 2026-2027 (BR2.1), kept in this one list. It is not invented data: the
+ * later hosting work loads the same list. The card text is checked in the owner's screenshot review.
+ */
+export const WORKING_GROUPS: readonly { name: string; description: string }[] = [
+  {
+    name: "Játszókert",
+    description:
+      "Rendszeresen bejárja az udvari játszóterületeket és növényeiket, és figyeli, hogy biztonságosak és használhatók-e. Az egyszerű hibákat maga javítja, a többit jelzi az Óvónői Konferenciának.",
+  },
+  {
+    name: "Karbantartó",
+    description:
+      "Elvégzi a kisebb ház körüli és kerti javításokat, és rendszeresen körbejárja az épületet és az udvart. Fogadja az óvónők javítási kéréseit, a költséggel járó munkákat egyezteti az Óvónői Konferenciával.",
+  },
+  {
+    name: "Ünnep-előkészítő",
+    description:
+      "Segít az ünnepek előkészítésében: berendezi és visszarendezi a termet, és beszerzi a szükséges anyagokat.",
+  },
+  {
+    name: "Kreatív-alkotó",
+    description:
+      "Saját készítésű termékekkel képviseli az óvodát a közeli Waldorf-iskolák rendezvényein, és megszervezi ezek elkészítését. Alkotófoglalkozásokat is szervez.",
+  },
+  {
+    name: "Nagytakarítás szervezése",
+    description:
+      "Megszervezi a szünetek utáni nagytakarításokat: meghatározza a takarítás rendjét, elmagyarázza a szülőknek, és átveszi az elkészült munkát.",
+  },
+  {
+    name: "Állatgondozás",
+    description:
+      "Összefogja az óvoda állatainak időszakos gondozását, és figyel arra, hogy a napi állatgondozási ügyeletek be legyenek töltve.",
+  },
+];
 
 export interface SeedAccount {
   key: string;
@@ -49,8 +89,17 @@ export interface SeedPlan {
   size: SeedSize;
   organization: { id: string; name: string };
   schoolYear: { id: string; name: string; startsOn: string; endsOn: string };
-  groups: { id: string; name: string }[];
-  families: { id: string; name: string; groupId: string; membershipId: string }[];
+  groups: { id: string; name: string; description: string }[];
+  families: { id: string; name: string }[];
+  memberships: { id: string; parentId: string; groupId: string }[];
+  /** The further rights of an account that holds more than one (a group administrator who is also a parent). */
+  extraGrants: {
+    id: string;
+    subjectId: string;
+    role: SeedRole;
+    scopeType: SeedScopeType;
+    scopeId: string;
+  }[];
   parents: {
     id: string;
     familyId: string;
@@ -66,7 +115,7 @@ export interface SeedPlan {
   accounts: SeedAccount[];
   events: {
     id: string;
-    groupId: string;
+    groupId: string | null;
     title: string;
     location: string;
     coordinator: string | null;
@@ -78,7 +127,7 @@ export interface SeedPlan {
   }[];
   tasks: {
     id: string;
-    groupId: string;
+    groupId: string | null;
     eventId: string | null;
     title: string;
     capacity: number;
@@ -233,7 +282,6 @@ const CHILD_NAMES = [
   "Vince",
   "Zsombor",
 ] as const;
-const GROUP_NAMES = ["Katica", "Süni", "Pillangó"] as const;
 const LOCALITIES = ["Pécs", "Mohács", "Komló", "Szigetvár"] as const;
 /** Example phone numbers that scripts/verification/privacy-allowlist.json already allows. */
 const PHONES = [
@@ -263,16 +311,17 @@ export function buildSeedPlan(schema: string, size: SeedSize): SeedPlan {
   const organization = { id: id("organization"), name: "Tesztiskola Waldorf Óvoda" };
   const schoolYear = {
     id: id("school-year"),
-    name: "2026/2027",
+    name: "2026-2027",
     startsOn: "2026-09-01",
     endsOn: "2027-06-30",
   };
-  const groups = Array.from({ length: shape.groups }, (_, g) => ({
-    id: id(`group:${g + 1}`),
-    name: pick(GROUP_NAMES, g),
-  }));
+  const groups = WORKING_GROUPS.map((group, g) => ({ id: id(`group:${g + 1}`), ...group }));
+  // Invented events and tasks hang on these groups; every family has one of them as its first parent's group.
+  const activeGroups = groups.slice(0, shape.activeGroups);
 
   const families: SeedPlan["families"] = [];
+  const memberships: SeedPlan["memberships"] = [];
+  const extraGrants: SeedPlan["extraGrants"] = [];
   const parents: SeedPlan["parents"] = [];
   const children: SeedPlan["children"] = [];
   const accounts: SeedAccount[] = [];
@@ -304,8 +353,11 @@ export function buildSeedPlan(schema: string, size: SeedSize): SeedPlan {
       organization.id,
     ),
   );
-  for (let g = 0; g < Math.min(2, groups.length); g++) {
-    accounts.push(
+  // The group administrators are parents too (BR3.2): each is the second parent of family 1 and 2, and the second
+  // administrator holds two groups.
+  const groupAdmins: SeedAccount[] = [];
+  for (let g = 0; g < 2; g++) {
+    groupAdmins.push(
       account(
         `group-admin-${g + 1}`,
         `group-admin-${g + 1}`,
@@ -315,24 +367,47 @@ export function buildSeedPlan(schema: string, size: SeedSize): SeedPlan {
       ),
     );
   }
+  accounts.push(...groupAdmins);
+  extraGrants.push({
+    id: id("grant:group-admin-2:second-group"),
+    subjectId: groupAdmins[1]!.id,
+    role: "group_admin",
+    scopeType: "group",
+    scopeId: groups[2]!.id,
+  });
   accounts.push(
-    account("teacher-1", SEED_STAFF_TAGS.teacher1, "kindergarten_teacher", "group", groups[0]!.id),
+    account(
+      "teacher-1",
+      SEED_STAFF_TAGS.teacher1,
+      "kindergarten_teacher",
+      "organization",
+      organization.id,
+    ),
   );
 
   for (let n = 1; n <= shape.families; n++) {
     const index = n - 1;
     const surname = pick(SURNAMES, index);
-    const group = groups[index % groups.length]!;
-    const family = {
-      id: id(`family:${n}`),
-      name: `${surname} család`,
-      groupId: group.id,
-      membershipId: id(`membership:${n}`),
-    };
+    const family = { id: id(`family:${n}`), name: `${surname} család` };
     families.push(family);
 
     const parentAccount = account(`parent-${n}`, `parent-${n}`, "parent", "family", family.id);
     accounts.push(parentAccount);
+    const coParentAdmin = groupAdmins[index];
+    if (coParentAdmin) {
+      extraGrants.push({
+        id: id(`grant:${coParentAdmin.tag}:parent`),
+        subjectId: coParentAdmin.id,
+        role: "parent",
+        scopeType: "family",
+        scopeId: family.id,
+      });
+    }
+    memberships.push({
+      id: id(`membership:${n}`),
+      parentId: id(`parent:${n}:1`),
+      groupId: activeGroups[index % activeGroups.length]!.id,
+    });
     for (const [slot, given] of [
       [1, pick(FEMALE_NAMES, index)],
       [2, pick(MALE_NAMES, index)],
@@ -342,7 +417,7 @@ export function buildSeedPlan(schema: string, size: SeedSize): SeedPlan {
         id: id(`parent:${n}:${slot}`),
         familyId: family.id,
         name: `${surname} ${given}`,
-        accountId: first ? parentAccount.id : null,
+        accountId: first ? parentAccount.id : (coParentAdmin?.id ?? null),
         contactEmail: `csalad${n}.szulo${slot}@example.test`,
         contactPhone: first || n % 2 === 0 ? pick(PHONES, index + slot) : null,
         locality: pick(LOCALITIES, index),
@@ -367,7 +442,7 @@ export function buildSeedPlan(schema: string, size: SeedSize): SeedPlan {
   const EVENT_PLACES = ["Tornaterem", "Kert", "Aula"] as const;
   const hours = (day: number, hour: number) => day * 24 + hour;
 
-  groups.forEach((group, g) => {
+  activeGroups.forEach((group, g) => {
     const eventId = id(`event:${g + 1}`);
     const eventDay = 10 + 2 * g;
     events.push({
@@ -419,7 +494,9 @@ export function buildSeedPlan(schema: string, size: SeedSize): SeedPlan {
     );
     // The families of the group, in order: two are placed by an admin on the baking task, the third signs up
     // for the decorating task itself, and the first one also holds the cleaning task. No task is over capacity.
-    const members = families.filter((family) => family.groupId === group.id);
+    const members = families.filter(
+      (_, index) => activeGroups[index % activeGroups.length]!.id === group.id,
+    );
     const place = (
       task: string,
       slot: number,
@@ -442,6 +519,43 @@ export function buildSeedPlan(schema: string, size: SeedSize): SeedPlan {
     place(cleaning, 1, "admin_assign", members[0]);
   });
 
+  // Community-wide items (BR1.1): an event with a task of its own scope, and a task without an event.
+  const communityEvent = id("event:community");
+  events.push({
+    id: communityEvent,
+    groupId: null,
+    title: "Közösségi nap",
+    location: "Udvar",
+    coordinator: "Tóth Mária",
+    startsAtHours: hours(16, 9),
+    endsAtHours: hours(16, 13),
+    allergenNote: null,
+    supplyNote: null,
+    foodNote: null,
+  });
+  tasks.push(
+    {
+      id: id("task:community:1"),
+      groupId: null,
+      eventId: communityEvent,
+      title: "Közös pakolás",
+      capacity: 4,
+      startsAtHours: hours(16, 8),
+      endsAtHours: hours(16, 9),
+      location: "Udvar",
+    },
+    {
+      id: id("task:community:2"),
+      groupId: null,
+      eventId: null,
+      title: "Közös kertrendezés",
+      capacity: 3,
+      startsAtHours: hours(18, 10),
+      endsAtHours: hours(18, 12),
+      location: "Kert",
+    },
+  );
+
   return {
     schema,
     size,
@@ -449,6 +563,8 @@ export function buildSeedPlan(schema: string, size: SeedSize): SeedPlan {
     schoolYear,
     groups,
     families,
+    memberships,
+    extraGrants,
     parents,
     children,
     accounts,

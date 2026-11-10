@@ -28,6 +28,15 @@ export function AppShell({ profile, children, statusMessage, headerAction }: App
             </p>
           </div>
         </div>
+        {profile.switchLink && (
+          <a
+            className="button-link button-link-secondary site-header-switch"
+            href={profile.switchLink.href}
+            data-testid="app-shell-switch-link"
+          >
+            {profile.switchLink.label}
+          </a>
+        )}
         {headerAction}
       </header>
 

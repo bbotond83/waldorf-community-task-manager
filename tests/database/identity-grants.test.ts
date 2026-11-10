@@ -102,7 +102,7 @@ for (const schema of IDENTITY_SCHEMAS) {
     };
 
     describe("grant_change", () => {
-      it("lets a super admin add a grant, raising the version and writing role.grant with the group", async () => {
+      it("lets a super admin add a family grant, raising the version and writing role.grant with no group", async () => {
         const result = await change(SUPER_ADMIN, "add", PARENT_F1, "parent", "family", FAMILY_2);
         assert.equal(result.state, "success");
         assert.equal(await version(PARENT_F1), 2);
@@ -133,34 +133,28 @@ for (const schema of IDENTITY_SCHEMAS) {
             "super_admin",
             "account",
             PARENT_F1,
-            GROUP_2,
+            null,
             ORGANIZATION,
           ],
         );
       });
 
-      it("lets a group admin add parent and teacher grants within their group only", async () => {
-        assert.equal(
-          (await change(ADMIN_G1, "add", OUTSIDER, "parent", "family", FAMILY_1)).state,
-          "success",
-        );
-        assert.equal(
-          (await change(ADMIN_G1, "add", OUTSIDER, "kindergarten_teacher", "group", GROUP_1)).state,
-          "success",
-        );
+      it("refuses a group admin every grant, even within their own group (BR3.6, BR3.8)", async () => {
         const refused: [string, string, string][] = [
+          ["parent", "family", FAMILY_1],
           ["parent", "family", FAMILY_2],
-          ["kindergarten_teacher", "group", GROUP_2],
+          ["kindergarten_teacher", "organization", ORGANIZATION],
           ["group_admin", "group", GROUP_1],
+          ["group_admin", "group", GROUP_2],
           ["super_admin", "organization", ORGANIZATION],
         ];
         for (const [role, scopeType, scope] of refused) {
           const result = await change(ADMIN_G1, "add", OUTSIDER, role, scopeType, scope);
           assert.equal(result.state, "denied", `${role} ${scopeType}`);
         }
-        assert.equal((await activeGrants(OUTSIDER)).length, 2);
+        assert.equal((await activeGrants(OUTSIDER)).length, 0);
         const events = await auditEvents(db);
-        assert.equal(events.filter((event) => event.outcome === "denied").length, 4);
+        assert.equal(events.filter((event) => event.outcome === "denied").length, 6);
         assert.ok(events.every((event) => event.actor_account_id === ADMIN_G1));
       });
 
@@ -216,12 +210,16 @@ for (const schema of IDENTITY_SCHEMAS) {
         );
       });
 
-      it("lets a group admin revoke within their group and refuses another group's grants", async () => {
-        assert.equal(
-          (await change(ADMIN_G1, "revoke", TEACHER_G1, "kindergarten_teacher", "group", GROUP_1))
-            .state,
-          "success",
+      it("refuses a group admin every revocation, even within their own group (BR3.6, BR3.8)", async () => {
+        const teacherRevoke = await change(
+          ADMIN_G1,
+          "revoke",
+          TEACHER_G1,
+          "kindergarten_teacher",
+          "organization",
+          ORGANIZATION,
         );
+        assert.equal(teacherRevoke.state, "denied");
         assert.equal(
           (await change(ADMIN_G2, "revoke", PARENT_F1, "parent", "family", FAMILY_1)).state,
           "denied",
@@ -230,6 +228,7 @@ for (const schema of IDENTITY_SCHEMAS) {
           (await change(ADMIN_G1, "revoke", ADMIN_G2, "group_admin", "group", GROUP_2)).state,
           "denied",
         );
+        assert.equal((await activeGrants(TEACHER_G1)).length, 1);
         assert.equal((await activeGrants(PARENT_F1)).length, 1);
         assert.equal((await activeGrants(ADMIN_G2)).length, 1);
       });
@@ -652,9 +651,12 @@ for (const schema of IDENTITY_SCHEMAS) {
       });
 
       it("lets a group admin find only accounts holding a grant in their group", async () => {
-        assert.equal((await find(ADMIN_G1, await emailOf(PARENT_F1))).reference, PARENT_F1);
-        assert.equal((await find(ADMIN_G1, await emailOf(TEACHER_G1))).reference, TEACHER_G1);
-        for (const hidden of [PARENT_F2, OUTSIDER, ADMIN_G2]) {
+        await db.query(
+          "insert into app_role_grants (subject_id, role, scope_type, scope_id, organization_id) values ($1, 'group_admin', 'group', $2, $3)",
+          [ADMIN_G2, GROUP_1, ORGANIZATION],
+        );
+        assert.equal((await find(ADMIN_G1, await emailOf(ADMIN_G2))).reference, ADMIN_G2);
+        for (const hidden of [PARENT_F1, TEACHER_G1, PARENT_F2, OUTSIDER]) {
           const result = await find(ADMIN_G1, await emailOf(hidden));
           assert.equal(result.state, "validation", hidden);
           assert.equal(result.code, "account_not_found");

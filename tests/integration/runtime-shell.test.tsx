@@ -13,7 +13,7 @@ describe("runtime shell", () => {
     );
     expect(screen.getByTestId("brand-link")).toHaveAttribute("href", "/admin");
     expect(screen.getByRole("img", { name: "Cinkotai Waldorf Óvoda" })).toBeVisible();
-    expect(screen.getByRole("status")).toHaveTextContent("Csoportadminisztrátor profil aktív.");
+    expect(screen.getByRole("status")).toHaveTextContent("Koordinátor profil aktív.");
   });
 
   it("renders the semantic shell and role announcement", () => {
@@ -53,7 +53,7 @@ describe("runtime shell", () => {
       </AppShell>,
     );
     expect(screen.getByTestId("app-shell-profile-summary")).toHaveTextContent(
-      "A kijelölt csoportok beosztása, módosítás nélkül",
+      "A közösség beosztása, módosítás nélkül",
     );
     expect(screen.getByRole("status")).toHaveTextContent("Betöltve.");
   });
@@ -77,13 +77,17 @@ describe("runtime shell", () => {
       "href",
       "/szulo/cserek",
     );
-    expect(navigation.getAllByRole("link")).toHaveLength(3);
+    expect(navigation.getByRole("link", { name: "Munkacsoportok" })).toHaveAttribute(
+      "href",
+      "/szulo/munkacsoportok",
+    );
+    expect(navigation.getAllByRole("link")).toHaveLength(4);
     expect(navigation.getAllByRole("link").map((link) => link.textContent)).toEqual([
       "Értesítések",
       "Feladatok",
       "Cserék",
+      "Munkacsoportok",
     ]);
-    expect(navigation.queryByRole("link", { name: "Importálás" })).not.toBeInTheDocument();
   });
 
   it.each([
@@ -117,17 +121,19 @@ describe("runtime shell", () => {
   });
 });
 
-it("teacher shell announces the localized role and has no menu", () => {
+it("teacher shell announces the localized role and lists Beosztás and Munkacsoportok", () => {
   render(
     <AppShell profile={shellProfile("teacher")}>
       <h1>Óvónői kezdőlap</h1>
     </AppShell>,
   );
   expect(screen.getByRole("status")).toHaveTextContent("Óvónő profil aktív.");
-  expect(screen.queryByRole("navigation")).not.toBeInTheDocument();
-  expect(screen.queryByTestId("app-shell-navigation-toggle")).not.toBeInTheDocument();
+  expect(
+    within(screen.getByRole("navigation"))
+      .getAllByRole("link")
+      .map((link) => link.textContent),
+  ).toEqual(["Beosztás", "Munkacsoportok"]);
   expect(screen.getByTestId("brand-link")).toHaveAttribute("href", "/teacher/schedule");
   expect(screen.getByTestId("app-shell-skip-link")).toHaveAttribute("href", "#fo-tartalom");
   expect(screen.getByTestId("app-shell-main")).toHaveAttribute("tabindex", "-1");
-  expect(screen.queryByRole("link", { name: "Importálás" })).not.toBeInTheDocument();
 });

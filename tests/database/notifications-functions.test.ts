@@ -519,8 +519,12 @@ for (const schema of NOTIFICATION_SCHEMAS) {
         [ORGANIZATION],
       );
       await db.query(
-        "insert into group_memberships (organization_id, family_id, group_id) values ($1, $2, $3)",
-        [ORGANIZATION, FAMILY_NO_GROUP, GROUP_1],
+        "insert into parents (id, organization_id, family_id, display_name) values ($1, $2, $3, 'Csoporttag Géza')",
+        [uuid(9410), ORGANIZATION, FAMILY_NO_GROUP],
+      );
+      await db.query(
+        "insert into group_memberships (organization_id, parent_id, group_id) values ($1, $2, $3)",
+        [ORGANIZATION, uuid(9410), GROUP_1],
       );
       await plan(TASK_1);
       const grouped = await live(TASK_1);
@@ -576,10 +580,6 @@ for (const schema of NOTIFICATION_SCHEMAS) {
       await db.query(
         "insert into families (id, organization_id, display_name) values ($1, $2, 'Magányos család')",
         [lonely, ORGANIZATION],
-      );
-      await db.query(
-        "insert into group_memberships (organization_id, family_id, group_id) values ($1, $2, $3)",
-        [ORGANIZATION, lonely, GROUP_1],
       );
       await db.query(
         "insert into parents (organization_id, family_id, display_name) values ($1, $2, 'Magányos Márta')",
@@ -736,7 +736,9 @@ for (const schema of NOTIFICATION_SCHEMAS) {
         "denied",
         "a group admin of another group",
       );
-      assert.equal((await retry(ADMIN_G1, uuid(9998), version)).code, "reminder_not_found");
+      // A group admin gets the same refusal for a made-up id as for an item out of reach (BR3.4, NFR3.3).
+      assert.equal((await retry(ADMIN_G1, uuid(9998), version)).code, "authorization_denied");
+      assert.equal((await retry(SUPER_ADMIN, uuid(9998), version)).code, "reminder_not_found");
       assert.equal((await retry(ADMIN_G1, job!.id, null)).code, "field_invalid");
       assert.equal(
         (await jobsOf(TASK_1)).find((entry) => entry.id === job!.id)!.status,

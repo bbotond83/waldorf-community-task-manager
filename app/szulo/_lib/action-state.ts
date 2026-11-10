@@ -58,7 +58,6 @@ export function mapParentResult<T>(
 /** One Hungarian message for each business conflict a parent screen can meet (BR32.8). */
 export const PARENT_CONFLICT_MESSAGES: Readonly<Record<string, string>> = Object.freeze({
   DUTY_FULL: "A feladat időközben betelt.",
-  DUTY_INELIGIBLE: "Ehhez a feladathoz most nem lehet jelentkezni.",
   DUTY_CLOSED: "Erre a feladatra már nem lehet jelentkezni, mert lezárták vagy elkezdődött.",
   DUTY_ALREADY_ASSIGNED: "A család már jelentkezett erre a feladatra.",
   REQUEST_DUPLICATE: "Ehhez a megbízáshoz már van függő kérelem.",

@@ -81,7 +81,7 @@ export type AuthorizationMatrixRowId =
   | "AUTH-PARENT-NOTIFICATIONS"
   | "AUTH-TEACHER-TRACKING"
   | "AUTH-GROUP-ADMIN-CORE"
-  | "AUTH-GRP-IMPORT-DENY"
+  | "AUTH-WORKING-GROUPS"
   | "AUTH-SUPER-ADMIN"
   | "AUTH-SUPER-GOVERNANCE";
 
@@ -155,7 +155,21 @@ export type TrackingModel = Readonly<{ entries: readonly TrackingEntry[] }>;
 export type DashboardModel = Readonly<{
   scopeId: string;
   openApprovals: number;
-  openImportConflicts: number;
+}>;
+
+/** One active working group of the community, as a card shows it (BR2.3). */
+export type WorkingGroupItem = Readonly<{
+  id: string;
+  name: string;
+  description: string;
+  schoolYearId: string;
+  schoolYearName: string;
+}>;
+export type WorkingGroupListModel = Readonly<{ items: readonly WorkingGroupItem[] }>;
+
+/** What the task form offers: active families by name only (BR3.10). */
+export type FamilyNameListModel = Readonly<{
+  items: readonly Readonly<{ id: string; displayName: string }>[];
 }>;
 
 export type ApprovalOutcome = "approved" | "rejected";
@@ -235,11 +249,12 @@ export type AdminItemDetails = Readonly<{
   endsOn?: string;
   /** Child: its family. */
   familyId?: string;
-  /** Family: parents, children and the groups it is an active member of. */
+  /** Family: parents and children. */
   parents?: readonly AdminParentDetail[];
   children?: readonly Readonly<{ id: string; version: number; displayName: string }>[];
-  groups?: readonly Readonly<{ id: string; name: string }>[];
-  /** Task or event. */
+  /** Working group: its description. */
+  description?: string;
+  /** Task or event; absent on a community-wide item. */
   groupId?: string;
   eventId?: string;
   category?: string;
@@ -267,57 +282,6 @@ export type AdminItemModel = Readonly<{
 }>;
 
 export type AdminListModel = Readonly<{ items: readonly AdminItemModel[] }>;
-
-export type ImportPreviewModel = Readonly<{
-  id: string;
-  fingerprint: string;
-  changedRows: readonly string[];
-  conflicts: readonly Readonly<{
-    id: string;
-    rowLabel: string;
-    message: string;
-    resolution?: "keep-existing" | "use-import";
-    /** The database adapter says when only "keep existing" is possible (there is nothing to import into). */
-    skipOnly?: boolean;
-  }>[];
-  step: 1 | 2 | 3 | 4 | 5 | 6 | 7;
-  totalRows: number;
-  state:
-    | "selected"
-    | "validated"
-    | "preview"
-    | "conflicts"
-    | "confirmed"
-    | "committed"
-    | "rolled-back"
-    | "interrupted"
-    | "recovered";
-  /** The real import run (database adapter): its id, the version every later call sends, and the file's name. */
-  runId?: string;
-  runVersion?: number;
-  fileName?: string;
-  /** Dropped phone values and profile texts counted at the upload (database adapter). */
-  warningCount?: number;
-  /** The real counts of a finished run: rows created or updated, and rows left unchanged or archive-only. */
-  importedRows?: number;
-  skippedRows?: number;
-}>;
-
-export type ImportOutcome = Readonly<{
-  runId: string;
-  importedRows: number;
-  skippedRows: number;
-  fingerprint: string;
-  state: "committed" | "interrupted" | "recovered";
-  /** The real counts of a commit (database adapter). */
-  createdRows?: number;
-  updatedRows?: number;
-  archivedRows?: number;
-  runVersion?: number;
-}>;
-
-/** A cancelled import run (its staged rows are deleted); the screen shows the upload form again. */
-export type ImportCancelOutcome = Readonly<{ runId: string }>;
 
 export type ReminderJobModel = Readonly<{
   id: string;

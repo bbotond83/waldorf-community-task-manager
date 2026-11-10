@@ -120,18 +120,6 @@ it("preserves signup idempotency and reports full/ineligible conflicts", async (
       )
     ).code,
   ).toBe("DUTY_FULL");
-  expect(
-    (
-      await actions.signUpAction(
-        initial,
-        form({
-          id: "duty-ineligible",
-          expectedVersion: "2",
-          idempotencyKey: "coverage:ineligible:0001",
-        }),
-      )
-    ).code,
-  ).toBe("DUTY_INELIGIBLE");
 });
 it.each([
   ["retryable", "retryable"],
