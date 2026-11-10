@@ -181,7 +181,14 @@ for (const schema of DIRECTORY_SCHEMAS) {
         ["a missing parent", create(email("t2"), "t2", uuid(99999))],
         [
           "a teacher invitation with a target",
-          create(email("t3"), "t3", PARENT_NEW, uuid(101), "kindergarten_teacher", "group"),
+          create(
+            email("t3"),
+            "t3",
+            PARENT_NEW,
+            ORGANIZATION,
+            "kindergarten_teacher",
+            "organization",
+          ),
         ],
       ];
       for (const [label, pending] of cases) {

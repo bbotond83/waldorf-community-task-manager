@@ -22,10 +22,7 @@ export function isValidScope(scope: Scope): boolean {
 }
 export function isRoleScope(role: unknown, scope: Scope): boolean {
   if (!isCurrentRole(role) || !isValidScope(scope)) return false;
-  return (
-    scope.type ===
-    (role === "parent" ? "family" : role === "super_admin" ? "organization" : "group")
-  );
+  return scope.type === (role === "parent" ? "family" : role === "group_admin" ? "group" : "organization");
 }
 export function scopeContains(grant: Scope, requested: Scope): boolean {
   return (
@@ -51,18 +48,8 @@ export function effectiveGrants(grants: readonly RoleGrant[]): RoleGrant[] {
     return true;
   });
 }
-const CORE_RESOURCES = new Set([
-  "dashboard",
-  "record",
-  "task",
-  "assignment",
-  "approval",
-  "archive",
-  "group",
-  "child",
-  "family",
-  "parent",
-]);
+// A group administrator manages their working groups' work. Family records are a super admin's (BR3.9).
+const CORE_RESOURCES = new Set(["dashboard", "task", "assignment", "approval", "archive"]);
 const TRACKING_FIELDS = new Set([
   "display_name",
   "participant_name",
@@ -93,6 +80,8 @@ export function grantAllows(
   if (!ACTIONS.includes(request.action)) return false;
   // Answering and withdrawing a request belong to the parents of the family involved, nobody else.
   if (FAMILY_ONLY_ACTIONS.includes(request.action) && grant.role !== "parent") return false;
+  // Every signed-in role reads the working groups (BR2.3).
+  if (request.resource.kind === "working_group") return request.action === "read";
   switch (grant.role) {
     case "super_admin":
       return true;

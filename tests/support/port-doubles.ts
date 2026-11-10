@@ -22,8 +22,6 @@ import {
   type EventNoteModel,
   type GrantListModel,
   type GrantOutcome,
-  type ImportOutcome,
-  type ImportPreviewModel,
   type LifecycleListModel,
   type LifecycleOutcomeModel,
   type NotificationListModel,
@@ -41,6 +39,7 @@ import {
   isTrackingSource,
   matchesTrackingScope,
   type TrackingSourceRecord,
+  type TrackingView,
 } from "../../src/application/tracking-model.ts";
 
 /**
@@ -197,7 +196,6 @@ export class ParentPortDouble implements ParentApplicationPort {
       return { state: "invalidated", code: "DUTY_VERSION_STALE" };
     }
     if (duty.state === "full") return { state: "conflict", code: "DUTY_FULL" };
-    if (duty.state === "ineligible") return { state: "conflict", code: "DUTY_INELIGIBLE" };
     if (duty.state !== "available") return { state: "conflict", code: "DUTY_ALREADY_ASSIGNED" };
     const assignment: AssignmentModel = Object.freeze({
       id: `assignment-${duty.id}`,
@@ -474,23 +472,6 @@ const INITIAL_APPROVALS: readonly AdminItem[] = [
   },
 ];
 
-const FINGERPRINT = "sha256:waldorf-advanced-v1:8b12";
-
-type MutablePreview = {
-  id: string;
-  fingerprint: string;
-  changedRows: string[];
-  conflicts: Array<{
-    id: string;
-    rowLabel: string;
-    message: string;
-    resolution?: "keep-existing" | "use-import";
-  }>;
-  step: 1 | 2 | 3 | 4 | 5 | 6 | 7;
-  totalRows: number;
-  state: ImportPreviewModel["state"];
-};
-
 const INITIAL_REMINDERS: ReminderListModel["jobs"] = [
   {
     id: "job-lampas",
@@ -575,8 +556,6 @@ export class AdminPortDouble implements AdminApplicationPort {
   private records = INITIAL_RECORDS.map((item) => ({ ...item }));
   private tasks = INITIAL_TASKS.map((item) => ({ ...item }));
   private approvals = INITIAL_APPROVALS.map((item) => ({ ...item }));
-  private preview?: MutablePreview;
-  private importOutcome?: ImportOutcome;
   private reminders = INITIAL_REMINDERS.map((job) => ({ ...job }));
   private grants = INITIAL_GRANTS.map((grant) => ({ ...grant }));
   private lastGrantOutcome?: GrantOutcome;
@@ -633,7 +612,6 @@ export class AdminPortDouble implements AdminApplicationPort {
             openApprovals: this.visible(this.approvals, scope).filter(
               (item) => item.state === "pending",
             ).length,
-            openImportConflicts: 0,
           } satisfies DashboardModel,
         };
       case "records.list":
@@ -660,18 +638,6 @@ export class AdminPortDouble implements AdminApplicationPort {
         return this.decideApproval(scope, payload);
       case "notes.save":
         return this.saveNotes(scope, payload);
-      case "import.status":
-        return this.preview
-          ? { state: "success", data: freezePreview(this.preview) }
-          : { state: "empty" };
-      case "import.preview":
-        return this.createPreview(payload);
-      case "import.resolve":
-        return this.resolveConflict(payload);
-      case "import.commit":
-        return this.commitImport(payload);
-      case "import.recover":
-        return this.recoverImport(payload);
       case "reminders.list":
         return this.listReminders(payload);
       case "reminders.retry":
@@ -797,8 +763,6 @@ export class AdminPortDouble implements AdminApplicationPort {
     scope: Scope,
     payload: Readonly<Record<string, unknown>>,
   ): DomainOutcome<AdminItemModel> {
-    if (payload.scenario === "ineligible")
-      return { state: "conflict", code: "ASSIGNMENT_INELIGIBLE" };
     if (payload.scenario === "full") return { state: "conflict", code: "ASSIGNMENT_CAPACITY_FULL" };
     const task = this.tasks.find((candidate) => candidate.id === payload.id);
     if (!task || !isInScope(task, scope)) return { state: "denied" };
@@ -858,98 +822,6 @@ export class AdminPortDouble implements AdminApplicationPort {
     const updated = { ...update(item), version: (item.version ?? 1) + 1 };
     items[index] = updated;
     return { state: "success", data: toAdminItem(updated) };
-  }
-
-  private createPreview(
-    payload: Readonly<Record<string, unknown>>,
-  ): DomainOutcome<ImportPreviewModel> {
-    const scenario = String(payload.scenario ?? "valid");
-    if (["malformed", "oversized", "missing-sheet", "missing-header"].includes(scenario)) {
-      return { state: "conflict", code: `IMPORT_${scenario.toUpperCase().replaceAll("-", "_")}` };
-    }
-    this.preview = {
-      id: "preview-waldorf-v1",
-      fingerprint: FINGERPRINT,
-      changedRows: ["Boróka csoport: 2 módosítás", "Napraforgó csoport: 1 új elem"],
-      conflicts: [
-        {
-          id: "conflict-family-1",
-          rowLabel: "Családok · 12. sor",
-          message: "Az elem már létezik.",
-        },
-      ],
-      step: 4,
-      totalRows: 30,
-      state: "conflicts",
-    };
-    this.importOutcome = undefined;
-    return { state: "success", data: freezePreview(this.preview) };
-  }
-
-  private resolveConflict(
-    payload: Readonly<Record<string, unknown>>,
-  ): DomainOutcome<ImportPreviewModel> {
-    if (!this.preview) return { state: "invalidated", code: "IMPORT_PREVIEW_STALE" };
-    if (payload.expectedVersion !== 1)
-      return { state: "invalidated", code: "IMPORT_PREVIEW_STALE" };
-    const conflict = this.preview.conflicts.find((item) => item.id === payload.conflictId);
-    const resolution = payload.resolution;
-    if (!conflict || (resolution !== "keep-existing" && resolution !== "use-import")) {
-      return { state: "conflict", code: "IMPORT_CONFLICT_UNRESOLVED" };
-    }
-    conflict.resolution = resolution;
-    this.preview.step = 5;
-    this.preview.state = "confirmed";
-    return { state: "success", data: freezePreview(this.preview) };
-  }
-
-  private commitImport(payload: Readonly<Record<string, unknown>>): DomainOutcome<ImportOutcome> {
-    if (!this.preview) return { state: "invalidated", code: "IMPORT_PREVIEW_STALE" };
-    if (payload.fingerprint !== this.preview.fingerprint)
-      return { state: "conflict", code: "IMPORT_FINGERPRINT_CHANGED" };
-    if (this.preview.conflicts.some((conflict) => !conflict.resolution))
-      return { state: "conflict", code: "IMPORT_CONFLICT_UNRESOLVED" };
-    if (payload.confirmed !== "yes")
-      return { state: "conflict", code: "IMPORT_CONFIRMATION_REQUIRED" };
-    if (payload.scenario === "interrupted") {
-      this.importOutcome = {
-        runId: "run-waldorf-v1",
-        importedRows: 0,
-        skippedRows: 0,
-        fingerprint: this.preview.fingerprint,
-        state: "interrupted",
-      };
-      this.preview.step = 6;
-      return { state: "recovery", data: this.importOutcome };
-    }
-    this.preview.step = 7;
-    this.preview.state = "committed";
-    this.importOutcome = {
-      runId: "run-waldorf-v1",
-      importedRows: 3,
-      skippedRows: 1,
-      fingerprint: this.preview.fingerprint,
-      state: "committed",
-    };
-    return { state: "success", data: this.importOutcome };
-  }
-
-  private recoverImport(payload: Readonly<Record<string, unknown>>): DomainOutcome<ImportOutcome> {
-    if (!this.importOutcome || this.importOutcome.state !== "interrupted")
-      return { state: "conflict", code: "IMPORT_RECOVERY_NOT_AVAILABLE" };
-    if (payload.action !== "resume")
-      return { state: "conflict", code: "IMPORT_RECOVERY_ACTION_INVALID" };
-    this.importOutcome = {
-      ...this.importOutcome,
-      importedRows: 3,
-      skippedRows: 1,
-      state: "recovered",
-    };
-    if (this.preview) {
-      this.preview.step = 7;
-      this.preview.state = "committed";
-    }
-    return { state: "success", data: this.importOutcome };
   }
 
   private listReminders(
@@ -1078,18 +950,16 @@ function toAdminItem(item: AdminItem): AdminItemModel {
   return { id: item.id, title: item.title, state: item.state, version: item.version };
 }
 
-function freezePreview(preview: MutablePreview): ImportPreviewModel {
-  return Object.freeze({
-    ...preview,
-    changedRows: [...preview.changedRows],
-    conflicts: preview.conflicts.map((item) => ({ ...item })),
-  });
-}
-
 // ---------------------------------------------------------------------------------------------------
 // Teacher
 // ---------------------------------------------------------------------------------------------------
 export const TEACHER_ORGANIZATION_ID = "org-waldorf-local";
+/** A teacher's right names the whole community (BR3.1). */
+export const TEACHER_SCOPE: Scope = Object.freeze({
+  id: TEACHER_ORGANIZATION_ID,
+  type: "organization",
+  organizationId: TEACHER_ORGANIZATION_ID,
+});
 export const TEACHER_GROUPS = Object.freeze([
   Object.freeze({
     scope: Object.freeze({
@@ -1171,7 +1041,7 @@ export function createTeacherRepositoryDouble(
   if (!records.every(isTrackingSource)) throw new Error("Invalid tracking records");
   let current = records.map(snapshot);
   const repository = Object.freeze({
-    readCurrent(query: { groupScope: Scope; from?: string; to?: string }) {
+    readCurrent(query: { scope: Scope; view: TrackingView; from?: string; to?: string }) {
       if (!isOptionalTrackingRange(query.from, query.to)) throw new Error("Invalid tracking range");
       const from = query.from === undefined ? -Infinity : Date.parse(`${query.from}T00:00:00.000Z`);
       const to = query.to === undefined ? Infinity : Date.parse(`${query.to}T23:59:59.999Z`);
@@ -1179,8 +1049,10 @@ export function createTeacherRepositoryDouble(
         current
           .filter(
             (row) =>
-              row.groupId === query.groupScope.id &&
-              row.organizationId === query.groupScope.organizationId &&
+              (query.view.kind === "all" ||
+                (query.view.kind === "community" && row.groupId === null) ||
+                (query.view.kind === "group" && row.groupId === query.view.groupId)) &&
+              row.organizationId === query.scope.organizationId &&
               Date.parse(row.startsAt) >= from &&
               Date.parse(row.startsAt) <= to,
           )
@@ -1225,7 +1097,8 @@ export class TeacherPortDouble implements TeacherApplicationPort {
 
   async getSchedule(input: {
     actorId: string;
-    groupScope: Scope;
+    scope: Scope;
+    view: TrackingView;
     from?: string;
     to?: string;
   }): Promise<DomainOutcome<{ entries: readonly TrackingSourceRecord[] }>> {
@@ -1233,11 +1106,18 @@ export class TeacherPortDouble implements TeacherApplicationPort {
     if (this.scenario === "terminal") throw new TerminalDoubleFailure();
     if (this.scenario === "denied") return { state: "denied" };
     if (this.scenario === "empty") return { state: "empty" };
+    // The real read refuses a group that is not in the community (schedule_get).
+    if (
+      input.view.kind === "group" &&
+      !TEACHER_GROUPS.some(
+        (group) => input.view.kind === "group" && group.scope.id === input.view.groupId,
+      )
+    )
+      return { state: "denied" };
     const entries = await this.repository.readCurrent(input);
     if (!Array.isArray(entries) || !entries.every(isTrackingSource))
       throw new Error("Invalid source");
-    if (!entries.every((row) => matchesTrackingScope(row, input.groupScope)))
-      return { state: "denied" };
+    if (!entries.every((row) => matchesTrackingScope(row, input.scope))) return { state: "denied" };
     if (new Set(entries.map((row) => row.id)).size !== entries.length)
       throw new Error("Duplicate identity");
     return entries.length

@@ -60,12 +60,15 @@ describe("seed on the real stack", () => {
     assert.equal(await rowCount(db, A, "organizations"), 1);
     assert.equal(await rowCount(db, A, "groups"), counts.groups);
     assert.equal(await rowCount(db, A, "families"), counts.families);
-    assert.equal(await rowCount(db, A, "group_memberships"), counts.families);
+    assert.equal(await rowCount(db, A, "group_memberships"), plan.memberships.length);
     assert.equal(await rowCount(db, A, "parents"), counts.parents);
     assert.equal(await rowCount(db, A, "parent_contacts"), counts.parents);
     assert.equal(await rowCount(db, A, "children"), counts.children);
     assert.equal(await rowCount(db, A, "accounts"), counts.accounts);
-    assert.equal(await rowCount(db, A, "app_role_grants"), counts.accounts);
+    assert.equal(
+      await rowCount(db, A, "app_role_grants"),
+      counts.accounts + plan.extraGrants.length,
+    );
     assert.equal(await rowCount(db, A, "app_authorization_versions"), counts.accounts);
     assert.equal(await rowCount(db, A, "events"), counts.events);
     assert.equal(await rowCount(db, A, "tasks"), counts.tasks);
@@ -82,7 +85,7 @@ describe("seed on the real stack", () => {
     const { deps, lines } = realSeedDeps();
     assert.equal(await seedMain(["--schema", A, "--large"], deps), 0, lines.join("\n"));
     assert.equal(await rowCount(db, A, "families"), 30);
-    assert.equal(await rowCount(db, A, "groups"), 3);
+    assert.equal(await rowCount(db, A, "groups"), 6);
     assert.equal(await rowCount(db, A, "accounts"), 34);
     assert.equal((await schemaUsers(db, A)).length, 34);
   });
@@ -98,10 +101,11 @@ describe("seed on the real stack", () => {
       return result.value.accessToken;
     };
     assert.equal((await readAs(await token("super-admin"), A, "families")).rows.length, 6);
-    assert.equal((await readAs(await token("group-admin-1"), A, "families")).rows.length, 3);
+    // A group administrator is a parent too, and reads only their own family (BR3.9).
+    assert.equal((await readAs(await token("group-admin-1"), A, "families")).rows.length, 1);
     assert.equal((await readAs(await token("parent-1"), A, "families")).rows.length, 1);
     assert.equal((await readAs(await token("parent-4"), A, "families")).rows.length, 1);
-    assert.equal((await readAs(await token("teacher-1"), A, "groups")).rows.length, 1);
+    assert.equal((await readAs(await token("teacher-1"), A, "groups")).rows.length, 6);
   });
 
   it("rejects a wrong password for a seeded account", async () => {

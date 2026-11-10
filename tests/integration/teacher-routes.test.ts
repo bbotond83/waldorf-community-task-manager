@@ -9,14 +9,19 @@ import {
   InMemoryAuthorizationVersions,
   type SessionContext,
 } from "../../src/application/index.ts";
-import { createTeacherFacadeDouble, TEACHER_GROUPS } from "../support/port-doubles.ts";
+import {
+  createTeacherFacadeDouble,
+  TEACHER_GROUPS,
+  TEACHER_SCOPE,
+} from "../support/port-doubles.ts";
 const session: SessionContext = {
   subjectId: "teacher",
   authorizationVersion: 1,
-  ...sessionGrantBindings("teacher", "kindergarten_teacher", [TEACHER_GROUPS[0]!.scope]),
+  ...sessionGrantBindings("teacher", "kindergarten_teacher", [TEACHER_SCOPE]),
   roles: ["kindergarten_teacher"] as const,
-  scopes: TEACHER_GROUPS.map((group) => group.scope),
+  scopes: [TEACHER_SCOPE],
 };
+const groups = TEACHER_GROUPS.map((group) => ({ id: group.scope.id, label: group.label }));
 it("Teacher compatibility GET responds307 no data or cookie", async () => {
   const response = listRedirect(
     new Request(
@@ -76,13 +81,14 @@ it("Teacher destination authorizes before invalid sentinel and does no source ca
       },
     },
   );
-  const granted = parseTeacherFilters({ from: "invalid", to: "invalid" }, session);
-  expect((await facade.getSchedule(session, granted)).state).toBe("validation");
-  const ungranted = parseTeacherFilters(
-    { groupId: "group-ungranted", from: "invalid", to: "invalid" },
-    session,
+  const filters = parseTeacherFilters({ from: "invalid", to: "invalid" }, groups);
+  expect((await facade.getSchedule(session, { scope: TEACHER_SCOPE, ...filters })).state).toBe(
+    "validation",
   );
-  expect((await facade.getSchedule(session, ungranted)).state).toBe("denied");
+  const otherCommunity = { id: "other", type: "organization" as const, organizationId: "other" };
+  expect((await facade.getSchedule(session, { scope: otherCommunity, ...filters })).state).toBe(
+    "denied",
+  );
   expect(reads).toBe(0);
 });
 it("Teacher malformed group gets grantderived validation only, no protected read", async () => {
@@ -98,16 +104,18 @@ it("Teacher malformed group gets grantderived validation only, no protected read
     },
   );
   const destination = new URL(compatibilityLocation({ csoport: "<bad>" }), "http://local");
-  const filters = parseTeacherFilters(Object.fromEntries(destination.searchParams), session);
+  const filters = parseTeacherFilters(Object.fromEntries(destination.searchParams), groups);
   // A malformed group is dropped (never reflected); the dates carry the invalid marker.
   expect(filters.groupId).toBe("");
-  expect((await facade.getSchedule(session, filters)).state).toBe("validation");
+  expect((await facade.getSchedule(session, { scope: TEACHER_SCOPE, ...filters })).state).toBe(
+    "validation",
+  );
   expect(reads).toBe(0);
 });
 it("Teacher retry carries no fixture word and does not widen valid business context", () => {
   const filters = parseTeacherFilters(
     { groupId: "group-oak", from: "2026-08-14", to: "2026-08-14", fixture: "retryable" },
-    session,
+    groups,
   );
   expect("scenario" in filters).toBe(false);
   expect(

@@ -13,11 +13,13 @@ import {
   matchesTrackingScope,
   projectTrackingEntry,
   type TrackingSourceRecord,
+  type TrackingView,
 } from "./tracking-model.ts";
 export interface TeacherApplicationPort {
   getSchedule(input: {
     actorId: string;
-    groupScope: Scope;
+    scope: Scope;
+    view: TrackingView;
     from?: string;
     to?: string;
   }): Promise<DomainOutcome<{ entries: readonly TrackingSourceRecord[] }>>;
@@ -31,14 +33,14 @@ export class TeacherApplicationFacade {
   }
   async getSchedule(
     session: SessionContext,
-    input: { groupScope: Scope; from?: string; to?: string },
+    input: { scope: Scope; view: TrackingView; from?: string; to?: string },
   ): Promise<ApplicationResult<TrackingModel>> {
     return this.pipeline.invoke<TrackingModel>({
       session,
       matrixRowId: "AUTH-TEACHER-TRACKING",
       action: "read",
       resource: "schedule",
-      scope: input.groupScope,
+      scope: input.scope,
       fields: ["SF-PARTICIPANT-NAME"],
       validate: () =>
         isOptionalTrackingRange(input.from, input.to)
@@ -60,7 +62,7 @@ export class TeacherApplicationFacade {
         const rows = outcome.data?.entries;
         if (!Array.isArray(rows) || !rows.every(isTrackingSource))
           throw new Error("Invalid tracking source");
-        if (!rows.every((row) => matchesTrackingScope(row, input.groupScope)))
+        if (!rows.every((row) => matchesTrackingScope(row, input.scope)))
           return { state: "denied" };
         if (new Set(rows.map((row) => row.id)).size !== rows.length)
           throw new Error("Duplicate tracking identity");
@@ -76,9 +78,9 @@ export class TeacherApplicationFacade {
   }
   async getScheduleEntry(
     session: SessionContext,
-    input: { groupScope: Scope; entryId: string; from?: string; to?: string },
+    input: { scope: Scope; entryId: string; from?: string; to?: string },
   ): Promise<ApplicationResult<TrackingEntry>> {
-    const schedule = await this.getSchedule(session, input);
+    const schedule = await this.getSchedule(session, { ...input, view: { kind: "all" } });
     if (schedule.state === "recovery") return terminalFailure("SCHEDULE_RECOVERY_UNAVAILABLE");
     if (schedule.state === "empty") return denied();
     if (schedule.state !== "success") return schedule;

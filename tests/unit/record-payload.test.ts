@@ -129,15 +129,26 @@ describe("parseRecordExtras", () => {
     });
   });
 
-  it("requires the school year of a new group and keeps it", () => {
+  it("requires the school year of a new group and a description of every group (BR2.2)", () => {
     expect(parseRecordExtras("group", form({ extended: "1" }), true).errors).toEqual({
       schoolYearId: "Válassza ki a nevelési évet.",
+      description: "A leírás megadása kötelező.",
     });
     expect(
-      parseRecordExtras("group", form({ extended: "1", schoolYearId: "y-1" }), true).payload,
-    ).toEqual({ schoolYearId: "y-1" });
-    expect(parseRecordExtras("group", form({ extended: "1" }), false)).toEqual({
-      payload: {},
+      parseRecordExtras(
+        "group",
+        form({ extended: "1", schoolYearId: "y-1", description: "  Kert gondozása.  " }),
+        true,
+      ).payload,
+    ).toEqual({ schoolYearId: "y-1", description: "Kert gondozása." });
+    expect(
+      parseRecordExtras("group", form({ extended: "1", description: "x".repeat(1001) }), false)
+        .errors,
+    ).toEqual({ description: "A leírás legfeljebb 1000 karakter lehet." });
+    expect(
+      parseRecordExtras("group", form({ extended: "1", description: "Rendben." }), false),
+    ).toEqual({
+      payload: { description: "Rendben." },
       errors: {},
     });
   });
@@ -171,34 +182,30 @@ describe("parseRecordExtras", () => {
     ).toEqual({ familyId: "f-1" });
   });
 
-  it("reads a family with its group, parents and ended memberships", () => {
+  it("reads a family with its parents and no working group (BR1.5)", () => {
     const created = parseRecordExtras(
       "family",
-      form({ extended: "1", addGroupId: "g-1", ...parent(0, { name: "Anna" }) }),
+      form({
+        extended: "1",
+        addGroupId: "g-1",
+        endGroupIds: ["g-2"],
+        ...parent(0, { name: "Anna" }),
+      }),
       true,
     );
     expect(created.errors).toEqual({});
-    expect(created.payload).toMatchObject({ addGroupIds: ["g-1"] });
     expect(created.payload.parents).toHaveLength(1);
+    expect(created.payload).not.toHaveProperty("addGroupIds");
     expect(created.payload).not.toHaveProperty("endGroupIds");
-
-    const edited = parseRecordExtras(
-      "family",
-      form({ extended: "1", endGroupIds: ["g-2", "", "g-3"] }),
-      false,
-    );
-    expect(edited.errors).toEqual({});
-    expect(edited.payload.endGroupIds).toEqual(["g-2", "g-3"]);
-    expect(edited.payload).not.toHaveProperty("addGroupIds");
   });
 
-  it("requires a group for a new family and passes parent errors on", () => {
+  it("passes parent errors on", () => {
     const { errors } = parseRecordExtras(
       "family",
       form({ extended: "1", ...parent(0, { name: "", email: "x" }) }),
       true,
     );
-    expect(errors.addGroupId).toBe("Válassza ki a csoportot, amelynek a család tagja lesz.");
+    expect(errors.addGroupId).toBeUndefined();
     expect(errors[parentField(0, "name")]).toBeDefined();
   });
 });
@@ -260,7 +267,7 @@ describe("parseTaskExtras", () => {
       true,
     );
     expect(errors).toEqual({
-      groupId: "Válassza ki a csoportot.",
+      groupId: "Válassza ki a munkacsoportot.",
       startsAt: "A kezdési időpont megadása kötelező.",
       endsAt: "A befejezési időpont megadása kötelező.",
       location: "A helyszín megadása kötelező.",

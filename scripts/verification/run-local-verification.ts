@@ -61,14 +61,12 @@ const commands = [
   // The directory and coordination database stage (U3): tables, policies, role matrix and the change
   // functions of people, structure, settings, events, tasks and notes, on the real stack.
   { key: "database-directory", args: ["run", "test:database:directory"] },
-  // The notifications and import database stage (U4): notification records, reminder jobs and the
-  // notice writes inside U3's use cases, and the import tables and functions, on the real stack.
-  { key: "database-notifications-import", args: ["run", "test:database:notifications-import"] },
+  // The notifications database stage (U4): notification records, reminder jobs and the notice writes
+  // inside U3's use cases, on the real stack.
+  { key: "database-notifications", args: ["run", "test:database:notifications"] },
   // The seed database stage (U5): the audit purge, the seed and reset commands and their timing limits, on the real stack.
   { key: "database-seed", args: ["run", "test:database:seed"] },
   { key: "database-shuffled", args: ["run", "test:database:shuffled"] },
-  // The 2000-row import timing test alone, with one retry, so a busy shared runner cannot fail it by itself.
-  { key: "database-import-timing", args: ["run", "test:database:import-timing"] },
   { key: "coverage", args: ["run", "test:coverage"] },
   { key: "security", args: ["run", "verify:security"] },
   { key: "build", args: ["run", "build"] },

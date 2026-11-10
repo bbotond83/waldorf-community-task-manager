@@ -36,13 +36,14 @@ it("Teacher renders permitted schedule with real projections", async () => {
   expect(output.toLocaleLowerCase("hu")).toContain("beosztás");
   expect(output).not.toContain("protectedReason");
 });
-it("Teacher first visit lists every granted group with empty filter fields", async () => {
+it("Teacher first visit lists the whole community with empty filter fields (W6)", async () => {
   signIn("teacher");
   const page = (await import("../../app/teacher/schedule/page.tsx")).default as (
     input: ReturnType<typeof props>,
   ) => ReactNode | Promise<ReactNode>;
   const output = html(await page(props("")));
-  expect(output).toContain("Minden csoport");
+  expect(output).toContain(">Minden<");
+  expect(output).toContain(">Egész közösség<");
   expect(output).not.toContain("required");
   expect(output).not.toMatch(/name="from"[^>]*value="[^"]/);
   expect(output).not.toMatch(/name="to"[^>]*value="[^"]/);

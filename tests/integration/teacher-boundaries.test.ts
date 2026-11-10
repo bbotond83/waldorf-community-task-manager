@@ -12,7 +12,7 @@ import type { SessionContext } from "../../src/application/index.ts";
 import {
   createTeacherFacadeDouble,
   createTeacherRepositoryDouble,
-  TEACHER_GROUPS,
+  TEACHER_SCOPE,
 } from "../support/port-doubles.ts";
 function setup() {
   const users = new InMemoryUserRepository([
@@ -24,7 +24,7 @@ function setup() {
       id: "legacy",
       subjectId: "converted",
       role: "read_only_staff",
-      scope: TEACHER_GROUPS[0]!.scope,
+      scope: TEACHER_SCOPE,
       grantedAt: "2026-01-01",
     },
   ]);
@@ -41,7 +41,7 @@ function setup() {
     isActive: true,
     grants: grants.list(),
     roles: ["kindergarten_teacher"],
-    scopes: [TEACHER_GROUPS[0]!.scope],
+    scopes: [TEACHER_SCOPE],
   };
   const authorization = new AuthorizationContract({
     getCurrentVersion: (id) => users.findById(id)?.authorizationVersion,
@@ -51,7 +51,12 @@ function setup() {
   const facade = createTeacherFacadeDouble(authorization, "ready", source.repository);
   return { users, grants, audit, store, session, authorization, source, facade };
 }
-const query = { groupScope: TEACHER_GROUPS[0]!.scope, from: "2026-08-12", to: "2026-08-20" };
+const query = {
+  scope: TEACHER_SCOPE,
+  view: { kind: "all" as const },
+  from: "2026-08-12",
+  to: "2026-08-20",
+};
 describe("Teacher foundation integration", () => {
   it("converted current teacher reads existing scope and preserved identities", async () => {
     const s = setup();
@@ -77,7 +82,7 @@ describe("Teacher foundation integration", () => {
         matrixRowId: "AUTH-TEACHER-TRACKING",
         action,
         resource: "schedule",
-        scope: query.groupScope,
+        scope: query.scope,
       });
       expect(result.state).toBe("denied");
     }
@@ -90,7 +95,7 @@ describe("Teacher foundation integration", () => {
     expect(
       access.authorize(s.session, {
         action: "update",
-        resource: { kind: "assignment", scope: query.groupScope },
+        resource: { kind: "assignment", scope: query.scope },
       }).allowed,
     ).toBe(false);
     expect(s.grants.list()).toEqual(before);
@@ -111,7 +116,7 @@ describe("Teacher foundation integration", () => {
     const s = setup();
     const result = await s.facade.getSchedule(s.session, {
       ...query,
-      groupScope: { ...query.groupScope, organizationId: "other" },
+      scope: { id: "other", type: "organization", organizationId: "other" },
     });
     expect(result.state).toBe("denied");
     expect(JSON.stringify(result)).not.toContain("Kitalált");

@@ -17,7 +17,7 @@ const legacy: LegacyConversionGrant = {
   id: "legacy",
   subjectId: "user",
   role: "read_only_staff",
-  scope: { type: "group", id: "oak", organizationId: "org" },
+  scope: { type: "organization", id: "org", organizationId: "org" },
   grantedAt: "2026",
   revokedAt: "2026-01",
 };
@@ -79,8 +79,12 @@ test("repeat creates no evidence or generation change", () => {
 test("unsupported roles and scope shapes block without touching state", () => {
   for (const row of [
     { ...legacy, role: "unknown" } as unknown as LegacyConversionGrant,
-    { ...legacy, scope: { type: "organization" as const, id: "org", organizationId: "org" } },
-    { ...legacy, role: "kindergarten_admin" as const },
+    { ...legacy, scope: { type: "group" as const, id: "group", organizationId: "org" } },
+    {
+      ...legacy,
+      role: "kindergarten_admin" as const,
+      scope: { type: "group" as const, id: "group", organizationId: "org" },
+    },
   ]) {
     const { store, grants } = setup([row]);
     assert.deepEqual(convertLegacyRoles(store, preconditions, "op"), {

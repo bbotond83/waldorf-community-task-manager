@@ -63,20 +63,20 @@ export async function loadDataset(db: pg.Client): Promise<void> {
   const groups = `array[${DATASET_GROUPS.map((group) => `'${group}'::uuid`).join(", ")}]`;
   const org = `'${ORGANIZATION}'::uuid`;
   await db.query(
-    `insert into groups (id, organization_id, school_year_id, name)
-     select ${id(1001, "g")}, ${org}, '${YEAR_1}'::uuid, 'Adat csoport ' || g from generate_series(0, ${DATASET.groups - 3}) g`,
+    `insert into groups (id, organization_id, school_year_id, name, description)
+     select ${id(1001, "g")}, ${org}, '${YEAR_1}'::uuid, 'Adat csoport ' || g, 'Adat leírás' from generate_series(0, ${DATASET.groups - 3}) g`,
   );
   await db.query(
     `insert into families (id, organization_id, display_name)
      select ${id(2000, "n")}, ${org}, 'Adat család ' || n from generate_series(0, ${DATASET.families - 1}) n`,
   );
   await db.query(
-    `insert into group_memberships (organization_id, family_id, group_id)
-     select ${org}, ${id(2000, "n")}, (${groups})[1 + n % ${DATASET.groups}] from generate_series(0, ${DATASET.families - 1}) n`,
-  );
-  await db.query(
     `insert into parents (id, organization_id, family_id, display_name)
      select ${id(4000, "n")}, ${org}, ${id(2000, "n")}, 'Adat szülő ' || n from generate_series(0, ${DATASET.families - 1}) n`,
+  );
+  await db.query(
+    `insert into group_memberships (organization_id, parent_id, group_id)
+     select ${org}, ${id(4000, "n")}, (${groups})[1 + n % ${DATASET.groups}] from generate_series(0, ${DATASET.families - 1}) n`,
   );
   await db.query(
     `insert into parent_contacts (parent_id, organization_id, contact_email, contact_phone, locality)

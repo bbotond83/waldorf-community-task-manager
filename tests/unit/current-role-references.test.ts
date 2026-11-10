@@ -16,7 +16,7 @@ it("current fixtures exactly match the four role and home contracts", () => {
 });
 it("current scenarios retain all mandatory workflow browser and outstanding inventories", () => {
   const scenarios = validateManifests();
-  expect(scenarios).toHaveLength(39);
+  expect(scenarios).toHaveLength(37);
   for (const id of REQUIRED_NFR08_SCENARIOS) expect(scenarios.some((s) => s.id === id)).toBe(true);
   expect(
     scenarios
@@ -63,7 +63,7 @@ it("Super governance allow is paired with an explicit non-Super advanced denial"
   });
   expect(rows.find((r: { id: string }) => r.id === "AUTH-NON-SUPER-ADVANCED-DENY")).toMatchObject({
     effect: "deny",
-    resources: ["import", "reminder", "lifecycle", "settings", "role_grant", "governance"],
+    resources: ["reminder", "lifecycle", "settings", "role_grant", "governance"],
   });
 });
 it("historical baseline migration and local-only exclusion remain independent of current claims", () => {

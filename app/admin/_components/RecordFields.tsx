@@ -16,14 +16,14 @@ export type RecordFormKind = Extract<AdminItemKind, "family" | "child" | "group"
 const KIND_OPTIONS: readonly Readonly<{ value: RecordFormKind; label: string }>[] = [
   { value: "family", label: "Család" },
   { value: "child", label: "Gyermek" },
-  { value: "group", label: "Csoport" },
+  { value: "group", label: "Munkacsoport" },
   { value: "school-year", label: "Nevelési év" },
 ];
 
 const TITLE_LABELS: Readonly<Record<RecordFormKind, string>> = {
   family: "A család neve",
   child: "A gyermek neve",
-  group: "A csoport neve",
+  group: "A munkacsoport neve",
   "school-year": "A nevelési év megnevezése",
 };
 
@@ -76,7 +76,18 @@ export function RecordFields({
         required
         testId="admin-record-title-input"
       />
-      {kind === "family" && <FamilyFields mode={mode} details={details} lookups={lookups} />}
+      {kind === "family" && <FamilyFields mode={mode} details={details} />}
+      {kind === "group" && (
+        <AdminTextareaField
+          id="description"
+          name="description"
+          label="Leírás"
+          defaultValue={details?.description}
+          maxLength={1000}
+          required
+          testId="admin-record-description-input"
+        />
+      )}
       {kind === "child" && mode === "create" && (
         <AdminSelectField
           id="familyId"
@@ -96,7 +107,7 @@ export function RecordFields({
           options={lookups.schoolYears}
           placeholder="Válasszon nevelési évet"
           required
-          hint="A csoport nevelési éve később nem módosítható."
+          hint="A munkacsoport nevelési éve később nem módosítható."
           testId="admin-record-school-year-select"
         />
       )}
@@ -129,40 +140,11 @@ export function RecordFields({
 function FamilyFields({
   mode,
   details,
-  lookups,
-}: Readonly<{ mode: "create" | "edit"; details?: AdminItemDetails; lookups: AdminLookups }>) {
-  const memberOf = details?.groups ?? [];
-  const memberIds = new Set(memberOf.map((group) => group.id));
-  const joinable = lookups.groups.filter((group) => !memberIds.has(group.value));
+}: Readonly<{ mode: "create" | "edit"; details?: AdminItemDetails }>) {
   const parents = details?.parents ?? [];
   const blocks = mode === "create" ? NEW_FAMILY_PARENT_BLOCKS : parents.length + 1;
   return (
     <>
-      {mode === "edit" && memberOf.length > 0 && (
-        <fieldset data-testid="admin-family-memberships">
-          <legend>Csoporttagságok</legend>
-          {memberOf.map((group) => (
-            <AdminCheckboxField
-              key={group.id}
-              id={`end-group-${group.id}`}
-              name="endGroupIds"
-              value={group.id}
-              label={`Tagság megszüntetése: ${group.name}`}
-              testId={`admin-family-end-membership-${group.id}`}
-            />
-          ))}
-        </fieldset>
-      )}
-      <AdminSelectField
-        id="addGroupId"
-        name="addGroupId"
-        label={mode === "create" ? "Csoport" : "Csoporttagság hozzáadása"}
-        options={joinable}
-        placeholder={mode === "create" ? "Válasszon csoportot" : "Nincs hozzáadás"}
-        required={mode === "create"}
-        hint={mode === "create" ? "A család ennek a csoportnak lesz a tagja." : undefined}
-        testId="admin-family-group-select"
-      />
       {Array.from({ length: blocks }, (_, index) => (
         <ParentBlock
           key={parents[index]?.id ?? `new-${index}`}

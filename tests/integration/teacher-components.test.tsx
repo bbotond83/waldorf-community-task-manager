@@ -1,4 +1,3 @@
-import { sessionGrantBindings } from "../../src/access/session-grants.ts";
 import { TEACHER_GROUPS } from "../support/port-doubles.ts";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
@@ -6,22 +5,12 @@ import type { ApplicationResult, TrackingModel } from "../../src/application/ind
 import { ScheduleCollection } from "../../app/teacher/schedule/_components/ScheduleCollection.tsx";
 import { ScheduleFilter } from "../../app/teacher/schedule/_components/ScheduleFilter.tsx";
 import { TeacherStatePanel } from "../../app/teacher/_components/TeacherStatePanel.tsx";
-import { parseTeacherFilters } from "../../app/teacher/_lib/filters.ts";
+import { COMMUNITY_FILTER, parseTeacherFilters } from "../../app/teacher/_lib/filters.ts";
 
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn() }) }));
 
-const session = {
-  subjectId: "teacher",
-  authorizationVersion: 1,
-  ...sessionGrantBindings(
-    "teacher",
-    "kindergarten_teacher",
-    TEACHER_GROUPS.map((group) => group.scope),
-  ),
-  roles: ["kindergarten_teacher"] as const,
-  scopes: TEACHER_GROUPS.map((group) => group.scope),
-};
-const filters = parseTeacherFilters({}, session);
+const groups = TEACHER_GROUPS.map((group) => ({ id: group.scope.id, label: group.label }));
+const filters = parseTeacherFilters({}, groups);
 const model: TrackingModel = {
   entries: [
     {
@@ -42,21 +31,21 @@ const model: TrackingModel = {
 describe("Teacher schedule components", () => {
   it("renders labelled bounded filters with stable interactive test IDs", () => {
     render(<ScheduleFilter filters={filters} />);
-    expect(screen.getByLabelText("Csoport")).toHaveValue("");
+    expect(screen.getByLabelText("Munkacsoport")).toHaveValue("");
     expect(screen.getByLabelText("Kezdő dátum")).toHaveValue("");
     expect(screen.getByLabelText("Záró dátum")).toHaveValue("");
     expect(screen.getByTestId("teacher-schedule-filter-submit-button")).toBeVisible();
     expect(screen.getByTestId("teacher-schedule-filter-clear-link")).toBeVisible();
   });
 
-  it("offers every granted group after an empty first choice and does not require dates", () => {
+  it("offers everything, the whole community and each working group, and does not require dates (W6)", () => {
     render(<ScheduleFilter filters={filters} />);
-    const options = within(screen.getByLabelText("Csoport")).getAllByRole("option");
+    const options = within(screen.getByLabelText("Munkacsoport")).getAllByRole("option");
     expect(options.map((option) => [option.getAttribute("value"), option.textContent])).toEqual([
-      ["", "Minden csoport"],
-      // The group's own name is not part of the grant; the screen names each granted group generically.
-      ["group-oak", "Engedélyezett csoport"],
-      ["group-sunflower", "Engedélyezett csoport"],
+      ["", "Minden"],
+      [COMMUNITY_FILTER, "Egész közösség"],
+      ["group-oak", "Tölgyfa csoport"],
+      ["group-sunflower", "Napraforgó csoport"],
     ]);
     expect(screen.getByLabelText("Kezdő dátum")).not.toBeRequired();
     expect(screen.getByLabelText("Záró dátum")).not.toBeRequired();
@@ -65,23 +54,28 @@ describe("Teacher schedule components", () => {
   it("shows the values of the address and clears every field with the clear link", () => {
     const filled = parseTeacherFilters(
       { groupId: "group-sunflower", from: "2026-08-13", to: "2026-08-15" },
-      session,
+      groups,
     );
     render(<ScheduleFilter filters={filled} />);
-    expect(screen.getByLabelText("Csoport")).toHaveValue("group-sunflower");
+    expect(screen.getByLabelText("Munkacsoport")).toHaveValue("group-sunflower");
     expect(screen.getByLabelText("Kezdő dátum")).toHaveValue("2026-08-13");
     const clear = screen.getByTestId("teacher-schedule-filter-clear-link");
     expect(clear).toHaveAttribute("href", "/teacher/schedule");
     fireEvent.click(clear);
-    expect(screen.getByLabelText("Csoport")).toHaveValue("");
+    expect(screen.getByLabelText("Munkacsoport")).toHaveValue("");
     expect(screen.getByLabelText("Kezdő dátum")).toHaveValue("");
     expect(screen.getByLabelText("Záró dátum")).toHaveValue("");
   });
 
-  it("opens each entry with its own group and remembers an all-groups list", () => {
-    render(<ScheduleCollection entries={model.entries} filters={filters} />);
+  it("opens each entry and keeps the current filter in its address", () => {
+    render(
+      <ScheduleCollection
+        entries={model.entries}
+        filters={parseTeacherFilters({ from: "2026-08-13" }, groups)}
+      />,
+    );
     const href = screen.getByTestId("teacher-schedule-open-schedule-test").getAttribute("href");
-    expect(href).toBe("/teacher/schedule/schedule-test?groupId=group-oak&allGroups=1");
+    expect(href).toBe("/teacher/schedule/schedule-test?from=2026-08-13");
   });
 
   it("shows the status with its symbol and the shared word", () => {
@@ -111,7 +105,7 @@ describe("Teacher schedule components", () => {
     expect(rowLink).toHaveAccessibleName("Kitalált felügyelet");
     expect(cardLink).toHaveAccessibleName("Kitalált felügyelet");
     expect(rowLink.getAttribute("href")).toBe(cardLink.getAttribute("href"));
-    expect(rowLink.getAttribute("href")).toMatch(/^\/teacher\/schedule\/schedule-test\?/);
+    expect(rowLink.getAttribute("href")).toMatch(/^\/teacher\/schedule\/schedule-test/);
     // The table keeps its row and cell semantics; the link sits in the title cell of its row.
     const row = within(table).getByRole("row", { name: /Kitalált felügyelet/ });
     expect(within(row).getAllByRole("cell")).toHaveLength(8);
@@ -120,14 +114,25 @@ describe("Teacher schedule components", () => {
     expect(document.body).not.toHaveTextContent("Részletek");
   });
 
-  it("renders desktop table and mobile cards from one authorized model", () => {
+  it("renders desktop table and mobile cards from one authorized model, naming the working group", () => {
     render(<ScheduleCollection entries={model.entries} filters={filters} />);
     const table = screen.getByTestId("teacher-schedule-table");
     const cards = screen.getByTestId("teacher-schedule-card-list");
     expect(within(table).getByText("Kitalált felügyelet")).toBeVisible();
     expect(within(cards).getByText("Kitalált felügyelet")).toBeVisible();
-    expect(within(table).getByRole("cell", { name: "Engedélyezett csoport" })).toBeVisible();
-    expect(within(cards).getAllByText("Engedélyezett csoport").length).toBeGreaterThan(0);
+    expect(within(table).getByRole("cell", { name: "Tölgyfa csoport" })).toBeVisible();
+    expect(within(cards).getAllByText("Tölgyfa csoport").length).toBeGreaterThan(0);
+  });
+
+  it("names a community-wide entry as the whole community", () => {
+    render(
+      <ScheduleCollection entries={[{ ...model.entries[0]!, groupId: null }]} filters={filters} />,
+    );
+    expect(
+      within(screen.getByTestId("teacher-schedule-table")).getByRole("cell", {
+        name: "Egész közösség",
+      }),
+    ).toBeVisible();
   });
 
   it("renders an empty state with a clear-filter link", () => {

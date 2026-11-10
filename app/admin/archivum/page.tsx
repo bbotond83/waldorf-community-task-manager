@@ -9,9 +9,11 @@ export default async function ArchivePage() {
   const facade = await resolveAdminFacade();
   const result =
     session.state === "success" && facade
-      ? await facade.listRecords(session.data.applicationSession, session.data.scope, {
-          state: "archived",
-        })
+      ? await facade.listArchive(
+          session.data.applicationSession,
+          session.data.scope,
+          session.data.groupIds.length > 0 ? { onlyGroupIds: session.data.groupIds } : {},
+        )
       : terminalFailure();
   return (
     <section className="admin-page" data-testid="admin-archive-page">

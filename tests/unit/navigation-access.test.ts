@@ -8,13 +8,15 @@ const RESOURCE_BY_ROUTE: Readonly<Record<string, string>> = {
   "/szulo/feladatok": "assignment",
   "/szulo/cserek": "swap_request",
   "/szulo/ertesitesek": "notification",
+  "/szulo/munkacsoportok": "working_group",
   "/teacher/schedule": "schedule",
+  "/teacher/munkacsoportok": "working_group",
   "/admin": "dashboard",
+  "/admin/munkacsoportok": "working_group",
   "/admin/nyilvantartasok": "record",
   "/admin/feladatok": "task",
   "/admin/jovahagyasok": "approval",
   "/admin/archivum": "archive",
-  "/admin/import": "import",
   "/admin/emlekeztetok": "reminder",
   "/admin/adatvedelem": "lifecycle",
   "/admin/beallitasok": "settings",
@@ -54,10 +56,10 @@ describe("navigation and default pages follow the access rules", () => {
     }
   });
 
-  it("keeps import, reminders, privacy and settings out of the group admin menu", () => {
+  it("keeps records, reminders, privacy and settings out of the group admin menu (BR3.9)", () => {
     const hrefs = roleProfile("group-admin").navigation.map((item) => item.href);
     for (const forbidden of [
-      "/admin/import",
+      "/admin/nyilvantartasok",
       "/admin/emlekeztetok",
       "/admin/adatvedelem",
       "/admin/beallitasok",
@@ -68,14 +70,14 @@ describe("navigation and default pages follow the access rules", () => {
   });
 
   it("lists the agreed items in the agreed order", () => {
-    expect(labels("parent")).toEqual(["Értesítések", "Feladatok", "Cserék"]);
-    expect(labels("teacher")).toEqual([]);
+    expect(labels("parent")).toEqual(["Értesítések", "Feladatok", "Cserék", "Munkacsoportok"]);
+    expect(labels("teacher")).toEqual(["Beosztás", "Munkacsoportok"]);
     expect(labels("group-admin")).toEqual([
       "Áttekintés",
-      "Nyilvántartások",
       "Feladatok és események",
       "Jóváhagyások",
       "Archívum",
+      "Munkacsoportok",
     ]);
     expect(labels("super-admin")).toEqual([
       "Áttekintés",
@@ -83,15 +85,15 @@ describe("navigation and default pages follow the access rules", () => {
       "Feladatok és események",
       "Jóváhagyások",
       "Archívum",
-      "Importálás",
+      "Munkacsoportok",
       "Emlékeztetők",
       "Adatvédelem",
       "Beállítások",
     ]);
   });
 
-  it("starts the super admin menu with exactly the group admin items", () => {
-    expect(labels("super-admin").slice(0, 5)).toEqual(labels("group-admin"));
+  it("gives the super admin every group admin item", () => {
+    expect(labels("super-admin")).toEqual(expect.arrayContaining(labels("group-admin")));
   });
 
   it("opens the agreed default page for every profile", () => {

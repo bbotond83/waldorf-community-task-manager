@@ -91,10 +91,9 @@ for (const schema of DIRECTORY_SCHEMAS) {
         },
       ],
       children: [{ display_name: "Új Gergő" }],
-      add_group_ids: [GROUP_1],
     };
 
-    it("creates a family with its parents, contacts, children and membership in one call, as a super admin", async () => {
+    it("creates a family with its parents, contacts and children in one call, as a super admin", async () => {
       const result = await save(SUPER_ADMIN, newFamily);
       assert.equal(result.state, "success");
       assert.equal(result.version, 1);
@@ -111,32 +110,28 @@ for (const schema of DIRECTORY_SCHEMAS) {
         locality: "Pécs",
       });
       assert.equal(
-        await count(
-          db,
-          "group_memberships",
-          `family_id = '${familyId}' and group_id = '${GROUP_1}' and status = 'active'`,
-        ),
-        1,
-      );
-      assert.equal(
         await count(db, "parents", `family_id = '${familyId}' and account_id is not null`),
         0,
       );
     });
 
-    it("lets a group admin create a family only with a membership of a group they reach, and change it afterwards", async () => {
-      const without = await save(ADMIN_G1, { ...newFamily, add_group_ids: [] });
-      assert.deepEqual([without.state, without.code], ["denied", "authorization_denied"]);
-      const otherGroup = await save(ADMIN_G1, { ...newFamily, add_group_ids: [GROUP_2] });
-      assert.equal(otherGroup.state, "denied");
+    it("refuses a group admin every family record: creating one and changing one (BR3.9)", async () => {
+      const refused = await save(ADMIN_G1, newFamily);
+      assert.deepEqual([refused.state, refused.code], ["denied", "authorization_denied"]);
       assert.equal(
         await count(db, "families", "display_name = 'Új család'"),
         0,
         "nothing was created",
       );
-      const created = await save(ADMIN_G1, newFamily);
+      const created = await save(SUPER_ADMIN, newFamily);
       assert.equal(created.state, "success");
-      const changed = await save(ADMIN_G1, {
+      const change = await save(ADMIN_G1, {
+        family_id: created.reference,
+        expected_version: created.version,
+        display_name: "Átnevezett család",
+      });
+      assert.equal(change.state, "denied");
+      const changed = await save(SUPER_ADMIN, {
         family_id: created.reference,
         expected_version: created.version,
         display_name: "Átnevezett család",
@@ -157,6 +152,11 @@ for (const schema of DIRECTORY_SCHEMAS) {
         assert.equal((await change(account, FAMILY_1)).state, "denied", account);
       }
       assert.equal(
+        (await change(ADMIN_G1, FAMILY_1)).state,
+        "denied",
+        "group admin, family with a member of their group",
+      );
+      assert.equal(
         (await change(ADMIN_G2, FAMILY_1)).state,
         "denied",
         "group admin of another group",
@@ -164,7 +164,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
       assert.equal(
         (await change(ADMIN_G1, FAMILY_NO_GROUP)).state,
         "denied",
-        "family without a group",
+        "family with no member in any group",
       );
       assert.equal(
         (await change(SUPER_ADMIN, FAMILY_NO_GROUP)).state,
@@ -242,7 +242,6 @@ for (const schema of DIRECTORY_SCHEMAS) {
           },
         ],
         ["children.display_name", { ...newFamily, children: [{ display_name: long(201) }] }],
-        ["add_group_ids", { ...newFamily, add_group_ids: ["nem-uuid"] }],
       ];
       for (const [field, payload] of cases) {
         const result = await save(SUPER_ADMIN, payload);
@@ -257,7 +256,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
         children: Array.from({ length: 21 }, () => ({ display_name: "Gyerek" })),
       });
       assert.deepEqual([tooMany.state, tooMany.code], ["validation", "request_invalid"]);
-      assert.equal(await count(db, "families"), 4, "no refused request created a family");
+      assert.equal(await count(db, "families"), 6, "no refused request created a family");
     });
 
     it("stores the optional profile only with consent and empties it when consent is withdrawn (BR30.4)", async () => {
@@ -271,7 +270,6 @@ for (const schema of DIRECTORY_SCHEMAS) {
             optional_profile: "Szívesen sütök.",
           },
         ],
-        add_group_ids: [GROUP_1],
       });
       assert.equal(created.state, "success");
       const rows = async () =>
@@ -321,43 +319,23 @@ for (const schema of DIRECTORY_SCHEMAS) {
       );
     });
 
-    it("adds and ends memberships only in groups the admin reaches, refuses a duplicate and a group of another organization", async () => {
-      // The version moves with every accepted save: read it before each call.
-      const version = async () =>
-        (await one("select version from families where id = $1", [FAMILY_1])).version as number;
-      const call = async (account: string, groups: string[], end: string[] = []) =>
-        save(account, {
-          family_id: FAMILY_1,
-          expected_version: await version(),
-          display_name: "Fenyő család",
-          add_group_ids: groups,
-          end_group_ids: end,
-        });
-      const duplicate = await call(ADMIN_G1, [GROUP_1]);
-      assert.deepEqual([duplicate.state, duplicate.code], ["conflict", "MEMBERSHIP_DUPLICATE"]);
-      const unreached = await call(ADMIN_G1, [GROUP_2]);
-      assert.equal(unreached.state, "denied", "a group admin adds only groups they reach");
-      const foreign = await call(SUPER_ADMIN, [GROUP_OTHER]);
-      assert.deepEqual(
-        [foreign.state, foreign.code, foreign.field],
-        ["validation", "field_invalid", "add_group_ids"],
-      );
-      assert.equal((await call(SUPER_ADMIN, [GROUP_2])).state, "success");
-      // Ending needs reach of that group: the admin of group 1 cannot end the group 2 membership.
-      assert.equal((await call(ADMIN_G1, [], [GROUP_2])).state, "denied");
-      assert.equal((await call(ADMIN_G2, [], [GROUP_2])).state, "success");
-      assert.equal(
-        await count(
-          db,
-          "group_memberships",
-          `family_id = '${FAMILY_1}' and group_id = '${GROUP_2}' and status = 'ended'`,
-        ),
-        1,
-      );
-      const notMember = await call(SUPER_ADMIN, [], [GROUP_2]);
-      assert.deepEqual([notMember.state, notMember.field], ["validation", "end_group_ids"]);
-      // Ending a membership keeps the family and its history.
-      assert.equal(await count(db, "group_memberships", `family_id = '${FAMILY_1}'`), 2);
+    it("no longer changes memberships: a family record carries no working group (BR1.5, functional-spec W1)", async () => {
+      const memberships = async () =>
+        (
+          await db.query(
+            "select parent_id, group_id, status from group_memberships order by parent_id, group_id",
+          )
+        ).rows;
+      const before = await memberships();
+      const saved = await save(SUPER_ADMIN, {
+        family_id: FAMILY_1,
+        expected_version: 1,
+        display_name: "Fenyő család",
+        add_group_ids: [GROUP_2],
+        end_group_ids: [GROUP_1, GROUP_OTHER],
+      });
+      assert.equal(saved.state, "success", "the removed inputs are ignored, not interpreted");
+      assert.deepEqual(await memberships(), before);
     });
 
     it("links a sign-in account only through a super admin correction and never to two parents (BR30.3)", async () => {
@@ -483,26 +461,40 @@ for (const schema of DIRECTORY_SCHEMAS) {
         ends_on: "2028-06-30",
       });
       assert.deepEqual([taken.field, taken.reason], ["name", "taken"]);
+      const description = "A csoport leírása.";
+      const noDescription = await structure(SUPER_ADMIN, "group", {
+        school_year_id: year.reference,
+        name: "Leírás nélküli",
+      });
+      assert.deepEqual(
+        [noDescription.state, noDescription.field],
+        ["validation", "description"],
+        "a working group needs a description (BR2.2)",
+      );
       const group = await structure(SUPER_ADMIN, "group", {
         school_year_id: year.reference,
         name: "Mókus",
+        description,
       });
       assert.equal(group.state, "success");
       const sameName = await structure(SUPER_ADMIN, "group", {
         school_year_id: year.reference,
         name: "mókus",
+        description,
       });
       assert.deepEqual([sameName.field, sameName.reason], ["name", "taken"]);
       const renamed = await structure(SUPER_ADMIN, "group", {
         id: group.reference,
         expected_version: 1,
         name: "Mókus 2",
+        description,
       });
       assert.deepEqual([renamed.state, renamed.version], ["success", 2]);
       const stale = await structure(SUPER_ADMIN, "group", {
         id: group.reference,
         expected_version: 1,
         name: "Elavult",
+        description,
       });
       assert.deepEqual([stale.state, stale.code], ["conflict", "VERSION_CONFLICT"]);
       const moved = await structure(SUPER_ADMIN, "group", {
@@ -510,34 +502,44 @@ for (const schema of DIRECTORY_SCHEMAS) {
         expected_version: 2,
         school_year_id: YEAR_1,
         name: "Mókus 2",
+        description,
       });
       assert.deepEqual([moved.field, moved.reason], ["school_year_id", "locked"]);
       const foreignYear = await structure(SUPER_ADMIN, "group", {
         school_year_id: uuid(5999),
         name: "Árva",
+        description,
       });
       assert.deepEqual([foreignYear.field, foreignYear.reason], ["school_year_id", "not_found"]);
       assert.equal(
-        (await structure(OTHER_ADMIN, "group", { school_year_id: year.reference, name: "Idegen" }))
-          .reason,
+        (
+          await structure(OTHER_ADMIN, "group", {
+            school_year_id: year.reference,
+            name: "Idegen",
+            description,
+          })
+        ).reason,
         "not_found",
       );
     });
 
     it("archives and restores a child, a group and a school year with the rules of BR30.7", async () => {
-      // A child: an admin who reaches its family, not another group's admin; stale and repeated archive refused.
-      assert.equal((await archive(ADMIN_G2, "child", CHILD_F1, 1)).state, "denied");
-      const stale = await archive(ADMIN_G1, "child", CHILD_F1, 9);
+      // A child belongs to a family record: a super admin's alone (BR3.9). Stale and repeated archive refused.
+      for (const account of [ADMIN_G1, ADMIN_G2]) {
+        assert.equal((await archive(account, "child", CHILD_F1, 1)).state, "denied", account);
+      }
+      const stale = await archive(SUPER_ADMIN, "child", CHILD_F1, 9);
       assert.deepEqual([stale.state, stale.code], ["conflict", "VERSION_CONFLICT"]);
-      const archived = await archive(ADMIN_G1, "child", CHILD_F1, 1);
+      const archived = await archive(SUPER_ADMIN, "child", CHILD_F1, 1);
       assert.deepEqual([archived.state, archived.version], ["success", 2]);
       assert.equal(
-        (await archive(ADMIN_G1, "child", CHILD_F1, 2)).code,
+        (await archive(SUPER_ADMIN, "child", CHILD_F1, 2)).code,
         "VERSION_CONFLICT",
         "already archived",
       );
-      assert.equal((await restore(ADMIN_G1, "child", CHILD_F1, 2)).state, "success");
-      const active = await restore(ADMIN_G1, "child", CHILD_F1, 3);
+      assert.equal((await restore(ADMIN_G1, "child", CHILD_F1, 2)).state, "denied");
+      assert.equal((await restore(SUPER_ADMIN, "child", CHILD_F1, 2)).state, "success");
+      const active = await restore(SUPER_ADMIN, "child", CHILD_F1, 3);
       assert.deepEqual([active.state, active.code], ["conflict", "RESTORE_CONFLICT"]);
       // A child of an archived family cannot be restored on its own.
       await archive(SUPER_ADMIN, "child", CHILD_F1, 3);

@@ -1,6 +1,6 @@
 import { isCalendarDate } from "../../../../src/application/tracking-model.ts";
 import { FilterClearLink } from "../../../../src/runtime/FilterClearLink.tsx";
-import type { TeacherFilters } from "../../_lib/filters.ts";
+import { COMMUNITY_FILTER, type TeacherFilters } from "../../_lib/filters.ts";
 
 export function ScheduleFilter({ filters }: Readonly<{ filters: TeacherFilters }>) {
   return (
@@ -14,16 +14,17 @@ export function ScheduleFilter({ filters }: Readonly<{ filters: TeacherFilters }
       <fieldset>
         <legend>Beosztás szűrése</legend>
         <div className="filter-field">
-          <label htmlFor="groupId">Csoport</label>
+          <label htmlFor="groupId">Munkacsoport</label>
           <select
             id="groupId"
             name="groupId"
             defaultValue={filters.groupId}
             data-testid="teacher-schedule-group-select"
           >
-            <option value="">Minden csoport</option>
-            {filters.groups.map(({ scope, label }) => (
-              <option key={scope.id} value={scope.id}>
+            <option value="">Minden</option>
+            <option value={COMMUNITY_FILTER}>Egész közösség</option>
+            {filters.groups.map(({ id, label }) => (
+              <option key={id} value={id}>
                 {label}
               </option>
             ))}

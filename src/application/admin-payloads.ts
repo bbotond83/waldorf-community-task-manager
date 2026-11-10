@@ -28,7 +28,7 @@ export type AdminChildPayload = Readonly<{
   displayName: string;
 }>;
 
-/** `records.save`: a family with parents, children and memberships, a child, a group or a school year. */
+/** `records.save`: a family with parents and children, a child, a working group or a school year. */
 export type AdminRecordPayload = Readonly<{
   kind?: AdminRecordKind;
   /** The legacy single text field: the display name or name of the record. */
@@ -45,15 +45,18 @@ export type AdminRecordPayload = Readonly<{
   /** Family: parents and children by id; those not listed stay as they are. */
   parents?: readonly AdminParentPayload[];
   children?: readonly AdminChildPayload[];
-  /** Family: groups whose membership starts or ends. */
-  addGroupIds?: readonly string[];
-  endGroupIds?: readonly string[];
+  /** Working group: what the group does (BR2.2). */
+  description?: string;
 }>;
+
+/** The choice "Egész közösség" on the task and event forms: the item stores no group (BR1.1). */
+export const COMMUNITY_GROUP = "community";
 
 /** `tasks.save`: a task or an event. */
 export type AdminTaskPayload = Readonly<{
   kind?: "task" | "event";
   title?: string;
+  /** A working group's id, or `COMMUNITY_GROUP`. */
   groupId?: string;
   /** Task: the event it belongs to (same group). */
   eventId?: string;

@@ -38,10 +38,13 @@ export const REQUIRED_LOCAL_STORIES = [
   "US-LR-09",
 ] as const;
 
+/** US-08 to US-10 were the stories of the workbook import, which FR19 removed. */
+const REMOVED_INHERITED_STORIES = new Set(["US-08", "US-09", "US-10"]);
+
 export const REQUIRED_INHERITED_STORIES = Array.from(
   { length: 14 },
   (_, index) => `US-${String(index + 1).padStart(2, "0")}`,
-);
+).filter((story) => !REMOVED_INHERITED_STORIES.has(story));
 
 export const REQUIRED_NFR08_SCENARIOS = [
   "NFR08-INVITATION-EXPIRY-RESEND",
@@ -50,7 +53,6 @@ export const REQUIRED_NFR08_SCENARIOS = [
   "NFR08-QUEUES-FILTERS",
   "NFR08-SCHOOL-YEAR-ARCHIVE",
   "NFR08-ROLE-RESOURCE-FIELD-PARITY",
-  "NFR08-IMPORT",
   "NFR08-REMINDERS",
   "NFR08-LIFECYCLE-RECOVERY",
 ] as const;

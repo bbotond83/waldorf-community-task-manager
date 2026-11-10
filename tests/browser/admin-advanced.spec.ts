@@ -1,68 +1,23 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test, type Page } from "@playwright/test";
-import { DIRECTORY_SHEET } from "../../src/import-parser/template.ts";
-import { buildWorkbook, directoryRow } from "../support/workbook.ts";
+import { expect, test } from "@playwright/test";
 import { SERIOUS, signInAs, bindSeededSchema } from "./support/seeded-schema.ts";
 
 const world = bindSeededSchema();
-
-const XLSX_TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-
-/** A workbook with one new family in the first seeded group: no conflict, so the run goes straight to the confirmation. */
-const newFamilyWorkbook = () =>
-  buildWorkbook({
-    rows: {
-      [DIRECTORY_SHEET]: [
-        directoryRow({
-          Csoport: "Katica",
-          Család: "Mézes család",
-          "Szülő neve": "Mézes Márta",
-          "E-mail": "marta@example.test",
-        }),
-      ],
-    },
-  });
-
-async function upload(page: Page, name: string, bytes: Uint8Array) {
-  await page
-    .getByTestId("admin-import-file-input")
-    .setInputFiles({ name, mimeType: XLSX_TYPE, buffer: Buffer.from(bytes) });
-  await page.getByTestId("admin-import-preview-form-submit-button").click();
-}
 
 test.beforeEach(async () => world().reseed());
 
 test("advanced navigation observes strict administrator role boundaries", async ({ page }) => {
   await signInAs(page, world().account("group-admin-1"));
   await page.goto("/admin");
-  await expect(page.getByTestId("app-shell-navigation-admin-import")).toHaveCount(0);
   await expect(page.getByTestId("app-shell-navigation-admin-reminders")).toHaveCount(0);
   await expect(page.getByTestId("app-shell-navigation-admin-settings")).toHaveCount(0);
-  await page.goto("/admin/import");
+  await page.goto("/admin/emlekeztetok");
   await expect(page.getByRole("heading", { name: "Nincs jogosultság" })).toBeVisible();
 
   await signInAs(page, world().account("super-admin"));
   await page.goto("/admin/beallitasok");
   await expect(page.getByTestId("admin-recipient-settings")).toBeVisible();
   await expect(page.getByTestId("admin-governance-section")).toBeVisible();
-});
-
-test("Super Administrator completes the seven-step import once", async ({ page }) => {
-  await signInAs(page, world().account("super-admin"));
-  await page.goto("/admin/import");
-  await expect(page.getByRole("heading", { name: "Importálás" })).toBeFocused();
-  await upload(page, "uj-csalad.xlsx", newFamilyWorkbook());
-  await expect(page.getByTestId("admin-import-preview")).toBeVisible();
-  await expect(page.getByTestId("admin-import-source")).toHaveText("uj-csalad.xlsx");
-  await expect(page.getByTestId("admin-import-commit-form")).toBeVisible();
-  await page.getByTestId("admin-import-confirm-checkbox").check();
-  await page.getByTestId("admin-import-commit-form-submit-button").click();
-  await expect(page.getByTestId("admin-import-outcome")).toBeVisible();
-  await expect(page.getByTestId("admin-import-outcome-counts")).toContainText("elem jött létre");
-  await expect(page.locator("body")).not.toContainText(/provider body|telefonszám/i);
-  // The new family is really in the records.
-  await page.goto("/admin/nyilvantartasok");
-  await expect(page.getByText("Mézes család")).toBeVisible();
 });
 
 test("the reminder page and the privacy page show their explicit empty states", async ({
@@ -128,7 +83,7 @@ test("@a11y advanced admin supports keyboard, focus, zoom, mobile touch, and axe
   page,
 }) => {
   await signInAs(page, world().account("super-admin"));
-  await page.goto("/admin/import");
+  await page.goto("/admin/beallitasok");
   for (let step = 0; step < 15; step += 1) {
     const isFocused = await page
       .getByTestId("app-shell-skip-link")
@@ -140,8 +95,8 @@ test("@a11y advanced admin supports keyboard, focus, zoom, mobile touch, and axe
   await page.evaluate(() => {
     document.documentElement.style.zoom = "2";
   });
-  await expect(page.getByTestId("admin-import-page")).toBeVisible();
-  const submitBox = await page.getByTestId("admin-import-preview-form-submit-button").boundingBox();
+  await expect(page.getByTestId("admin-recipient-settings")).toBeVisible();
+  const submitBox = await page.getByTestId("admin-settings-form-submit-button").boundingBox();
   expect(submitBox?.height ?? 0).toBeGreaterThanOrEqual(44);
   expect(submitBox?.width ?? 0).toBeGreaterThanOrEqual(44);
   const results = await new AxeBuilder({ page }).analyze();
@@ -153,18 +108,12 @@ test("Parent Teacher and Group admin direct advanced routes disclose no privileg
 }) => {
   for (const tag of ["parent-1", "teacher-1", "group-admin-1"]) {
     await signInAs(page, world().account(tag));
-    for (const route of [
-      "/admin/import",
-      "/admin/emlekeztetok",
-      "/admin/adatvedelem",
-      "/admin/beallitasok",
-    ]) {
+    for (const route of ["/admin/emlekeztetok", "/admin/adatvedelem", "/admin/beallitasok"]) {
       await page.goto(route);
       await expect(
         page.getByRole("heading", { name: "Nincs jogosultság", exact: true }),
       ).toBeVisible();
       for (const hook of [
-        "admin-import-preview",
         "admin-governance-section",
         "admin-recipient-settings",
         "admin-reminder-page",

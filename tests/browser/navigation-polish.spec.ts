@@ -130,7 +130,7 @@ test("the teacher gets back to Beosztás from a detail page and from a denied pa
   await page.getByRole("link", { name: "Vissza a beosztáshoz" }).click();
   await expect(page).toHaveURL(/\/teacher\/schedule(\?.*)?$/);
 
-  for (const deniedPath of ["/admin", "/admin/import", "/szulo/feladatok"]) {
+  for (const deniedPath of ["/admin", "/admin/beallitasok", "/szulo/feladatok"]) {
     await page.goto(deniedPath);
     await expect(
       page.getByRole("heading", { name: "Nincs jogosultság", exact: true }),

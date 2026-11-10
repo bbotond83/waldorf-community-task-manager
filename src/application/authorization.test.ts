@@ -64,26 +64,40 @@ describe("AuthorizationContract", () => {
     assert.equal(result.state, "denied");
   });
 
-  it("denies Group Administrator import explicitly", async () => {
+  it("denies a Group Administrator family records and removes the import for everyone (BR3.9, BR7.1)", async () => {
     const session = makeSession("group_admin", groupScope);
-    const result = await contractFor(session).authorize(session, {
-      matrixRowId: "AUTH-GRP-IMPORT-DENY",
-      action: "manage",
-      resource: "import",
+    const records = await contractFor(session).authorize(session, {
+      matrixRowId: "AUTH-GROUP-ADMIN-CORE",
+      action: "read",
+      resource: "record",
       scope: groupScope,
     });
-    assert.equal(result.state, "denied");
-  });
-
-  it("allows Super Administrator import at organization scope", async () => {
-    const session = makeSession("super_admin", organizationScope);
-    const result = await contractFor(session).authorize(session, {
+    assert.equal(records.state, "denied");
+    const admin = makeSession("super_admin", organizationScope);
+    const imported = await contractFor(admin).authorize(admin, {
       matrixRowId: "AUTH-SUPER-ADMIN",
       action: "manage",
       resource: "import",
       scope: organizationScope,
     });
-    assert.equal(result.state, "success");
+    assert.equal(imported.state, "denied");
+  });
+
+  it("lets every role read the working groups through a right it holds (BR2.3)", async () => {
+    for (const [role, scope] of [
+      ["group_admin", groupScope],
+      ["kindergarten_teacher", organizationScope],
+      ["super_admin", organizationScope],
+    ] as const) {
+      const session = makeSession(role, scope);
+      const result = await contractFor(session).authorize(session, {
+        matrixRowId: "AUTH-WORKING-GROUPS",
+        action: "read",
+        resource: "working_group",
+        scope,
+      });
+      assert.equal(result.state, "success", role);
+    }
   });
 
   it("limits governance to Super Administrator", async () => {
@@ -224,7 +238,7 @@ it("inactive and revoked sessions have no protected navigation", async () => {
   }
 });
 it("missing version invalidates and clears navigation cache", async () => {
-  const session = makeSession("kindergarten_teacher", groupScope);
+  const session = makeSession("kindergarten_teacher", organizationScope);
   const versions = new InMemoryAuthorizationVersions();
   const result = await new AuthorizationContract(versions).navigation(session);
   assert.equal(result.state, "invalidated");

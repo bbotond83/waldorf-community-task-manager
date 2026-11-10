@@ -14,10 +14,14 @@ export default async function AdminDashboardPage() {
       </section>
     );
   }
-  const { applicationSession, scope } = session.data;
+  const { applicationSession, scope, groupIds } = session.data;
+  // Family records are a super admin's (BR3.9): a group administrator has no records panel.
+  const showRecords = groupIds.length === 0;
   const [dashboard, records, tasks] = await Promise.all([
     facade.getDashboard(applicationSession, scope),
-    facade.listRecords(applicationSession, scope),
+    showRecords
+      ? facade.listRecords(applicationSession, scope)
+      : Promise.resolve(terminalFailure()),
     facade.listTasks(applicationSession, scope),
   ]).catch(() => [terminalFailure(), terminalFailure(), terminalFailure()] as const);
 
@@ -44,19 +48,21 @@ export default async function AdminDashboardPage() {
             {(data) => <strong>{data.openApprovals}</strong>}
           </AsyncStatePanel>
         </DashboardPanel>
-        <DashboardPanel
-          title="Nyilvántartások"
-          testId="admin-dashboard-records"
-          href="/admin/nyilvantartasok"
-        >
-          <AsyncStatePanel
-            result={records}
-            testId="admin-dashboard-records-state"
-            emptyMessage="Nincs nyilvántartás."
+        {showRecords && (
+          <DashboardPanel
+            title="Nyilvántartások"
+            testId="admin-dashboard-records"
+            href="/admin/nyilvantartasok"
           >
-            {(data) => <strong>{data.items.length}</strong>}
-          </AsyncStatePanel>
-        </DashboardPanel>
+            <AsyncStatePanel
+              result={records}
+              testId="admin-dashboard-records-state"
+              emptyMessage="Nincs nyilvántartás."
+            >
+              {(data) => <strong>{data.items.length}</strong>}
+            </AsyncStatePanel>
+          </DashboardPanel>
+        )}
         <DashboardPanel
           title="Feladatok és események"
           testId="admin-dashboard-tasks"

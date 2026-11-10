@@ -2,14 +2,8 @@ import assert from "node:assert/strict";
 import { randomBytes } from "node:crypto";
 import { after, before, beforeEach, describe, it } from "node:test";
 import type pg from "pg";
-import {
-  WorkbookUpload,
-  retryableFailure,
-  type AdminOperation,
-  type DomainOutcome,
-} from "../../src/application/index.ts";
-import { createAdminPort, createParentPort, RetryableDataFailure } from "../../src/data/index.ts";
-import { parseWorkbook } from "../../src/import-parser/workbook.ts";
+import type { AdminOperation, DomainOutcome } from "../../src/application/index.ts";
+import { createAdminPort, createParentPort } from "../../src/data/index.ts";
 import { createSignInService } from "../../src/identity/service.ts";
 import { createDatabaseClient, type DatabaseClient } from "../../src/runtime/database/client.ts";
 import {
@@ -17,8 +11,6 @@ import {
   DIRECTORY_SCHEMAS,
   FAMILY_1,
   FAMILY_2,
-  FAMILY_NO_GROUP,
-  GROUP_1,
   nextKey,
   openDirectoryDatabase,
   ORGANIZATION,
@@ -33,22 +25,12 @@ import {
   TASK_3,
 } from "./directory-support.ts";
 import { insertJob, insertNotification } from "./notifications-support.ts";
-import { budapestText } from "./import-support.ts";
 import { stackSettings } from "./stack-support.ts";
-import {
-  buildWorkbook,
-  directoryRow,
-  taskRow,
-  zipBomb,
-  type RowSpec,
-} from "../support/workbook.ts";
-import { DIRECTORY_SHEET } from "../../src/import-parser/template.ts";
 
 const settings = stackSettings();
 const apiUrl = settings.apiUrl.replace(/\/$/, "");
 const SESSION_SECRET = `test-secret-${randomBytes(24).toString("hex")}`;
 const PASSWORD = `Pw-${randomBytes(6).toString("hex")}-1`;
-const TASK_SHEET = "Kinti - benti takarítás 2025-26";
 
 const ACCOUNTS = {
   parent: PARENT_F1,
@@ -59,100 +41,19 @@ const ACCOUNTS = {
 } as const;
 type Who = keyof typeof ACCOUNTS;
 type Result = DomainOutcome<unknown> & { code?: string };
-type Preview = {
-  id: string;
-  runId: string;
-  runVersion: number;
-  fingerprint: string;
-  fileName: string;
-  state: string;
-  step: number;
-  totalRows: number;
-  warningCount: number;
-  conflicts: { id: string; message: string; skipOnly: boolean; resolution?: string }[];
-};
-type Committed = {
-  runId: string;
-  state: string;
-  importedRows: number;
-  skippedRows: number;
-  createdRows?: number;
-  updatedRows?: number;
-  archivedRows?: number;
-};
-
-/** Every code of the table of BR42.3 that a test of this file has seen come back through the adapter. */
-const TABLE_OF_BR42_3 = [
-  "IMPORT_MALFORMED",
-  "IMPORT_OVERSIZED",
-  "IMPORT_MISSING_SHEET",
-  "IMPORT_MISSING_HEADER",
-  "IMPORT_UNSAFE_CELL",
-  "IMPORT_FINGERPRINT_CHANGED",
-  "IMPORT_CONFLICT_UNRESOLVED",
-  "IMPORT_CONFIRMATION_REQUIRED",
-  "IMPORT_MATCH_CHANGED",
-  "IMPORT_RECOVERY_NOT_AVAILABLE",
-  "IMPORT_RECOVERY_ACTION_INVALID",
-  "IMPORT_PREVIEW_STALE",
-  "REMINDER_NOT_RETRYABLE",
-  "REMINDER_STALE",
-] as const;
 
 function must<T>(value: T | undefined | null, what: string): T {
   assert.ok(value !== undefined && value !== null, what);
   return value;
 }
 
-/** The fictitious workbook of these tests: one new family, a task for it, and a row naming a family that exists nowhere. */
-function workbookBytes(extraDirectory: RowSpec[] = []): Uint8Array {
-  const start = budapestText(20, 10);
-  const end = budapestText(20, 12);
-  return buildWorkbook({
-    rows: {
-      [DIRECTORY_SHEET]: [
-        directoryRow({
-          Csoport: "Boróka",
-          Család: "Mézes család",
-          "Szülő neve": "Mézes Márta",
-          "E-mail": "marta@example.test",
-          Telefon: "+36 20 333 4444",
-        }),
-        directoryRow({ Csoport: "Boróka", Család: "Mézes család", "Gyermek neve": "Mézes Máté" }),
-        ...extraDirectory,
-      ],
-      [TASK_SHEET]: [
-        taskRow({
-          Csoport: "Boróka",
-          Esemény: "Tavaszi nagytakarítás",
-          Feladat: "Ablakmosás",
-          Kezdés: start,
-          Befejezés: end,
-          Létszám: 2,
-          Család: "Mézes család",
-        }),
-        taskRow({
-          Csoport: "Boróka",
-          Esemény: "Tavaszi nagytakarítás",
-          Feladat: "Ablakmosás",
-          Kezdés: start,
-          Befejezés: end,
-          Létszám: 2,
-          Család: "Hiányzó család",
-        }),
-      ],
-    },
-  });
-}
-
 /**
- * The notification, reminder and import adapters against the real local stack, with real sign-in tokens
- * (NFR2.26, NFR6.23, NFR6.20): every operation, the parser in front of the import, the interruption of a commit
- * with an injected failure, and a code-by-code contract test of the table of BR42.3. Nothing is mocked: the
- * data API, the row-level policies, the functions and the sign-in service are the stack's own.
+ * The notification and reminder adapters against the real local stack, with real sign-in tokens (NFR2.26,
+ * NFR6.23). Nothing is mocked: the data API, the row-level policies, the functions and the sign-in service are
+ * the stack's own.
  */
 for (const schema of DIRECTORY_SCHEMAS) {
-  describe(`notification, reminder and import adapters in ${schema}`, () => {
+  describe(`notification and reminder adapters in ${schema}`, () => {
     let db: pg.Client;
     const database = createDatabaseClient({
       url: apiUrl,
@@ -162,7 +63,6 @@ for (const schema of DIRECTORY_SCHEMAS) {
     });
     const service = createSignInService({ url: apiUrl, publicKey: settings.publicKey });
     const tokens = new Map<string, string>();
-    const seen = new Set<string>();
 
     async function asPerson(who: Who): Promise<DatabaseClient> {
       const account = ACCOUNTS[who];
@@ -199,10 +99,6 @@ for (const schema of DIRECTORY_SCHEMAS) {
     });
     beforeEach(async () => {
       await seedCoordinationWorld(db, schema);
-      await db.query(
-        "insert into group_memberships (organization_id, family_id, group_id) values ($1, $2, $3), ($1, $4, $3)",
-        [ORGANIZATION, FAMILY_2, GROUP_1, FAMILY_NO_GROUP],
-      );
     });
 
     const admin = async (
@@ -210,51 +106,21 @@ for (const schema of DIRECTORY_SCHEMAS) {
       operation: AdminOperation,
       payload: Record<string, unknown> = {},
       key = nextKey("adm"),
-      client?: DatabaseClient,
     ) => {
-      const port = createAdminPort(client ?? (await asPerson(who)), { parseWorkbook });
-      const result = (await port.execute<unknown>({
+      const port = createAdminPort(await asPerson(who));
+      return (await port.execute<unknown>({
         actorId: ACCOUNTS[who],
         operation,
         scope: { id: ORGANIZATION, type: "organization", organizationId: ORGANIZATION },
         payload,
         idempotencyKey: key,
       })) as Result;
-      if ("code" in result && typeof result.code === "string") seen.add(result.code);
-      return result;
     };
     const parent = async (who: Who) => createParentPort(await asPerson(who));
     const data = <T>(result: Result): T => {
       assert.equal(result.state, "success", JSON.stringify(result));
       return (result as { data: T }).data;
     };
-    const upload = (bytes: Uint8Array, name = "tavaszi-feladatok.xlsx") =>
-      new WorkbookUpload(name, bytes);
-    const previewOf = async (bytes = workbookBytes()) =>
-      data<Preview>(await admin("super", "import.preview", { workbook: upload(bytes) }));
-    const resolveAll = async (model: Preview) => {
-      let current = model;
-      for (const conflict of model.conflicts) {
-        current = data<Preview>(
-          await admin("super", "import.resolve", {
-            id: current.runId,
-            expectedVersion: current.runVersion,
-            conflictId: conflict.id,
-            resolution: "keep-existing",
-          }),
-        );
-      }
-      return current;
-    };
-    const commitPayload = (model: Preview, over: Record<string, unknown> = {}) => ({
-      id: model.runId,
-      expectedVersion: model.runVersion,
-      fingerprint: model.fingerprint,
-      confirmed: "yes",
-      ...over,
-    });
-    const count = async (sql: string, values: unknown[] = []) =>
-      (await db.query(sql, values)).rows[0].n as number;
 
     it("lists only the signed-in parent's own notifications, newest first, with the display fields of the model (BR40.2)", async () => {
       await insertNotification(db, {
@@ -459,326 +325,6 @@ for (const schema of DIRECTORY_SCHEMAS) {
       assert.equal(
         (await admin("outsider", "reminders.retry", { id: job, expectedVersion: 1 })).state,
         "denied",
-      );
-    });
-
-    it("runs an import end to end through the adapter: upload, two conflicts' worth of resolution, commit with real counts, then a second upload (BR42.1, BR41.13)", async () => {
-      const first = await previewOf();
-      assert.equal(first.fileName, "tavaszi-feladatok.xlsx");
-      assert.equal(first.step, 4);
-      assert.deepEqual(
-        first.conflicts.map((conflict) => [conflict.message, conflict.skipOnly]),
-        [["Ismeretlen család.", true]],
-        "the family the workbook creates resolves; the one that exists nowhere is a conflict",
-      );
-      assert.equal(data<Preview>(await admin("super", "import.status")).runId, first.runId);
-      const resolved = await resolveAll(first);
-      assert.equal(resolved.state, "confirmed");
-      assert.equal(resolved.runVersion, first.runVersion + 1);
-
-      const outcome = data<Committed>(
-        await admin("super", "import.commit", commitPayload(resolved), nextKey("commit")),
-      );
-      assert.equal(outcome.state, "committed");
-      assert.equal(outcome.createdRows, 3);
-      assert.equal(outcome.archivedRows, 18);
-      assert.equal(outcome.importedRows, 3);
-      assert.equal(outcome.skippedRows, 19);
-      assert.equal(
-        await count("select count(*)::int as n from families where display_name = 'Mézes család'"),
-        1,
-      );
-      assert.equal(
-        await count("select count(*)::int as n from assignments where source = 'import'"),
-        1,
-      );
-      assert.equal(
-        await count("select count(*)::int as n from notifications"),
-        0,
-        "an import writes no notice",
-      );
-
-      const status = data<Preview & { state: string }>(await admin("super", "import.status"));
-      assert.equal(status.state, "committed");
-      const second = await previewOf();
-      assert.notEqual(
-        second.runId,
-        first.runId,
-        "a new upload supersedes the finished run on screen",
-      );
-      assert.equal(
-        second.conflicts.length,
-        1,
-        "the same file again: nothing new to create, the unknown family conflicts again",
-      );
-    });
-
-    it("refuses a file that is not a usable workbook with the parser's code and creates no run (BR41.2, BR42.3)", async () => {
-      const before = await count("select count(*)::int as n from import_runs");
-      const cases: [string, Uint8Array][] = [
-        ["IMPORT_MALFORMED", new TextEncoder().encode("Csoport;Család\n")],
-        ["IMPORT_OVERSIZED", zipBomb()],
-        ["IMPORT_MISSING_SHEET", buildWorkbook({ omitSheets: ["Könyvtár"] })],
-        ["IMPORT_MISSING_HEADER", buildWorkbook({ headers: { [TASK_SHEET]: ["Rossz"] } })],
-        [
-          "IMPORT_UNSAFE_CELL",
-          buildWorkbook({
-            rows: { [DIRECTORY_SHEET]: [directoryRow({ Csoport: "A", Család: "=1+1" })] },
-          }),
-        ],
-      ];
-      for (const [code, bytes] of cases) {
-        const result = await admin("super", "import.preview", { workbook: upload(bytes) });
-        assert.deepEqual([result.state, result.code], ["conflict", code], code);
-      }
-      assert.equal(
-        await count("select count(*)::int as n from import_runs"),
-        before,
-        "no run was created",
-      );
-    });
-
-    it("counts a dropped phone number as a warning of the preview and never stages the dropped text (BR41.2)", async () => {
-      const model = await previewOf(
-        workbookBytes([
-          directoryRow({
-            Csoport: "Boróka",
-            Család: "Mézes család",
-            "Szülő neve": "Mézes Mihály",
-            Telefon: "nincs",
-          }),
-        ]),
-      );
-      assert.equal(model.warningCount, 1);
-      assert.equal(
-        await count(
-          "select count(*)::int as n from import_staged_rows where payload::text like '%nincs%'",
-        ),
-        0,
-      );
-    });
-
-    it("keeps the import to super admins: a group admin, a parent and an outsider are denied every operation (BR41.1)", async () => {
-      const bytes = workbookBytes();
-      for (const who of ["adminSame", "parent", "outsider"] as const) {
-        const port = createAdminPort(await asPerson(who), { parseWorkbook });
-        const scope = {
-          id: ORGANIZATION,
-          type: "organization" as const,
-          organizationId: ORGANIZATION,
-        };
-        for (const [operation, payload] of [
-          ["import.preview", { workbook: upload(bytes) }],
-          ["import.status", {}],
-        ] as const) {
-          const result = await port.execute({
-            actorId: ACCOUNTS[who],
-            operation,
-            scope,
-            payload,
-            idempotencyKey: nextKey("deny"),
-          });
-          assert.equal(result.state, "denied", `${who} ${operation}`);
-        }
-      }
-      assert.equal(await count("select count(*)::int as n from import_runs"), 0);
-    });
-
-    it("answers each commit and resolve refusal with its code: stale, fingerprint, open conflict, confirmation, cancelled run (BR42.3)", async () => {
-      const model = await previewOf();
-      const wrongFingerprint = await admin(
-        "super",
-        "import.commit",
-        commitPayload(model, { fingerprint: "0".repeat(64) }),
-        nextKey("c"),
-      );
-      assert.deepEqual(
-        [wrongFingerprint.state, wrongFingerprint.code],
-        ["conflict", "IMPORT_FINGERPRINT_CHANGED"],
-      );
-      const open = await admin("super", "import.commit", commitPayload(model), nextKey("c"));
-      assert.deepEqual([open.state, open.code], ["conflict", "IMPORT_CONFLICT_UNRESOLVED"]);
-      const staleResolve = await admin("super", "import.resolve", {
-        id: model.runId,
-        expectedVersion: model.runVersion + 7,
-        conflictId: model.conflicts[0]!.id,
-        resolution: "keep-existing",
-      });
-      assert.deepEqual(
-        [staleResolve.state, staleResolve.code],
-        ["invalidated", "IMPORT_PREVIEW_STALE"],
-      );
-      const useImport = await admin("super", "import.resolve", {
-        id: model.runId,
-        expectedVersion: model.runVersion,
-        conflictId: model.conflicts[0]!.id,
-        resolution: "use-import",
-      });
-      assert.deepEqual(
-        [useImport.state, useImport.code],
-        ["conflict", "IMPORT_CONFLICT_UNRESOLVED"],
-        "nothing to import into",
-      );
-      const resolved = await resolveAll(model);
-      const unconfirmed = await admin(
-        "super",
-        "import.commit",
-        commitPayload(resolved, { confirmed: "" }),
-        nextKey("c"),
-      );
-      assert.deepEqual(
-        [unconfirmed.state, unconfirmed.code],
-        ["conflict", "IMPORT_CONFIRMATION_REQUIRED"],
-      );
-      const cancelled = data<{ runId: string }>(
-        await admin(
-          "super",
-          "import.cancel",
-          { id: resolved.runId, expectedVersion: resolved.runVersion },
-          nextKey("x"),
-        ),
-      );
-      assert.equal(cancelled.runId, resolved.runId);
-      const afterCancel = await admin(
-        "super",
-        "import.commit",
-        commitPayload(resolved),
-        nextKey("c"),
-      );
-      assert.deepEqual(
-        [afterCancel.state, afterCancel.code],
-        ["invalidated", "IMPORT_PREVIEW_STALE"],
-      );
-      assert.equal(
-        await count("select count(*)::int as n from import_staged_rows"),
-        0,
-        "a cancelled run keeps no staged row",
-      );
-      assert.deepEqual(await admin("super", "import.status"), { state: "empty" });
-    });
-
-    it("sends the match-changed code when a record changed between preview and commit, and the run returns to the preview (BR41.6)", async () => {
-      const model = await previewOf();
-      const resolved = await resolveAll(model);
-      // Someone creates the family the workbook was going to create: the second matching sees it.
-      await db.query(
-        "with f as (insert into families (organization_id, display_name) values ($1, 'Mézes család') returning id) insert into group_memberships (organization_id, family_id, group_id) select $1, id, $2 from f",
-        [ORGANIZATION, GROUP_1],
-      );
-      const result = await admin("super", "import.commit", commitPayload(resolved), nextKey("c"));
-      assert.deepEqual([result.state, result.code], ["conflict", "IMPORT_MATCH_CHANGED"]);
-      const status = data<Preview>(await admin("super", "import.status"));
-      assert.equal(
-        status.state,
-        "conflicts",
-        "back to the preview with the changed rows as new conflicts",
-      );
-      assert.equal(
-        await count("select count(*)::int as n from assignments where source = 'import'"),
-        0,
-      );
-    });
-
-    it("interrupts a commit whose connection fails, leaves the data as it was, and resumes it with the recovery action (BR41.9, NFR6.20)", async () => {
-      const model = await previewOf();
-      const resolved = await resolveAll(model);
-      const real = await asPerson("super");
-      let armed = true;
-      const flaky = new Proxy(real, {
-        get(target, property) {
-          if (property === "read") {
-            return (run: never, meta: { action?: string }) =>
-              armed && meta.action === "import_commit"
-                ? Promise.resolve(
-                    retryableFailure({ idempotencyKey: "x", action: "import_commit" } as never),
-                  )
-                : target.read(run, meta as never);
-          }
-          const value = Reflect.get(target, property);
-          return typeof value === "function" ? value.bind(target) : value;
-        },
-      }) as DatabaseClient;
-      const familiesBefore = await count("select count(*)::int as n from families");
-      await assert.rejects(
-        admin("super", "import.commit", commitPayload(resolved), nextKey("c"), flaky),
-        RetryableDataFailure,
-      );
-      armed = false;
-      assert.equal(
-        await count("select count(*)::int as n from families"),
-        familiesBefore,
-        "the data is as it was",
-      );
-      const status = data<Preview>(await admin("super", "import.status"));
-      assert.deepEqual([status.state, status.step], ["interrupted", 6]);
-
-      const invalidAction = await admin(
-        "super",
-        "import.recover",
-        { id: status.runId, expectedVersion: 1, action: "retry" },
-        nextKey("r"),
-      );
-      assert.deepEqual(
-        [invalidAction.state, invalidAction.code],
-        ["conflict", "IMPORT_RECOVERY_ACTION_INVALID"],
-      );
-      const recovered = data<Committed>(
-        await admin(
-          "super",
-          "import.recover",
-          { id: status.runId, expectedVersion: 1, action: "resume" },
-          nextKey("r"),
-        ),
-      );
-      assert.equal(recovered.state, "recovered");
-      assert.equal(recovered.importedRows, 3);
-      assert.equal(await count("select count(*)::int as n from families"), familiesBefore + 1);
-      const notAvailable = await admin(
-        "super",
-        "import.recover",
-        { id: status.runId, expectedVersion: 1, action: "resume" },
-        nextKey("r"),
-      );
-      assert.deepEqual(
-        [notAvailable.state, notAvailable.code],
-        ["conflict", "IMPORT_RECOVERY_NOT_AVAILABLE"],
-      );
-    });
-
-    it("answers a repeated upload key whose run was cancelled meanwhile with the stale-preview code, not a malformed response (BR42.3)", async () => {
-      const key = nextKey("again");
-      const first = data<Preview>(
-        await admin("super", "import.preview", { workbook: upload(workbookBytes()) }, key),
-      );
-      // The same key while the run is open returns the same run.
-      const repeat = data<Preview>(
-        await admin("super", "import.preview", { workbook: upload(workbookBytes()) }, key),
-      );
-      assert.equal(repeat.runId, first.runId);
-      data(await admin("super", "import.cancel", { id: first.runId }, nextKey("x")));
-      const afterCancel = await admin(
-        "super",
-        "import.preview",
-        { workbook: upload(workbookBytes()) },
-        key,
-      );
-      assert.deepEqual(
-        [afterCancel.state, afterCancel.code],
-        ["invalidated", "IMPORT_PREVIEW_STALE"],
-        "the person is told to upload again",
-      );
-    });
-
-    it("produced every code of the table of BR42.3 through the adapter in this file, and no other code (BR42.3)", () => {
-      const imports = [...seen].filter(
-        (code) => code.startsWith("IMPORT_") || code.startsWith("REMINDER_"),
-      );
-      const missing = TABLE_OF_BR42_3.filter((code) => !imports.includes(code));
-      assert.deepEqual(missing, [], "every code of the table was seen");
-      assert.deepEqual(
-        imports.filter((code) => !(TABLE_OF_BR42_3 as readonly string[]).includes(code)),
-        [],
-        "no code outside the table",
       );
     });
   });

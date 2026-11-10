@@ -24,7 +24,6 @@ import { resolveParentFacade } from "../../app/szulo/_lib/facade.ts";
 import { resolveParentSession } from "../../app/szulo/_lib/session.ts";
 import { resolveTeacherFacade } from "../../app/teacher/_lib/facade.ts";
 import { resolveTeacherSession } from "../../app/teacher/_lib/session.ts";
-import { parseWorkbook } from "../../src/import-parser/workbook.ts";
 import { composeRuntime } from "../../src/runtime/composition.ts";
 import { createProductionComposition } from "../../src/runtime/production/composition.ts";
 import { createProductionServices } from "../../src/runtime/production/services.ts";
@@ -70,9 +69,7 @@ function world(grants: Row[], parent = false): FakeHandlers {
 
 function readyRequest(handlers: FakeHandlers) {
   const fake = fakeData(handlers);
-  const services = createProductionServices(fake.database, { parseWorkbook }).forRequest(
-    "access-token-of-the-person",
-  );
+  const services = createProductionServices(fake.database).forRequest("access-token-of-the-person");
   boundary.request = { state: "ready", accountId: ACCOUNT, services };
   return { fake, services };
 }
@@ -155,36 +152,6 @@ describe("the production composition", () => {
     if (!composed.ok) return;
     expect("services" in composed.value).toBe(true);
     expect("profiles" in composed.value).toBe(false);
-  });
-});
-
-describe("the admin import status in a production request", () => {
-  it("answers the import status from the database inside a production request", async () => {
-    const { services, fake } = readyRequest({
-      ...world([grant("super_admin", "organization", ORG)]),
-      rpc: (name) =>
-        name === "import_status" ? envelope("success", null, { run: null }) : ok(true),
-    });
-    const scope = { id: ORG, type: "organization" as const, organizationId: ORG };
-    const session = {
-      subjectId: ACCOUNT,
-      authorizationVersion: 1,
-      isActive: true,
-      grants: [
-        {
-          id: "g",
-          subjectId: ACCOUNT,
-          role: "super_admin" as const,
-          scope,
-          grantedAt: "2026-10-22T00:00:00.000Z",
-        },
-      ],
-      roles: ["super_admin" as const],
-      scopes: [scope],
-    };
-    const result = await services.admin.import.status(session, scope);
-    expect(result.state).toBe("empty");
-    expect(fake.rpcCalls.map((call) => call.name)).toContain("import_status");
   });
 });
 
@@ -272,13 +239,13 @@ describe("the session helpers in the production mode", () => {
     expect(await resolveTeacherSession()).toEqual({ state: "denied" });
   });
 
-  it("reads a teacher's granted groups and gives the teacher page its facade", async () => {
-    readyRequest(world([grant("kindergarten_teacher", "group", GROUP)]));
+  it("reads a teacher's community and gives the teacher page its facade", async () => {
+    readyRequest(world([grant("kindergarten_teacher", "organization", ORG)]));
     const session = await resolveTeacherSession();
     expect(session.state).toBe("success");
     if (session.state === "success") {
       expect(session.data.applicationSession.scopes).toEqual([
-        { id: GROUP, type: "group", organizationId: ORG },
+        { id: ORG, type: "organization", organizationId: ORG },
       ]);
     }
     expect(await resolveTeacherFacade()).toBeDefined();

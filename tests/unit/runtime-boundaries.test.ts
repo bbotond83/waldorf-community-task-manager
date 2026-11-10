@@ -100,28 +100,32 @@ describe("runtime composition", () => {
 });
 
 describe("role navigation", () => {
-  it("keeps group administrator navigation free of import and governance", () => {
+  it("keeps group administrator navigation free of records and governance", () => {
     const hrefs = GROUP_ADMIN_NAVIGATION.map((item) => item.href);
-    expect(hrefs).not.toContain("/admin/import");
+    expect(hrefs).not.toContain("/admin/nyilvantartasok");
     expect(hrefs).not.toContain("/admin/beallitasok");
     expect(hrefs).toContain("/admin/archivum");
   });
 
-  it("gives the super admin the group menu and the four super admin pages, the teacher none", () => {
-    expect(SUPER_ADMIN_NAVIGATION.slice(0, GROUP_ADMIN_NAVIGATION.length)).toEqual(
-      GROUP_ADMIN_NAVIGATION,
+  it("gives the super admin the group menu, records and the three super admin pages, the teacher two items", () => {
+    expect(SUPER_ADMIN_NAVIGATION.map((item) => item.id)).toEqual(
+      expect.arrayContaining(GROUP_ADMIN_NAVIGATION.map((item) => item.id)),
     );
-    expect(SUPER_ADMIN_NAVIGATION.map((item) => item.id).slice(-4)).toEqual([
-      "admin-import",
+    expect(SUPER_ADMIN_NAVIGATION.map((item) => item.id).slice(-3)).toEqual([
       "admin-reminders",
       "admin-privacy",
       "admin-settings",
     ]);
-    expect(TEACHER_NAVIGATION).toEqual([]);
+    expect(SUPER_ADMIN_NAVIGATION.map((item) => item.id)).toContain("admin-records");
+    expect(TEACHER_NAVIGATION.map((item) => item.id)).toEqual([
+      "teacher-schedule",
+      "teacher-working-groups",
+    ]);
     expect(PARENT_NAVIGATION.map((item) => item.id)).toEqual([
       "parent-notifications",
       "parent-duties",
       "parent-swaps",
+      "parent-working-groups",
     ]);
   });
 });

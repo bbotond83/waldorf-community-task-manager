@@ -1,0 +1,44 @@
+{
+  "measuredAt": "2026-11-09T16:53:21.229Z",
+  "dataSet": "db:seed:large (30 families)",
+  "browser": "chromium",
+  "server": "production build",
+  "results": [
+    {
+      "label": "Working-group list (parent)",
+      "account": "parent-1",
+      "targetMs": 2000,
+      "path": "/szulo/munkacsoportok",
+      "medianMs": 43,
+      "worstMs": 44,
+      "runs": [39, 39, 43, 44, 44]
+    },
+    {
+      "label": "Parent Feladatok",
+      "account": "parent-1",
+      "targetMs": 2000,
+      "path": "/szulo/feladatok",
+      "medianMs": 40,
+      "worstMs": 44,
+      "runs": [40, 40, 40, 40, 44]
+    },
+    {
+      "label": "Teacher unfiltered Beosztás",
+      "account": "teacher-1",
+      "targetMs": 2000,
+      "path": "/teacher/schedule",
+      "medianMs": 43,
+      "worstMs": 47,
+      "runs": [43, 43, 43, 45, 47]
+    },
+    {
+      "label": "Administrator Feladatok és események",
+      "account": "super-admin",
+      "targetMs": 2000,
+      "path": "/admin/feladatok",
+      "medianMs": 46,
+      "worstMs": 49,
+      "runs": [44, 44, 46, 48, 49]
+    }
+  ]
+}

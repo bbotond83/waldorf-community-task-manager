@@ -296,6 +296,7 @@ export function AdminTextareaField({
   name: string;
   defaultValue?: string;
   maxLength?: number;
+  required?: boolean;
   hint?: string;
 }>) {
   const message = useContext(FieldErrorsContext)[input.name];

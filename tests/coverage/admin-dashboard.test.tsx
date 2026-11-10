@@ -27,8 +27,16 @@ async function render(path: string, query = {}) {
   return new DOMParser().parseFromString(output, "text/html");
 }
 
-it("renders the three overview cards as links to their lists", async () => {
+it("shows a group admin the work cards and no records card (BR3.9)", async () => {
   requestWorld.signIn("group_admin");
+  const document = await render("../../app/admin/page.tsx");
+  expect(document.querySelector('[data-testid="admin-dashboard-records"]')).toBeNull();
+  expect(document.querySelector('[data-testid="admin-dashboard-approvals"]')?.tagName).toBe("A");
+  expect(document.querySelector('[data-testid="admin-dashboard-tasks"]')?.tagName).toBe("A");
+});
+
+it("renders the three overview cards as links to their lists", async () => {
+  requestWorld.signIn("super_admin");
   const document = await render("../../app/admin/page.tsx");
   const hrefs = {
     "admin-dashboard-approvals": "/admin/jovahagyasok?state=pending",

@@ -207,7 +207,7 @@ it.each([
     for (const row of manifest.scenarios)
       row.storyIds = row.storyIds.map((id) => (id === "US-LR-00" ? "unrequired-story" : id));
   if (kind === "missing-nfr")
-    manifest.scenarios.find((s) => s.id === "NFR08-IMPORT")!.id = "renamed";
+    manifest.scenarios.find((s) => s.id === "NFR08-REMINDERS")!.id = "renamed";
   if (kind === "missing-browser")
     for (const row of manifest.scenarios)
       row.browsers = row.browsers?.filter((b) => b !== "firefox");

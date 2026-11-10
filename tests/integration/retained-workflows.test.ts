@@ -80,11 +80,10 @@ it("Parent own participation requests and notifications remain permitted while o
   expect(denied).not.toHaveProperty("data");
   expect(await app.listDuties(actor, own)).toEqual(before);
 });
-it("Group core fixtures preserve records and permit assignments while ungranted scopes deny", async () => {
+it("Group core fixtures permit assignments in the own group, and never family records (BR3.9)", async () => {
   const actor = session("group_admin", group);
   const app = createAdminFacadeDouble(authorization());
-  const before = await app.listRecords(actor, group);
-  expect(before.state).toBe("success");
+  expect((await app.listRecords(actor, group)).state).toBe("denied");
   expect(
     (
       await app.assign(actor, {
@@ -92,19 +91,27 @@ it("Group core fixtures preserve records and permit assignments while ungranted 
         id: "task-kert",
         expectedVersion: 1,
         idempotencyKey: "assign:retained:1",
-        payload: { scenario: "eligible" },
+        payload: {},
       })
     ).state,
   ).toBe("success");
-  expect((await app.listRecords(actor, { ...group, id: "other" })).state).toBe("denied");
+  expect(
+    (
+      await app.assign(actor, {
+        scope: { ...group, id: "other" },
+        id: "task-kert",
+        expectedVersion: 1,
+        idempotencyKey: "assign:retained:2",
+        payload: {},
+      })
+    ).state,
+  ).toBe("denied");
   expect((await app.getRecord(actor, group, "family", "family-napraforgo")).state).toBe("denied");
-  expect(await app.listRecords(actor, group)).toEqual(before);
 });
-it("Super current organization retains import reminders privacy settings and governance", async () => {
+it("Super current organization retains reminders privacy settings and governance", async () => {
   const actor = session("super_admin", org, "super-admin-account");
   const app = createAdminFacadeDouble(authorization(actor.subjectId));
   for (const result of [
-    await app.import.status(actor, org),
     await app.reminders.list(actor, org),
     await app.lifecycle.list(actor, org),
     await app.settings.get(actor, org),
@@ -121,7 +128,7 @@ it("all non-Super advanced requests deny and leave authorized advanced snapshots
   const before = await app.governance.list(admin, org);
   for (const [role, scope] of [
     ["parent", PARENT_FAMILY_SCOPE],
-    ["kindergarten_teacher", group],
+    ["kindergarten_teacher", org],
     ["group_admin", group],
   ] as const) {
     const actor = session(role, scope);
@@ -132,7 +139,6 @@ it("all non-Super advanced requests deny and leave authorized advanced snapshots
       idempotencyKey: "denied:retained:1",
     };
     for (const result of [
-      await app.import.commit(actor, command),
       await app.reminders.retry(actor, command),
       await app.lifecycle.run(actor, command),
       await app.settings.save(actor, command),

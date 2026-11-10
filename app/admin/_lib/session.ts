@@ -10,6 +10,8 @@ export type AdminSession = Readonly<{
   applicationSession: ApplicationSession;
   profile: ShellProfile;
   scope: Scope;
+  /** Empty for a super admin; otherwise every working group the person administers. */
+  groupIds: readonly string[];
 }>;
 
 export type AdminSessionResult =

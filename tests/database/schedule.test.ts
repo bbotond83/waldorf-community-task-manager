@@ -69,7 +69,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
       from: string | null = null,
       to: string | null = null,
     ): Promise<Result> =>
-      callFunction(db, schema, account, "schedule_get($1, $2, $3)", [group, from, to]);
+      callFunction(db, schema, account, "schedule_get('group', $1, $2, $3)", [group, from, to]);
     const entries = (result: Result) => result.items as Entry[];
     /** The UTC calendar day an offset in days from now falls on. */
     const day = async (offset: number) =>
@@ -124,10 +124,10 @@ for (const schema of DIRECTORY_SCHEMAS) {
       );
     });
 
-    it("grants the schedule to teachers, group admins and super admins of the group and to nobody else (BR33.1, NFR1.26)", async () => {
+    it("grants the schedule to the community's teachers, to group admins of the group and to super admins, and to nobody else (BR33.1, BR3.7, NFR1.26)", async () => {
       const expected: [string, string, boolean][] = [
         [TEACHER_G1, GROUP_1, true],
-        [TEACHER_G1, GROUP_2, false],
+        [TEACHER_G1, GROUP_2, true],
         [ADMIN_G1, GROUP_1, true],
         [ADMIN_G1, GROUP_2, false],
         [ADMIN_G2, GROUP_2, true],

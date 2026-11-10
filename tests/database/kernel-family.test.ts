@@ -66,10 +66,6 @@ for (const schema of DIRECTORY_SCHEMAS) {
       await seedCoordinationWorld(db, schema);
       // Family 2 joins group 1 and holds an active place on task 2; family 1's seeded cancellation request
       // stays open. A started task of group 1 carries a place of family 1 as history.
-      await db.query(
-        "insert into group_memberships (organization_id, family_id, group_id) values ($1, $2, $3), ($1, $4, $3)",
-        [ORGANIZATION, FAMILY_2, GROUP_1, FAMILY_NO_GROUP],
-      );
       await db.query("update tasks set capacity = 3 where id = $1", [TASK_2]);
       await db.query(
         "insert into assignments (id, organization_id, task_id, family_id, parent_id, source) values ($1, $2, $3, $4, $5, 'parent_sign_up')",
@@ -117,7 +113,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
 
     it("archives the family, its people and its future places, withdraws its requests and keeps the history (BR30.7)", async () => {
       const [t1, tPast] = [await taskVersion(TASK_1), await taskVersion(TASK_PAST)];
-      const result = await archive(ADMIN_G1);
+      const result = await archive(SUPER_ADMIN);
       assert.deepEqual([result.state, result.removed_places], ["success", 1]);
       const family = (
         await db.query("select status, archived_at, version from families where id = $1", [
@@ -191,37 +187,33 @@ for (const schema of DIRECTORY_SCHEMAS) {
       assert.equal(await status("assignments", ASSIGNMENT_F1_T1), "removed");
     });
 
-    it("lets only an admin in reach archive (BR30.1, BR30.7)", async () => {
-      for (const account of [ADMIN_G2, PARENT_F1, CO_PARENT_F1, TEACHER_G1, OUTSIDER]) {
+    it("lets only a super admin archive (BR30.1, BR30.7, BR3.9)", async () => {
+      for (const account of [ADMIN_G1, ADMIN_G2, PARENT_F1, CO_PARENT_F1, TEACHER_G1, OUTSIDER]) {
         refused(await archive(account), "denied", "authorization_denied");
       }
       refused(await archive(OTHER_ADMIN), "validation", "family_not_found");
       refused(await archive(SUPER_ADMIN, uuid(99999), 1), "validation", "family_not_found");
       assert.equal(await status("families", FAMILY_1), "active");
-      assert.equal((await archive(ADMIN_G1)).state, "success");
+      assert.equal((await archive(SUPER_ADMIN)).state, "success");
     });
 
-    it("refuses a stale or repeated archive and a family of no group for a group admin", async () => {
-      await db.query(
-        "update group_memberships set status = 'ended', ended_at = now() where family_id = $1",
-        [FAMILY_NO_GROUP],
-      );
+    it("refuses a stale or repeated archive, and every group admin (BR3.9)", async () => {
       refused(await archive(ADMIN_G1, FAMILY_NO_GROUP), "denied", "authorization_denied");
       assert.equal(
         (await archive(SUPER_ADMIN, FAMILY_NO_GROUP)).state,
         "success",
         "a super admin reaches it",
       );
-      refused(await archive(ADMIN_G1, FAMILY_1, 99), "conflict", "VERSION_CONFLICT");
+      refused(await archive(SUPER_ADMIN, FAMILY_1, 99), "conflict", "VERSION_CONFLICT");
       assert.equal(await status("families", FAMILY_1), "active", "nothing changed");
-      const missing = await fn(ADMIN_G1, "family_archive($1, $2, null)", [nextKey(), FAMILY_1]);
+      const missing = await fn(SUPER_ADMIN, "family_archive($1, $2, null)", [nextKey(), FAMILY_1]);
       assert.deepEqual([missing.state, missing.field], ["validation", "expected_version"]);
-      assert.equal((await archive(ADMIN_G1)).state, "success");
-      refused(await archive(ADMIN_G1), "conflict", "VERSION_CONFLICT");
+      assert.equal((await archive(SUPER_ADMIN)).state, "success");
+      refused(await archive(SUPER_ADMIN), "conflict", "VERSION_CONFLICT");
     });
 
-    it("hides the archived family from its parents and from the lists, while admins still read it (BR30.7)", async () => {
-      assert.equal((await archive(ADMIN_G1)).state, "success");
+    it("hides the archived family from its parents and from the lists, while super admins still read it (BR30.7, BR3.9)", async () => {
+      assert.equal((await archive(SUPER_ADMIN)).state, "success");
       refused(await fn(PARENT_F1, "duty_list()"), "denied", "no_family");
       refused(
         await fn(CO_PARENT_F1, "duty_sign_up($1, $2, 1)", [nextKey(), TASK_2]),
@@ -238,7 +230,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
       const adminRows = await asActor(
         db,
         schema,
-        authenticated(ADMIN_G1),
+        authenticated(SUPER_ADMIN),
         async () =>
           (await db.query("select id from families where status = 'archived'")).rows.length,
       );
@@ -246,10 +238,11 @@ for (const schema of DIRECTORY_SCHEMAS) {
     });
 
     it("restores the people but not the removed places, and refuses a stale, active or unreachable restore (BR30.7)", async () => {
-      assert.equal((await archive(ADMIN_G1)).state, "success");
+      assert.equal((await archive(SUPER_ADMIN)).state, "success");
+      refused(await restore(ADMIN_G1), "denied", "authorization_denied");
       refused(await restore(ADMIN_G2), "denied", "authorization_denied");
-      refused(await restore(ADMIN_G1, FAMILY_1, 99), "conflict", "VERSION_CONFLICT");
-      const restored = await restore(ADMIN_G1);
+      refused(await restore(SUPER_ADMIN, FAMILY_1, 99), "conflict", "VERSION_CONFLICT");
+      const restored = await restore(SUPER_ADMIN);
       assert.deepEqual([restored.state, restored.version], ["success", await familyVersion()]);
       assert.deepEqual(
         [
@@ -269,7 +262,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
           .archived_at,
         null,
       );
-      refused(await restore(ADMIN_G1), "conflict", "RESTORE_CONFLICT");
+      refused(await restore(SUPER_ADMIN), "conflict", "RESTORE_CONFLICT");
       refused(await restore(SUPER_ADMIN, FAMILY_2), "conflict", "RESTORE_CONFLICT");
       assert.equal(
         (
@@ -285,9 +278,9 @@ for (const schema of DIRECTORY_SCHEMAS) {
 
     it("returns the stored result for a repeated archive key and changes nothing more (NFR6.11)", async () => {
       const key = nextKey("same");
-      const first = await archive(ADMIN_G1, FAMILY_1, undefined, key);
+      const first = await archive(SUPER_ADMIN, FAMILY_1, undefined, key);
       const version = await taskVersion(TASK_1);
-      const again = await fn(ADMIN_G1, "family_archive($1, $2, $3)", [key, FAMILY_1, 1]);
+      const again = await fn(SUPER_ADMIN, "family_archive($1, $2, $3)", [key, FAMILY_1, 1]);
       assert.deepEqual([first.state, again.state, again.code], ["success", "success", "replayed"]);
       assert.equal(await taskVersion(TASK_1), version);
     });
@@ -302,7 +295,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
         "create trigger refuse_child_archive before update on children for each row execute function refuse_child_archive()",
       );
       try {
-        const failure = await archive(ADMIN_G1).then(
+        const failure = await archive(SUPER_ADMIN).then(
           () => undefined,
           (error: Error & { code?: string }) => error,
         );
@@ -355,7 +348,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
           );
           const version = await familyVersion();
           const [archived, responded] = await Promise.all([
-            callFunction(connections[0]!, schema, ADMIN_G1, "family_archive($1, $2, $3)", [
+            callFunction(connections[0]!, schema, SUPER_ADMIN, "family_archive($1, $2, $3)", [
               nextKey("x"),
               FAMILY_1,
               version,
@@ -390,7 +383,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
           const version = await familyVersion();
           const taskVersion1 = await taskVersion(TASK_2);
           const [archived, signed] = await Promise.all([
-            callFunction(connections[0]!, schema, ADMIN_G1, "family_archive($1, $2, $3)", [
+            callFunction(connections[0]!, schema, SUPER_ADMIN, "family_archive($1, $2, $3)", [
               nextKey("a"),
               FAMILY_1,
               version,
@@ -423,13 +416,11 @@ for (const schema of DIRECTORY_SCHEMAS) {
       }
     });
 
-    it("counts the open approvals of the admin's reach and keeps the import conflicts at zero until U4 (BR32.5)", async () => {
+    it("counts the open approvals of the admin's reach, and no longer has import conflicts to count (BR32.5, BR7.1)", async () => {
       const dashboard = (account: string) => fn(account, "dashboard_get()");
       const answer = await dashboard(SUPER_ADMIN);
-      assert.deepEqual(
-        [answer.state, answer.open_approvals, answer.open_import_conflicts],
-        ["success", 1, 0],
-      );
+      assert.deepEqual([answer.state, answer.open_approvals], ["success", 1]);
+      assert.equal("open_import_conflicts" in answer, false);
       assert.equal((await dashboard(ADMIN_G1)).open_approvals, 1);
       assert.equal(
         (await dashboard(ADMIN_G2)).open_approvals,
@@ -448,17 +439,10 @@ for (const schema of DIRECTORY_SCHEMAS) {
         0,
         "another organization's requests are not counted",
       );
-      const source = (
-        await db.query(
-          "select prosrc from pg_proc where proname = 'dashboard_import_conflicts' and pronamespace = current_schema()::regnamespace",
-        )
-      ).rows[0].prosrc as string;
-      assert.doesNotMatch(source, /select 0\b/, "U4 finished the link: the count is the real one");
-      assert.match(
-        source,
-        /import_conflicts/,
-        "the dashboard counts the import's open conflicts (BR41.12)",
+      const remaining = await db.query(
+        "select 1 from pg_proc where proname = 'dashboard_import_conflicts' and pronamespace = current_schema()::regnamespace",
       );
+      assert.equal(remaining.rowCount, 0, "the import's count is gone with the import");
     });
 
     describe("governance_revoke", () => {

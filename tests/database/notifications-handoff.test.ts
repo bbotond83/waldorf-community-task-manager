@@ -68,8 +68,9 @@ for (const schema of NOTIFICATION_SCHEMAS) {
         [FAMILY_A, FAMILY_B, FAMILY_C, ORGANIZATION],
       );
       await db.query(
-        "insert into group_memberships (organization_id, family_id, group_id) values ($1, $2, $5), ($1, $3, $5), ($1, $4, $5)",
-        [ORGANIZATION, FAMILY_A, FAMILY_B, FAMILY_C, GROUP_1],
+        `insert into app_role_grants (subject_id, role, scope_type, scope_id, organization_id)
+         values ($1, 'parent', 'family', $4, $6), ($2, 'parent', 'family', $4, $6), ($3, 'parent', 'family', $5, $6)`,
+        [ACCOUNT_A, ACCOUNT_A2, ACCOUNT_B, FAMILY_A, FAMILY_B, ORGANIZATION],
       );
       await db.query(
         `insert into parents (id, organization_id, family_id, display_name, account_id)
@@ -88,6 +89,11 @@ for (const schema of NOTIFICATION_SCHEMAS) {
           ACCOUNT_B,
           FAMILY_C,
         ],
+      );
+      // A group-wide reminder reaches the families of the group's members (BR4.4).
+      await db.query(
+        "insert into group_memberships (organization_id, parent_id, group_id) values ($1, $2, $5), ($1, $3, $5), ($1, $4, $5)",
+        [ORGANIZATION, PARENT_A, PARENT_B, PARENT_C, GROUP_1],
       );
       await db.query(
         `insert into tasks (id, organization_id, group_id, title, capacity, starts_at, ends_at, location)
@@ -502,7 +508,7 @@ for (const schema of NOTIFICATION_SCHEMAS) {
       covered.add("family.archive");
       const version = (await db.query("select version from families where id = $1", [FAMILY_A]))
         .rows[0].version as number;
-      const archived = await as(ADMIN_G1, "family_archive($1, $2, $3)", [
+      const archived = await as(SUPER_ADMIN, "family_archive($1, $2, $3)", [
         nextKey("fa"),
         FAMILY_A,
         version,
@@ -524,7 +530,7 @@ for (const schema of NOTIFICATION_SCHEMAS) {
       const restoredVersion = (
         await db.query("select version from families where id = $1", [FAMILY_A])
       ).rows[0].version as number;
-      const restored = await as(ADMIN_G1, "family_restore($1, $2, $3)", [
+      const restored = await as(SUPER_ADMIN, "family_restore($1, $2, $3)", [
         nextKey("fr"),
         FAMILY_A,
         restoredVersion,
@@ -656,7 +662,7 @@ for (const schema of NOTIFICATION_SCHEMAS) {
       const version = (await db.query("select version from families where id = $1", [FAMILY_A]))
         .rows[0].version as number;
       assert.equal(
-        (await as(ADMIN_G1, "family_archive($1, $2, $3)", [nextKey("fa"), FAMILY_A, version]))
+        (await as(SUPER_ADMIN, "family_archive($1, $2, $3)", [nextKey("fa"), FAMILY_A, version]))
           .state,
         "success",
       );

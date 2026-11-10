@@ -22,15 +22,6 @@ import {
   seedDirectoryWorld,
   SUPER_ADMIN,
 } from "./directory-support.ts";
-import {
-  budapestText,
-  dirRow,
-  importKeyOf,
-  preview,
-  type ParsedRow,
-  seedImportAccounts,
-  taskRow,
-} from "./import-support.ts";
 import { count } from "./identity-support.ts";
 import { report } from "./stack-support.ts";
 
@@ -41,19 +32,18 @@ const SECONDS = (milliseconds: number) => (milliseconds / 1000).toFixed(2);
 
 /**
  * Timings of the database side of U4 on the 300-task data set with 3000 notifications and 600 reminder jobs
- * (NFR3.12, NFR4.10 to NFR4.15), reported against the typical targets and failing above their ceilings. The
+ * (NFR3.12, NFR4.12 to NFR4.15), reported against the typical targets and failing above their ceilings. The
  * timings of U3's use cases and of U2's access checks are also re-run here with U4's tables and hooks present;
  * `directory-timing.test.ts` of U3 runs the same checks again as part of the directory suite (NFR4.14, NFR4.15).
  * A warm-up call precedes every measurement and no ceiling is relaxed.
  */
 for (const schema of DIRECTORY_SCHEMAS) {
-  describe(`notification and import timings in ${schema}`, () => {
+  describe(`notification timings in ${schema}`, () => {
     let db: pg.Client;
 
     before(async () => {
       db = await openDirectoryDatabase(schema);
       await seedDirectoryWorld(db, schema);
-      await seedImportAccounts(db);
       await loadDataset(db);
       await loadNotificationDataset(db, PARENT_ROW_F1);
       await db.query("analyze");
@@ -102,7 +92,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
       assert.equal(await count(db, "tasks", `title like 'Adat feladat%'`), DATASET.tasks);
     });
 
-    it("lists a parent's notifications, marks one read, lists the reminders and reads the import status within the read targets (NFR4.12)", async () => {
+    it("lists a parent's notifications, marks one read and lists the reminders within the read targets (NFR4.12)", async () => {
       const list = await fn(PARENT_F1, "notification_list()");
       assert.equal(list.state, "success");
       assert.equal((list.items as unknown[]).length, NOTIFICATION_DATASET.heavyParent);
@@ -121,14 +111,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
       await timed("reminders list of a group admin", TYPICAL.read, () =>
         fn(ADMIN_G1, "reminder_list('queued')"),
       );
-      const run = await preview(db, schema, SUPER_ADMIN, [
-        dirRow(2, { Csoport: "Boróka", Család: "Időmérő család", "Szülő neve": "Időmérő Ida" }),
-      ]);
-      assert.equal(run.state, "success");
-      await timed("import status", TYPICAL.read, () => fn(SUPER_ADMIN, "import_status()"));
-      await timed("dashboard with the import count", TYPICAL.action, () =>
-        fn(SUPER_ADMIN, "dashboard_get()"),
-      );
+      await timed("dashboard", TYPICAL.action, () => fn(SUPER_ADMIN, "dashboard_get()"));
     });
 
     it("runs the tick on 600 due jobs within its ceiling, and the list stays within the read target afterwards (NFR4.13)", async () => {
@@ -151,7 +134,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
     });
 
     it("keeps U3's use cases within their targets with the notice and job writes added (NFR4.14)", async () => {
-      // The parent's family signs up for a task of its group each run: a place, a notice and the jobs.
+      // The parent's family signs up for a task each run: a place, a notice and the jobs.
       const task = datasetTask(0);
       await timed("sign-up with notice and job writes", TYPICAL.action, async () => {
         await db.query("delete from assignments where family_id = $1", [FAMILY_1]);
@@ -204,108 +187,10 @@ for (const schema of DIRECTORY_SCHEMAS) {
         PARENT_F1,
         "select count(*) from notifications where current_session_is_active() and parent_id = (select notification_actor_parent())",
       );
-      const staged = await median(SUPER_ADMIN, "select count(*) from import_staged_rows");
       report(
-        `access checks of U4's tables in ${schema}: notifications ${plain.toFixed(2)} ms plain, ${checked.toFixed(2)} ms checked, staged rows ${staged.toFixed(2)} ms (overhead target 50 ms, fails above 200 ms)`,
+        `access checks of U4's tables in ${schema}: notifications ${plain.toFixed(2)} ms plain, ${checked.toFixed(2)} ms checked (overhead target 50 ms, fails above 200 ms)`,
       );
       assert.ok(checked - plain < 200, `the overhead was ${(checked - plain).toFixed(1)} ms`);
-      assert.ok(staged < 200);
     });
-
-    // Skipped here and run alone by `npm run test:database:import-timing` (scripts/db/import-timing-stage.ts): on a
-    // busy shared runner this test alone exceeded its ceiling without any change to the import.
-    it(
-      "previews and commits a 2000-row workbook within the ceilings (NFR4.10, NFR4.11)",
-      {
-        skip:
-          process.env.IMPORT_TIMING_STAGE === "1" ? false : "runs in the quiet import timing stage",
-      },
-      async () => {
-        // 300 new families (a parent row and a child row each) and 280 new tasks with five rows each, whose families
-        // are the 15 families of the first group; 2000 rows in all.
-        const rows: ParsedRow[] = [];
-        let row = 2;
-        for (let n = 0; n < 300; n += 1) {
-          rows.push(
-            dirRow(row, {
-              Csoport: "Boróka",
-              Család: `Import család ${n}`,
-              "Szülő neve": `Import Szülő ${n}`,
-              "E-mail": `import${n}@example.test`,
-              Telefon: "+36 30 555 0000",
-              Helység: "Pécs",
-            }),
-          );
-          row += 1;
-          rows.push(
-            dirRow(row, {
-              Csoport: "Boróka",
-              Család: `Import család ${n}`,
-              "Gyermek neve": `Import Gyerek ${n}`,
-            }),
-          );
-          row += 1;
-        }
-        const sheet = "Kinti - benti takarítás 2025-26";
-        for (let t = 0; t < 280; t += 1) {
-          for (let k = 0; k < 5; k += 1) {
-            rows.push(
-              taskRow(
-                row,
-                {
-                  Csoport: "Boróka",
-                  Feladat: `Import feladat ${t}`,
-                  Kezdés: budapestText(90 + t, 9),
-                  Befejezés: budapestText(90 + t, 11),
-                  Létszám: "5",
-                  Család: `Adat család ${((t + k) % 15) * 10}`,
-                },
-                sheet,
-              ),
-            );
-            row += 1;
-          }
-        }
-        assert.equal(rows.length, 2000);
-
-        const started = performance.now();
-        const model = await preview(
-          db,
-          schema,
-          SUPER_ADMIN,
-          rows,
-          "iskola.xlsx",
-          importKeyOf("big"),
-        );
-        const previewMs = performance.now() - started;
-        assert.equal(model.state, "success");
-        assert.equal(model.conflicts.length, 0, JSON.stringify(model.conflicts.slice(0, 3)));
-        assert.equal(model.total_rows, 2000);
-        report(
-          `import preview of 2000 rows in ${schema}: ${SECONDS(previewMs)} s (typical target 10 s, fails above 60 s)`,
-        );
-        assert.ok(previewMs < 60_000, `the preview took ${previewMs.toFixed(0)} ms`);
-
-        const committedAt = performance.now();
-        const outcome = (await fn(SUPER_ADMIN, "import_commit($1, $2, $3, 'yes')", [
-          importKeyOf("big-commit"),
-          model.run_id,
-          model.fingerprint,
-        ])) as unknown as { state: string; imported_rows: number; skipped_rows: number };
-        const commitMs = performance.now() - committedAt;
-        assert.deepEqual(
-          [outcome.state, outcome.imported_rows, outcome.skipped_rows],
-          ["success", 2000, 0],
-        );
-        report(
-          `import commit of 2000 rows in ${schema}: ${SECONDS(commitMs)} s (typical target 15 s, fails above 60 s)`,
-        );
-        assert.ok(commitMs < 60_000, `the commit took ${commitMs.toFixed(0)} ms`);
-        assert.equal(await count(db, "families", "display_name like 'Import család%'"), 300);
-        assert.equal(await count(db, "tasks", "title like 'Import feladat%'"), 280);
-        assert.equal(await count(db, "assignments", "source = 'import'"), 1400);
-        assert.equal(await count(db, "import_staged_rows"), 0);
-      },
-    );
   });
 }

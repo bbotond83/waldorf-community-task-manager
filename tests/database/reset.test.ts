@@ -6,7 +6,6 @@ import { main as resetMain, resetSchema } from "../../scripts/db/reset.ts";
 import { seedSchema } from "../../scripts/db/seed.ts";
 import { buildSeedPlan, SEED_PASSWORDS, seedAccount } from "../../scripts/db/seed/index.ts";
 import { resetWorkerData, workerAccountEmail } from "../../scripts/db/worker.ts";
-import { insertRow, insertRun, insertStaged } from "./import-support.ts";
 import { insertJob } from "./notifications-support.ts";
 import {
   dumpSchema,
@@ -67,7 +66,7 @@ describe("reset on the real stack", () => {
     await db.query("delete from auth.users where email = any($1)", [BYSTANDERS]);
   });
 
-  it("leaves every table empty except the reference data, the audit log included", async () => {
+  it("leaves every table empty, the audit log included", async () => {
     await seed(A);
     const plan = buildSeedPlan(A, "small");
     await db.query(
@@ -84,10 +83,8 @@ describe("reset on the real stack", () => {
     const { deps, lines } = realSeedDeps();
     assert.equal(await resetMain(["--schema", A], deps), 0, lines.join("\n"));
     for (const table of await tableNames(A)) {
-      if (table === "sheet_registry") continue;
       assert.equal(await rowCount(db, A, table), 0, `${table} is empty after the reset`);
     }
-    assert.equal(await rowCount(db, A, "sheet_registry"), 17, "the reference data stays");
     assert.deepEqual(await schemaUsers(db, A), []);
   });
 
@@ -165,8 +162,7 @@ describe("reset on the real stack", () => {
     await bindSchema(db, A);
     const plan = buildSeedPlan(A, "small");
     const organization = plan.organization.id;
-    const admin = seedAccount(A, "super-admin");
-    // A due reminder job on a seeded task, and an import run past its seven days with a staged row.
+    // A due reminder job on a seeded task.
     const task = plan.tasks[0]!;
     const startsAt = (await db.query(`select starts_at from "${A}".tasks where id = $1`, [task.id]))
       .rows[0].starts_at as Date;
@@ -177,13 +173,6 @@ describe("reset on the real stack", () => {
       startsAt: startsAt.toISOString(),
       scheduledFor: new Date(Date.now() - 60_000).toISOString(),
     });
-    const run = await insertRun(db, { startedBy: admin.id, organization, status: "previewed" });
-    await db.query(
-      `update "${A}".import_runs set created_at = now() - interval '8 days', expires_at = now() - interval '1 hour' where id = $1`,
-      [run],
-    );
-    await insertRow(db, { run, row: 2, organization });
-    await insertStaged(db, { run, row: 2, organization });
 
     const seen: Record<string, unknown> = {};
     const { deps, lines } = realSeedDeps({
@@ -196,10 +185,6 @@ describe("reset on the real stack", () => {
             seen.job = (
               await db.query(`select status from "${A}".reminder_jobs where id = $1`, [job])
             ).rows[0]?.status;
-            seen.run = (
-              await db.query(`select status from "${A}".import_runs where id = $1`, [run])
-            ).rows[0]?.status;
-            seen.staged = await rowCount(db, A, "import_staged_rows");
             seen.attempts = await rowCount(db, A, "reminder_attempts");
           }
           return query(sql, values);
@@ -208,10 +193,9 @@ describe("reset on the real stack", () => {
       },
     });
     assert.equal(await resetMain(["--schema", A], deps), 0, lines.join("\n"));
-    assert.deepEqual(seen, { job: "sent", run: "expired", staged: 0, attempts: 1 });
+    assert.deepEqual(seen, { job: "sent", attempts: 1 });
     assert.match(lines[0]!, /^RESET ok schema=worker_3 organizations_processed=1$/);
     assert.equal(await rowCount(db, A, "reminder_jobs"), 0);
-    assert.equal(await rowCount(db, A, "import_runs"), 0);
   });
 
   it("changes nothing when the emptying fails: the schema and its accounts are as they were", async () => {

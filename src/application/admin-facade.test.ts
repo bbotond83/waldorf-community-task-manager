@@ -57,11 +57,10 @@ test("mixed organizations choose authorized Group core without unrelated Super p
   for (const grants of [mixed().grants, [...mixed().grants].reverse()]) {
     const s = setup();
     const session = { ...mixed(), grants };
-    assert.equal((await s.facade.listRecords(session, groupB)).state, "success");
-    assert.equal((await s.facade.saveRecord(session, command(groupB))).state, "success");
-    assert.equal((await s.facade.import.status(session, orgB)).state, "denied");
+    assert.equal((await s.facade.listTasks(session, groupB)).state, "success");
+    assert.equal((await s.facade.saveTaskOrEvent(session, command(groupB))).state, "success");
     assert.equal((await s.facade.governance.list(session, orgB)).state, "denied");
-    assert.deepEqual(s.calls, ["records.list", "records.save"]);
+    assert.deepEqual(s.calls, ["tasks.list", "tasks.save"]);
   }
 });
 test("Super administrator retains core advanced and governance only in its organization", async () => {
@@ -69,7 +68,6 @@ test("Super administrator retains core advanced and governance only in its organ
   const session = actor("super_admin", orgA);
   for (const result of [
     await s.facade.getDashboard(session, orgA),
-    await s.facade.import.status(session, orgA),
     await s.facade.reminders.list(session, orgA),
     await s.facade.lifecycle.list(session, orgA),
     await s.facade.settings.get(session, orgA),
@@ -89,7 +87,6 @@ test("Parent Teacher and Group admin direct advanced mutations never invoke doma
     const s = setup();
     const session = actor(role, scope);
     for (const result of [
-      await s.facade.import.commit(session, command(orgB)),
       await s.facade.reminders.retry(session, command(orgB)),
       await s.facade.lifecycle.run(session, command(orgB)),
       await s.facade.settings.save(session, command(orgB)),
@@ -139,7 +136,6 @@ test("revoked unrelated Super cannot shadow a surviving Group grant", async () =
     ...session,
     grants: session.grants.map((g) => (g.role === "super_admin" ? { ...g, revokedAt: "now" } : g)),
   };
-  assert.equal((await s.facade.listRecords(revoked, groupB)).state, "success");
-  assert.equal((await s.facade.import.status(revoked, orgA)).state, "denied");
-  assert.deepEqual(s.calls, ["records.list"]);
+  assert.equal((await s.facade.listTasks(revoked, groupB)).state, "success");
+  assert.deepEqual(s.calls, ["tasks.list"]);
 });

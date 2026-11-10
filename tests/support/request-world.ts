@@ -6,6 +6,7 @@ import {
   InMemoryIdempotencyStore,
   ParentApplicationFacade,
   TeacherApplicationFacade,
+  WorkingGroupApplicationFacade,
 } from "../../src/application/index.ts";
 import { createVersionPort } from "../../src/data/index.ts";
 import type { RequestServices } from "../../src/runtime/production/services.ts";
@@ -64,14 +65,25 @@ function initialAccess(): Record<RoleKey, AccessState> {
     teacher: {
       active: true,
       version: 1,
-      grants: TEACHER_GROUPS.map((group) =>
-        grant("kindergarten_teacher", "group", group.scope.id, TEACHER_ORGANIZATION_ID),
-      ),
+      grants: [
+        grant(
+          "kindergarten_teacher",
+          "organization",
+          TEACHER_ORGANIZATION_ID,
+          TEACHER_ORGANIZATION_ID,
+        ),
+      ],
     },
     group_admin: {
       active: true,
       version: 1,
       grants: [grant("group_admin", "group", "group-boroka", PARENT_ORGANIZATION_ID)],
+      // A group administrator's right counts only while their linked parent is active (BR3.2).
+      parent: {
+        id: "parent-admin",
+        family_id: PARENT_FAMILY_ID,
+        organization_id: PARENT_ORGANIZATION_ID,
+      },
     },
     super_admin: {
       active: true,
@@ -158,6 +170,20 @@ export function createRequestWorld() {
         pipeline,
         new TeacherPortDouble(teacherSource.repository, teacherScenario),
       ),
+      workingGroups: new WorkingGroupApplicationFacade(pipeline, {
+        list: async () => ({
+          state: "success",
+          data: {
+            items: TEACHER_GROUPS.map((group) => ({
+              id: group.scope.id,
+              name: group.label,
+              description: `${group.label} leírása.`,
+              schoolYearId: "year-2026",
+              schoolYearName: "2026/2027",
+            })),
+          },
+        }),
+      }),
     });
   }
 

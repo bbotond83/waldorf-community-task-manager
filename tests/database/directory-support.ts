@@ -105,16 +105,17 @@ export async function seedDirectoryWorld(db: pg.Client, schema: string): Promise
     [YEAR_OTHER, OTHER_ORGANIZATION],
   );
   await db.query(
-    "insert into groups (id, organization_id, school_year_id, name) values ($1, $2, $3, 'Boróka')",
+    "insert into groups (id, organization_id, school_year_id, name, description) values ($1, $2, $3, 'Boróka', 'A másik közösség csoportja.')",
     [GROUP_OTHER, OTHER_ORGANIZATION, YEAR_OTHER],
   );
   await db.query(
     "insert into families (id, organization_id, display_name) values ($1, $3, 'Csoport nélküli család'), ($2, $4, 'Idegen család')",
     [FAMILY_NO_GROUP, FAMILY_OTHER, ORGANIZATION, OTHER_ORGANIZATION],
   );
+  // The co-parent reads the family through their own parent right (current_family_id).
   await db.query(
-    "insert into group_memberships (organization_id, family_id, group_id) values ($1, $2, $3)",
-    [OTHER_ORGANIZATION, FAMILY_OTHER, GROUP_OTHER],
+    "insert into app_role_grants (subject_id, role, scope_type, scope_id, organization_id) values ($1, 'parent', 'family', $2, $3)",
+    [CO_PARENT_F1, FAMILY_1, ORGANIZATION],
   );
   const parent = (
     id: string,
@@ -131,6 +132,10 @@ export async function seedDirectoryWorld(db: pg.Client, schema: string): Promise
   await parent(PARENT_ROW_DEACTIVATED, FAMILY_1, "Fenyő Dóra", DEACTIVATED);
   await parent(PARENT_ROW_SIGNED_OUT, FAMILY_1, "Fenyő Emma", SIGNED_OUT);
   await parent(PARENT_ROW_OTHER, FAMILY_OTHER, "Idegen Flóra", null, OTHER_ORGANIZATION);
+  await db.query(
+    "insert into group_memberships (organization_id, parent_id, group_id) values ($1, $2, $3)",
+    [OTHER_ORGANIZATION, PARENT_ROW_OTHER, GROUP_OTHER],
+  );
   const contact = (parentId: string, email: string, org = ORGANIZATION) =>
     db.query(
       "insert into parent_contacts (parent_id, organization_id, contact_email, contact_phone, locality) values ($1, $2, $3, '+36 30 111 2222', 'Pécs')",

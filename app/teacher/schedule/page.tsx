@@ -8,8 +8,8 @@ import {
   teacherScheduleHref,
   type TeacherSearchParams,
 } from "../_lib/filters.ts";
-import { resolveTeacherFacade } from "../_lib/facade.ts";
-import { readTeacherSchedule } from "../_lib/schedule.ts";
+import { resolveTeacherFacade, resolveWorkingGroupFacade } from "../_lib/facade.ts";
+import { readTeacherSchedule, teacherGroupOptions } from "../_lib/schedule.ts";
 import { resolveTeacherSession } from "../_lib/session.ts";
 
 export default async function TeacherSchedulePage({
@@ -18,10 +18,17 @@ export default async function TeacherSchedulePage({
   const session = await resolveTeacherSession();
   if (session.state === "signed-out") redirect("/");
   if (session.state !== "success") return null;
-  const filters = parseTeacherFilters(await searchParams, session.data.applicationSession);
-  const facade = await resolveTeacherFacade();
-  if (session.state !== "success" || !facade) return null;
-  const result = await readTeacherSchedule(facade, session.data.applicationSession, filters);
+  const [facade, workingGroups] = await Promise.all([
+    resolveTeacherFacade(),
+    resolveWorkingGroupFacade(),
+  ]);
+  if (!facade || !workingGroups) return null;
+  const { applicationSession, scope } = session.data;
+  const filters = parseTeacherFilters(
+    await searchParams,
+    await teacherGroupOptions(workingGroups, applicationSession, scope),
+  );
+  const result = await readTeacherSchedule(facade, applicationSession, scope, filters);
 
   return (
     <section className="teacher-page" data-testid="teacher-schedule-page">
@@ -30,7 +37,7 @@ export default async function TeacherSchedulePage({
         <h1 tabIndex={-1} autoFocus>
           Beosztás
         </h1>
-        <p>Csak az engedélyezett csoportok és a szükséges koordinációs adatok láthatók.</p>
+        <p>A teljes közösség beosztása és a szükséges koordinációs adatok láthatók.</p>
       </header>
       {(result.state === "success" ||
         result.state === "empty" ||

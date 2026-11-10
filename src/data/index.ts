@@ -5,7 +5,6 @@ export {
   ADMIN_NOTIFICATION_USE_CASES,
   createAdminPort,
   DATABASE_ADMIN_OPERATIONS,
-  type AdminPortOptions,
 } from "./admin-port.ts";
 export { classifyDataFailure, RetryableDataFailure, TerminalDataFailure } from "./errors.ts";
 export { createParentPort, PARENT_NOTIFICATION_USE_CASES } from "./parent-port.ts";
@@ -18,6 +17,7 @@ export {
   type ParentLink,
 } from "./session.ts";
 export { createTeacherPort } from "./teacher-port.ts";
+export { createWorkingGroupPort } from "./working-groups.ts";
 
 import { ADMIN_NOTIFICATION_USE_CASES } from "./admin-port.ts";
 import { PARENT_NOTIFICATION_USE_CASES } from "./parent-port.ts";

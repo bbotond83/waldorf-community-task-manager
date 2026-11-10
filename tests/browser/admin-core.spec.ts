@@ -10,23 +10,26 @@ test.beforeEach(async ({ page }) => {
   await signInAs(page, world().account("group-admin-1"));
 });
 
-test("Group Administrator sees scoped core dashboard without import", async ({ page }) => {
+test("Group Administrator sees the scoped core dashboard, with no records and no import", async ({
+  page,
+}) => {
   const startedAt = Date.now();
   await page.goto("/admin");
   await expect(page.getByRole("heading", { name: "Áttekintés" })).toBeFocused();
   expect(Date.now() - startedAt).toBeLessThan(2_000);
   await expect(page.getByTestId("admin-dashboard-page")).toBeVisible();
-  await expect(page.getByTestId("app-shell-navigation-admin-records")).toBeVisible();
+  await expect(page.getByTestId("app-shell-navigation-admin-records")).toHaveCount(0);
   await expect(page.getByTestId("app-shell-navigation-admin-import")).toHaveCount(0);
 });
 
-test("records remain scoped and crafted outside-scope identifiers are denied", async ({ page }) => {
+test("family records are refused to a group administrator, without confirming any family (BR3.9)", async ({
+  page,
+}) => {
   await page.goto("/admin/nyilvantartasok");
-  await expect(page.getByText("Szabó család")).toBeVisible();
-  // The second family belongs to the other group.
-  await expect(page.getByText("Kiss család")).toHaveCount(0);
+  await expect(page.getByText("Nincs jogosultság", { exact: true }).first()).toBeVisible();
+  await expect(page.getByText("Szabó család")).toHaveCount(0);
   await page.goto(`/admin/nyilvantartasok/${world().id("family:2")}`);
-  await expect(page.getByText("Nincs jogosultság")).toBeVisible();
+  await expect(page.getByText("Nincs jogosultság", { exact: true }).first()).toBeVisible();
   await expect(page.getByText("Kiss család")).toHaveCount(0);
 });
 
@@ -101,10 +104,11 @@ test("archiving a family keeps it in the archive and out of the active list", as
   await expect(page.getByText("Állapot: Archivált")).toBeVisible();
 });
 
-test("Group Administrator direct import access is generically denied", async ({ page }) => {
-  await page.goto("/admin/import");
-  await expect(page.getByRole("heading", { name: "Nincs jogosultság" })).toBeVisible();
-  await expect(page.getByText("import", { exact: false })).toHaveCount(0);
+test("the removed import answers page not found to a group administrator (BR7.1)", async ({
+  page,
+}) => {
+  const response = await page.goto("/admin/import");
+  expect(response?.status()).toBe(404);
 });
 
 test("@a11y administrator keyboard and automated accessibility checks pass", async ({ page }) => {

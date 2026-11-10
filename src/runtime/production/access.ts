@@ -33,11 +33,14 @@ export type ParentAccess = Readonly<{
 export type AdminAccess = Readonly<{
   applicationSession: SessionContext;
   scope: Scope;
+  /** Empty for a super admin; otherwise every working group the person administers. */
+  groupIds: readonly string[];
   profile: ShellProfile;
 }>;
 
 export type TeacherAccess = Readonly<{
   applicationSession: SessionContext;
+  scope: Scope;
   profile: ShellProfile;
 }>;
 
@@ -74,8 +77,45 @@ function profile(
   scopeSummary: string,
   homePath: string,
   navigation: readonly NavigationItem[],
+  switchLink?: ShellProfile["switchLink"],
 ): ShellProfile {
-  return Object.freeze({ label, scopeSummary, homePath, navigation });
+  return Object.freeze({
+    label,
+    scopeSummary,
+    homePath,
+    navigation,
+    ...(switchLink ? { switchLink } : {}),
+  });
+}
+
+/** A parent right is usable only with the linked, active parent of that very family. */
+function holdsParentRole(context: AccessContext): boolean {
+  const link = context.parent;
+  return (
+    link !== undefined &&
+    context.grants.some(
+      (grant) =>
+        grant.role === "parent" &&
+        grant.scope.type === "family" &&
+        grant.scope.id === link.familyId &&
+        grant.scope.organizationId === link.organizationId,
+    )
+  );
+}
+
+/** A group-admin right counts only while the linked parent and family are active (BR3.2). */
+function usableGroupGrants(context: AccessContext) {
+  if (context.parent === undefined) return [];
+  return context.grants
+    .filter((grant) => grant.role === "group_admin")
+    .toSorted((a, b) => a.scope.id.localeCompare(b.scope.id));
+}
+
+function holdsAdminRole(context: AccessContext): boolean {
+  return (
+    context.grants.some((grant) => grant.role === "super_admin") ||
+    usableGroupGrants(context).length > 0
+  );
 }
 
 async function load(
@@ -99,16 +139,7 @@ export async function resolveParentAccess(
   if (context === "unavailable") return { state: "unavailable" };
   if (!context) return { state: "signed-out" };
   const link = context.parent;
-  const granted =
-    link !== undefined &&
-    context.grants.some(
-      (grant) =>
-        grant.role === "parent" &&
-        grant.scope.type === "family" &&
-        grant.scope.id === link.familyId &&
-        grant.scope.organizationId === link.organizationId,
-    );
-  if (!link || !granted) return deniedFor(context);
+  if (!link || !holdsParentRole(context)) return deniedFor(context);
   return {
     state: "success",
     data: Object.freeze({
@@ -119,7 +150,13 @@ export async function resolveParentAccess(
         type: "family" as const,
         organizationId: link.organizationId,
       },
-      profile: profile("Szülő", "A család saját feladatai", HOME.parent, PARENT_NAVIGATION),
+      profile: profile(
+        "Szülő",
+        "A család saját feladatai",
+        HOME.parent,
+        PARENT_NAVIGATION,
+        holdsAdminRole(context) ? { label: "Adminisztráció", href: "/admin" } : undefined,
+      ),
     }),
   };
 }
@@ -133,28 +170,32 @@ export async function resolveAdminAccess(
   if (context === "unavailable") return { state: "unavailable" };
   if (!context) return { state: "signed-out" };
   const superGrant = context.grants.find((grant) => grant.role === "super_admin");
-  const groupGrant = context.grants
-    .filter((grant) => grant.role === "group_admin")
-    .toSorted((a, b) => a.scope.id.localeCompare(b.scope.id))[0];
-  const chosen = superGrant ?? groupGrant;
+  const groupGrants = usableGroupGrants(context);
+  const chosen = superGrant ?? groupGrants[0];
   if (!chosen) return deniedFor(context);
+  const switchLink = holdsParentRole(context)
+    ? { label: "Szülői nézet", href: HOME.parent }
+    : undefined;
   return {
     state: "success",
     data: Object.freeze({
       applicationSession: toSessionContext(accountId, context),
       scope: chosen.scope,
+      groupIds: Object.freeze(superGrant ? [] : groupGrants.map((grant) => grant.scope.id)),
       profile: superGrant
         ? profile(
             "Szuperadminisztrátor",
             "A szervezet és a szerepkörök kezelése",
             HOME.super_admin,
             SUPER_ADMIN_NAVIGATION,
+            switchLink,
           )
         : profile(
-            "Csoportadminisztrátor",
-            "A kijelölt csoportok",
+            "Koordinátor",
+            "A saját munkacsoportok",
             HOME.group_admin,
             GROUP_ADMIN_NAVIGATION,
+            switchLink,
           ),
     }),
   };
@@ -168,16 +209,16 @@ export async function resolveTeacherAccess(
   const context = await load(database, accountId, now);
   if (context === "unavailable") return { state: "unavailable" };
   if (!context) return { state: "signed-out" };
-  if (!context.grants.some((grant) => grant.role === "kindergarten_teacher")) {
-    return deniedFor(context);
-  }
+  const grant = context.grants.find((candidate) => candidate.role === "kindergarten_teacher");
+  if (!grant) return deniedFor(context);
   return {
     state: "success",
     data: Object.freeze({
       applicationSession: toSessionContext(accountId, context),
+      scope: grant.scope,
       profile: profile(
         "Óvónő",
-        "A kijelölt csoportok beosztása, módosítás nélkül",
+        "A közösség beosztása, módosítás nélkül",
         HOME.kindergarten_teacher,
         TEACHER_NAVIGATION,
       ),

@@ -86,10 +86,8 @@ function writers(functions: Map<string, Fn>): Set<string> {
 }
 
 /**
- * The import changes assignments too (it places families on tasks), and by decision (NFR6.26) it writes no notice
- * to a parent: an imported assignment is not news to the family the way a sign-up or a placement by an admin is.
- * It plans the reminder jobs and recipients instead. The two callable functions that apply an import are therefore
- * decided here and not part of the hand-off list; the next test pins the decision to the code.
+ * The removed import's two callable functions still appear in the migration history this test reads (BR7.1 drops
+ * them later, in another migration), so they are not part of the hand-off list.
  */
 const IMPORT_WITHOUT_NOTICES = ["import_commit", "import_recover"];
 
@@ -127,30 +125,6 @@ test("the internal helpers that change assignments are reached only through list
     );
     for (const caller of callers)
       assert.ok(listed.has(caller.name), `${helper} via ${caller.name}`);
-  }
-});
-
-test("the import places families on tasks without a notice: it uses the core of the assignment, never its wrapper, and plans the reminders (NFR6.26)", () => {
-  const functions = definitions();
-  const callable = callableBySignedInAccounts();
-  const changing = [...writers(functions)].filter((name) => callable.has(name));
-  for (const name of IMPORT_WITHOUT_NOTICES) {
-    assert.ok(changing.includes(name), `${name} is a callable function that changes assignments`);
-  }
-  const apply = functions.get("import_apply")!.body;
-  assert.match(apply, /\bassignment_assign_core\s*\(/, "the place is made by the core");
-  assert.doesNotMatch(
-    apply,
-    /\bassignment_assign\s*\(/,
-    "never by the wrapper that writes the notice",
-  );
-  assert.doesNotMatch(apply, /notification_/, "no notice helper is called");
-  assert.doesNotMatch(apply, /insert\s+into\s+notifications/, "no notice is written");
-  assert.match(apply, /\breminder_plan_tasks\s*\(/, "the jobs and recipients are planned");
-  for (const name of IMPORT_WITHOUT_NOTICES) {
-    const body = functions.get(name)!.body;
-    assert.match(body, /\bimport_apply\s*\(/, `${name} applies the import through import_apply`);
-    assert.doesNotMatch(body, /notification_|insert\s+into\s+notifications/, name);
   }
 });
 

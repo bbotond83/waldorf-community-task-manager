@@ -92,23 +92,23 @@ for (const schema of IDENTITY_SCHEMAS) {
     }
 
     describe("create", () => {
-      it("lets a super admin invite for any family or group of the organization, storing only the token hash for seven days", async () => {
+      it("lets a super admin invite a parent, a teacher of the community and a super admin, storing only the token hash for seven days, and never a group admin (BR3.6)", async () => {
         const family = await create(SUPER_ADMIN, { label: "a" });
         assert.equal(family.state, "success");
-        const group = await create(SUPER_ADMIN, {
+        const teacher = await create(SUPER_ADMIN, {
           role: "kindergarten_teacher",
-          scopeType: "group",
-          scope: GROUP_2,
+          scopeType: "organization",
+          scope: ORGANIZATION,
           email: email("teacher"),
         });
-        assert.equal(group.state, "success");
+        assert.equal(teacher.state, "success");
         const admin = await create(SUPER_ADMIN, {
           role: "group_admin",
           scopeType: "group",
           scope: GROUP_1,
           email: email("ga"),
         });
-        assert.equal(admin.state, "success");
+        assert.deepEqual([admin.state, admin.code], ["validation", "invitation_invalid"]);
         const top = await create(SUPER_ADMIN, {
           role: "super_admin",
           scopeType: "organization",
@@ -130,22 +130,16 @@ for (const schema of IDENTITY_SCHEMAS) {
         );
       });
 
-      it("lets a group admin invite parents of their own group's families and teachers of their own group only", async () => {
-        assert.equal((await create(ADMIN_G1, { email: email("p1") })).state, "success");
-        assert.equal(
-          (
-            await create(ADMIN_G1, {
-              role: "kindergarten_teacher",
-              scopeType: "group",
-              scope: GROUP_1,
-              email: email("t1"),
-            })
-          ).state,
-          "success",
-        );
+      it("refuses a group admin every invitation: a parent, a teacher, a group admin and a super admin (BR3.6, BR3.8)", async () => {
         const denied: Parameters<typeof create>[1][] = [
+          { email: email("p1") },
           { scope: FAMILY_2, email: email("p2") },
-          { role: "kindergarten_teacher", scopeType: "group", scope: GROUP_2, email: email("t2") },
+          {
+            role: "kindergarten_teacher",
+            scopeType: "organization",
+            scope: ORGANIZATION,
+            email: email("t1"),
+          },
           { role: "group_admin", scopeType: "group", scope: GROUP_1, email: email("g1") },
           {
             role: "super_admin",
@@ -159,7 +153,7 @@ for (const schema of IDENTITY_SCHEMAS) {
           assert.equal(result.state, "denied", JSON.stringify(args));
         }
         const events = await auditEvents(db);
-        assert.equal(events.length, 4);
+        assert.equal(events.length, 5);
         assert.ok(
           events.every(
             (event) =>
@@ -169,7 +163,7 @@ for (const schema of IDENTITY_SCHEMAS) {
               event.actor_role === "group_admin",
           ),
         );
-        assert.equal(await count(db, "invitations"), 2);
+        assert.equal(await count(db, "invitations"), 0);
       });
 
       it("refuses a parent, a teacher and an account without a grant, with a denied event each", async () => {
@@ -260,8 +254,8 @@ for (const schema of IDENTITY_SCHEMAS) {
         callAs(db, schema, authenticated(account), "invitation_revoke($1, $2)", [nextKey(), id]);
 
       it("replaces a pending invitation by a new one with a new token and a new expiry", async () => {
-        const first = await create(ADMIN_G1);
-        const next = await resend(ADMIN_G1, first.reference!, "second-token");
+        const first = await create(SUPER_ADMIN);
+        const next = await resend(SUPER_ADMIN, first.reference!, "second-token");
         assert.equal(next.state, "success");
         assert.equal(await status(first.reference!), "replaced");
         const row = (await db.query("select * from invitations where id = $1", [next.reference]))
@@ -298,9 +292,9 @@ for (const schema of IDENTITY_SCHEMAS) {
         assert.equal((await revoke(SUPER_ADMIN, row.reference!)).state, "conflict");
       });
 
-      it("refuses another group's admin, a parent and another organization's admin, and the foreign one learns nothing", async () => {
-        const row = await create(ADMIN_G1);
-        for (const account of [ADMIN_G2, PARENT_F1, OUTSIDER]) {
+      it("refuses a group admin, a parent and another organization's admin, and the foreign one learns nothing (BR3.6, BR3.8)", async () => {
+        const row = await create(SUPER_ADMIN);
+        for (const account of [ADMIN_G1, PARENT_F1, OUTSIDER]) {
           const resent = await resend(account, row.reference!);
           assert.equal(resent.state, "denied", `resend as ${account}`);
           assert.equal(
@@ -316,16 +310,17 @@ for (const schema of IDENTITY_SCHEMAS) {
         assert.equal(await status(row.reference!), "pending");
         const denied = (await auditEvents(db)).filter((event) => event.outcome === "denied");
         assert.equal(denied.length, 6);
+        // An invitation of a family belongs to no working group, so only super admins read these events.
         assert.ok(
-          denied.every((event) => event.target_type === "invitation" && event.group_id === GROUP_1),
+          denied.every((event) => event.target_type === "invitation" && event.group_id === null),
         );
       });
 
-      it("lets a group admin resend and revoke an invitation another admin of the same group created", async () => {
+      it("refuses a group admin the resend and the revoke of a super admin's invitation (BR3.6)", async () => {
         const row = await create(SUPER_ADMIN);
-        assert.equal((await resend(ADMIN_G1, row.reference!)).state, "success");
-        const later = await create(SUPER_ADMIN, { email: email("later") });
-        assert.equal((await revoke(ADMIN_G1, later.reference!)).state, "success");
+        assert.equal((await resend(ADMIN_G2, row.reference!)).state, "denied");
+        assert.equal((await revoke(ADMIN_G2, row.reference!)).state, "denied");
+        assert.equal(await status(row.reference!), "pending");
       });
     });
 
@@ -605,7 +600,7 @@ for (const schema of IDENTITY_SCHEMAS) {
             event.details,
             event.group_id,
           ]),
-          [["role.grant", "success", "system", "invitation", id, `invitation:${id}`, GROUP_1]],
+          [["role.grant", "success", "system", "invitation", id, `invitation:${id}`, null]],
         );
         assert.equal(events[0]!.actor_account_id, "00000000-0000-0000-0000-000000000000");
       });

@@ -8,9 +8,7 @@ import type {
   DashboardModel,
   GrantOutcome,
   GrantListModel,
-  ImportCancelOutcome,
-  ImportOutcome,
-  ImportPreviewModel,
+  FamilyNameListModel,
   LifecycleOutcomeModel,
   LifecycleListModel,
   ReminderListModel,
@@ -36,12 +34,7 @@ export type AdminOperation =
   | "approvals.list"
   | "approvals.decide"
   | "notes.save"
-  | "import.preview"
-  | "import.status"
-  | "import.resolve"
-  | "import.commit"
-  | "import.recover"
-  | "import.cancel"
+  | "families.names"
   | "reminders.list"
   | "reminders.retry"
   | "governance.update"
@@ -71,7 +64,6 @@ type AdminCommandInput = Readonly<{
 }>;
 
 export class AdminApplicationFacade {
-  readonly import: AdminImportApplication;
   readonly reminders: AdminReminderApplication;
   readonly governance: AdminGovernanceApplication;
   readonly lifecycle: AdminLifecycleApplication;
@@ -82,7 +74,6 @@ export class AdminApplicationFacade {
   constructor(pipeline: FacadePipeline, domain: AdminApplicationPort) {
     this.pipeline = pipeline;
     this.domain = domain;
-    this.import = new AdminImportApplication(pipeline, domain);
     this.reminders = new AdminReminderApplication(pipeline, domain);
     this.governance = new AdminGovernanceApplication(pipeline, domain);
     this.lifecycle = new AdminLifecycleApplication(pipeline, domain);
@@ -129,6 +120,31 @@ export class AdminApplicationFacade {
     input: AdminCommandInput,
   ): Promise<ApplicationResult<Readonly<{ completed: true }>>> {
     return this.command(session, "archive", "records.restore", input);
+  }
+
+  /** The archive: every archived record for a super admin, `onlyGroupIds` for a group administrator. */
+  listArchive(
+    session: SessionContext,
+    scope: Scope,
+    query: Readonly<Record<string, unknown>> = {},
+  ): Promise<ApplicationResult<AdminListModel>> {
+    return this.query(session, scope, "archive", "records.list", { ...query, state: "archived" });
+  }
+
+  getArchived(
+    session: SessionContext,
+    scope: Scope,
+    id: string,
+  ): Promise<ApplicationResult<AdminItemModel>> {
+    return this.query(session, scope, "archive", "records.get", { type: "record", id });
+  }
+
+  /** Active families by name only, for assigning a task (BR3.10). */
+  listFamilyNames(
+    session: SessionContext,
+    scope: Scope,
+  ): Promise<ApplicationResult<FamilyNameListModel>> {
+    return this.query(session, scope, "task", "families.names", {});
   }
 
   listTasks(
@@ -209,96 +225,6 @@ export class AdminApplicationFacade {
     input: AdminCommandInput,
   ): Promise<ApplicationResult<T>> {
     return invokeAdminCommand<T>(this.pipeline, this.domain, session, resource, operation, input);
-  }
-}
-
-export class AdminImportApplication {
-  private readonly pipeline: FacadePipeline;
-  private readonly domain: AdminApplicationPort;
-
-  constructor(pipeline: FacadePipeline, domain: AdminApplicationPort) {
-    this.pipeline = pipeline;
-    this.domain = domain;
-  }
-
-  status(session: SessionContext, scope: Scope): Promise<ApplicationResult<ImportPreviewModel>> {
-    return invokeAdmin(this.pipeline, this.domain, session, {
-      scope,
-      resource: "import",
-      action: "read",
-      operation: "import.status",
-      payload: {},
-    });
-  }
-
-  createPreview(
-    session: SessionContext,
-    input: AdminCommandInput,
-  ): Promise<ApplicationResult<ImportPreviewModel>> {
-    return invokeAdminCommand(
-      this.pipeline,
-      this.domain,
-      session,
-      "import",
-      "import.preview",
-      input,
-    );
-  }
-
-  resolveConflict(
-    session: SessionContext,
-    input: AdminCommandInput,
-  ): Promise<ApplicationResult<ImportPreviewModel>> {
-    return invokeAdminCommand(
-      this.pipeline,
-      this.domain,
-      session,
-      "import",
-      "import.resolve",
-      input,
-    );
-  }
-
-  commit(
-    session: SessionContext,
-    input: AdminCommandInput,
-  ): Promise<ApplicationResult<ImportOutcome>> {
-    return invokeAdminCommand(
-      this.pipeline,
-      this.domain,
-      session,
-      "import",
-      "import.commit",
-      input,
-    );
-  }
-
-  recover(
-    session: SessionContext,
-    input: AdminCommandInput,
-  ): Promise<ApplicationResult<ImportOutcome>> {
-    return invokeAdminCommand(
-      this.pipeline,
-      this.domain,
-      session,
-      "import",
-      "import.recover",
-      input,
-    );
-  }
-
-  cancel(
-    session: SessionContext,
-    input: AdminCommandInput,
-  ): Promise<ApplicationResult<ImportCancelOutcome>> {
-    return invokeAdminCommand(
-      this.pipeline,
-      this.domain,
-      session,
-      "import",
-      "import.cancel",
-      input,
-    );
   }
 }
 
@@ -465,7 +391,7 @@ function invokeAdmin<T>(
 ): Promise<ApplicationResult<T>> {
   return pipeline.invoke({
     session,
-    matrixRowId: input.matrixRowId ?? matrixRowFor(session, input.resource, input.scope),
+    matrixRowId: input.matrixRowId ?? matrixRowFor(session, input.scope),
     action: input.action,
     resource: input.resource,
     scope: input.scope,
@@ -511,9 +437,8 @@ function invokeAdminCommand<T>(
 
 function matrixRowFor(
   session: SessionContext,
-  resource: string,
   scope: Scope,
-): "AUTH-GROUP-ADMIN-CORE" | "AUTH-GRP-IMPORT-DENY" | "AUTH-SUPER-ADMIN" {
+): "AUTH-GROUP-ADMIN-CORE" | "AUTH-SUPER-ADMIN" {
   if (
     session.grants.some(
       (grant) =>
@@ -525,7 +450,7 @@ function matrixRowFor(
     )
   )
     return "AUTH-SUPER-ADMIN";
-  return resource === "import" ? "AUTH-GRP-IMPORT-DENY" : "AUTH-GROUP-ADMIN-CORE";
+  return "AUTH-GROUP-ADMIN-CORE";
 }
 
 function freezeModel<T>(model: T): Readonly<T> {

@@ -17,7 +17,6 @@ export const BUSINESS_CODE_STATES = Object.freeze({
   // Records, tasks, notes, assignments (admin)
   VERSION_CONFLICT: "conflict",
   RESTORE_CONFLICT: "conflict",
-  ASSIGNMENT_INELIGIBLE: "conflict",
   ASSIGNMENT_CAPACITY_FULL: "conflict",
   // Approvals
   APPROVAL_ALREADY_DECIDED: "conflict",
@@ -29,7 +28,6 @@ export const BUSINESS_CODE_STATES = Object.freeze({
   DUTY_VERSION_STALE: "invalidated",
   DUTY_CLOSED: "conflict",
   DUTY_ALREADY_ASSIGNED: "conflict",
-  DUTY_INELIGIBLE: "conflict",
   DUTY_FULL: "conflict",
   // Swap and cancellation
   REQUEST_VERSION_STALE: "invalidated",

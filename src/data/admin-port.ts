@@ -21,21 +21,13 @@ import {
   saveTask,
 } from "./admin-tasks.ts";
 import { DataGateway } from "./gateway.ts";
-import {
-  cancelImport,
-  commitImport,
-  importStatus,
-  previewImport,
-  recoverImport,
-  resolveImport,
-} from "./imports.ts";
 import { listReminders, retryReminder } from "./notifications.ts";
 import type { Payload } from "./payload.ts";
-import type { WorkbookParser } from "../import-parser/types.ts";
+import { listFamilyNames } from "./working-groups.ts";
 
 /**
  * Database adapter for the admin application port (BR32.1): records, tasks, assignments, approvals, notes,
- * dashboard, settings, governance, lifecycle, reminders and the Excel import, each calling one named database
+ * dashboard, settings, governance, lifecycle and reminders, each calling one named database
  * function or a policy-filtered table read, with the same result states and codes as today (BR32.8, BR42.3).
  *
  * Every admin operation now has a database answer, so the production composition no longer uses the interim
@@ -78,33 +70,16 @@ export const DATABASE_ADMIN_OPERATIONS: readonly AdminOperation[] = Object.freez
   "lifecycle.run",
   "settings.get",
   "settings.save",
-  "import.preview",
-  "import.status",
-  "import.resolve",
-  "import.commit",
-  "import.recover",
-  "import.cancel",
   "reminders.list",
   "reminders.retry",
+  "families.names",
 ]);
-
-/** What the admin port is built with besides the database: the workbook parser of the import (BR41.2). */
-export type AdminPortOptions = Readonly<{
-  /**
-   * Reads an uploaded workbook's bytes. It is injected, not imported here, so the server-only reader stays
-   * behind its own door (`src/import-parser/server.ts`) and this module stays free of the library. Without
-   * one, an upload is answered with `denied`.
-   */
-  parseWorkbook?: WorkbookParser;
-}>;
 
 export class DatabaseAdminPort implements AdminApplicationPort {
   private readonly gateway: DataGateway;
-  private readonly parseWorkbook: WorkbookParser | undefined;
 
-  constructor(database: DatabaseClient, options: AdminPortOptions = {}) {
+  constructor(database: DatabaseClient) {
     this.gateway = new DataGateway(database);
-    this.parseWorkbook = options.parseWorkbook;
   }
 
   async execute<T>(input: {
@@ -166,20 +141,8 @@ export class DatabaseAdminPort implements AdminApplicationPort {
         return getSettings(this.gateway);
       case "settings.save":
         return saveSettings(this.gateway, call);
-      case "import.preview":
-        return this.parseWorkbook
-          ? previewImport(this.gateway, this.parseWorkbook, call)
-          : Promise.resolve({ state: "denied" });
-      case "import.status":
-        return importStatus(this.gateway);
-      case "import.resolve":
-        return resolveImport(this.gateway, call);
-      case "import.commit":
-        return commitImport(this.gateway, call);
-      case "import.recover":
-        return recoverImport(this.gateway, call);
-      case "import.cancel":
-        return cancelImport(this.gateway, call);
+      case "families.names":
+        return listFamilyNames(this.gateway);
       case "reminders.list":
         return listReminders(this.gateway, input.payload);
       case "reminders.retry":
@@ -190,9 +153,6 @@ export class DatabaseAdminPort implements AdminApplicationPort {
   }
 }
 
-export function createAdminPort(
-  database: DatabaseClient,
-  options: AdminPortOptions = {},
-): AdminApplicationPort {
-  return new DatabaseAdminPort(database, options);
+export function createAdminPort(database: DatabaseClient): AdminApplicationPort {
+  return new DatabaseAdminPort(database);
 }

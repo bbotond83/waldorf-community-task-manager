@@ -59,16 +59,24 @@ test("restricts group admins to their granted group", () => {
   assert.equal(
     service.authorize(session("admin"), {
       action: "read",
-      resource: { kind: "child", scope: groupA },
+      resource: { kind: "task", scope: groupA },
     }).allowed,
     true,
   );
   assert.equal(
     service.authorize(session("admin"), {
       action: "read",
-      resource: { kind: "child", scope: groupB },
+      resource: { kind: "task", scope: groupB },
     }).allowed,
     false,
+  );
+  assert.equal(
+    service.authorize(session("admin"), {
+      action: "read",
+      resource: { kind: "child", scope: groupA },
+    }).allowed,
+    false,
+    "family records are a super admin's (BR3.9)",
   );
 });
 test("restricts parents to their linked family", () => {
@@ -91,7 +99,7 @@ test("restricts parents to their linked family", () => {
 test("limits Kindergarten teacher to schedules and coordination display names", () => {
   const { service } = setup(
     [person("staff")],
-    [roleGrant("g", "staff", "kindergarten_teacher", groupA)],
+    [roleGrant("g", "staff", "kindergarten_teacher", org)],
   );
   assert.equal(
     service.authorize(session("staff"), {
@@ -169,7 +177,7 @@ test("teacher commands and advanced group operations preserve state", () => {
   const { service, users, grants } = setup(
     [person("teacher"), person("group")],
     [
-      roleGrant("t", "teacher", "kindergarten_teacher", groupA),
+      roleGrant("t", "teacher", "kindergarten_teacher", org),
       roleGrant("g", "group", "group_admin", groupA),
     ],
   );
@@ -195,7 +203,7 @@ test("missing inactive and invalid generation subjects cannot authorize", () => 
     { ...person("teacher"), isActive: false },
     { ...person("teacher"), authorizationVersion: 0 },
   ]) {
-    const { service } = setup([user], [roleGrant("t", "teacher", "kindergarten_teacher", groupA)]);
+    const { service } = setup([user], [roleGrant("t", "teacher", "kindergarten_teacher", org)]);
     assert.equal(
       service.authorize(session("teacher"), {
         action: "read",
@@ -214,7 +222,7 @@ test("grant writes invalidate current version atomically", () => {
     id: "new",
     subjectId: "target",
     role: "kindergarten_teacher",
-    scope: groupA,
+    scope: org,
   });
   assert.equal("role" in result, true);
   assert.equal(users.findById("target")?.authorizationVersion, 2);
@@ -354,15 +362,15 @@ test("persistence current role scope RPC binds all role/scope dimensions", async
       return { data: true, error: null };
     },
   });
-  assert.equal(await adapter.hasCurrentRoleScope("kindergarten_teacher", groupA), true);
+  assert.equal(await adapter.hasCurrentRoleScope("kindergarten_teacher", org), true);
   assert.deepEqual(calls, [
     [
       "has_current_role_scope",
       {
         requested_role: "kindergarten_teacher",
         requested_organization_id: "org",
-        requested_scope_type: "group",
-        requested_scope_id: "a",
+        requested_scope_type: "organization",
+        requested_scope_id: "org",
       },
     ],
   ]);
@@ -376,7 +384,7 @@ test("scope-only or malformed persistence requests do not query", async () => {
     },
   });
   assert.equal(await adapter.hasActiveScope(groupA), false);
-  assert.equal(await adapter.hasCurrentRoleScope("kindergarten_teacher", org), false);
+  assert.equal(await adapter.hasCurrentRoleScope("kindergarten_teacher", groupA), false);
   assert.equal(calls, 0);
 });
 test("persistence boolean adapter rejects truthy nonbooleans", async () => {

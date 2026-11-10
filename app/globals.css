@@ -1953,3 +1953,40 @@ nav a:hover {
   border-color: var(--color-primary-dark);
   border-width: 2px;
 }
+
+.workgroup-page {
+  padding-block: clamp(1.5rem, 4vw, 3rem);
+}
+
+.workgroup-page > header {
+  margin-bottom: 1.5rem;
+}
+
+.workgroup-list {
+  display: grid;
+  gap: 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.workgroup-card,
+.workgroup-state {
+  padding: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.workgroup-card h2 {
+  margin: 0 0 0.5rem;
+  color: var(--color-primary-dark);
+  font-size: var(--text-headline-sm);
+}
+
+.workgroup-card p {
+  margin: 0;
+}
+
+.site-header-switch {
+  white-space: nowrap;
+}

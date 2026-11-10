@@ -4,6 +4,7 @@ import {
   FacadePipeline,
   ParentApplicationFacade,
   TeacherApplicationFacade,
+  WorkingGroupApplicationFacade,
 } from "../../application/index.ts";
 import {
   classifyDataFailure,
@@ -11,8 +12,8 @@ import {
   createParentPort,
   createTeacherPort,
   createVersionPort,
+  createWorkingGroupPort,
 } from "../../data/index.ts";
-import type { WorkbookParser } from "../../import-parser/types.ts";
 import type { DatabaseClient } from "../database/client.ts";
 
 /**
@@ -28,23 +29,14 @@ export type RequestServices = Readonly<{
   parent: ParentApplicationFacade;
   admin: AdminApplicationFacade;
   teacher: TeacherApplicationFacade;
+  workingGroups: WorkingGroupApplicationFacade;
 }>;
 
 export interface ProductionServices {
   forRequest(accessToken: string): RequestServices;
 }
 
-/**
- * What the production services are built with besides the database: the workbook parser of the import. It is
- * handed in by the composition (the only module that imports the server-only reader), so these services and
- * the adapters stay free of the spreadsheet library (BR41.2, NFR2.21).
- */
-export type ProductionServiceDependencies = Readonly<{ parseWorkbook: WorkbookParser }>;
-
-export function createProductionServices(
-  database: DatabaseClient,
-  dependencies: ProductionServiceDependencies,
-): ProductionServices {
+export function createProductionServices(database: DatabaseClient): ProductionServices {
   return {
     forRequest(accessToken) {
       const asPerson = database.forSession(accessToken);
@@ -56,11 +48,12 @@ export function createProductionServices(
         authorization,
         parent: new ParentApplicationFacade(pipeline, createParentPort(asPerson)),
         // Every admin operation has a database answer, so there is no interim port in this path (BR42.1).
-        admin: new AdminApplicationFacade(
-          pipeline,
-          createAdminPort(asPerson, { parseWorkbook: dependencies.parseWorkbook }),
-        ),
+        admin: new AdminApplicationFacade(pipeline, createAdminPort(asPerson)),
         teacher: new TeacherApplicationFacade(pipeline, createTeacherPort(asPerson)),
+        workingGroups: new WorkingGroupApplicationFacade(
+          pipeline,
+          createWorkingGroupPort(asPerson),
+        ),
       });
     },
   };

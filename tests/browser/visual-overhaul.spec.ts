@@ -102,22 +102,15 @@ test("the sign-in screen stays usable and stable when images fail to load (R-05)
 const ROLE_LANDINGS = [
   { tag: "super-admin", path: /\/admin$/, menuItems: 9 },
   { tag: "group-admin-1", path: /\/admin$/, menuItems: 5 },
-  { tag: "parent-1", path: /\/szulo\/ertesitesek$/, menuItems: 3 },
-  { tag: "teacher-1", path: /\/teacher\/schedule$/, menuItems: 0 },
+  { tag: "parent-1", path: /\/szulo\/ertesitesek$/, menuItems: 4 },
+  { tag: "teacher-1", path: /\/teacher\/schedule$/, menuItems: 2 },
 ] as const;
 
 for (const { tag, path, menuItems } of ROLE_LANDINGS) {
   test(`signing in as ${tag} lands on the role home with its menu`, async ({ page }) => {
     await signInAs(page, world().account(tag));
     await expect(page).toHaveURL(path);
-    const menu = page.getByTestId("app-shell-navigation");
-    if (menuItems === 0) {
-      // The teacher keeps no menu by design: the schedule and the sign-out button are the whole page.
-      await expect(menu).toHaveCount(0);
-      await expect(page.getByRole("heading", { name: "Beosztás", exact: true })).toBeVisible();
-    } else {
-      await expect(menu.locator("li")).toHaveCount(menuItems);
-    }
+    await expect(page.getByTestId("app-shell-navigation").locator("li")).toHaveCount(menuItems);
     await expect(page.getByTestId("sign-out-button").first()).toBeVisible();
     const results = await new AxeBuilder({ page }).analyze();
     expect(results.violations.filter(SERIOUS)).toEqual([]);

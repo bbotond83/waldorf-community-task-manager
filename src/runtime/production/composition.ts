@@ -1,5 +1,4 @@
 import { AuthorizationContract } from "../../application/index.ts";
-import { parseWorkbook } from "../../import-parser/server.ts";
 import type { RuntimeConfig } from "../config.ts";
 import { createDatabaseClient, type DatabaseClient } from "../database/client.ts";
 import { DEFAULT_DATABASE_SCHEMA } from "../database/config.ts";
@@ -45,9 +44,7 @@ export function createProductionComposition(
 ): RuntimeComposition {
   const database =
     dependencies.database ?? clientFor(config, dependencies.environment ?? process.env);
-  // The composition is the one place that reaches the server-only workbook reader (BR41.2, NFR2.21); the
-  // services and adapters receive it as a plain function.
-  const services: ProductionServices = createProductionServices(database, { parseWorkbook });
+  const services: ProductionServices = createProductionServices(database);
   return {
     config,
     authenticationBoundary: "supabase-session",

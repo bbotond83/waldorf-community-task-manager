@@ -12,20 +12,20 @@ import {
 import {
   classifyDoubleFailure,
   createTeacherRepositoryDouble,
-  TEACHER_GROUPS,
   TEACHER_SCHEDULE as SCHEDULE,
+  TEACHER_SCOPE as scope,
   TeacherPortDouble,
   type TeacherScenario,
 } from "../../tests/support/port-doubles.ts";
-const scope = TEACHER_GROUPS[0]!.scope;
 const session: SessionContext = {
   subjectId: "teacher",
   authorizationVersion: 1,
   ...sessionGrantBindings("teacher", "kindergarten_teacher", [scope]),
   roles: ["kindergarten_teacher"] as const,
-  scopes: TEACHER_GROUPS.map((group) => group.scope),
+  scopes: [scope],
 };
-const query = { groupScope: scope, from: "2026-08-12", to: "2026-08-20" };
+const view = { kind: "all" } as const;
+const query = { scope, view, from: "2026-08-12", to: "2026-08-20" };
 function facadeOn(
   authorization: AuthorizationContract,
   scenario: TeacherScenario = "ready",
@@ -60,16 +60,17 @@ it("Teacher facade projects explicit allowlist and exact list/detail envelopes",
 it("Teacher facade accepts missing dates and validates only what is filled", async () => {
   const { facade } = setup();
   for (const range of [{}, { from: "2026-08-14" }, { to: "2026-08-20" }]) {
-    const result = await facade.getSchedule(session, { groupScope: scope, ...range });
+    const result = await facade.getSchedule(session, { scope, view, ...range });
     assert.equal(result.state, "success");
   }
   const swapped = await facade.getSchedule(session, {
-    groupScope: scope,
+    scope,
+    view,
     from: "2026-08-20",
     to: "2026-08-12",
   });
   assert.equal(swapped.state, "validation");
-  const impossible = await facade.getSchedule(session, { groupScope: scope, from: "2026-02-30" });
+  const impossible = await facade.getSchedule(session, { scope, view, from: "2026-02-30" });
   assert.equal(impossible.state, "validation");
 });
 it("Teacher facade authorizes before validation and source", async () => {
@@ -85,7 +86,7 @@ it("Teacher facade authorizes before validation and source", async () => {
     (
       await facade.getSchedule(session, {
         ...query,
-        groupScope: { ...scope, id: "other" },
+        scope: { ...scope, id: "other", organizationId: "other" },
         from: "bad",
       })
     ).state,

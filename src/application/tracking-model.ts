@@ -1,7 +1,8 @@
 import type { Scope } from "../access/types.ts";
 export type TrackingEntry = Readonly<{
   id: string;
-  groupId: string;
+  /** Empty for a community-wide item. */
+  groupId: string | null;
   startsAt: string;
   endsAt: string;
   title: string;
@@ -13,8 +14,18 @@ export type TrackingEntry = Readonly<{
 }>;
 export type TrackingSourceRecord = TrackingEntry &
   Readonly<{ sourceRecordId: string; organizationId: string }>;
+/** Which part of the schedule is read: everything, the community-wide items, or one working group. */
+export type TrackingView =
+  | Readonly<{ kind: "all" }>
+  | Readonly<{ kind: "community" }>
+  | Readonly<{ kind: "group"; groupId: string }>;
 /** A missing `from` or `to` means no limit on that side. */
-export type TrackingQuery = Readonly<{ groupScope: Scope; from?: string; to?: string }>;
+export type TrackingQuery = Readonly<{
+  scope: Scope;
+  view: TrackingView;
+  from?: string;
+  to?: string;
+}>;
 export interface TeacherScheduleRepository {
   readCurrent(
     query: TrackingQuery,
@@ -49,16 +60,10 @@ export function isTrackingSource(value: unknown): value is TrackingSourceRecord 
   const row = value as Record<string, unknown>;
   const text = (key: string) => typeof row[key] === "string" && (row[key] as string).length > 0;
   return (
-    [
-      "id",
-      "sourceRecordId",
-      "groupId",
-      "organizationId",
-      "startsAt",
-      "endsAt",
-      "title",
-      "location",
-    ].every(text) &&
+    ["id", "sourceRecordId", "organizationId", "startsAt", "endsAt", "title", "location"].every(
+      text,
+    ) &&
+    (row.groupId === null || text("groupId")) &&
     Number.isFinite(Date.parse(row.startsAt as string)) &&
     Number.isFinite(Date.parse(row.endsAt as string)) &&
     Date.parse(row.startsAt as string) <= Date.parse(row.endsAt as string) &&
@@ -87,10 +92,7 @@ export function projectTrackingEntry(row: TrackingSourceRecord): TrackingEntry {
     currentStatusLabel: row.currentStatusLabel,
   });
 }
+/** A row belongs to the community the read was made for. */
 export function matchesTrackingScope(row: TrackingSourceRecord, scope: Scope): boolean {
-  return (
-    scope.type === "group" &&
-    row.groupId === scope.id &&
-    row.organizationId === scope.organizationId
-  );
+  return row.organizationId === scope.organizationId;
 }

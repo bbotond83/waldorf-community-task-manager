@@ -15,6 +15,8 @@ async function resetAndSelect(page: Page, profile: ProfileId) {
 }
 
 const isMobile = (name: string) => name === "mobile-chrome";
+/** The tasks of the small seed: three in each of the two active groups and two community-wide ones. */
+const WHOLE_COMMUNITY = 8;
 
 /** One schedule item per entry: a table row on desktop, a card on a phone. */
 function scheduleItems(page: Page, projectName: string): Locator {
@@ -44,10 +46,16 @@ test.describe("teacher schedule: Szűrők törlése empties every field", () => 
       /.*/,
     );
     await expect(page.getByTestId("teacher-schedule-group-select").locator("option")).toHaveText([
-      "Minden csoport",
-      "Engedélyezett csoport",
+      "Minden",
+      "Egész közösség",
+      "Állatgondozás",
+      "Játszókert",
+      "Karbantartó",
+      "Kreatív-alkotó",
+      "Nagytakarítás szervezése",
+      "Ünnep-előkészítő",
     ]);
-    await expect(scheduleItems(page, testInfo.project.name)).toHaveCount(3);
+    await expect(scheduleItems(page, testInfo.project.name)).toHaveCount(WHOLE_COMMUNITY);
   });
 
   test("a typed, unsubmitted value is cleared and focus moves to the heading", async ({
@@ -60,7 +68,7 @@ test.describe("teacher schedule: Szűrők törlése empties every field", () => 
     await page.getByTestId("teacher-schedule-filter-clear-link").click();
     await expectTeacherFieldsEmpty(page);
     await expect(page.getByRole("heading", { name: "Beosztás", exact: true })).toBeFocused();
-    await expect(scheduleItems(page, testInfo.project.name)).toHaveCount(3);
+    await expect(scheduleItems(page, testInfo.project.name)).toHaveCount(WHOLE_COMMUNITY);
   });
 
   test("an address with filters is cleared too, and everything the teacher may see shows", async ({
@@ -76,7 +84,7 @@ test.describe("teacher schedule: Szűrők törlése empties every field", () => 
     await page.getByTestId("teacher-schedule-filter-clear-link").click();
     await expect(page).toHaveURL(/\/teacher\/schedule$/);
     await expectTeacherFieldsEmpty(page);
-    await expect(scheduleItems(page, testInfo.project.name)).toHaveCount(3);
+    await expect(scheduleItems(page, testInfo.project.name)).toHaveCount(WHOLE_COMMUNITY);
     await expect(page.getByRole("heading", { name: "Beosztás", exact: true })).toBeFocused();
   });
 
@@ -86,7 +94,8 @@ test.describe("teacher schedule: Szűrők törlése empties every field", () => 
     await page.getByTestId("teacher-schedule-from-input").fill(seedDay(EVENT_DAY));
     await page.getByTestId("teacher-schedule-filter-submit-button").click();
     await expect(page).toHaveURL(new RegExp(`from=${seedDay(EVENT_DAY)}`));
-    await expect(scheduleItems(page, testInfo.project.name)).toHaveCount(2);
+    // Both groups' event tasks and the two community-wide tasks start on or after that day.
+    await expect(scheduleItems(page, testInfo.project.name)).toHaveCount(6);
   });
 
   test("Back after a filtered detail shows the address's values; after a clear it shows none", async ({
@@ -131,12 +140,10 @@ test.describe("teacher schedule: Szűrők törlése empties every field", () => 
           : `teacher-schedule-open-${world().id("task:1:3")}`,
       )
       .click();
-    await expect(page.getByTestId("teacher-schedule-detail-fields")).toContainText(
-      "Engedélyezett csoport",
-    );
+    await expect(page.getByTestId("teacher-schedule-detail-fields")).toContainText("Játszókert");
     await page.getByTestId("teacher-schedule-detail-back-link").click();
     await expect(page).toHaveURL(/\/teacher\/schedule$/);
-    await expect(scheduleItems(page, testInfo.project.name)).toHaveCount(3);
+    await expect(scheduleItems(page, testInfo.project.name)).toHaveCount(WHOLE_COMMUNITY);
   });
 
   test("the status shows its symbol and the shared word", async ({ page }, testInfo) => {

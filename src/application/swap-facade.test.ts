@@ -384,14 +384,19 @@ describe("the admin and teacher facades with the extended ports", () => {
   });
 
   it("returns an adapter's validation outcome to the teacher screen", async () => {
-    const teacher = session("kindergarten_teacher", group);
+    const community = {
+      id: group.organizationId,
+      type: "organization",
+      organizationId: group.organizationId,
+    } as const;
+    const teacher = session("kindergarten_teacher", community);
     const port: TeacherApplicationPort = {
       async getSchedule() {
         return { state: "validation", fieldErrors: { range: "VAL-DATE-RANGE" } };
       },
     };
     const facade = new TeacherApplicationFacade(pipeline(teacher), port);
-    const result = await facade.getSchedule(teacher, { groupScope: group });
+    const result = await facade.getSchedule(teacher, { scope: community, view: { kind: "all" } });
     assert.equal(result.state, "validation");
   });
 });

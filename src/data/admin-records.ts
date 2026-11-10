@@ -43,7 +43,7 @@ const TABLES: Readonly<Record<RecordKind, { table: string; columns: string; name
     },
     group: {
       table: "groups",
-      columns: "id,school_year_id,name,status,version",
+      columns: "id,school_year_id,name,description,status,version",
       name: "name",
     },
     school_year: {
@@ -116,10 +116,13 @@ export async function listRecords(
 ): Promise<DomainOutcome<AdminListModel>> {
   const search = payloadText(payload, "q")?.trim();
   const state = payloadText(payload, "state");
+  // A group administrator's archive holds only their own working groups.
+  const onlyGroupIds = payloadTexts(payload, "onlyGroupIds");
   const lists = await Promise.all(
-    KINDS.map(async (kind) => {
+    (onlyGroupIds ? (["group"] as const) : KINDS).map(async (kind) => {
       const rows = await readRows(gateway, kind, (query) => {
         let refined = query;
+        if (onlyGroupIds) refined = refined.in("id", onlyGroupIds);
         if (state === "active" || state === "archived") refined = refined.eq("status", state);
         if (search) refined = refined.ilike(TABLES[kind].name, likePattern(search));
         return refined.order(TABLES[kind].name);
@@ -160,18 +163,23 @@ async function readTable(
 
 /**
  * What a form needs to edit a stored record: the fields of its kind and, for a family, its parents with
- * their contact details, its children and the groups it is an active member of. The reads are policy-filtered
- * like every other read, so an admin outside the family's reach gets nothing here either.
+ * their contact details and its children. The reads are policy-filtered like every other read, so an admin
+ * outside the family's reach gets nothing here either.
  */
 async function detailsOf(gateway: DataGateway, found: Found): Promise<AdminItemDetails> {
   const { kind, row } = found;
-  if (kind === "group") return Object.freeze({ schoolYearId: text(row, "school_year_id") });
+  if (kind === "group") {
+    return Object.freeze({
+      schoolYearId: text(row, "school_year_id"),
+      description: text(row, "description"),
+    });
+  }
   if (kind === "school_year") {
     return Object.freeze({ startsOn: text(row, "starts_on"), endsOn: text(row, "ends_on") });
   }
   if (kind === "child") return Object.freeze({ familyId: text(row, "family_id") });
   const familyId = text(row, "id");
-  const [parents, children, memberships] = await Promise.all([
+  const [parents, children] = await Promise.all([
     readTable(
       gateway,
       "parents",
@@ -182,28 +190,19 @@ async function detailsOf(gateway: DataGateway, found: Found): Promise<AdminItemD
     readTable(gateway, "children", "id,display_name,version", (q) =>
       q.eq("family_id", familyId).eq("status", "active").order("display_name"),
     ),
-    readTable(gateway, "group_memberships", "group_id", (q) =>
-      q.eq("family_id", familyId).eq("status", "active"),
-    ),
   ]);
-  const groupIds = memberships.map((membership) => text(membership, "group_id"));
-  const [contacts, groups] = await Promise.all([
-    parents.length
-      ? readTable(
-          gateway,
-          "parent_contacts",
-          "parent_id,contact_email,contact_phone,locality",
-          (q) =>
-            q.in(
-              "parent_id",
-              parents.map((parent) => text(parent, "id")),
-            ),
-        )
-      : Promise.resolve([] as readonly Row[]),
-    groupIds.length
-      ? readTable(gateway, "groups", "id,name", (q) => q.in("id", groupIds).order("name"))
-      : Promise.resolve([] as readonly Row[]),
-  ]);
+  const contacts = parents.length
+    ? await readTable(
+        gateway,
+        "parent_contacts",
+        "parent_id,contact_email,contact_phone,locality",
+        (q) =>
+          q.in(
+            "parent_id",
+            parents.map((parent) => text(parent, "id")),
+          ),
+      )
+    : ([] as readonly Row[]);
   // The optional profile exists only with consent, and only the function may read it (BR30.4).
   const profiles = await Promise.all(
     parents.map(async (parent) => {
@@ -232,9 +231,6 @@ async function detailsOf(gateway: DataGateway, found: Found): Promise<AdminItemD
           displayName: text(child, "display_name"),
         }),
       ),
-    ),
-    groups: Object.freeze(
-      groups.map((group) => Object.freeze({ id: text(group, "id"), name: text(group, "name") })),
     ),
   });
 }
@@ -319,8 +315,6 @@ export async function saveRecord(
         display_name: nameOf(payload) ?? (current ? text(current, "display_name") : undefined),
         parents: payloadObjects(payload, "parents")?.map(parentBody),
         children: payloadObjects(payload, "children")?.map(childBody),
-        add_group_ids: payloadTexts(payload, "addGroupIds"),
-        end_group_ids: payloadTexts(payload, "endGroupIds"),
       });
       const envelope = await gateway.call(
         "directory_save",
@@ -341,6 +335,9 @@ export async function saveRecord(
         id: creating ? null : id,
         expected_version: creating ? undefined : expectedVersion,
         name: nameOf(payload) ?? (current ? text(current, "name") : undefined),
+        description:
+          payloadText(payload, "description") ??
+          (current ? text(current, "description") : undefined),
         school_year_id: payloadText(payload, "schoolYearId"),
       });
       const envelope = await gateway.call(

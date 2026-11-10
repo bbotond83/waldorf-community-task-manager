@@ -299,11 +299,11 @@ describe("migrations on the real local stack", () => {
       const again = await run(db, schema);
       assert.deepEqual(again.applied, [], schema);
       const objects = await db.query(
-        `select (select count(*)::int from pg_tables where schemaname = $1 and tablename in ('notifications','reminder_jobs','reminder_recipients','reminder_attempts','sheet_registry','import_runs','import_rows','import_staged_rows','import_conflicts')) as tables,
-                (select count(*)::int from pg_proc p where p.pronamespace = $1::regnamespace and p.proname in ('duty_sign_up', 'duty_sign_up_core', 'reminder_plan', 'notification_list', 'import_preview_create', 'import_match', 'import_apply', 'import_commit', 'import_after_lifecycle')) as functions`,
+        `select (select count(*)::int from pg_tables where schemaname = $1 and tablename in ('notifications','reminder_jobs','reminder_recipients','reminder_attempts')) as tables,
+                (select count(*)::int from pg_proc p where p.pronamespace = $1::regnamespace and p.proname in ('duty_sign_up', 'duty_sign_up_core', 'reminder_plan', 'notification_list')) as functions`,
         [schema],
       );
-      assert.deepEqual(objects.rows[0], { tables: 9, functions: 9 }, schema);
+      assert.deepEqual(objects.rows[0], { tables: 4, functions: 4 }, schema);
     }
   });
 

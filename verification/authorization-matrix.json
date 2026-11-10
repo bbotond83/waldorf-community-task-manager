@@ -58,7 +58,7 @@
     {
       "id": "AUTH-TEACHER-TRACKING-ALLOW",
       "role": "kindergarten_teacher",
-      "scope": "granted-group",
+      "scope": "community",
       "route": "/teacher/schedule/**",
       "actions": ["read"],
       "resources": ["schedule", "coordination"],
@@ -68,7 +68,7 @@
     {
       "id": "AUTH-TEACHER-MUTATION-DENY",
       "role": "kindergarten_teacher",
-      "scope": "granted-group",
+      "scope": "community",
       "route": "/teacher/**",
       "actions": ["create", "update", "delete", "manage"],
       "resources": ["schedule", "assignment", "record"],
@@ -78,7 +78,7 @@
     {
       "id": "AUTH-TEACHER-SENSITIVE-FIELDS-DENY",
       "role": "kindergarten_teacher",
-      "scope": "granted-group",
+      "scope": "community",
       "route": "/teacher/**",
       "actions": ["read"],
       "resources": ["schedule", "family", "profile", "request"],
@@ -94,7 +94,7 @@
     {
       "id": "AUTH-TEACHER-OUT-OF-SCOPE-DENY",
       "role": "kindergarten_teacher",
-      "scope": "ungranted-group",
+      "scope": "other-community",
       "route": "/teacher/schedule/**",
       "actions": ["read"],
       "resources": ["schedule", "coordination"],
@@ -107,8 +107,58 @@
       "scope": "granted-group",
       "route": "/admin/**",
       "actions": ["read", "create", "update", "manage"],
-      "resources": ["dashboard", "record", "task", "assignment", "approval", "archive"],
+      "resources": ["dashboard", "task", "assignment", "approval", "archive"],
       "fields": ["SF-DISPLAY-NAME", "SF-PARTICIPANT-NAME"],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-GROUP-ADMIN-RECORDS-DENY",
+      "role": "group_admin",
+      "scope": "granted-group",
+      "route": "/admin/nyilvantartasok/**",
+      "actions": ["read", "create", "update", "delete", "manage"],
+      "resources": ["record"],
+      "fields": [],
+      "effect": "deny"
+    },
+    {
+      "id": "AUTH-WORKING-GROUPS-PARENT-ALLOW",
+      "role": "parent",
+      "scope": "community",
+      "route": "/szulo/munkacsoportok",
+      "actions": ["read"],
+      "resources": ["working_group"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-WORKING-GROUPS-TEACHER-ALLOW",
+      "role": "kindergarten_teacher",
+      "scope": "community",
+      "route": "/teacher/munkacsoportok",
+      "actions": ["read"],
+      "resources": ["working_group"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-WORKING-GROUPS-GROUP-ADMIN-ALLOW",
+      "role": "group_admin",
+      "scope": "community",
+      "route": "/admin/munkacsoportok",
+      "actions": ["read"],
+      "resources": ["working_group"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-WORKING-GROUPS-SUPER-ADMIN-ALLOW",
+      "role": "super_admin",
+      "scope": "community",
+      "route": "/admin/munkacsoportok",
+      "actions": ["read"],
+      "resources": ["working_group"],
+      "fields": [],
       "effect": "allow"
     },
     {
@@ -118,16 +168,6 @@
       "route": "/admin/**",
       "actions": ["read", "create", "update", "manage"],
       "resources": ["record", "task", "assignment", "approval", "archive"],
-      "fields": [],
-      "effect": "deny"
-    },
-    {
-      "id": "AUTH-GRP-IMPORT-DENY",
-      "role": "group_admin",
-      "scope": "granted-group",
-      "route": "/admin/import/**",
-      "actions": ["read", "create", "update", "manage"],
-      "resources": ["import"],
       "fields": [],
       "effect": "deny"
     },
@@ -144,7 +184,6 @@
         "assignment",
         "approval",
         "archive",
-        "import",
         "reminder",
         "lifecycle",
         "settings",
@@ -199,7 +238,7 @@
       "scope": "non-super-role",
       "route": "/admin/**",
       "actions": ["read", "create", "update", "delete", "manage"],
-      "resources": ["import", "reminder", "lifecycle", "settings", "role_grant", "governance"],
+      "resources": ["reminder", "lifecycle", "settings", "role_grant", "governance"],
       "fields": [],
       "effect": "deny"
     }
