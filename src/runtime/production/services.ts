@@ -1,6 +1,7 @@
 import {
   AdminApplicationFacade,
   AuthorizationContract,
+  DirectoryApplicationFacade,
   FacadePipeline,
   ParentApplicationFacade,
   RotaApplicationFacade,
@@ -10,6 +11,7 @@ import {
 import {
   classifyDataFailure,
   createAdminPort,
+  createDirectoryPort,
   createParentPort,
   createRotaPort,
   createTeacherPort,
@@ -34,6 +36,8 @@ export type RequestServices = Readonly<{
   workingGroups: WorkingGroupApplicationFacade;
   /** The school calendar and the rota (U2); the screens that use it come after the owner's design approval. */
   rota: RotaApplicationFacade;
+  /** The parent directory, the parent's own profile and the removal of a parent (U3). */
+  directory: DirectoryApplicationFacade;
 }>;
 
 export interface ProductionServices {
@@ -59,6 +63,7 @@ export function createProductionServices(database: DatabaseClient): ProductionSe
           createWorkingGroupPort(asPerson),
         ),
         rota: new RotaApplicationFacade(pipeline, createRotaPort(asPerson)),
+        directory: new DirectoryApplicationFacade(pipeline, createDirectoryPort(asPerson)),
       });
     },
   };

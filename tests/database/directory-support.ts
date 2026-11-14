@@ -138,7 +138,7 @@ export async function seedDirectoryWorld(db: pg.Client, schema: string): Promise
   );
   const contact = (parentId: string, email: string, org = ORGANIZATION) =>
     db.query(
-      "insert into parent_contacts (parent_id, organization_id, contact_email, contact_phone, locality) values ($1, $2, $3, '+36 30 111 2222', 'Pécs')",
+      "insert into parent_profiles (parent_id, organization_id, email_on_record, phone, residence) values ($1, $2, $3, '+36 30 111 2222', 'Pécs') on conflict (parent_id) do update set email_on_record = excluded.email_on_record, phone = excluded.phone, residence = excluded.residence",
       [parentId, org, email],
     );
   await contact(PARENT_ROW_F1, "anna@example.test");

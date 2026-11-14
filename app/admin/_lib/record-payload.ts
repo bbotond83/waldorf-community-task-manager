@@ -43,30 +43,19 @@ export function parseParents(formData: FormData): {
     const name = field("name");
     const email = field("email").toLowerCase();
     const phone = field("phone");
-    const locality = field("locality");
-    const profile = field("profile");
-    const consent = formData.has(parentField(index, "consent"));
-    if (id === "" && !name && !email && !phone && !locality && !profile) continue;
+    if (id === "" && !name && !email && !phone) continue;
 
     if (!name) errors[parentField(index, "name")] = "A szülő nevének megadása kötelező.";
     else if (name.length > TEXT_MAX) {
       errors[parentField(index, "name")] = "A szülő neve legfeljebb 200 karakter lehet.";
     }
-    if (email && (email.length > 254 || !EMAIL.test(email))) {
+    // The email on record is required: it is where the invitation goes and the first sign-in address (BR35.2).
+    if (!email || email.length > 254 || !EMAIL.test(email)) {
       errors[parentField(index, "email")] = "Adjon meg érvényes e-mail-címet.";
     }
     if (phone && !PHONE.test(phone)) {
       errors[parentField(index, "phone")] =
         "A telefonszám 6–20 karakter lehet, és csak számjegyet, szóközt, + és - jelet tartalmazhat.";
-    }
-    if (locality.length > 100) {
-      errors[parentField(index, "locality")] = "A település legfeljebb 100 karakter lehet.";
-    }
-    if (profile.length > 500) {
-      errors[parentField(index, "profile")] = "A bemutatkozás legfeljebb 500 karakter lehet.";
-    } else if (profile && !consent) {
-      errors[parentField(index, "profile")] =
-        "A bemutatkozás csak hozzájárulással menthető: jelölje be a hozzájárulást, vagy hagyja üresen a mezőt.";
     }
 
     const version = Number(field("version"));
@@ -74,13 +63,10 @@ export function parseParents(formData: FormData): {
     parents.push({
       ...(existing ? { id, expectedVersion: Number.isInteger(version) ? version : 0 } : {}),
       displayName: name,
-      // A stored parent always sends all three contact fields, so a cleared field is cleared in the
+      // A stored parent always sends both contact fields, so a cleared field is cleared in the
       // database; a new parent sends only what was filled in.
-      ...(existing || email ? { email } : {}),
+      email,
       ...(existing || phone ? { phone } : {}),
-      ...(existing || locality ? { locality } : {}),
-      ...(existing || profile ? { optionalProfile: profile } : {}),
-      optionalProfileConsent: consent,
     });
   }
   return { parents, errors };

@@ -114,23 +114,13 @@ export async function writeSeedPlan(client: SqlClient, plan: SeedPlan): Promise<
     await insertRows(
       client,
       "parents",
-      [
-        "id",
-        "organization_id",
-        "family_id",
-        "account_id",
-        "display_name",
-        "optional_profile",
-        "optional_profile_consent",
-      ],
+      ["id", "organization_id", "family_id", "account_id", "display_name"],
       plan.parents.map((parent) => [
         parent.id,
         organization,
         parent.familyId,
         parent.accountId,
         parent.name,
-        parent.optionalProfile,
-        parent.consent,
       ]),
     );
     await insertRows(
@@ -146,14 +136,28 @@ export async function writeSeedPlan(client: SqlClient, plan: SeedPlan): Promise<
     );
     await insertRows(
       client,
-      "parent_contacts",
-      ["parent_id", "organization_id", "contact_email", "contact_phone", "locality"],
+      "parent_profiles",
+      [
+        "parent_id",
+        "organization_id",
+        "email_on_record",
+        "phone",
+        "residence",
+        "occupation",
+        "hobby",
+        "how_i_support",
+        "sharing_consent",
+      ],
       plan.parents.map((parent) => [
         parent.id,
         organization,
         parent.contactEmail,
         parent.contactPhone,
-        parent.locality,
+        parent.residence,
+        parent.occupation,
+        parent.hobby,
+        parent.howISupport,
+        parent.sharing,
       ]),
     );
     await insertRows(

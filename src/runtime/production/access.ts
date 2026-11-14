@@ -27,6 +27,8 @@ export type ParentAccess = Readonly<{
   applicationSession: SessionContext;
   familyScope: Scope;
   familyId: string;
+  /** The Parent record linked to the signed-in account. */
+  parentId: string;
   profile: ShellProfile;
 }>;
 
@@ -145,6 +147,7 @@ export async function resolveParentAccess(
     data: Object.freeze({
       applicationSession: toSessionContext(accountId, context),
       familyId: link.familyId,
+      parentId: link.parentId,
       familyScope: {
         id: link.familyId,
         type: "family" as const,

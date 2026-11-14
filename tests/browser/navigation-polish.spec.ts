@@ -80,7 +80,9 @@ for (const profile of ROLES) {
       if (profile.id === "group-admin" && path.startsWith("/szulo/")) {
         // The group admin's link to the rota overview opens the parent view, which has the parent menu (as
         // with the "Szülői nézet" switch); the page itself must still open for the group admin.
-        await expect(page.getByTestId("rota-overview-page")).toBeVisible();
+        await expect(
+          page.getByTestId(path === "/szulo/szulok" ? "directory-page" : "rota-overview-page"),
+        ).toBeVisible();
         continue;
       }
       const links = page.getByTestId("app-shell-navigation").getByRole("link");

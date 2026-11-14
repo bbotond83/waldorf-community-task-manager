@@ -3,12 +3,7 @@
 import { useState } from "react";
 import type { AdminItemDetails, AdminItemKind } from "../../../src/application/index.ts";
 import type { AdminLookups } from "../_lib/lookups.ts";
-import {
-  AdminCheckboxField,
-  AdminSelectField,
-  AdminTextareaField,
-  AdminTextField,
-} from "./AdminMutationForm.tsx";
+import { AdminSelectField, AdminTextareaField, AdminTextField } from "./AdminMutationForm.tsx";
 
 /** The kinds of record the create form offers, in the order of its dropdown. */
 export type RecordFormKind = Extract<AdminItemKind, "family" | "child" | "group" | "school-year">;
@@ -196,33 +191,10 @@ function ParentBlock({
         maxLength={20}
         testId={`admin-parent-${index}-phone-input`}
       />
-      <AdminTextField
-        id={`${prefix}-locality`}
-        name={`${prefix}-locality`}
-        label="Település"
-        defaultValue={parent?.locality}
-        maxLength={100}
-        testId={`admin-parent-${index}-locality-input`}
-      />
-      <AdminTextareaField
-        id={`${prefix}-profile`}
-        name={`${prefix}-profile`}
-        label="Önkéntes bemutatkozás"
-        defaultValue={parent?.optionalProfile}
-        maxLength={500}
-        hint="Nem kötelező. Csak a szülő hozzájárulásával menthető."
-        testId={`admin-parent-${index}-profile-input`}
-      />
-      <AdminCheckboxField
-        id={`${prefix}-consent`}
-        name={`${prefix}-consent`}
-        label="A szülő hozzájárult a bemutatkozás tárolásához"
-        defaultChecked={parent?.optionalProfileConsent}
-        testId={`admin-parent-${index}-consent-input`}
-      />
       {parent?.linked && (
         <p className="form-hint" data-testid={`admin-parent-${index}-linked`}>
-          Ehhez a szülőhöz már tartozik bejelentkezési fiók.
+          Ehhez a szülőhöz már tartozik bejelentkezési fiók, az e-mail-címét ő maga módosíthatja a
+          Fiókom oldalon.
         </p>
       )}
     </fieldset>

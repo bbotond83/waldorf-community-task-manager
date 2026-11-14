@@ -93,6 +93,22 @@ export const AUTHORIZATION_MATRIX: readonly MatrixRow[] = Object.freeze([
     fields: [],
   },
   {
+    // The parent directory: every signed-in role reads it; the database decides which fields (BR30).
+    id: "AUTH-DIRECTORY",
+    roles: ["parent", "group_admin", "kindergarten_teacher", "super_admin"],
+    actions: ["read"],
+    resources: ["directory"],
+    fields: [],
+  },
+  {
+    // A parent's own details, sharing choice and sign-in settings: the parent themself only (BR31.2, BR32.1).
+    id: "AUTH-PARENT-ACCOUNT",
+    roles: ["parent"],
+    actions: ["read", "update"],
+    resources: ["own_profile", "own_account"],
+    fields: [],
+  },
+  {
     // A duty card opens for a parent of the holding family and for a super admin; the database decides which (BR24.2).
     // A group admin who is also a parent of that family holds the parent grant and opens it as a parent; a group
     // admin grant alone gives no card.
@@ -124,6 +140,7 @@ export const AUTHORIZATION_MATRIX: readonly MatrixRow[] = Object.freeze([
       "reminder",
       "lifecycle",
       "settings",
+      "invitation",
     ],
     fields: DISPLAY_NAME_FIELDS,
     navigation: { id: "admin-dashboard", label: "Áttekintés", href: "/admin" },

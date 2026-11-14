@@ -13,6 +13,7 @@ import {
 import {
   changeGrant,
   deactivateAccount,
+  endRemovedParentSignIn,
   reactivateAccount,
   reconcileAccountBans,
 } from "./accounts.ts";
@@ -226,5 +227,53 @@ describe("reconciling accounts whose status and sign-in ban disagree", () => {
     const down = setup({ identity_ban_mismatches: () => unavailable });
     assert.deepEqual(await reconcileAccountBans(down.deps), { checked: 0, repaired: 0, failed: 0 });
     assert.equal(down.admin.calls.length, 1);
+  });
+});
+
+describe("the follow-up after a parent was removed (BR36.3)", () => {
+  it("bans the sign-in user and ends its sessions, in that order", async () => {
+    const { deps, admin, events } = setup();
+    assert.equal(await endRemovedParentSignIn(TARGET, deps), "done");
+    assert.deepEqual(
+      admin.calls.map((call) => call.name),
+      ["setBan", "sessions_remove"],
+    );
+    assert.deepEqual(admin.calls[0]!.args, [TARGET, true]);
+    assert.deepEqual(admin.calls[1]!.args, [{ p_user_id: TARGET }]);
+    assert.equal(events.events.length, 0);
+  });
+
+  it("does nothing for a parent who never had an account", async () => {
+    const { deps, admin } = setup();
+    assert.equal(await endRemovedParentSignIn(null, deps), "done");
+    assert.equal(admin.calls.length, 0);
+  });
+
+  it("retries a failed ban three times, then reports the failure line and says pending", async () => {
+    const { deps, admin, events } = setup({}, { setBan: async () => unavailable });
+    assert.equal(await endRemovedParentSignIn(TARGET, deps), "pending");
+    assert.equal(admin.calls.filter((call) => call.name === "setBan").length, 3);
+    assert.deepEqual(events.events, [
+      { event: "follow_up_failed", subject: { account: TARGET }, code: "parent_removal" },
+    ]);
+  });
+
+  it("reports the failure line when the sessions cannot be ended", async () => {
+    const { deps, admin, events } = setup({ sessions_remove: () => envelope("terminal") });
+    assert.equal(await endRemovedParentSignIn(TARGET, deps), "pending");
+    assert.equal(admin.calls.filter((call) => call.name === "sessions_remove").length, 3);
+    assert.equal(events.events[0]!.code, "parent_removal");
+  });
+
+  it("counts a thrown error as a failed attempt", async () => {
+    const { deps } = setup(
+      {},
+      {
+        setBan: async () => {
+          throw new Error("down");
+        },
+      },
+    );
+    assert.equal(await endRemovedParentSignIn(TARGET, deps), "pending");
   });
 });

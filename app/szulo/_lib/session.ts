@@ -11,6 +11,7 @@ export type ParentSession = Readonly<{
   profile: ShellProfile;
   familyScope: Scope;
   familyId: string;
+  parentId: string;
 }>;
 
 export type ParentSessionResult =

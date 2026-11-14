@@ -24,7 +24,7 @@ describe("Hungarian copy (NFR5.3)", () => {
     );
     assert.equal(
       COPY.invitation.notValid,
-      "Ez a meghívó már nem érvényes. Kérjen újat a csoport adminisztrátorától.",
+      "Ez a meghívó már nem érvényes. Kérj újat az adminisztrátortól.",
     );
     assert.equal(
       COPY.password.ruleError,

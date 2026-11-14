@@ -125,6 +125,8 @@ describe("the other new words of the screens", () => {
       ["parent-rota", "Beosztás", "/szulo/beosztas"],
       ["parent-swaps", "Cserék", "/szulo/cserek"],
       ["parent-working-groups", "Munkacsoportok", "/szulo/munkacsoportok"],
+      ["parent-directory", "Szülők", "/szulo/szulok"],
+      ["parent-account", "Fiókom", "/szulo/fiokom"],
     ]);
   });
 });

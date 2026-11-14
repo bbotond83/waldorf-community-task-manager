@@ -62,7 +62,7 @@ describe("seed on the real stack", () => {
     assert.equal(await rowCount(db, A, "families"), counts.families);
     assert.equal(await rowCount(db, A, "group_memberships"), plan.memberships.length);
     assert.equal(await rowCount(db, A, "parents"), counts.parents);
-    assert.equal(await rowCount(db, A, "parent_contacts"), counts.parents);
+    assert.equal(await rowCount(db, A, "parent_profiles"), counts.parents);
     assert.equal(await rowCount(db, A, "children"), counts.children);
     assert.equal(await rowCount(db, A, "accounts"), counts.accounts);
     assert.equal(

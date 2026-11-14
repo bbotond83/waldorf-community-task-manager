@@ -159,11 +159,6 @@ test("a school year and a child are read with the fields their forms edit", asyn
 
 test("a family is read with its active parents, their contact details and children", async () => {
   const { fake, run } = admin({
-    // The profile text is read through its function, only for the parent who gave consent.
-    rpc: (name, args) =>
-      name === "directory_parent_profile" && args.p_parent_id === id(30)
-        ? ok("Kertész vagyok.")
-        : ok(null),
     table: tables({
       families: [FAMILY],
       parents: [
@@ -172,7 +167,6 @@ test("a family is read with its active parents, their contact details and childr
           family_id: id(1),
           status: "active",
           display_name: "Fenyő Anna",
-          optional_profile_consent: true,
           account_id: id(99),
           version: 4,
         },
@@ -181,8 +175,6 @@ test("a family is read with its active parents, their contact details and childr
           family_id: id(1),
           status: "active",
           display_name: "Fenyő Béla",
-          optional_profile: null,
-          optional_profile_consent: false,
           account_id: null,
           version: 1,
         },
@@ -191,18 +183,15 @@ test("a family is read with its active parents, their contact details and childr
           family_id: id(1),
           status: "archived",
           display_name: "Régi szülő",
-          optional_profile: null,
-          optional_profile_consent: false,
           account_id: null,
           version: 1,
         },
       ],
-      parent_contacts: [
+      parent_profiles: [
         {
           parent_id: id(30),
-          contact_email: "anna@example.test",
-          contact_phone: "+36 30 111 2222",
-          locality: "Pécs",
+          email_on_record: "anna@example.test",
+          phone: "+36 30 111 2222",
         },
       ],
       children: [{ ...CHILD, status: "active" }],
@@ -221,61 +210,47 @@ test("a family is read with its active parents, their contact details and childr
         displayName: "Fenyő Anna",
         email: "anna@example.test",
         phone: "+36 30 111 2222",
-        locality: "Pécs",
-        optionalProfile: "Kertész vagyok.",
-        optionalProfileConsent: true,
         linked: true,
+        invitation: "none",
       },
-      {
-        id: id(31),
-        version: 1,
-        displayName: "Fenyő Béla",
-        optionalProfileConsent: false,
-        linked: false,
-      },
+      { id: id(31), version: 1, displayName: "Fenyő Béla", linked: false, invitation: "none" },
     ],
     children: [{ id: id(2), version: 2, displayName: "Gergő" }],
   });
-  // Only the parent with consent had a profile asked for.
-  assert.deepEqual(
-    fake.rpcCalls.map((call) => [call.name, call.args.p_parent_id]),
-    [["directory_parent_profile", id(30)]],
-  );
+  // No function is called to read a family: the profile text no longer exists here (BR31).
+  assert.deepEqual(fake.rpcCalls, []);
 });
 
-test("a parent who consented but wrote no profile text is read without a profile; a NULL answer stays a terminal failure", async () => {
-  const parents = [
-    {
-      id: id(30),
-      family_id: id(1),
-      status: "active",
-      display_name: "Fenyő Anna",
-      optional_profile_consent: true,
-      account_id: null,
-      version: 1,
-    },
-  ];
-  // The database now answers the empty string for this case (migration 20261035_integrity_directory_reads).
-  const empty = admin({
-    rpc: () => ok(""),
-    table: tables({ families: [FAMILY], parents }),
+test("a parent's invitation is read as none, pending or expired", async () => {
+  const past = new Date(Date.now() - 86_400_000).toISOString();
+  const future = new Date(Date.now() + 86_400_000).toISOString();
+  const parent = (n: number) => ({
+    id: id(n),
+    family_id: id(1),
+    status: "active",
+    display_name: `Minta ${n}`,
+    account_id: null,
+    version: 1,
   });
-  const outcome = await empty.run("records.get", { id: id(1) });
+  const { run } = admin({
+    table: tables({
+      families: [FAMILY],
+      parents: [parent(30), parent(31), parent(32), parent(33)],
+      invitations: [
+        { target_id: id(30), status: "pending", expires_at: future, created_at: past },
+        { target_id: id(31), status: "pending", expires_at: past, created_at: past },
+        { target_id: id(32), status: "accepted", expires_at: future, created_at: past },
+      ],
+    }),
+  });
+  const outcome = await run("records.get", { id: id(1) });
   assert.equal(outcome.state, "success");
-  if (outcome.state === "success") {
-    const details = outcome.data as { details: { parents: Record<string, unknown>[] } };
-    assert.equal(details.details.parents[0]?.optionalProfileConsent, true);
-    assert.equal("optionalProfile" in (details.details.parents[0] ?? {}), false);
-  }
-  // The client guard is unchanged: a NULL scalar is still an unexpected failure, which is why the fix is
-  // in the database function and not here.
-  const nothing = admin({
-    rpc: () => ok(null),
-    table: tables({ families: [FAMILY], parents }),
-  });
-  await assert.rejects(
-    () => nothing.run("records.get", { id: id(1) }),
-    /UNEXPECTED_DEPENDENCY_FAILURE/,
+  if (outcome.state !== "success") return;
+  const parents = (outcome.data as { details: { parents: { invitation: string }[] } }).details
+    .parents;
+  assert.deepEqual(
+    parents.map((entry) => entry.invitation),
+    ["pending", "expired", "none", "none"],
   );
 });
 
@@ -308,9 +283,6 @@ test("a new family is saved with its parents, contact details and children", asy
           displayName: "Új Anna",
           email: "anna@example.test",
           phone: "+36 30 111 2222",
-          locality: "Pécs",
-          optionalProfile: "Szívesen főzök.",
-          optionalProfileConsent: true,
         },
       ],
       children: [{ displayName: "Új Gyerek" }],
@@ -331,9 +303,7 @@ test("a new family is saved with its parents, contact details and children", asy
         parents: [
           {
             display_name: "Új Anna",
-            optional_profile: "Szívesen főzök.",
-            optional_profile_consent: true,
-            contact: { email: "anna@example.test", phone: "+36 30 111 2222", locality: "Pécs" },
+            contact: { email: "anna@example.test", phone: "+36 30 111 2222" },
           },
         ],
         children: [{ display_name: "Új Gyerek" }],

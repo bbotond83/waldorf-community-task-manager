@@ -112,8 +112,11 @@ describe("honest executable denominator", () => {
     // src/data/working-groups.ts and the three pages): 218 - 14 + 6. U2 adds the rota facade
     // (src/application/rota-facade.ts) and the rota data adapter (src/data/rota.ts): 210 + 2; the screens then add eleven: the four pages and the duty card page, the shared
     // overview and card component, the action file with its state mapper, the year switcher, the facade resolver and
-    // the Hungarian wording module: 212 + 11. The review fixes add the super admin's duty card page: 223 + 1.
-    expect(inventory.length).toBe(224);
+    // the Hungarian wording module: 212 + 11. The review fixes add the super admin's duty card page: 223 + 1. U3 adds the account changes of the sign-in
+    // module (src/identity/account-changes.ts) and the directory adapter (src/data/directory.ts): 224 + 2. The screens then add seventeen: the facade, the search function, the search component and the
+    // directory page (4), the three directory pages (3), Fiókom (page, actions, field component, state mapper: 4), the
+    // email confirmation page (page, action, form: 3), and the invitation list, the parent actions and the removal page (3): 226 + 17.
+    expect(inventory.length).toBe(243);
     for (const path of [
       "src/runtime/AppNav.tsx",
       "src/runtime/StatusBadge.tsx",

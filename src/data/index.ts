@@ -7,6 +7,14 @@ export {
   DATABASE_ADMIN_OPERATIONS,
 } from "./admin-port.ts";
 export { classifyDataFailure, RetryableDataFailure, TerminalDataFailure } from "./errors.ts";
+export {
+  createDirectoryPort,
+  type DirectoryFamily,
+  type DirectoryModel,
+  type DirectoryParent,
+  type DirectoryPort,
+  type OwnProfileModel,
+} from "./directory.ts";
 export { createParentPort, PARENT_NOTIFICATION_USE_CASES } from "./parent-port.ts";
 export { BUSINESS_CODE_STATES, type BusinessCode } from "./results.ts";
 export {

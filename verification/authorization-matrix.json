@@ -282,6 +282,106 @@
       "effect": "deny"
     },
     {
+      "id": "AUTH-DIRECTORY-PARENT-ALLOW",
+      "role": "parent",
+      "scope": "community",
+      "route": "/szulo/szulok",
+      "actions": ["read"],
+      "resources": ["directory"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-DIRECTORY-TEACHER-ALLOW",
+      "role": "kindergarten_teacher",
+      "scope": "community",
+      "route": "/teacher/szulok",
+      "actions": ["read"],
+      "resources": ["directory"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-DIRECTORY-GROUP-ADMIN-ALLOW",
+      "role": "group_admin",
+      "scope": "community",
+      "route": "/szulo/szulok",
+      "actions": ["read"],
+      "resources": ["directory"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-DIRECTORY-SUPER-ADMIN-ALLOW",
+      "role": "super_admin",
+      "scope": "community",
+      "route": "/admin/szulok",
+      "actions": ["read"],
+      "resources": ["directory"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-DIRECTORY-WRITE-DENY",
+      "role": "any_authenticated",
+      "scope": "any-role",
+      "route": "/szulo/szulok|/teacher/szulok|/admin/szulok",
+      "actions": ["create", "update", "delete", "manage"],
+      "resources": ["directory"],
+      "fields": [],
+      "effect": "deny"
+    },
+    {
+      "id": "AUTH-OWN-ACCOUNT-PARENT-ALLOW",
+      "role": "parent",
+      "scope": "own-parent-record",
+      "route": "/szulo/fiokom",
+      "actions": ["read", "update"],
+      "resources": ["own_profile", "own_account"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-OWN-ACCOUNT-OTHER-PARENT-DENY",
+      "role": "parent",
+      "scope": "other-parent-record",
+      "route": "/szulo/fiokom",
+      "actions": ["read", "update"],
+      "resources": ["own_profile", "own_account"],
+      "fields": [],
+      "effect": "deny"
+    },
+    {
+      "id": "AUTH-OWN-ACCOUNT-NON-PARENT-DENY",
+      "role": "any_authenticated",
+      "scope": "non-parent-grant-only",
+      "route": "/szulo/fiokom",
+      "actions": ["read", "update"],
+      "resources": ["own_profile", "own_account"],
+      "fields": [],
+      "effect": "deny"
+    },
+    {
+      "id": "AUTH-RECORDS-SUPER-ADMIN-ALLOW",
+      "role": "super_admin",
+      "scope": "organization",
+      "route": "/admin/nyilvantartasok",
+      "actions": ["read", "create", "update", "delete", "manage"],
+      "resources": ["record", "invitation"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-RECORDS-NON-SUPER-DENY",
+      "role": "any_authenticated",
+      "scope": "non-super-role",
+      "route": "/admin/nyilvantartasok",
+      "actions": ["read", "create", "update", "delete", "manage"],
+      "resources": ["record", "invitation"],
+      "fields": [],
+      "effect": "deny"
+    },
+    {
       "id": "AUTH-GROUP-ADMIN-OUT-OF-SCOPE-DENY",
       "role": "group_admin",
       "scope": "ungranted-group",

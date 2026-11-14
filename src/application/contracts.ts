@@ -84,6 +84,8 @@ export type AuthorizationMatrixRowId =
   | "AUTH-WORKING-GROUPS"
   | "AUTH-ROTA-OVERVIEW"
   | "AUTH-ROTA-DUTY"
+  | "AUTH-DIRECTORY"
+  | "AUTH-PARENT-ACCOUNT"
   | "AUTH-SUPER-ROTA"
   | "AUTH-SUPER-ADMIN"
   | "AUTH-SUPER-GOVERNANCE";
@@ -334,11 +336,13 @@ export type AdminParentDetail = Readonly<{
   displayName: string;
   email?: string;
   phone?: string;
-  locality?: string;
-  optionalProfile?: string;
-  optionalProfileConsent: boolean;
   /** True once the parent accepted an invitation and has an account. */
   linked: boolean;
+  /**
+   * The state of the parent's latest invitation while there is no account: none sent, waiting for an answer, or
+   * past its 7 days. Only a super admin reads invitations, so for anyone else this stays "none".
+   */
+  invitation: "none" | "pending" | "expired";
 }>;
 
 /**
@@ -500,3 +504,56 @@ export interface IdGenerator {
 export function assertNever(value: never): never {
   throw new Error(`Unhandled application state: ${String(value)}`);
 }
+
+/* The parent directory, a parent's own profile and the directory commands (U3). */
+export type DirectoryParent = Readonly<{
+  id: string;
+  fullName: string;
+  email?: string;
+  phone?: string;
+  residence?: string;
+  occupation?: string;
+  hobby?: string;
+  howISupport?: string;
+  /** Only the parent themself and a super admin get the sharing choice. */
+  sharingConsent?: boolean;
+  isSelf: boolean;
+  /** Only the super admin gets this. */
+  hasAccount?: boolean;
+}>;
+
+export type DirectoryFamily = Readonly<{
+  familyId: string;
+  familyName: string;
+  isOwnFamily: boolean;
+  parents: readonly DirectoryParent[];
+  /** Present only when the viewer may see the children and the family has any. */
+  children?: readonly string[];
+}>;
+
+export type DirectoryModel = Readonly<{ families: readonly DirectoryFamily[] }>;
+
+export type OwnProfileModel = Readonly<{
+  parentId: string;
+  version: number;
+  email?: string;
+  phone?: string;
+  residence?: string;
+  occupation?: string;
+  hobby?: string;
+  howISupport?: string;
+  sharingConsent: boolean;
+}>;
+
+export type ProfileFields = Readonly<
+  Partial<Record<"phone" | "residence" | "occupation" | "hobby" | "how_i_support", string | null>>
+>;
+
+export type ParentInput = Readonly<{
+  displayName: string;
+  email: string;
+  phone?: string | null;
+}>;
+
+export type VersionModel = Readonly<{ id: string | null; version: number | null }>;
+export type RemovedParentModel = Readonly<{ parentId: string; accountId: string | null }>;

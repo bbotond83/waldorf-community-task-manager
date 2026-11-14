@@ -118,7 +118,7 @@ export async function seedIdentityWorld(db: pg.Client, schema: string): Promise<
     [FAMILY_1, FAMILY_2, ORGANIZATION, FAMILY_ADMIN_G1, FAMILY_ADMIN_G2],
   );
   await db.query(
-    "insert into parents (id, organization_id, family_id, display_name, account_id, optional_profile, optional_profile_consent) values ($1, $3, $4, 'Fenyő Anna', $5, 'Szívesen főzök.', true), ($2, $3, $6, 'Napraforgó Csilla', $7, null, false)",
+    "insert into parents (id, organization_id, family_id, display_name, account_id) values ($1, $3, $4, 'Fenyő Anna', $5), ($2, $3, $6, 'Napraforgó Csilla', $7)",
     [PARENT_ROW_F1, PARENT_ROW_F2, ORGANIZATION, FAMILY_1, PARENT_F1, FAMILY_2, PARENT_F2],
   );
   await db.query(

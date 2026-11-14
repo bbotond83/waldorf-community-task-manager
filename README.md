@@ -130,6 +130,21 @@ A draft is visible to the super admin only. Publishing creates one duty and one 
 parent. A published plan cannot be changed or discarded in this version; to start over on your computer, reset the local
 database (`npm run db:reset`, then `npm run db:seed`).
 
+### The parent directory, "Fiókom" and the family records
+
+The seed shares the first parent of family 1 only; every other parent shows by name. Sign in as the matching seeded account to see each screen.
+
+| Screen                  | Address                                                            | Who                                                                 | What it does                                                                                                                                                                                                                                                                                                |
+| ----------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Szülők                  | `/szulo/szulok`, `/teacher/szulok`, `/admin/szulok`                | parent, group administrator, teacher, super admin (own area's page) | family cards with the details each parent chose to share (name only otherwise; teachers also see phone and email); a hint under the search, "Aktív családok (N bejegyzés)" with a legend for the voluntarily shared data; search runs in the browser with no request; "Nincs találat" and "Keresés törlése" |
+| Fiókom                  | `/szulo/fiokom`                                                    | parent                                                              | own details with the green "Hitelesített szülő" and "Megerősített e-mail" badges, the sharing tick box, new e-mail address (link sent to the new address, "Mégse", "Új levél") and password change                                                                                                          |
+| E-mail-cím megerősítése | `/email-megerosites/<token>`                                       | anyone with the link                                                | a button spends the link once; "A hivatkozás már nem érvényes" afterwards                                                                                                                                                                                                                                   |
+| Nyilvántartások         | `/admin/nyilvantartasok/<family>` and `.../szulo/<id>/eltavolitas` | super admin                                                         | add family and parents (e-mail on record required), invitation state per parent, "Meghívó küldése" or "Új meghívó", removal with confirmation (the only parent of a family is refused)                                                                                                                      |
+
+Removing a parent ends their sign-in after the database change is saved. If the sign-in service cannot be reached, the screen says the follow-up is still pending and a failure line is logged. After a removal the page shows "Ez a szülő már nem szerepel a családban."
+
+Timing of these pages on the 30-family seed: `DIRECTORY_TIMING=1 npx playwright test --project=chromium tests/browser/directory-timing.spec.ts`. Screenshots for the owner's comparison with Stitch: `DIRECTORY_SCREENSHOTS=<folder> npx playwright test --project=chromium tests/browser/directory-screenshots.spec.ts`.
+
 Build and run the production-compatible output locally with the same environment:
 
 ```bash

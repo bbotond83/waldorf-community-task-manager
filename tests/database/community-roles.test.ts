@@ -247,7 +247,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
         ["families", `id = '${FAMILY_2}'`],
         ["parents", `family_id = '${FAMILY_2}'`],
         ["children", `family_id = '${FAMILY_2}'`],
-        ["parent_contacts", "true"],
+        ["parent_profiles", "true"],
       ] as const) {
         assert.equal(await countAs(db, schema, ADMIN_G1, table, where), 0, table);
       }

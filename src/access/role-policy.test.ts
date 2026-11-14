@@ -234,3 +234,92 @@ test("Group admin preserves scoped queue/year reads without generic advanced dis
     false,
   );
 });
+test("every current role reads the directory and nothing else of it (BR30.1)", () => {
+  const request = (action: Parameters<typeof grantAllows>[1]["action"], scope: Scope) => ({
+    action,
+    resource: { kind: "directory", scope },
+  });
+  for (const [role, scope] of [
+    ["parent", family],
+    ["group_admin", group],
+    ["kindergarten_teacher", org],
+    ["super_admin", org],
+  ] as const) {
+    assert.equal(grantAllows(grant(role, scope), request("read", scope)), true, role);
+    for (const action of ["create", "update", "delete", "manage"] as const) {
+      assert.equal(
+        grantAllows(grant(role, scope), request(action, scope)),
+        false,
+        `${role} ${action}`,
+      );
+    }
+  }
+  assert.equal(
+    grantAllows(grant("parent", family), request("read", { ...family, id: "other" })),
+    false,
+  );
+  assert.equal(
+    grantAllows(grant("parent", family), request("read", { ...family, organizationId: "other" })),
+    false,
+  );
+});
+test("a parent's own profile and account belong to the parent grant alone, a super admin included (BR31.2, BR32.1, NFR3.4)", () => {
+  for (const kind of ["own_profile", "own_account"]) {
+    for (const action of ["read", "update"] as const) {
+      assert.equal(
+        grantAllows(grant("parent", family), { action, resource: { kind, scope: family } }),
+        true,
+        `parent ${kind} ${action}`,
+      );
+      for (const [role, scope] of [
+        ["super_admin", org],
+        ["group_admin", group],
+        ["kindergarten_teacher", org],
+      ] as const) {
+        assert.equal(
+          grantAllows(grant(role, scope), { action, resource: { kind, scope } }),
+          false,
+          `${role} ${kind}`,
+        );
+        assert.equal(
+          grantAllows(grant(role, scope), { action, resource: { kind, scope: family } }),
+          false,
+        );
+      }
+    }
+    for (const action of ["create", "delete", "manage"] as const) {
+      assert.equal(
+        grantAllows(grant("parent", family), { action, resource: { kind, scope: family } }),
+        false,
+      );
+    }
+    assert.equal(
+      grantAllows(grant("parent", family), {
+        action: "update",
+        resource: { kind, scope: { ...family, id: "other" } },
+      }),
+      false,
+      "another family's parent",
+    );
+  }
+});
+test("invitations and family and parent records are a super admin's alone (BR35.1, BR37.1)", () => {
+  for (const kind of ["invitation", "record"]) {
+    assert.equal(
+      grantAllows(grant("super_admin", org), { action: "create", resource: { kind, scope: org } }),
+      true,
+      kind,
+    );
+    for (const [role, scope] of [
+      ["group_admin", group],
+      ["kindergarten_teacher", org],
+      ["parent", family],
+    ] as const) {
+      assert.equal(
+        grantAllows(grant(role, scope), { action: "create", resource: { kind, scope } }),
+        false,
+        `${role} ${kind}`,
+      );
+    }
+  }
+});

@@ -16,6 +16,8 @@ import {
   type ApprovalOutcome,
   type AssignmentModel,
   type DashboardModel,
+  type DirectoryApplicationPort,
+  type DirectoryModel,
   type DomainOutcome,
   type DutyDetailModel,
   type DutyListModel,
@@ -26,6 +28,10 @@ import {
   type LifecycleOutcomeModel,
   type NotificationListModel,
   type NotificationModel,
+  type OwnProfileModel,
+  type ProfileFields,
+  type RemovedParentModel,
+  type VersionModel,
   type ParentApplicationPort,
   type ReminderListModel,
   type ReminderOutcome,
@@ -1166,4 +1172,112 @@ export function createTeacherFacadeDouble(
     new FacadePipeline(authorization, classifyDoubleFailure),
     new TeacherPortDouble(repository, scenario),
   );
+}
+
+/**
+ * The directory behind the page tests (U3): three invented families as a parent would see them. The first has
+ * shared; the second holds one parent who has not (name only); the third is a family without children.
+ */
+export const DIRECTORY_FIXTURE: DirectoryModel = Object.freeze({
+  families: Object.freeze([
+    {
+      familyId: "family-boroka",
+      familyName: "Minta család",
+      isOwnFamily: true,
+      parents: [
+        {
+          id: "parent-boroka",
+          fullName: "Minta Borbála",
+          isSelf: true,
+          email: "borbala@example.test",
+          phone: "+36 30 111 2222",
+          residence: "Mintaváros",
+          occupation: "Kertész",
+          hobby: "Kenyérsütés",
+          howISupport: "Kertrendezés",
+          sharingConsent: true,
+        },
+      ],
+      children: ["Minta Liliána"],
+    },
+    {
+      familyId: "family-reti",
+      familyName: "Réti család",
+      isOwnFamily: false,
+      parents: [{ id: "parent-reti", fullName: "Réti Johanna", isSelf: false }],
+    },
+    {
+      familyId: "family-szabo",
+      familyName: "Szabó család",
+      isOwnFamily: false,
+      parents: [
+        {
+          id: "parent-szabo",
+          fullName: "Szabó Márton",
+          isSelf: false,
+          email: "marton@example.test",
+          phone: "+36 70 913 2468",
+        },
+      ],
+    },
+  ]),
+});
+
+export class DirectoryPortDouble implements DirectoryApplicationPort {
+  directory: DirectoryModel | undefined = DIRECTORY_FIXTURE;
+  sharing = false;
+  version = 1;
+  profileFields: Record<string, string> = {};
+  readonly removed: string[] = [];
+  removeAnswer: DomainOutcome<RemovedParentModel> | undefined;
+
+  async list(): Promise<DomainOutcome<DirectoryModel>> {
+    return this.directory ? { state: "success", data: this.directory } : { state: "empty" };
+  }
+
+  async ownProfile(parentId: string): Promise<OwnProfileModel | undefined> {
+    return Object.freeze({
+      parentId,
+      version: this.version,
+      sharingConsent: this.sharing,
+      email: "borbala@example.test",
+      ...this.profileFields,
+    });
+  }
+
+  async setSharing(input: {
+    expectedVersion: number;
+    sharing: boolean;
+  }): Promise<DomainOutcome<VersionModel>> {
+    if (input.expectedVersion !== this.version) {
+      return { state: "conflict", code: "VERSION_CONFLICT" };
+    }
+    this.sharing = input.sharing;
+    this.version += 1;
+    return { state: "success", data: { id: null, version: this.version } };
+  }
+
+  async updateOwnProfile(input: {
+    expectedVersion: number;
+    fields: ProfileFields;
+  }): Promise<DomainOutcome<VersionModel>> {
+    if (input.expectedVersion !== this.version) {
+      return { state: "conflict", code: "VERSION_CONFLICT" };
+    }
+    for (const [key, value] of Object.entries(input.fields)) {
+      if (value) this.profileFields[key === "how_i_support" ? "howISupport" : key] = value;
+    }
+    this.version += 1;
+    return { state: "success", data: { id: null, version: this.version } };
+  }
+
+  async removeParent(input: { parentId: string }): Promise<DomainOutcome<RemovedParentModel>> {
+    this.removed.push(input.parentId);
+    return (
+      this.removeAnswer ?? {
+        state: "success",
+        data: { parentId: input.parentId, accountId: "account-removed" },
+      }
+    );
+  }
 }

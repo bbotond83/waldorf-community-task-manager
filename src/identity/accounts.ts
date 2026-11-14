@@ -150,3 +150,24 @@ export async function changeGrant(
   deps.events.emit("grant_change", { account: input.subjectId }, input.change);
   return success({ subjectId: input.subjectId });
 }
+
+/**
+ * The follow-up of removing a parent (BR36.3): the database has already archived the parent and ended the sign-in
+ * on its side; the server now bans the sign-in user and ends its sessions. Each call is tried three times. A
+ * failure is reported as an event line and in the result, never silently dropped; the hourly repair of
+ * `reconcileAccountBans` closes any gap that remains. No account (a parent who never signed up) needs nothing.
+ */
+export async function endRemovedParentSignIn(
+  accountId: string | null,
+  deps: Pick<AccountDeps, "admin" | "events">,
+): Promise<FollowUp> {
+  if (!accountId) return "done";
+  const banned = await attempt(async () => (await deps.admin.setBan(accountId, true)).ok);
+  const ended = await attempt(async () => {
+    const removed = await deps.admin.callFunction("sessions_remove", { p_user_id: accountId });
+    return removed.ok && removed.value.state === "success";
+  });
+  if (banned && ended) return "done";
+  deps.events.emit("follow_up_failed", { account: accountId }, "parent_removal");
+  return "pending";
+}

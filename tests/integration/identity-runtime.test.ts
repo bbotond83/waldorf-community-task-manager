@@ -110,6 +110,7 @@ describe("the process-wide composition", () => {
     });
     expect(runtime.emailKeySecret).toBe(SECRET);
     expect(Object.keys(runtime).sort()).toEqual([
+      "accountMailer",
       "admin",
       "database",
       "emailKeySecret",

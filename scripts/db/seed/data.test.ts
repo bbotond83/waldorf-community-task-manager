@@ -155,11 +155,13 @@ describe("seed data: the small set", () => {
     assert.ok(plan.families.every((family) => family.name.endsWith(" család")));
   });
 
-  it("stores a parent's optional profile only with consent (the database's own rule)", () => {
-    for (const parent of plan.parents) {
-      assert.ok(parent.consent || parent.optionalProfile === null);
+  it("seeds the sharing choice: some parents share a filled profile and some keep a filled one private", () => {
+    for (const parent of plan.parents.filter((entry) => entry.sharing)) {
+      assert.ok(parent.accountId !== null, "a sharing parent has an account");
+      assert.ok(parent.occupation && parent.hobby && parent.howISupport);
     }
-    assert.ok(plan.parents.some((parent) => parent.consent && parent.optionalProfile));
+    assert.ok(plan.parents.some((parent) => parent.sharing && parent.occupation));
+    assert.ok(plan.parents.some((parent) => !parent.sharing && parent.occupation));
   });
 });
 

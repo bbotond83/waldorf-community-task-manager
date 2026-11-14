@@ -55,3 +55,33 @@ export function scheduleStatusLabel(label: string | null): string | null {
   if (label === null) return null;
   return SCHEDULE_STATUS_WORDS[label] ?? null;
 }
+
+/**
+ * What a person reads for each refusal of the directory, profile, account and invitation commands (U3). The
+ * address refusals say the same thing whichever record held the address (NFR1.4), and none names a person.
+ * A code not listed here is shown with `DIRECTORY_REFUSAL_FALLBACK`.
+ */
+export const DIRECTORY_REFUSAL_MESSAGES: Readonly<Record<string, string>> = Object.freeze({
+  VERSION_CONFLICT:
+    "Közben valaki módosította az adatot. Kérjük, töltse újra az oldalt, és próbálja újra.",
+  EMAIL_INVALID: "Kérjük, érvényes e-mail-címet adjon meg.",
+  EMAIL_UNAVAILABLE: "Ez az e-mail-cím nem használható.",
+  EMAIL_RATE_LIMITED:
+    "Túl sok levelet kértek erre a címre rövid idő alatt. Kérjük, próbálja később.",
+  EMAIL_REQUEST_NOT_PENDING: "Nincs függőben lévő címváltoztatási kérés.",
+  EMAIL_LINK_INVALID: "Ez a hivatkozás már nem érvényes.",
+  EMAIL_MAIL_NOT_SENT: "A levelet most nem sikerült elküldeni. Kérjük, próbálja újra később.",
+  INVITATION_MAIL_NOT_SENT: "A meghívó elkészült, de a levelet most nem sikerült elküldeni.",
+  INVITATION_BUSY: "Ehhez a szülőhöz már tartozik nyitott meghívó.",
+  PARENT_LAST_IN_FAMILY: "Az utolsó szülő nem távolítható el a családból.",
+  PARENT_HAS_ACCOUNT: "Ennek a szülőnek már van fiókja, ezért a címét ott lehet módosítani.",
+  PROFILE_FIELD_INVALID: "Az egyik megadott adat nem érvényes.",
+  authorization_denied: "Ehhez nincs jogosultsága.",
+  session_inactive: "A munkamenet lejárt. Kérjük, jelentkezzen be újra.",
+});
+
+export const DIRECTORY_REFUSAL_FALLBACK = "A művelet most nem hajtható végre.";
+
+export function directoryRefusalMessage(code: string | undefined): string {
+  return (code && DIRECTORY_REFUSAL_MESSAGES[code]) || DIRECTORY_REFUSAL_FALLBACK;
+}

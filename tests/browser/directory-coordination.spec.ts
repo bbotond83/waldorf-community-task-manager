@@ -533,27 +533,22 @@ test("the extended admin forms create a family and a task, refuse a wrong assign
   await expect(page.getByTestId("admin-parent-0-name-input")).toHaveValue("Újfalusi Zoltán");
   await page.getByTestId("admin-parent-0-email-input").fill("zoltan@example.test");
   await page.getByTestId("admin-parent-0-phone-input").fill("+36 30 111 2222");
-  await page.getByTestId("admin-parent-0-profile-input").fill("Asztalos vagyok.");
-  await page.getByTestId("admin-parent-0-consent-input").check();
   await accessible(page, "family form");
   await page.getByTestId("admin-record-create-form-submit-button").click();
   await expect(page.getByTestId("admin-record-create-form-state-success")).toBeVisible();
   const family = await oneValue<{ id: string }>(
     "select id from families where display_name = 'Újfalusi család'",
   );
-  const stored = await oneValue<{ contact_email: string; optional_profile: string }>(
-    "select c.contact_email, p.optional_profile from parents p join parent_contacts c on c.parent_id = p.id where p.family_id = $1",
+  const stored = await oneValue<{ email_on_record: string; sharing_consent: boolean }>(
+    "select c.email_on_record, c.sharing_consent from parents p join parent_profiles c on c.parent_id = p.id where p.family_id = $1",
     [family.id],
   );
-  expect(stored).toEqual({
-    contact_email: "zoltan@example.test",
-    optional_profile: "Asztalos vagyok.",
-  });
+  expect(stored).toEqual({ email_on_record: "zoltan@example.test", sharing_consent: false });
 
   // The same family on its edit page, with the parent filled in; a family has no working group (BR1.5).
   await page.goto(`/admin/nyilvantartasok/${family.id}`);
   await expect(page.getByTestId("admin-parent-0-name-input")).toHaveValue("Újfalusi Zoltán");
-  await expect(page.getByTestId("admin-parent-0-consent-input")).toBeChecked();
+  await expect(page.getByTestId("admin-parent-0-email-input")).toHaveValue("zoltan@example.test");
   await expect(page.getByLabel("Tagság megszüntetése: Boróka")).toHaveCount(0);
   await accessible(page, "family edit form");
 

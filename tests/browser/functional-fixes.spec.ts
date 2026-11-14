@@ -36,6 +36,8 @@ test.describe("parent: notifications stay under Értesítések", () => {
       "Beosztás",
       "Cserék",
       "Munkacsoportok",
+      "Szülők",
+      "Fiókom",
     ]);
     await expect(page.getByTestId("app-shell-navigation-parent-notifications")).toHaveAttribute(
       "aria-current",

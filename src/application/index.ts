@@ -40,3 +40,5 @@ export {
 export type { ValidationCode } from "./validation.ts";
 export { WorkingGroupApplicationFacade } from "./working-group-facade.ts";
 export type { WorkingGroupApplicationPort } from "./working-group-facade.ts";
+export { DirectoryApplicationFacade } from "./directory-facade.ts";
+export type { DirectoryApplicationPort } from "./directory-facade.ts";

@@ -116,9 +116,11 @@ export interface SeedPlan {
     accountId: string | null;
     contactEmail: string;
     contactPhone: string | null;
-    locality: string;
-    optionalProfile: string | null;
-    consent: boolean;
+    residence: string;
+    occupation: string | null;
+    hobby: string | null;
+    howISupport: string | null;
+    sharing: boolean;
   }[];
   children: { id: string; familyId: string; name: string }[];
   accounts: SeedAccount[];
@@ -291,6 +293,7 @@ const CHILD_NAMES = [
   "Vince",
   "Zsombor",
 ] as const;
+const OCCUPATIONS = ["Kertész", "Tanár", "Asztalos", "Orvos"] as const;
 const LOCALITIES = ["Pécs", "Mohács", "Komló", "Szigetvár"] as const;
 /** Example phone numbers that scripts/verification/privacy-allowlist.json already allows. */
 const PHONES = [
@@ -442,9 +445,11 @@ export function buildSeedPlan(schema: string, size: SeedSize): SeedPlan {
         accountId: first ? parentAccount.id : (coParentAdmin?.id ?? null),
         contactEmail: `csalad${n}.szulo${slot}@example.test`,
         contactPhone: first || n % 2 === 0 ? pick(PHONES, index + slot) : null,
-        locality: pick(LOCALITIES, index),
-        optionalProfile: n === 1 && first ? "Szívesen sütök és kertészkedem." : null,
-        consent: n === 1 && first,
+        residence: pick(LOCALITIES, index),
+        occupation: first && (n === 1 || n % 3 === 0) ? pick(OCCUPATIONS, index) : null,
+        hobby: n === 1 && first ? "Kertészkedés és sütés." : null,
+        howISupport: n === 1 && first ? "Szívesen sütök a közös ünnepekre." : null,
+        sharing: n === 1 && first,
       });
     }
     const childCount = n % 3 === 0 ? 2 : 1;

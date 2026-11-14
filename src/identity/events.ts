@@ -24,7 +24,11 @@ export type SecurityEventCode =
   | "follow_up_failed"
   | "follow_up_reconciled"
   | "housekeeping_done"
-  | "housekeeping_failed";
+  | "housekeeping_failed"
+  | "password_change_audit_failed"
+  | "sessions_end_failed"
+  | "email_change_mail_failed"
+  | "email_rate_limited";
 
 export type EventSubject = { account: string } | { address: string } | Record<string, never>;
 

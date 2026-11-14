@@ -81,19 +81,21 @@ describe("runtime shell", () => {
       "href",
       "/szulo/munkacsoportok",
     );
-    expect(navigation.getAllByRole("link")).toHaveLength(5);
+    expect(navigation.getAllByRole("link")).toHaveLength(7);
     expect(navigation.getAllByRole("link").map((link) => link.textContent)).toEqual([
       "Értesítések",
       "Feladatok",
       "Beosztás",
       "Cserék",
       "Munkacsoportok",
+      "Szülők",
+      "Fiókom",
     ]);
   });
 
   it.each([
-    ["group-admin", 6],
-    ["super-admin", 11],
+    ["group-admin", 7],
+    ["super-admin", 12],
   ] as const)("shows the one menu of %s with %i items", (id, count) => {
     const profile = shellProfile(id);
     render(
@@ -122,7 +124,7 @@ describe("runtime shell", () => {
   });
 });
 
-it("teacher shell announces the localized role and lists Beosztás, Takarítás and Munkacsoportok", () => {
+it("teacher shell announces the localized role and lists Beosztás, Takarítás, Munkacsoportok and Szülők", () => {
   render(
     <AppShell profile={shellProfile("teacher")}>
       <h1>Óvónői kezdőlap</h1>
@@ -133,7 +135,7 @@ it("teacher shell announces the localized role and lists Beosztás, Takarítás 
     within(screen.getByRole("navigation"))
       .getAllByRole("link")
       .map((link) => link.textContent),
-  ).toEqual(["Beosztás", "Takarítás", "Munkacsoportok"]);
+  ).toEqual(["Beosztás", "Takarítás", "Munkacsoportok", "Szülők"]);
   expect(screen.getByTestId("brand-link")).toHaveAttribute("href", "/teacher/schedule");
   expect(screen.getByTestId("app-shell-skip-link")).toHaveAttribute("href", "#fo-tartalom");
   expect(screen.getByTestId("app-shell-main")).toHaveAttribute("tabindex", "-1");
