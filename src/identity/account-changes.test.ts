@@ -323,12 +323,12 @@ describe("the pending request and cancelling it", () => {
     const withOne = setup({
       handlers: {
         email_change_pending: () =>
-          envelope("success", "pending", "r1", { new_email: "a@b.test", expires_at: "x" }),
+          envelope("success", "pending", "r1", { new_email: "a@example.test", expires_at: "x" }),
       },
     });
     const found = await pendingEmailChange(caller, withOne.deps);
     assert.deepEqual(found.state === "success" && found.data, {
-      newEmail: "a@b.test",
+      newEmail: "a@example.test",
       expiresAt: "x",
     });
     const none = setup({ handlers: { email_change_pending: () => envelope("success", "none") } });
