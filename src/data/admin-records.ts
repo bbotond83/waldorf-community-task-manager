@@ -10,7 +10,6 @@ import type { DataGateway } from "./gateway.ts";
 import {
   defined,
   likePattern,
-  payloadFlag,
   payloadNumber,
   payloadObjects,
   payloadText,
@@ -18,7 +17,7 @@ import {
   type Payload,
 } from "./payload.ts";
 import { refused, toOutcome } from "./results.ts";
-import { asRows, flag, integer, isUuid, optionalText, text, type Row } from "./values.ts";
+import { asRows, integer, isUuid, optionalText, text, type Row } from "./values.ts";
 
 /**
  * The admin operations on records (records.list, records.get, records.save, records.archive,
@@ -180,46 +179,40 @@ async function detailsOf(gateway: DataGateway, found: Found): Promise<AdminItemD
   if (kind === "child") return Object.freeze({ familyId: text(row, "family_id") });
   const familyId = text(row, "id");
   const [parents, children] = await Promise.all([
-    readTable(
-      gateway,
-      "parents",
-      // The profile text is no readable column; it comes from `directory_parent_profile` below.
-      "id,display_name,optional_profile_consent,account_id,version",
-      (q) => q.eq("family_id", familyId).eq("status", "active").order("display_name"),
+    readTable(gateway, "parents", "id,display_name,account_id,version", (q) =>
+      q.eq("family_id", familyId).eq("status", "active").order("display_name"),
     ),
     readTable(gateway, "children", "id,display_name,version", (q) =>
       q.eq("family_id", familyId).eq("status", "active").order("display_name"),
     ),
   ]);
-  const contacts = parents.length
-    ? await readTable(
-        gateway,
-        "parent_contacts",
-        "parent_id,contact_email,contact_phone,locality",
-        (q) =>
-          q.in(
-            "parent_id",
-            parents.map((parent) => text(parent, "id")),
-          ),
+  // A super admin reads the profile rows directly (the policy of `parent_profiles`); other roles never reach here.
+  const profiles = parents.length
+    ? await readTable(gateway, "parent_profiles", "parent_id,email_on_record,phone", (q) =>
+        q.in(
+          "parent_id",
+          parents.map((parent) => text(parent, "id")),
+        ),
       )
     : ([] as readonly Row[]);
-  // The optional profile exists only with consent, and only the function may read it (BR30.4).
-  const profiles = await Promise.all(
-    parents.map(async (parent) => {
-      if (parent.optional_profile_consent !== true) return undefined;
-      const answer = await gateway.select("records.profile", (client) =>
-        client.rpc("directory_parent_profile", { p_parent_id: text(parent, "id") }),
-      );
-      return typeof answer === "string" && answer !== "" ? answer : undefined;
-    }),
-  );
+  // Only a super admin's policy returns invitations; for anyone else the list is empty and every state reads "none".
+  const invitations = parents.length
+    ? await readTable(gateway, "invitations", "target_id,status,expires_at,created_at", (q) =>
+        q
+          .in(
+            "target_id",
+            parents.map((parent) => text(parent, "id")),
+          )
+          .order("created_at", { ascending: false }),
+      )
+    : ([] as readonly Row[]);
   return Object.freeze({
     parents: Object.freeze(
-      parents.map((parent, index) =>
+      parents.map((parent) =>
         parentDetail(
           parent,
-          contacts.find((contact) => contact.parent_id === parent.id),
-          profiles[index],
+          profiles.find((profile) => profile.parent_id === parent.id),
+          invitations.find((invitation) => invitation.target_id === parent.id),
         ),
       ),
     ),
@@ -235,24 +228,28 @@ async function detailsOf(gateway: DataGateway, found: Found): Promise<AdminItemD
   });
 }
 
+/** Expiry is read from the time; it is not stored (BR37.4). */
+function invitationState(invitation: Row | undefined): AdminParentDetail["invitation"] {
+  if (!invitation || invitation.status !== "pending") return "none";
+  const expires = Date.parse(String(invitation.expires_at ?? ""));
+  return Number.isNaN(expires) || expires > Date.now() ? "pending" : "expired";
+}
+
 function parentDetail(
   parent: Row,
-  contact: Row | undefined,
-  profile: string | undefined,
+  profile: Row | undefined,
+  invitation: Row | undefined,
 ): AdminParentDetail {
-  const email = contact ? optionalText(contact, "contact_email") : undefined;
-  const phone = contact ? optionalText(contact, "contact_phone") : undefined;
-  const locality = contact ? optionalText(contact, "locality") : undefined;
+  const email = profile ? optionalText(profile, "email_on_record") : undefined;
+  const phone = profile ? optionalText(profile, "phone") : undefined;
   return Object.freeze({
     id: text(parent, "id"),
     version: integer(parent, "version"),
     displayName: text(parent, "display_name"),
     ...(email !== undefined ? { email } : {}),
     ...(phone !== undefined ? { phone } : {}),
-    ...(locality !== undefined ? { locality } : {}),
-    ...(profile !== undefined ? { optionalProfile: profile } : {}),
-    optionalProfileConsent: flag(parent, "optional_profile_consent"),
     linked: parent.account_id !== null && parent.account_id !== undefined,
+    invitation: invitationState(invitation),
   });
 }
 
@@ -265,14 +262,11 @@ function parentBody(entry: Payload): Record<string, unknown> {
   const contact = defined({
     email: payloadText(entry, "email"),
     phone: payloadText(entry, "phone"),
-    locality: payloadText(entry, "locality"),
   });
   return defined({
     id: payloadText(entry, "id"),
     expected_version: payloadNumber(entry, "expectedVersion"),
     display_name: payloadText(entry, "displayName"),
-    optional_profile: payloadText(entry, "optionalProfile"),
-    optional_profile_consent: payloadFlag(entry, "optionalProfileConsent"),
     contact: Object.keys(contact).length > 0 ? contact : undefined,
   });
 }

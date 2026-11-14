@@ -1,6 +1,7 @@
 import {
   AdminApplicationFacade,
   AuthorizationContract,
+  DirectoryApplicationFacade,
   FacadePipeline,
   IdempotencyCoordinator,
   InMemoryIdempotencyStore,
@@ -18,6 +19,7 @@ import {
   AdminPortDouble,
   classifyDoubleFailure,
   createTeacherRepositoryDouble,
+  DirectoryPortDouble,
   PARENT_FAMILY_ID,
   PARENT_ORGANIZATION_ID,
   ParentPortDouble,
@@ -153,6 +155,7 @@ export function createRequestWorld() {
   const teacherSource = createTeacherRepositoryDouble();
   let parentPort = new ParentPortDouble(ACCOUNT_IDS.parent);
   let adminPort = newAdminPort();
+  let directoryPort = new DirectoryPortDouble();
 
   function newAdminPort(): AdminPortDouble {
     return new AdminPortDouble({
@@ -226,6 +229,7 @@ export function createRequestWorld() {
       }),
       // The rota screens come after the owner's design approval; until then nothing is planned or published.
       rota: new RotaApplicationFacade(pipeline, ROTA_PORT_DOUBLE),
+      directory: new DirectoryApplicationFacade(pipeline, directoryPort),
     });
   }
 
@@ -249,7 +253,12 @@ export function createRequestWorld() {
       return access;
     },
     get ports() {
-      return { parent: parentPort, admin: adminPort, teacher: teacherSource };
+      return {
+        parent: parentPort,
+        admin: adminPort,
+        teacher: teacherSource,
+        directory: directoryPort,
+      };
     },
     /** The state of a fresh test: everyone active, nobody signed in, all fixture data as first delivered. */
     reset(): void {
@@ -261,6 +270,7 @@ export function createRequestWorld() {
       teacherScenario = "ready";
       parentPort = new ParentPortDouble(ACCOUNT_IDS.parent);
       adminPort = newAdminPort();
+      directoryPort = new DirectoryPortDouble();
     },
     /** What `productionRequest()` answers. */
     async productionRequest(): Promise<ProductionRequestDouble> {

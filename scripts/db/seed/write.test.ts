@@ -52,7 +52,7 @@ describe("seed writer", () => {
       "accounts",
       "parents",
       "group_memberships",
-      "parent_contacts",
+      "parent_profiles",
       "children",
       "app_role_grants",
       "app_authorization_versions",
@@ -94,7 +94,7 @@ describe("seed writer", () => {
     assert.equal(rowsOf("groups"), counts.groups);
     assert.equal(rowsOf("families"), counts.families);
     assert.equal(rowsOf("parents"), counts.parents);
-    assert.equal(rowsOf("parent_contacts"), counts.parents);
+    assert.equal(rowsOf("parent_profiles"), counts.parents);
     assert.equal(rowsOf("children"), counts.children);
     assert.equal(rowsOf("accounts"), counts.accounts);
     assert.equal(rowsOf("app_role_grants"), counts.accounts + plan.extraGrants.length);

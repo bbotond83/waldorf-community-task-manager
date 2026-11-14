@@ -17,9 +17,6 @@ export type AdminParentPayload = Readonly<{
   displayName: string;
   email?: string;
   phone?: string;
-  locality?: string;
-  optionalProfile?: string;
-  optionalProfileConsent?: boolean;
 }>;
 
 export type AdminChildPayload = Readonly<{

@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  createContext,
   startTransition,
   useActionState,
   useEffect,
@@ -10,6 +11,9 @@ import {
 } from "react";
 import type { ParentActionState } from "../_lib/action-state.ts";
 import { freshKey, keyPrefix } from "./fresh-key.ts";
+
+/** The field messages of the last refused submit, so a field can show its own message next to it. */
+export const ParentFieldErrorsContext = createContext<Readonly<Record<string, string>>>({});
 
 export type ParentAction = (
   state: ParentActionState,
@@ -98,12 +102,14 @@ export function ParentMutationForm({
       {replaced ? (
         afterSuccess
       ) : (
-        <>
+        <ParentFieldErrorsContext
+          value={state.state === "validation" ? (state.fieldErrors ?? {}) : {}}
+        >
           {children}
           <button type="submit" disabled={isPending} data-testid={`${testId}-submit-button`}>
             {isPending ? "Feldolgozás folyamatban" : submitLabel}
           </button>
-        </>
+        </ParentFieldErrorsContext>
       )}
     </form>
   );

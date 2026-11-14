@@ -29,6 +29,12 @@
 - ALWAYS include security and performance instructions when explicit NFR or privacy risks require them, even under Standard strategy (learned 2026-08-06) <!-- cid:build-and-test:c2 -->
 - ALWAYS report provisioned environment checks as outstanding evidence until they are executed against real integrations (learned 2026-08-06) <!-- cid:build-and-test:c3 -->
 - ALWAYS block CI on high and critical dependency vulnerabilities (learned 2026-08-06) <!-- cid:ci-pipeline:c3 -->
+- ALWAYS stop leftover app servers (pkill -f next-server) before a full npm run verify:local, because a leftover server on port 3100 can block the browser runs. (learned 2026-11-14) <!-- cid:261108-ovis-tabla-workflow:code-generation:32c4bcc6cc93abc2d3da4058217965f36a1f5a181f24e3b357b3a302eaa5d02e -->
+
+- ALWAYS add every phone number or e-mail address used in a test to scripts/verification/privacy-allowlist.json, or the privacy scan fails the verification run. (learned 2026-11-14) <!-- cid:261108-ovis-tabla-workflow:code-generation:26ab28ca7937e98833227c851b205fbd62e7d72f01fa21e00ddea1d839ccfb82 -->
+
+- ALWAYS check owner-review screenshots for error pages before sending them, because a wrong address in the screenshot script silently shows an error screen instead of the intended screen. (learned 2026-11-14) <!-- cid:261108-ovis-tabla-workflow:code-generation:be1fb7af972058101a51643f40419529287edf164d3f275b419eac82e0476c6a -->
+
 ## Deployment
 
 <!-- Project-specific specialisation. -->

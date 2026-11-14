@@ -48,7 +48,7 @@ const U3_TABLES = [
   "families",
   "group_memberships",
   "parents",
-  "parent_contacts",
+  "parent_profiles",
   "children",
   "organization_settings",
   "reminder_settings",
@@ -101,9 +101,12 @@ for (const schema of DIRECTORY_SCHEMAS) {
       ]);
       // Contact values that belong to the first family only, so the search can tell them from the others'.
       await db.query(
-        "update parent_contacts set contact_phone = '+36 30 777 1010', locality = 'Kaposvár' where parent_id in ($1, $2)",
+        "update parent_profiles set phone = '+36 30 777 1010', residence = 'Kaposvár' where parent_id in ($1, $2)",
         [PARENT_ROW_F1, PARENT_ROW_CO],
       );
+      await db.query("update parent_profiles set hobby = 'Szívesen főzök.' where parent_id = $1", [
+        PARENT_ROW_F1,
+      ]);
     });
 
     const fn = (account: string, sql: string, values: unknown[] = []): Promise<Result> =>
@@ -303,7 +306,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
       for (const table of [
         "families",
         "parents",
-        "parent_contacts",
+        "parent_profiles",
         "children",
         "contribution_notes",
         "change_requests",
@@ -342,25 +345,18 @@ for (const schema of DIRECTORY_SCHEMAS) {
         ["Anonimizált család", "archived", true],
       );
       assert.equal(
-        await count(db, "parent_contacts"),
+        await count(db, "parent_profiles"),
         2,
         "only the other families' contacts remain",
       );
       assert.equal(await count(db, "group_memberships", `parent_id = '${PARENT_ROW_F1}'`), 0);
       const parents = (
-        await db.query(
-          "select display_name, account_id, optional_profile, optional_profile_consent from parents where family_id = $1",
-          [FAMILY_1],
-        )
+        await db.query("select display_name, account_id from parents where family_id = $1", [
+          FAMILY_1,
+        ])
       ).rows;
       assert.ok(
-        parents.every(
-          (row) =>
-            row.display_name === "Anonimizált szülő" &&
-            row.account_id === null &&
-            row.optional_profile === null &&
-            row.optional_profile_consent === false,
-        ),
+        parents.every((row) => row.display_name === "Anonimizált szülő" && row.account_id === null),
       );
       assert.equal(
         (await db.query("select display_name from children where id = $1", [CHILD_F1])).rows[0]
@@ -452,11 +448,11 @@ for (const schema of DIRECTORY_SCHEMAS) {
 
     it("deletes a family without any place completely, with one audit event (BR35.2)", async () => {
       await db.query(
-        "insert into parents (id, organization_id, family_id, display_name, optional_profile, optional_profile_consent) values ($1, $2, $3, 'Csoport Géza', 'Zenél.', true)",
+        "insert into parents (id, organization_id, family_id, display_name) values ($1, $2, $3, 'Csoport Géza')",
         [uuid(620), ORGANIZATION, FAMILY_NO_GROUP],
       );
       await db.query(
-        "insert into parent_contacts (parent_id, organization_id, contact_email, contact_phone, locality) values ($1, $2, 'geza@example.test', '+36 20 555 1212', 'Mohács')",
+        "insert into parent_profiles (parent_id, organization_id, email_on_record, phone, residence, occupation) values ($1, $2, 'geza@example.test', '+36 20 555 1212', 'Mohács', 'Zenél.')",
         [uuid(620), ORGANIZATION],
       );
       await db.query(
@@ -600,7 +596,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
         await db.query("drop function refuse_anonymize()");
       }
       assert.deepEqual(
-        Object.keys(await rowsContaining(ORIGINALS)).includes("parent_contacts"),
+        Object.keys(await rowsContaining(ORIGINALS)).includes("parent_profiles"),
         true,
         "the contacts are still there",
       );

@@ -1,0 +1,319 @@
+{
+  "stage": "code-generation",
+  "unit": "u3-directory-and-profile",
+  "version": 1,
+  "writes": [
+    {
+      "path": "README.md"
+    },
+    {
+      "path": "app/admin/_components/ParentInvitations.tsx"
+    },
+    {
+      "path": "app/admin/_components/RecordFields.tsx"
+    },
+    {
+      "path": "app/admin/_lib/action-state.ts"
+    },
+    {
+      "path": "app/admin/_lib/record-payload.ts"
+    },
+    {
+      "path": "app/admin/nyilvantartasok/[id]/page.tsx"
+    },
+    {
+      "path": "app/admin/nyilvantartasok/[id]/szulo/[parentId]/eltavolitas/page.tsx"
+    },
+    {
+      "path": "app/admin/parent-actions.ts"
+    },
+    {
+      "path": "app/admin/szulok/page.tsx"
+    },
+    {
+      "path": "app/email-megerosites/[token]/ConfirmEmailForm.tsx"
+    },
+    {
+      "path": "app/email-megerosites/[token]/actions.ts"
+    },
+    {
+      "path": "app/email-megerosites/[token]/page.tsx"
+    },
+    {
+      "path": "app/globals.css"
+    },
+    {
+      "path": "app/szulo/_components/ParentFields.tsx"
+    },
+    {
+      "path": "app/szulo/_components/ParentMutationForm.tsx"
+    },
+    {
+      "path": "app/szulo/_lib/account-state.ts"
+    },
+    {
+      "path": "app/szulo/_lib/facade.ts"
+    },
+    {
+      "path": "app/szulo/_lib/session.ts"
+    },
+    {
+      "path": "app/szulo/fiokom/actions.ts"
+    },
+    {
+      "path": "app/szulo/fiokom/page.tsx"
+    },
+    {
+      "path": "app/szulo/szulok/page.tsx"
+    },
+    {
+      "path": "app/teacher/szulok/page.tsx"
+    },
+    {
+      "path": "package.json"
+    },
+    {
+      "path": "scripts/db/seed/data.test.ts"
+    },
+    {
+      "path": "scripts/db/seed/data.ts"
+    },
+    {
+      "path": "scripts/db/seed/write.test.ts"
+    },
+    {
+      "path": "scripts/db/seed/write.ts"
+    },
+    {
+      "path": "scripts/db/shuffled-tests.ts"
+    },
+    {
+      "path": "src/access/access-matrix.test.ts"
+    },
+    {
+      "path": "src/access/role-policy.test.ts"
+    },
+    {
+      "path": "src/access/role-policy.ts"
+    },
+    {
+      "path": "src/application/admin-payloads.ts"
+    },
+    {
+      "path": "src/application/authorization.ts"
+    },
+    {
+      "path": "src/application/contracts.ts"
+    },
+    {
+      "path": "src/application/directory-facade.test.ts"
+    },
+    {
+      "path": "src/application/directory-facade.ts"
+    },
+    {
+      "path": "src/application/index.ts"
+    },
+    {
+      "path": "src/data/admin-port.test.ts"
+    },
+    {
+      "path": "src/data/admin-records.ts"
+    },
+    {
+      "path": "src/data/copy.ts"
+    },
+    {
+      "path": "src/data/directory.test.ts"
+    },
+    {
+      "path": "src/data/directory.ts"
+    },
+    {
+      "path": "src/data/index.ts"
+    },
+    {
+      "path": "src/identity/account-changes.test.ts"
+    },
+    {
+      "path": "src/identity/account-changes.ts"
+    },
+    {
+      "path": "src/identity/accounts.test.ts"
+    },
+    {
+      "path": "src/identity/accounts.ts"
+    },
+    {
+      "path": "src/identity/admin-client.ts"
+    },
+    {
+      "path": "src/identity/copy.test.ts"
+    },
+    {
+      "path": "src/identity/copy.ts"
+    },
+    {
+      "path": "src/identity/events.ts"
+    },
+    {
+      "path": "src/identity/mail.ts"
+    },
+    {
+      "path": "src/identity/runtime.ts"
+    },
+    {
+      "path": "src/runtime/DirectoryPage.tsx"
+    },
+    {
+      "path": "src/runtime/DirectorySearch.tsx"
+    },
+    {
+      "path": "src/runtime/directory-search.ts"
+    },
+    {
+      "path": "src/runtime/navigation.ts"
+    },
+    {
+      "path": "src/runtime/production/access.test.ts"
+    },
+    {
+      "path": "src/runtime/production/access.ts"
+    },
+    {
+      "path": "src/runtime/production/services.ts"
+    },
+    {
+      "path": "supabase/migrations/20261049_directory_and_profile.sql"
+    },
+    {
+      "path": "tests/browser/admin-advanced.spec.ts"
+    },
+    {
+      "path": "tests/browser/directory-account.spec.ts"
+    },
+    {
+      "path": "tests/browser/directory-coordination.spec.ts"
+    },
+    {
+      "path": "tests/browser/directory-screenshots.spec.ts"
+    },
+    {
+      "path": "tests/browser/directory-timing.spec.ts"
+    },
+    {
+      "path": "tests/browser/directory.spec.ts"
+    },
+    {
+      "path": "tests/browser/functional-fixes.spec.ts"
+    },
+    {
+      "path": "tests/browser/navigation-polish.spec.ts"
+    },
+    {
+      "path": "tests/browser/runtime-foundation.spec.ts"
+    },
+    {
+      "path": "tests/browser/teacher-web.spec.ts"
+    },
+    {
+      "path": "tests/browser/visual-overhaul.spec.ts"
+    },
+    {
+      "path": "tests/coverage/production-inventory.test.ts"
+    },
+    {
+      "path": "tests/database/community-roles.test.ts"
+    },
+    {
+      "path": "tests/database/data-adapters.test.ts"
+    },
+    {
+      "path": "tests/database/dataset.ts"
+    },
+    {
+      "path": "tests/database/directory-functions.test.ts"
+    },
+    {
+      "path": "tests/database/directory-profile.test.ts"
+    },
+    {
+      "path": "tests/database/directory-records.test.ts"
+    },
+    {
+      "path": "tests/database/directory-schema.test.ts"
+    },
+    {
+      "path": "tests/database/directory-support.ts"
+    },
+    {
+      "path": "tests/database/identity-catalogue.test.ts"
+    },
+    {
+      "path": "tests/database/identity-email-change.test.ts"
+    },
+    {
+      "path": "tests/database/identity-support.ts"
+    },
+    {
+      "path": "tests/database/lifecycle.test.ts"
+    },
+    {
+      "path": "tests/database/schedule.test.ts"
+    },
+    {
+      "path": "tests/database/seed.test.ts"
+    },
+    {
+      "path": "tests/integration/admin-extended-actions.test.ts"
+    },
+    {
+      "path": "tests/integration/admin-forms.test.tsx"
+    },
+    {
+      "path": "tests/integration/app-nav.test.tsx"
+    },
+    {
+      "path": "tests/integration/copy.test.ts"
+    },
+    {
+      "path": "tests/integration/directory.test.tsx"
+    },
+    {
+      "path": "tests/integration/identity-runtime.test.ts"
+    },
+    {
+      "path": "tests/integration/runtime-shell.test.tsx"
+    },
+    {
+      "path": "tests/support/port-doubles.ts"
+    },
+    {
+      "path": "tests/support/request-world.ts"
+    },
+    {
+      "path": "tests/unit/navigation-access.test.ts"
+    },
+    {
+      "path": "tests/unit/record-payload.test.ts"
+    },
+    {
+      "path": "tests/unit/runtime-boundaries.test.ts"
+    },
+    {
+      "path": "verification/AUTHORIZATION.md"
+    },
+    {
+      "path": "verification/authorization-matrix.json"
+    },
+    {
+      "path": "verification/reports/local-acceptance.json"
+    },
+    {
+      "path": "verification/reports/local-acceptance.md"
+    },
+    {
+      "path": "verification/reports/outstanding-targets.md"
+    }
+  ]
+}

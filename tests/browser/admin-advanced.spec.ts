@@ -84,7 +84,7 @@ test("@a11y advanced admin supports keyboard, focus, zoom, mobile touch, and axe
 }) => {
   await signInAs(page, world().account("super-admin"));
   await page.goto("/admin/beallitasok");
-  for (let step = 0; step < 15; step += 1) {
+  for (let step = 0; step < 30; step += 1) {
     const isFocused = await page
       .getByTestId("app-shell-skip-link")
       .evaluate((element) => element === document.activeElement);

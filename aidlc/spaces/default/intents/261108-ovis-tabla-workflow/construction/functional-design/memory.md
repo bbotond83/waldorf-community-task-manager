@@ -10,12 +10,18 @@
 - 2026-11-10T08:05:00Z [unit u2-first-rota-slice] — Indoor-cleaning card text is a short fixed Hungarian sentence; the sources hold no cleaning instructions, only "no fixed day" (FR5.7), so detailed text waits for the information page and the owner corrects the wording in the screenshot review.
 - 2026-11-10T08:05:00Z [unit u2-first-rota-slice] — Every active family counts as full-year in the draft; family standing (leaving, new) is U6's, so the part-year half of AC5.1.2 and AC5.1.3 are traced to U6.
 
+- 2026-11-13T07:07:04Z [unit u3-directory-and-profile] — A parent always sees their own family's children; Q2 put the other parent's contact details under the tick-box rule, but the children are the viewer's own family's data, so BR30.4 shows them to the family itself.
+- 2026-11-13T07:07:04Z [unit u3-directory-and-profile] — A working-group coordinator sees the directory as a parent does; FR3.5 names only teachers and super admins as wider readers, while today's code lets group admins read contacts in reach.
+
 ## Deviations
 <!-- example: 2026-05-29T10:14:32Z — skipped the optional caching layer the stage prose suggested; the dataset is small enough that it adds risk -->
 - 2026-11-09T07:11:20Z [unit u1-community-foundation] — Left isCoordinator off WorkingGroupMembership although components.md lists it; the unrevoked group-admin grant is the single record, because ADR-010 keeps grants in Identity and a second copy could disagree.
 
 - 2026-11-10T08:05:00Z [unit u2-first-rota-slice] — U2 also builds the C5 place functions and C18 place_mark_done although no U2 screen uses them; the contracts name U2 as provider, and leaving them would make U7 and U9 reach back into U2.
 - 2026-11-10T08:05:00Z [unit u2-first-rota-slice] — Today's notices are tied to one task, so the publishing notice adds one kind to them (rota_published) rather than waiting for U6's notification function; contract C8 said U2 would use today's function unchanged.
+
+- 2026-11-13T07:07:04Z [unit u3-directory-and-profile] — U3 also designs the C16 directory removal step and the C17 family load step although no U3 screen needs the latter; the contracts name U3 as provider, so U14 and U15 need not reach back into U3.
+- 2026-11-13T07:07:04Z [unit u3-directory-and-profile] — The old free-text profile and the separate contact email are dropped rather than migrated; the records are invented test data (AC1.1.3), and the owner chose one email per parent (Q1).
 
 ## Tradeoffs
 <!-- example: 2026-05-29T10:14:32Z — picked TDD over BDD this run; the team is unit-first and the domain is well-understood -->
@@ -25,6 +31,10 @@
 - 2026-11-10T08:05:00Z [unit u2-first-rota-slice] — Published is final in U2, so a mistake means a local reset until U7 can change duties; the alternative, an unpublish step, would need rules for notices already sent and duties already created.
 - 2026-11-10T08:05:00Z [unit u2-first-rota-slice] — Rota duties are refused by today's change functions (DUTY_ROTA_MANAGED) rather than left editable, because an edit through the old task form would break the rota's one-family-per-week link until U7 moves those functions.
 
+- 2026-11-13T07:07:04Z [unit u3-directory-and-profile] — The directory search filters the cards already sent to the browser instead of searching in the database; with about 20 families one read is fast enough, and it guarantees a hidden field can never make a card match.
+
 ## Open questions
 - 2026-11-10T08:05:00Z [unit u2-first-rota-slice] — The teacher's overview route is only proposed; confirm it in the Stitch design.
+- 2026-11-13T07:07:04Z [unit u3-directory-and-profile] — U14's notes say its design settles removing a family's only parent; U3 now refuses it (owner answer Q5), so U14 should start from that refusal.
+- 2026-11-13T07:16:30Z [unit u3-directory-and-profile] — Settle in NFR Design or the code plan: the extended account-status step must lock the family row before touching the profile (lock order), and the password change must end the sign-in service's sessions that the database's active-session check reads, with a test that an old session is refused.
 <!-- example: 2026-05-29T10:14:32Z — confirm the retention window with compliance before the next stage hardens the schema -->

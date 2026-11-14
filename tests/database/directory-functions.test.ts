@@ -85,9 +85,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
       parents: [
         {
           display_name: "Új Anna",
-          optional_profile_consent: true,
-          optional_profile: "Kertészkedem.",
-          contact: { email: "Anna@Example.test", phone: "+36 30 123 4567", locality: "Pécs" },
+          contact: { email: "Uj.Anna@Example.test", phone: "+36 30 123 4567" },
         },
       ],
       children: [{ display_name: "Új Gergő" }],
@@ -101,13 +99,13 @@ for (const schema of DIRECTORY_SCHEMAS) {
       assert.equal(await count(db, "parents", `family_id = '${familyId}'`), 1);
       assert.equal(await count(db, "children", `family_id = '${familyId}'`), 1);
       const contact = await one(
-        "select c.contact_email, c.contact_phone, c.locality from parent_contacts c join parents p on p.id = c.parent_id where p.family_id = $1",
+        "select c.email_on_record, c.phone, c.sharing_consent from parent_profiles c join parents p on p.id = c.parent_id where p.family_id = $1",
         [familyId],
       );
       assert.deepEqual(contact, {
-        contact_email: "anna@example.test",
-        contact_phone: "+36 30 123 4567",
-        locality: "Pécs",
+        email_on_record: "uj.anna@example.test",
+        phone: "+36 30 123 4567",
+        sharing_consent: false,
       });
       assert.equal(
         await count(db, "parents", `family_id = '${familyId}' and account_id is not null`),
@@ -228,19 +226,6 @@ for (const schema of DIRECTORY_SCHEMAS) {
           "parents.contact.phone",
           { ...newFamily, parents: [{ display_name: "A", contact: { phone: "12" } }] },
         ],
-        [
-          "parents.contact.locality",
-          { ...newFamily, parents: [{ display_name: "A", contact: { locality: long(101) } }] },
-        ],
-        [
-          "parents.optional_profile",
-          {
-            ...newFamily,
-            parents: [
-              { display_name: "A", optional_profile_consent: true, optional_profile: long(501) },
-            ],
-          },
-        ],
         ["children.display_name", { ...newFamily, children: [{ display_name: long(201) }] }],
       ];
       for (const [field, payload] of cases) {
@@ -259,15 +244,15 @@ for (const schema of DIRECTORY_SCHEMAS) {
       assert.equal(await count(db, "families"), 6, "no refused request created a family");
     });
 
-    it("stores the optional profile only with consent and empties it when consent is withdrawn (BR30.4)", async () => {
+    it("keeps the contact details when only the name changes and never stores sharing or profile text from a record save (BR31.1)", async () => {
       const created = await save(SUPER_ADMIN, {
         display_name: "Profil család",
         parents: [
-          { display_name: "Nincs hozzájárulás", optional_profile: "Ezt nem szabad tárolni." },
           {
             display_name: "Hozzájárult",
-            optional_profile_consent: true,
-            optional_profile: "Szívesen sütök.",
+            contact: { email: "profil@example.test", phone: "+36 30 555 0000" },
+            optional_profile: "Ezt nem szabad tárolni.",
+            sharing_consent: true,
           },
         ],
       });
@@ -275,47 +260,30 @@ for (const schema of DIRECTORY_SCHEMAS) {
       const rows = async () =>
         (
           await db.query(
-            "select display_name, optional_profile, optional_profile_consent, version, id from parents where family_id = $1 order by display_name",
+            "select p.display_name, p.version, p.id, c.email_on_record, c.phone, c.sharing_consent from parents p join parent_profiles c on c.parent_id = p.id where p.family_id = $1",
             [created.reference],
           )
         ).rows as {
           display_name: string;
-          optional_profile: string | null;
-          optional_profile_consent: boolean;
           version: number;
           id: string;
+          email_on_record: string;
+          phone: string;
+          sharing_consent: boolean;
         }[];
-      let [consenting, without] = await rows();
-      assert.equal(without!.optional_profile, null, "text sent without consent is dropped");
-      assert.equal(consenting!.optional_profile, "Szívesen sütök.");
-      // Changing the name keeps the stored profile when the payload does not mention it.
+      let [parent] = await rows();
+      assert.equal(parent!.sharing_consent, false);
       await save(SUPER_ADMIN, {
         family_id: created.reference,
         expected_version: 1,
         display_name: "Profil család",
-        parents: [{ id: consenting!.id, expected_version: 1, display_name: "Hozzájárult Anna" }],
+        parents: [{ id: parent!.id, expected_version: 1, display_name: "Hozzájárult Anna" }],
       });
-      [consenting, without] = await rows();
-      assert.equal(consenting!.display_name, "Hozzájárult Anna");
-      assert.equal(consenting!.optional_profile, "Szívesen sütök.");
-      // Withdrawing consent empties the text in the same change.
-      await save(SUPER_ADMIN, {
-        family_id: created.reference,
-        expected_version: 2,
-        display_name: "Profil család",
-        parents: [
-          {
-            id: consenting!.id,
-            expected_version: consenting!.version,
-            display_name: "Hozzájárult Anna",
-            optional_profile_consent: false,
-          },
-        ],
-      });
-      [consenting] = await rows();
+      [parent] = await rows();
+      assert.equal(parent!.display_name, "Hozzájárult Anna");
       assert.deepEqual(
-        [consenting!.optional_profile_consent, consenting!.optional_profile],
-        [false, null],
+        [parent!.email_on_record, parent!.phone],
+        ["profil@example.test", "+36 30 555 0000"],
       );
     });
 
@@ -628,7 +596,15 @@ for (const schema of DIRECTORY_SCHEMAS) {
       const refusedKey = nextKey("refused");
       const refused = await save(SUPER_ADMIN, { ...newFamily, display_name: "" }, refusedKey);
       assert.equal(refused.state, "validation");
-      const retry = await save(SUPER_ADMIN, { ...newFamily, display_name: "Javított" }, refusedKey);
+      const retry = await save(
+        SUPER_ADMIN,
+        {
+          ...newFamily,
+          display_name: "Javított",
+          parents: [{ display_name: "Új Anna", contact: { email: "javitott@example.test" } }],
+        },
+        refusedKey,
+      );
       assert.equal(retry.state, "success");
       const badKey = await save(SUPER_ADMIN, newFamily, "");
       assert.deepEqual([badKey.state, badKey.code], ["validation", "idempotency_key_invalid"]);

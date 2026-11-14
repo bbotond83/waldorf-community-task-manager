@@ -79,7 +79,7 @@ export async function loadDataset(db: pg.Client): Promise<void> {
      select ${org}, ${id(4000, "n")}, (${groups})[1 + n % ${DATASET.groups}] from generate_series(0, ${DATASET.families - 1}) n`,
   );
   await db.query(
-    `insert into parent_contacts (parent_id, organization_id, contact_email, contact_phone, locality)
+    `insert into parent_profiles (parent_id, organization_id, email_on_record, phone, residence)
      select ${id(4000, "n")}, ${org}, 'adat' || n || '@example.test', '+36 30 555 ' || lpad(n::text, 4, '0'), 'Pécs'
        from generate_series(0, ${DATASET.families - 1}) n`,
   );

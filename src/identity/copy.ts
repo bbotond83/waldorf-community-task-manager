@@ -52,7 +52,7 @@ export const COPY = {
     title: "Meghívó elfogadása",
     heading: "Meghívó elfogadása",
     notValidTitle: "A meghívó nem érvényes",
-    notValid: "Ez a meghívó már nem érvényes. Kérjen újat a csoport adminisztrátorától.",
+    notValid: "Ez a meghívó már nem érvényes. Kérj újat az adminisztrátortól.",
     passwordLabel: "Jelszó",
     submit: "Fiók létrehozása",
     pending: "Fiók létrehozása folyamatban…",
@@ -85,6 +85,15 @@ export const COPY = {
       "Túl sok próbálkozás érkezett rövid idő alatt. Kérjük, várjon néhány percet, majd próbálja újra.",
     accessDenied: "Ehhez az adathoz nincs jogosultsága.",
   },
+  account: {
+    emailRateLimited: "Túl sok levelet kértek rövid idő alatt. Kérjük, próbálja később.",
+    emailMailNotSent: "A levelet most nem sikerült elküldeni. Kérjük, próbálja újra később.",
+    passwordCurrentWrong: "A jelenlegi jelszó nem helyes.",
+    passwordSame: "Az új jelszó nem egyezhet a jelenlegivel.",
+    passwordLocked: "Túl sok sikertelen próbálkozás. Kérjük, próbálja később.",
+    sessionsNotEnded:
+      "A jelszó megváltozott, de a többi bejelentkezést nem sikerült kijelentkeztetni.",
+  },
   mail: {
     invitationSubject: "Meghívó a Waldorf közösségi feladatkezelőbe",
     invitationGreeting: "Üdvözöljük!",
@@ -93,5 +102,17 @@ export const COPY = {
     invitationLinkLabel: "Fiók létrehozása",
     invitationValidity: "A hivatkozás 7 napig érvényes, és csak egyszer használható.",
     invitationIgnore: "Ha nem várta ezt a levelet, hagyja figyelmen kívül.",
+    emailChangeSubject: "Új e-mail-cím megerősítése",
+    emailChangeGreeting: "Üdvözöljük!",
+    emailChangeBody:
+      "Új e-mail-címet adtak meg a fiókjához a Waldorf közösségi feladatkezelőben. Az alábbi hivatkozással erősítheti meg:",
+    emailChangeLinkLabel: "E-mail-cím megerősítése",
+    emailChangeValidity: "A hivatkozás 24 óráig érvényes, és csak egyszer használható.",
+    emailChangeIgnore: "Ha nem Ön kérte, hagyja figyelmen kívül ezt a levelet.",
+    noticeSubject: "A fiókja e-mail-címe megváltozott",
+    noticeGreeting: "Üdvözöljük!",
+    noticeBody:
+      "A Waldorf közösségi feladatkezelőben a fiókja e-mail-címét megváltoztatták. Ezentúl az új címmel jelentkezhet be.",
+    noticeContact: "Ha nem Ön kérte a változtatást, azonnal forduljon az óvoda adminisztrátorához.",
   },
 } as const;

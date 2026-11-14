@@ -40,7 +40,7 @@ const DIRECTORY_TABLES = [
   "families",
   "group_memberships",
   "parents",
-  "parent_contacts",
+  "parent_profiles",
   "children",
   "organization_settings",
   "reminder_settings",
@@ -205,43 +205,49 @@ for (const schema of DIRECTORY_SCHEMAS) {
       );
     });
 
-    it("stores the optional profile only with consent and validates contact fields", async () => {
-      assert.equal(
-        await code("update parents set optional_profile_consent = false where id = $1", [
-          PARENT_ROW_F1,
-        ]),
-        "23514",
-        "profile text without consent",
-      );
-      await db.query(
-        "update parents set optional_profile_consent = false, optional_profile = null where id = $1",
-        [PARENT_ROW_F1],
-      );
+    it("validates the profile fields and keeps one address on record per parent", async () => {
       assert.equal(
         await code(
-          "update parent_contacts set contact_email = 'Upper@Example.test' where parent_id = $1",
+          "update parent_profiles set email_on_record = 'Upper@Example.test' where parent_id = $1",
           [PARENT_ROW_F1],
         ),
         "23514",
       );
       assert.equal(
-        await code("update parent_contacts set contact_email = 'no-at-sign' where parent_id = $1", [
+        await code(
+          "update parent_profiles set email_on_record = 'no-at-sign' where parent_id = $1",
+          [PARENT_ROW_F1],
+        ),
+        "23514",
+      );
+      assert.equal(
+        await code("update parent_profiles set phone = 'call me' where parent_id = $1", [
           PARENT_ROW_F1,
         ]),
         "23514",
       );
+      for (const [column, length] of [
+        ["residence", 101],
+        ["occupation", 101],
+        ["hobby", 201],
+        ["how_i_support", 501],
+      ] as const) {
+        assert.equal(
+          await code(`update parent_profiles set ${column} = $2 where parent_id = $1`, [
+            PARENT_ROW_F1,
+            "x".repeat(length),
+          ]),
+          "23514",
+          column,
+        );
+      }
       assert.equal(
-        await code("update parent_contacts set contact_phone = 'call me' where parent_id = $1", [
-          PARENT_ROW_F1,
-        ]),
-        "23514",
-      );
-      assert.equal(
-        await code("update parent_contacts set locality = $2 where parent_id = $1", [
-          PARENT_ROW_F1,
-          "x".repeat(101),
-        ]),
-        "23514",
+        await code(
+          "update parent_profiles set email_on_record = 'bela@example.test' where parent_id = $1",
+          [PARENT_ROW_F1],
+        ),
+        "23505",
+        "an address on record belongs to one parent",
       );
     });
 
@@ -401,9 +407,9 @@ for (const schema of DIRECTORY_SCHEMAS) {
         signedOut: 0,
         otherOrganizationAdmin: 1,
       },
-      parent_contacts: {
-        parent: 2,
-        coParent: 2,
+      parent_profiles: {
+        parent: 1,
+        coParent: 1,
         parentOther: 1,
         teacher: 0,
         adminSame: 0,
@@ -471,88 +477,30 @@ for (const schema of DIRECTORY_SCHEMAS) {
       }
     });
 
-    it("hides contact details from other families, teachers and group admins, and shows them to the family and super admins (BR30.5, BR3.9)", async () => {
+    it("lets a parent read only their own profile row and a super admin every row (BR30.5, BR3.9)", async () => {
       const visibleTo = async (account: string) =>
         asActor(db, schema, authenticated(account), async () =>
-          (await db.query("select parent_id from parent_contacts order by parent_id")).rows.map(
+          (await db.query("select parent_id from parent_profiles order by parent_id")).rows.map(
             (row) => row.parent_id as string,
           ),
         );
-      assert.deepEqual(await visibleTo(PARENT_F1), [PARENT_ROW_F1, PARENT_ROW_CO]);
-      assert.deepEqual(await visibleTo(CO_PARENT_F1), [PARENT_ROW_F1, PARENT_ROW_CO]);
+      assert.deepEqual(await visibleTo(PARENT_F1), [PARENT_ROW_F1]);
+      assert.deepEqual(await visibleTo(CO_PARENT_F1), [PARENT_ROW_CO]);
       assert.deepEqual(await visibleTo(PARENT_F2), [PARENT_ROW_F2]);
       assert.deepEqual(await visibleTo(VIEWERS.teacher), []);
       assert.deepEqual(await visibleTo(VIEWERS.adminSame), []);
       assert.deepEqual(await visibleTo(VIEWERS.adminOther), []);
-      assert.deepEqual(
-        await visibleTo(VIEWERS.otherOrganizationAdmin).then((rows) => rows.length),
-        1,
-      );
+      assert.equal((await visibleTo(VIEWERS.otherOrganizationAdmin)).length, 1);
     });
 
-    it("keeps the optional profile out of the table rights and readable only by the parent and super admins, with consent (BR30.4, BR3.9)", async () => {
-      const selecting = await failureOf(() =>
-        asActor(db, schema, authenticated(PARENT_F1), () =>
-          db.query("select optional_profile from parents"),
-        ),
-      );
-      assert.equal(selecting?.code, "42501");
-      const profileAs = (account: string, parentId: string) =>
-        asActor(
-          db,
-          schema,
-          authenticated(account),
-          async () =>
-            (await db.query("select directory_parent_profile($1) as profile", [parentId])).rows[0]
-              .profile as string | null,
-        );
-      assert.equal(await profileAs(PARENT_F1, PARENT_ROW_F1), "Szívesen főzök.");
-      assert.equal(await profileAs(SUPER_ADMIN, PARENT_ROW_F1), "Szívesen főzök.");
-      for (const account of [
-        CO_PARENT_F1,
-        PARENT_F2,
-        VIEWERS.teacher,
-        VIEWERS.adminSame,
-        VIEWERS.adminOther,
-        VIEWERS.nogrant,
-      ]) {
-        assert.equal(await profileAs(account, PARENT_ROW_F1), null, account);
-      }
-      await db.query(
-        "update parents set optional_profile_consent = false, optional_profile = null where id = $1",
-        [PARENT_ROW_F1],
-      );
-      assert.equal(await profileAs(PARENT_F1, PARENT_ROW_F1), null, "no consent, no text");
-    });
-
-    it("answers the empty string, never NULL, to a reader who may see the profile of a parent with consent but no text (R-01, BR30.4)", async () => {
-      await db.query(
-        "update parents set optional_profile_consent = true, optional_profile = null where id = $1",
-        [PARENT_ROW_F1],
-      );
-      const profileAs = (account: string) =>
-        asActor(
-          db,
-          schema,
-          authenticated(account),
-          async () =>
-            (await db.query("select directory_parent_profile($1) as profile", [PARENT_ROW_F1]))
-              .rows[0].profile as string | null,
-        );
-      for (const account of [PARENT_F1, SUPER_ADMIN]) {
-        assert.equal(await profileAs(account), "", account);
-      }
-      // Everyone else gets nothing, not even an empty text.
-      for (const account of [
-        CO_PARENT_F1,
-        PARENT_F2,
-        VIEWERS.teacher,
-        VIEWERS.adminSame,
-        VIEWERS.adminOther,
-        VIEWERS.nogrant,
-      ]) {
-        assert.equal(await profileAs(account), null, account);
-      }
+    it("keeps the old profile columns and the contact table gone", async () => {
+      const gone = (
+        await db.query(
+          "select (select count(*) from information_schema.columns where table_schema = current_schema() and table_name = 'parents' and column_name in ('optional_profile', 'optional_profile_consent'))::int as columns, to_regclass('parent_contacts') as old_table",
+        )
+      ).rows[0];
+      assert.equal(gone.columns, 0);
+      assert.equal(gone.old_table, null);
     });
 
     it("hides an archived family from its own parents and keeps it for super admins (BR30.8, BR3.9)", async () => {
@@ -562,7 +510,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
       assert.equal(await countAs(db, schema, PARENT_F1, "families"), 0);
       assert.equal(await countAs(db, schema, PARENT_F1, "parents"), 0);
       assert.equal(await countAs(db, schema, PARENT_F1, "children"), 0);
-      assert.equal(await countAs(db, schema, PARENT_F1, "parent_contacts"), 0);
+      assert.equal(await countAs(db, schema, PARENT_F1, "parent_profiles"), 0);
       assert.equal(await countAs(db, schema, VIEWERS.adminSame, "families"), 0);
       assert.equal(await countAs(db, schema, SUPER_ADMIN, "families"), 5);
       // A parent of an archived family reads no working group either, from the next request (BR3.11).
@@ -575,7 +523,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
         "groups",
         "families",
         "parents",
-        "parent_contacts",
+        "parent_profiles",
         "children",
       ]) {
         assert.equal(

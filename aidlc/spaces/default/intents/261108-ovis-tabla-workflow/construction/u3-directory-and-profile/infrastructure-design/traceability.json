@@ -1,0 +1,164 @@
+{
+  "stage": "infrastructure-design",
+  "unit": "u3-directory-and-profile",
+  "upstream_ids": [
+    "NFR1.1",
+    "NFR1.5",
+    "NFR3.6",
+    "NFR3.7",
+    "NFR4.4",
+    "NFR4.7",
+    "NFR4.8",
+    "NFR5.3",
+    "NFR5.4",
+    "NFR6.3",
+    "NFR7.4",
+    "NFR7.5",
+    "NFR7.6",
+    "NFR9.1",
+    "NFR10.1",
+    "NFR10.2",
+    "NFR10.3",
+    "NFR1.3",
+    "NFR5.6",
+    "NFR9.2",
+    "NFR11.1",
+    "NFR11.3",
+    "NFR3.1",
+    "NFR3.3",
+    "NFR2.2",
+    "NFR4.1"
+  ],
+  "coverage": [
+    {
+      "id": "NFR1.1",
+      "status": "OK",
+      "target": "invented seed and `db:seed:large` only; secret scan unchanged"
+    },
+    {
+      "id": "NFR1.5",
+      "status": "OK",
+      "target": "housekeeping step deletes finished email-change requests after 30 days"
+    },
+    {
+      "id": "NFR3.6",
+      "status": "OK",
+      "target": "`email_change_confirm` granted to service role only"
+    },
+    {
+      "id": "NFR3.7",
+      "status": "OK",
+      "target": "new functions `revoke all` then explicit grant; contacts read rule narrowed in migration"
+    },
+    {
+      "id": "NFR4.4",
+      "status": "OK",
+      "target": "audit action constraint widened by 8 names in migration"
+    },
+    {
+      "id": "NFR4.7",
+      "status": "OK",
+      "target": "event lines with keyed hashes in sign-in service"
+    },
+    {
+      "id": "NFR4.8",
+      "status": "OK",
+      "target": "four new event line names, no personal data"
+    },
+    {
+      "id": "NFR5.3",
+      "status": "OK",
+      "target": "partial unique index: one pending request per account"
+    },
+    {
+      "id": "NFR5.4",
+      "status": "OK",
+      "target": "unique index on active parent email on record"
+    },
+    {
+      "id": "NFR6.3",
+      "status": "OK",
+      "target": "new database test files added to `test:database:*` script and shuffled run"
+    },
+    {
+      "id": "NFR7.4",
+      "status": "OK",
+      "target": "single forward-only migration file in own transaction"
+    },
+    {
+      "id": "NFR7.5",
+      "status": "OK",
+      "target": "mail via existing nodemailer and catcher; record kept on failed send"
+    },
+    {
+      "id": "NFR7.6",
+      "status": "OK",
+      "target": "`npm run verify:local` on three browsers in Validate job"
+    },
+    {
+      "id": "NFR9.1",
+      "status": "OK",
+      "target": "timing tests on `db:seed:large`"
+    },
+    {
+      "id": "NFR10.1",
+      "status": "OK",
+      "target": "one Hungarian mail template per kind through existing mail path"
+    },
+    {
+      "id": "NFR10.2",
+      "status": "OK",
+      "target": "link tokens hashed in request and invitation tables"
+    },
+    {
+      "id": "NFR10.3",
+      "status": "OK",
+      "target": "`email_send_attempts` table with index; rows older than 24 h deleted by housekeeping"
+    },
+    {
+      "id": "NFR1.3",
+      "status": "OK",
+      "target": "new tables not readable by any read route; pending address only inside functions"
+    },
+    {
+      "id": "NFR5.6",
+      "status": "OK",
+      "target": "per-address advisory lock in add-parent, confirm, email edit and resend limit"
+    },
+    {
+      "id": "NFR9.2",
+      "status": "OK",
+      "target": "indexes on family and parent ids"
+    },
+    {
+      "id": "NFR11.1",
+      "status": "OK",
+      "target": "anonymisation function redefined in the migration"
+    },
+    {
+      "id": "NFR11.3",
+      "status": "OK",
+      "target": "account-status function redefined in the migration"
+    },
+    {
+      "id": "NFR3.1",
+      "status": "OK",
+      "target": "directory function checks session inside; grants explicit"
+    },
+    {
+      "id": "NFR3.3",
+      "status": "OK",
+      "target": "records commands granted to signed-in role, refuse inside"
+    },
+    {
+      "id": "NFR2.2",
+      "status": "OK",
+      "target": "sharing and consent time stored in profile table"
+    },
+    {
+      "id": "NFR4.1",
+      "status": "OK",
+      "target": "audit function called inside each command"
+    }
+  ]
+}

@@ -3,6 +3,7 @@ import { AdminBackLink } from "../../_components/AdminBackLink.tsx";
 import { AdminMutationForm, AdminTextField } from "../../_components/AdminMutationForm.tsx";
 import { AsyncStatePanel } from "../../_components/AsyncStatePanel.tsx";
 import { DeveloperDetails } from "../../_components/DeveloperDetails.tsx";
+import { ParentInvitations } from "../../_components/ParentInvitations.tsx";
 import { RecordFields } from "../../_components/RecordFields.tsx";
 import { resolveAdminLookups } from "../../_lib/request-lookups.ts";
 import { archiveRecordAction, saveRecordAction } from "../../actions.ts";
@@ -51,6 +52,9 @@ export default async function RecordDetailPage({
                 Állapot: <StatusBadge {...statusDisplay(record.state)} />
               </p>
             </section>
+            {record.kind === "family" && record.details?.parents && (
+              <ParentInvitations familyId={record.id} parents={record.details.parents} />
+            )}
             <AdminMutationForm
               action={saveRecordAction}
               submitLabel="Módosítás mentése"

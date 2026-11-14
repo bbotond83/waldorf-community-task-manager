@@ -38,52 +38,61 @@ describe("parseParents", () => {
         displayName: "Fenyő Anna",
         email: "anna@example.test",
         phone: "+36 30 111 2222",
-        optionalProfileConsent: false,
       },
     ]);
   });
 
-  it("sends all contact fields of a stored parent so a cleared field is cleared", () => {
+  it("sends the phone of a stored parent even when cleared, so a cleared phone is cleared", () => {
     const { parents } = parseParents(
-      form(parent(0, { id: "p-1", version: "4", name: "Fenyő Anna", email: "", phone: "" })),
+      form(
+        parent(0, {
+          id: "p-1",
+          version: "4",
+          name: "Fenyő Anna",
+          email: "anna@example.test",
+          phone: "",
+        }),
+      ),
     );
     expect(parents).toEqual([
       {
         id: "p-1",
         expectedVersion: 4,
         displayName: "Fenyő Anna",
-        email: "",
+        email: "anna@example.test",
         phone: "",
-        locality: "",
-        optionalProfile: "",
-        optionalProfileConsent: false,
       },
     ]);
   });
 
-  it("keeps the profile with the consent and refuses it without", () => {
-    const withConsent = parseParents(
+  it("requires the email on record of every parent, new or stored (BR35.2)", () => {
+    const { errors } = parseParents(
       form({
-        ...parent(0, { name: "Anna", profile: "Kertész vagyok." }),
+        ...parent(0, { id: "p-1", version: "1", name: "Fenyő Anna", email: "" }),
+        ...parent(1, { name: "Fenyő Béla" }),
+      }),
+    );
+    expect(errors).toEqual({
+      [parentField(0, "email")]: "Adjon meg érvényes e-mail-címet.",
+      [parentField(1, "email")]: "Adjon meg érvényes e-mail-címet.",
+    });
+  });
+
+  it("ignores the old profile and consent fields: they belong to the parent now (BR31.1)", () => {
+    const { parents } = parseParents(
+      form({
+        ...parent(0, { name: "Anna", email: "anna@example.test", profile: "Kertész vagyok." }),
         [parentField(0, "consent")]: "on",
       }),
     );
-    expect(withConsent.errors).toEqual({});
-    expect(withConsent.parents[0]).toMatchObject({
-      optionalProfile: "Kertész vagyok.",
-      optionalProfileConsent: true,
-    });
-    const without = parseParents(form(parent(0, { name: "Anna", profile: "Kertész vagyok." })));
-    expect(without.errors[parentField(0, "profile")]).toMatch(/csak hozzájárulással menthető/);
+    expect(parents[0]).toEqual({ displayName: "Anna", email: "anna@example.test" });
   });
 
   it("names the field of every wrong value", () => {
     const { errors } = parseParents(
       form({
-        ...parent(0, { name: "", email: "nem-cim", phone: "abc", locality: "x".repeat(101) }),
-        ...parent(1, { name: "y".repeat(201) }),
-        ...parent(2, { name: "Béla", profile: "z".repeat(501) }),
-        [parentField(2, "consent")]: "on",
+        ...parent(0, { name: "", email: "nem-cim", phone: "abc" }),
+        ...parent(1, { name: "y".repeat(201), email: "y@example.test" }),
       }),
     );
     expect(errors).toEqual({
@@ -91,14 +100,15 @@ describe("parseParents", () => {
       [parentField(0, "email")]: "Adjon meg érvényes e-mail-címet.",
       [parentField(0, "phone")]:
         "A telefonszám 6–20 karakter lehet, és csak számjegyet, szóközt, + és - jelet tartalmazhat.",
-      [parentField(0, "locality")]: "A település legfeljebb 100 karakter lehet.",
       [parentField(1, "name")]: "A szülő neve legfeljebb 200 karakter lehet.",
-      [parentField(2, "profile")]: "A bemutatkozás legfeljebb 500 karakter lehet.",
     });
   });
 
   it("requires a name for a stored parent and stops at the first missing block", () => {
-    expect(parseParents(form(parent(0, { id: "p-1", version: "1", name: "" }))).errors).toEqual({
+    expect(
+      parseParents(form(parent(0, { id: "p-1", version: "1", name: "", email: "a@example.test" })))
+        .errors,
+    ).toEqual({
       [parentField(0, "name")]: "A szülő nevének megadása kötelező.",
     });
     const gap = parseParents(
@@ -189,7 +199,7 @@ describe("parseRecordExtras", () => {
         extended: "1",
         addGroupId: "g-1",
         endGroupIds: ["g-2"],
-        ...parent(0, { name: "Anna" }),
+        ...parent(0, { name: "Anna", email: "anna@example.test" }),
       }),
       true,
     );

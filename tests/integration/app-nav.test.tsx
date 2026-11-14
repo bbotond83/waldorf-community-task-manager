@@ -74,6 +74,8 @@ describe("AppNav for a parent", () => {
       "Beosztás",
       "Cserék",
       "Munkacsoportok",
+      "Szülők",
+      "Fiókom",
     ]);
   });
 

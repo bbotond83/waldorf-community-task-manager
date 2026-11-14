@@ -10,6 +10,10 @@ const RESOURCE_BY_ROUTE: Readonly<Record<string, string>> = {
   "/szulo/ertesitesek": "notification",
   "/szulo/munkacsoportok": "working_group",
   "/szulo/beosztas": "rota",
+  "/szulo/szulok": "directory",
+  "/teacher/szulok": "directory",
+  "/admin/szulok": "directory",
+  "/szulo/fiokom": "own_account",
   "/teacher/beosztas": "rota",
   "/admin/tanev": "school_calendar",
   "/admin/beosztas": "rota_plan",
@@ -80,8 +84,10 @@ describe("navigation and default pages follow the access rules", () => {
       "Beosztás",
       "Cserék",
       "Munkacsoportok",
+      "Szülők",
+      "Fiókom",
     ]);
-    expect(labels("teacher")).toEqual(["Beosztás", "Takarítás", "Munkacsoportok"]);
+    expect(labels("teacher")).toEqual(["Beosztás", "Takarítás", "Munkacsoportok", "Szülők"]);
     expect(labels("group-admin")).toEqual([
       "Áttekintés",
       "Feladatok és események",
@@ -89,6 +95,7 @@ describe("navigation and default pages follow the access rules", () => {
       "Archívum",
       "Munkacsoportok",
       "Beosztás",
+      "Szülők",
     ]);
     expect(labels("super-admin")).toEqual([
       "Áttekintés",
@@ -99,6 +106,7 @@ describe("navigation and default pages follow the access rules", () => {
       "Munkacsoportok",
       "Tanév",
       "Beosztás",
+      "Szülők",
       "Emlékeztetők",
       "Adatvédelem",
       "Beállítások",
@@ -128,6 +136,7 @@ describe("navigation and default pages follow the access rules", () => {
       ["Beosztás", "/teacher/schedule"],
       ["Takarítás", "/teacher/beosztas"],
       ["Munkacsoportok", "/teacher/munkacsoportok"],
+      ["Szülők", "/teacher/szulok"],
     ]);
     expect(teacher.filter((item) => /beoszt/i.test(item.label))).toHaveLength(1);
   });
@@ -141,5 +150,28 @@ describe("navigation and default pages follow the access rules", () => {
       "group-admin": "/admin",
       "super-admin": "/admin",
     });
+  });
+});
+
+describe("the directory and the own account follow the access rules (BR30, BR31.2, BR32.1)", () => {
+  it("lets every role open the directory and only the parent open the own account", () => {
+    for (const role of ["parent", "group_admin", "kindergarten_teacher", "super_admin"] as const) {
+      expect(mayOpen(role, "/szulo/szulok"), role).toBe(true);
+    }
+    expect(mayOpen("parent", "/szulo/fiokom")).toBe(true);
+    for (const role of ["group_admin", "kindergarten_teacher", "super_admin"] as const) {
+      expect(mayOpen(role, "/szulo/fiokom"), role).toBe(false);
+    }
+  });
+
+  it("shows the directory to the teacher and the super admin on their own areas and Fiókom to parents only", () => {
+    expect(roleProfile("teacher").navigation.map((item) => item.href)).toContain("/teacher/szulok");
+    expect(roleProfile("super-admin").navigation.map((item) => item.href)).toContain(
+      "/admin/szulok",
+    );
+    for (const id of ["teacher", "group-admin", "super-admin"] as const) {
+      expect(roleProfile(id).navigation.map((item) => item.href)).not.toContain("/szulo/fiokom");
+    }
+    expect(roleProfile("parent").navigation.map((item) => item.href)).toContain("/szulo/fiokom");
   });
 });

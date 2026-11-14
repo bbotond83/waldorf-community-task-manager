@@ -86,8 +86,6 @@ type FamilyParent = {
   displayName: string;
   email?: string;
   linked: boolean;
-  optionalProfile?: string;
-  optionalProfileConsent?: boolean;
 };
 type RecordDetails = {
   parents: FamilyParent[];
@@ -650,30 +648,6 @@ for (const schema of DIRECTORY_SCHEMAS) {
         });
       });
 
-      it("opens the family of a parent who consented to a profile but wrote no text (regression: a NULL scalar was a terminal failure)", async () => {
-        await db.query(
-          "update parents set optional_profile_consent = true, optional_profile = null where id = $1",
-          [PARENT_ROW_F1],
-        );
-        const one = await admin("super", "records.get", { id: FAMILY_1 });
-        assert.equal(one.state, "success", JSON.stringify(one));
-        const consenting = must(
-          one.data.details.parents.find((entry) => entry.optionalProfileConsent === true),
-          "the consenting parent is listed",
-        );
-        assert.equal(consenting.optionalProfile, undefined, "no text, no profile shown");
-        // A profile with text still comes through.
-        await db.query("update parents set optional_profile = 'Szívesen főzök.' where id = $1", [
-          PARENT_ROW_F1,
-        ]);
-        const filled = await admin("super", "records.get", { id: FAMILY_1 });
-        assert.equal(
-          filled.data.details.parents.find((entry) => entry.optionalProfileConsent === true)
-            ?.optionalProfile,
-          "Szívesen főzök.",
-        );
-      });
-
       it("saves a family with parents, contact details and a child, then changes only its name (super admin, BR3.9)", async () => {
         const created = await admin("super", "records.save", {
           id: "new",
@@ -685,9 +659,6 @@ for (const schema of DIRECTORY_SCHEMAS) {
               displayName: "Új Anna",
               email: "uj.anna@example.test",
               phone: "+36 30 123 4567",
-              locality: "Pécs",
-              optionalProfile: "Szívesen főzök.",
-              optionalProfileConsent: true,
             },
           ],
           children: [{ displayName: "Új Gyerek" }],
@@ -696,7 +667,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
         const id = created.data.id as string;
         assert.equal(await count(db, "parents", `family_id = '${id}'`), 1);
         assert.equal(
-          await count(db, "parent_contacts", "contact_email = 'uj.anna@example.test'"),
+          await count(db, "parent_profiles", "email_on_record = 'uj.anna@example.test'"),
           1,
         );
         const renamed = await admin("super", "records.save", {

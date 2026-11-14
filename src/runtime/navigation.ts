@@ -10,6 +10,8 @@ export const PARENT_NAVIGATION: readonly NavigationItem[] = [
   { id: "parent-rota", label: "Beosztás", href: "/szulo/beosztas" },
   { id: "parent-swaps", label: "Cserék", href: "/szulo/cserek" },
   { id: "parent-working-groups", label: "Munkacsoportok", href: "/szulo/munkacsoportok" },
+  { id: "parent-directory", label: "Szülők", href: "/szulo/szulok" },
+  { id: "parent-account", label: "Fiókom", href: "/szulo/fiokom" },
 ];
 
 export const TEACHER_NAVIGATION: readonly NavigationItem[] = [
@@ -17,6 +19,7 @@ export const TEACHER_NAVIGATION: readonly NavigationItem[] = [
   // "Beosztás" stays the task schedule; the indoor-cleaning rota has its own short name so the two never read alike.
   { id: "teacher-rota", label: "Takarítás", href: "/teacher/beosztas" },
   { id: "teacher-working-groups", label: "Munkacsoportok", href: "/teacher/munkacsoportok" },
+  { id: "teacher-directory", label: "Szülők", href: "/teacher/szulok" },
 ];
 
 export const GROUP_ADMIN_NAVIGATION: readonly NavigationItem[] = [
@@ -27,6 +30,8 @@ export const GROUP_ADMIN_NAVIGATION: readonly NavigationItem[] = [
   { id: "admin-working-groups", label: "Munkacsoportok", href: "/admin/munkacsoportok" },
   // The overview is the parent page: a group admin is also a parent of a family, who reads it there (BR24.1).
   { id: "admin-rota-overview", label: "Beosztás", href: "/szulo/beosztas" },
+  // The directory is the parent page, which every signed-in role opens (BR30.1). "Fiókom" is the parent's own page.
+  { id: "admin-directory", label: "Szülők", href: "/szulo/szulok" },
 ];
 
 export const SUPER_ADMIN_NAVIGATION: readonly NavigationItem[] = [
@@ -38,6 +43,7 @@ export const SUPER_ADMIN_NAVIGATION: readonly NavigationItem[] = [
   { id: "admin-working-groups", label: "Munkacsoportok", href: "/admin/munkacsoportok" },
   { id: "admin-school-year", label: "Tanév", href: "/admin/tanev" },
   { id: "admin-rota", label: "Beosztás", href: "/admin/beosztas" },
+  { id: "admin-directory", label: "Szülők", href: "/admin/szulok" },
   { id: "admin-reminders", label: "Emlékeztetők", href: "/admin/emlekeztetok" },
   { id: "admin-privacy", label: "Adatvédelem", href: "/admin/adatvedelem" },
   { id: "admin-settings", label: "Beállítások", href: "/admin/beallitasok" },

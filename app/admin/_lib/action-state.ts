@@ -1,10 +1,27 @@
 import type { ApplicationResult } from "../../../src/application/index.ts";
+import { DIRECTORY_REFUSAL_MESSAGES } from "../../../src/data/copy.ts";
 import type { AdminActionState } from "../actions.ts";
 
 export function mapApplicationResult<T>(
   result: ApplicationResult<T>,
   successMessage = "A művelet sikerült.",
 ): AdminActionState {
+  const mapped = mapByState(result, successMessage);
+  // The directory commands name their refusals by code (one Hungarian text each, shared with the account page); a
+  // refused field carries the words next to it, anything else shows them as the message.
+  const words =
+    result.state === "success" ||
+    !Object.hasOwn(DIRECTORY_REFUSAL_MESSAGES, result.code) ||
+    Object.hasOwn(ADMIN_CONFLICT_MESSAGES, result.code)
+      ? undefined
+      : DIRECTORY_REFUSAL_MESSAGES[result.code];
+  if (!words) return mapped;
+  return mapped.state === "validation"
+    ? { ...mapped, fieldErrors: { ...mapped.fieldErrors, request: words } }
+    : { ...mapped, message: words };
+}
+
+function mapByState<T>(result: ApplicationResult<T>, successMessage: string): AdminActionState {
   switch (result.state) {
     case "success":
     case "recovery":

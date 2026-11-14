@@ -28,6 +28,8 @@ export const DATABASE_TEST_FILES = [
   "tests/database/identity-email-change.test.ts",
   "tests/database/directory-schema.test.ts",
   "tests/database/directory-functions.test.ts",
+  "tests/database/directory-profile.test.ts",
+  "tests/database/directory-records.test.ts",
   "tests/database/coordination-schema.test.ts",
   "tests/database/coordination-functions.test.ts",
   "tests/database/kernel-signup.test.ts",

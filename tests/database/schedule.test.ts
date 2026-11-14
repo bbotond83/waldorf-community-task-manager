@@ -324,7 +324,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
         "assignments",
         "families",
         "parents",
-        "parent_contacts",
+        "parent_profiles",
         "children",
         "contribution_notes",
         "change_requests",

@@ -117,14 +117,7 @@ describe("the record form on the create page", () => {
     const blocks = screen.getAllByRole("group", { name: /^Szülő \d \(új\)$/ });
     expect(blocks).toHaveLength(2);
     const first = within(blocks[0]!);
-    for (const label of [
-      "A szülő neve",
-      "E-mail-cím",
-      "Telefonszám",
-      "Település",
-      "Önkéntes bemutatkozás",
-      "A szülő hozzájárult a bemutatkozás tárolásához",
-    ]) {
+    for (const label of ["A szülő neve", "E-mail-cím", "Telefonszám"]) {
       expect(first.getByLabelText(label)).toBeInTheDocument();
     }
     expect(first.getByLabelText("E-mail-cím")).toHaveAttribute("type", "email");
@@ -216,22 +209,20 @@ describe("the record form on the edit page", () => {
         displayName: "Fenyő Anna",
         email: "anna@example.test",
         phone: "+36 30 111 2222",
-        locality: "Pécs",
-        optionalProfile: "Kertész vagyok.",
-        optionalProfileConsent: true,
         linked: true,
+        invitation: "none" as const,
       },
       {
         id: "p-2",
         version: 1,
         displayName: "Fenyő Béla",
-        optionalProfileConsent: false,
         linked: false,
+        invitation: "none" as const,
       },
     ],
   };
 
-  it("shows a family's parents with their details, the consent and an empty block for a new one", () => {
+  it("shows a family's parents with their details and an empty block for a new one", () => {
     render(
       <Form>
         <RecordFields
@@ -249,14 +240,10 @@ describe("the record form on the edit page", () => {
     expect(first.getByLabelText("A szülő neve")).toHaveValue("Fenyő Anna");
     expect(first.getByLabelText("E-mail-cím")).toHaveValue("anna@example.test");
     expect(first.getByLabelText("Telefonszám")).toHaveValue("+36 30 111 2222");
-    expect(first.getByLabelText("Település")).toHaveValue("Pécs");
-    expect(first.getByLabelText("Önkéntes bemutatkozás")).toHaveValue("Kertész vagyok.");
-    expect(first.getByLabelText("A szülő hozzájárult a bemutatkozás tárolásához")).toBeChecked();
     expect(first.getByTestId("admin-parent-0-linked")).toHaveTextContent("bejelentkezési fiók");
     const second = within(screen.getByTestId("admin-parent-block-1"));
-    expect(
-      second.getByLabelText("A szülő hozzájárult a bemutatkozás tárolásához"),
-    ).not.toBeChecked();
+    expect(second.getByLabelText("A szülő neve")).toHaveValue("Fenyő Béla");
+    expect(second.queryByLabelText("Település")).not.toBeInTheDocument();
     expect(second.queryByTestId("admin-parent-1-linked")).not.toBeInTheDocument();
     expect(screen.getByRole("group", { name: "Szülő 3 (új)" })).toBeInTheDocument();
     expect(document.querySelector('input[name="parent-0-id"]') as HTMLInputElement).toHaveValue(

@@ -47,6 +47,11 @@ export const ADMIN_FUNCTIONS = [
   "sessions_remove",
   "identity_housekeeping",
   "identity_ban_mismatches",
+  "account_password_changed",
+  "email_change_pending",
+  "email_change_request",
+  "email_change_cancel",
+  "email_change_confirm",
 ] as const;
 export type AdminFunctionName = (typeof ADMIN_FUNCTIONS)[number];
 

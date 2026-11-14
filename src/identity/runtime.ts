@@ -8,7 +8,14 @@ import {
 import { type AdminAccess } from "./admin-client.ts";
 import { getAdminAccess } from "./admin-runtime.ts";
 import { type EventEmitter, createEventEmitter } from "./events.ts";
-import { createInvitationMailer, createSmtpTransport, type InvitationMailer } from "./mail.ts";
+import type { AccountChangeDeps } from "./account-changes.ts";
+import {
+  createAccountMailer,
+  createInvitationMailer,
+  createSmtpTransport,
+  type AccountMailer,
+  type InvitationMailer,
+} from "./mail.ts";
 import { createSignInService, type SignInService } from "./service.ts";
 
 /**
@@ -23,6 +30,7 @@ export type IdentityRuntime = Readonly<{
   admin: AdminAccess;
   database: DatabaseClient;
   mailer: InvitationMailer;
+  accountMailer: AccountMailer;
   events: EventEmitter;
 }>;
 
@@ -46,19 +54,32 @@ export function getIdentityRuntime(): IdentityRuntime {
   const config = requireDatabaseConfig(process.env);
   const settings = requireIdentitySettings(process.env, config.url);
   const events = createEventEmitter({ secret: config.sessionSecret });
+  const transport = createSmtpTransport({ host: settings.smtp.host, port: settings.smtp.port });
   cached = {
     settings,
     emailKeySecret: config.sessionSecret,
     service: createSignInService({ url: config.url, publicKey: config.publicKey }),
     admin: getAdminAccess(),
     database: getDatabaseClient(config),
-    mailer: createInvitationMailer({
-      transport: createSmtpTransport({ host: settings.smtp.host, port: settings.smtp.port }),
-      from: settings.smtp.from,
-    }),
+    mailer: createInvitationMailer({ transport, from: settings.smtp.from }),
+    accountMailer: createAccountMailer({ transport, from: settings.smtp.from }),
     events,
   };
   return cached;
+}
+
+/** What the account changes (password, address, parent invitation) need, taken from the runtime. */
+export function accountChangeDeps(runtime: IdentityRuntime): AccountChangeDeps {
+  return {
+    service: runtime.service,
+    admin: runtime.admin,
+    database: runtime.database,
+    mailer: runtime.accountMailer,
+    invitationMailer: runtime.mailer,
+    events: runtime.events,
+    emailKeySecret: runtime.emailKeySecret,
+    appPublicUrl: runtime.settings.appPublicUrl,
+  };
 }
 
 export function resetIdentityRuntimeForTests(): void {

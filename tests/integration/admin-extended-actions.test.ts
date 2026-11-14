@@ -59,7 +59,7 @@ beforeEach(() => {
 });
 
 describe("saveRecordAction with the extended record form", () => {
-  it("sends a family with its parents, contact details and consent, with no group (BR1.5)", async () => {
+  it("sends a family with its parents, contact details, with no group (BR1.5)", async () => {
     const result = await saveRecordAction(
       initial,
       form({
@@ -70,8 +70,6 @@ describe("saveRecordAction with the extended record form", () => {
         addGroupId: "g-1",
         "parent-0-name": "Fenyő Anna",
         "parent-0-email": "Anna@Example.test",
-        "parent-0-profile": "Kertész vagyok.",
-        "parent-0-consent": "on",
         "parent-1-name": "",
       }),
     );
@@ -84,8 +82,6 @@ describe("saveRecordAction with the extended record form", () => {
         {
           displayName: "Fenyő Anna",
           email: "anna@example.test",
-          optionalProfile: "Kertész vagyok.",
-          optionalProfileConsent: true,
         },
       ],
     });
