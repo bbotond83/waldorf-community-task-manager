@@ -17,7 +17,8 @@
     "+36 20 999 8888",
     "+36 30 100 2000",
     "+36 30 222 3333",
-    "+36 30 000 0009"
+    "+36 30 000 0009",
+    "+36 30 000 0001"
   ],
   "phoneAllowedPaths": ["scripts/db/seed/", "scripts/verification/privacy-allowlist.json"],
   "allowedPaths": ["supabase/migrations/", "supabase/roles.sql", "tests/database/fixtures/"],
