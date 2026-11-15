@@ -162,6 +162,126 @@
       "effect": "allow"
     },
     {
+      "id": "AUTH-GROUP-PAGE-SZULO-PARENT-ALLOW",
+      "role": "parent",
+      "scope": "community",
+      "route": "/szulo/munkacsoportok/[id]",
+      "actions": ["read", "create", "update"],
+      "resources": ["working_group", "working_group_membership"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-GROUP-PAGE-SZULO-TEACHER-DENY",
+      "role": "kindergarten_teacher",
+      "scope": "community",
+      "route": "/szulo/munkacsoportok/[id]",
+      "actions": ["read", "create", "update", "manage"],
+      "resources": ["working_group", "working_group_membership", "working_group_coordinator"],
+      "fields": [],
+      "effect": "deny"
+    },
+    {
+      "id": "AUTH-GROUP-PAGE-SZULO-GROUP-ADMIN-DENY",
+      "role": "group_admin",
+      "scope": "community",
+      "route": "/szulo/munkacsoportok/[id]",
+      "actions": ["read", "create", "update", "manage"],
+      "resources": ["working_group", "working_group_membership", "working_group_coordinator"],
+      "fields": [],
+      "effect": "deny"
+    },
+    {
+      "id": "AUTH-GROUP-PAGE-SZULO-SUPER-ADMIN-DENY",
+      "role": "super_admin",
+      "scope": "community",
+      "route": "/szulo/munkacsoportok/[id]",
+      "actions": ["read", "create", "update", "manage"],
+      "resources": ["working_group", "working_group_membership", "working_group_coordinator"],
+      "fields": [],
+      "effect": "deny"
+    },
+    {
+      "id": "AUTH-GROUP-PAGE-TEACHER-PARENT-DENY",
+      "role": "parent",
+      "scope": "community",
+      "route": "/teacher/munkacsoportok/[id]",
+      "actions": ["read", "create", "update", "manage"],
+      "resources": ["working_group", "working_group_membership", "working_group_coordinator"],
+      "fields": [],
+      "effect": "deny"
+    },
+    {
+      "id": "AUTH-GROUP-PAGE-TEACHER-TEACHER-ALLOW",
+      "role": "kindergarten_teacher",
+      "scope": "community",
+      "route": "/teacher/munkacsoportok/[id]",
+      "actions": ["read"],
+      "resources": ["working_group"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-GROUP-PAGE-TEACHER-GROUP-ADMIN-DENY",
+      "role": "group_admin",
+      "scope": "community",
+      "route": "/teacher/munkacsoportok/[id]",
+      "actions": ["read", "create", "update", "manage"],
+      "resources": ["working_group", "working_group_membership", "working_group_coordinator"],
+      "fields": [],
+      "effect": "deny"
+    },
+    {
+      "id": "AUTH-GROUP-PAGE-TEACHER-SUPER-ADMIN-DENY",
+      "role": "super_admin",
+      "scope": "community",
+      "route": "/teacher/munkacsoportok/[id]",
+      "actions": ["read", "create", "update", "manage"],
+      "resources": ["working_group", "working_group_membership", "working_group_coordinator"],
+      "fields": [],
+      "effect": "deny"
+    },
+    {
+      "id": "AUTH-GROUP-PAGE-ADMIN-PARENT-DENY",
+      "role": "parent",
+      "scope": "community",
+      "route": "/admin/munkacsoportok/[id]",
+      "actions": ["read", "create", "update", "manage"],
+      "resources": ["working_group", "working_group_membership", "working_group_coordinator"],
+      "fields": [],
+      "effect": "deny"
+    },
+    {
+      "id": "AUTH-GROUP-PAGE-ADMIN-TEACHER-DENY",
+      "role": "kindergarten_teacher",
+      "scope": "community",
+      "route": "/admin/munkacsoportok/[id]",
+      "actions": ["read", "create", "update", "manage"],
+      "resources": ["working_group", "working_group_membership", "working_group_coordinator"],
+      "fields": [],
+      "effect": "deny"
+    },
+    {
+      "id": "AUTH-GROUP-PAGE-ADMIN-GROUP-ADMIN-ALLOW",
+      "role": "group_admin",
+      "scope": "community",
+      "route": "/admin/munkacsoportok/[id]",
+      "actions": ["read"],
+      "resources": ["working_group"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-GROUP-PAGE-ADMIN-SUPER-ADMIN-ALLOW",
+      "role": "super_admin",
+      "scope": "community",
+      "route": "/admin/munkacsoportok/[id]",
+      "actions": ["read", "manage"],
+      "resources": ["working_group", "working_group_coordinator"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
       "id": "AUTH-ROTA-OVERVIEW-PARENT-ALLOW",
       "role": "parent",
       "scope": "community",

@@ -1,0 +1,26 @@
+{
+  "stage": "infrastructure-design",
+  "unit": "u4-working-groups",
+  "upstream_ids": [
+    "NFR1.8", "NFR3.15", "NFR3.16", "NFR4.14", "NFR5.12", "NFR6.7", "NFR6.8",
+    "NFR7.15", "NFR7.17", "NFR7.18", "NFR8.4", "NFR9.8", "NFR9.9", "NFR9.10", "NFR9.11", "NFR10.5"
+  ],
+  "coverage": [
+    { "id": "NFR1.8", "status": "OK", "target": "invented seed members and coordinators; privacy allowlist (infrastructure-specification.md, Seed and reset)" },
+    { "id": "NFR3.15", "status": "OK", "target": "revoke all and grants restated after every function in the one migration (infrastructure-specification.md, Postgres)" },
+    { "id": "NFR3.16", "status": "OK", "target": "three routes with exact matrix rows (infrastructure-specification.md, WebApplication)" },
+    { "id": "NFR4.14", "status": "OK", "target": "U5 failures screen for coordinator emails (monitoring-design.md, Alerts)" },
+    { "id": "NFR5.12", "status": "OK", "target": "four 50-run race tests with zero deadlocks (monitoring-design.md, Metrics)" },
+    { "id": "NFR6.7", "status": "OK", "target": "working-groups.test.ts in test:database:directory and DATABASE_TEST_FILES (cicd-pipeline.md)" },
+    { "id": "NFR6.8", "status": "OK", "target": "changed role and grant tests in the same pull request (cicd-pipeline.md)" },
+    { "id": "NFR7.15", "status": "OK", "target": "invariant check after every writer's tests (monitoring-design.md, Metrics)" },
+    { "id": "NFR7.17", "status": "OK", "target": "version and end_reason columns with backfill and check (infrastructure-specification.md, Postgres)" },
+    { "id": "NFR7.18", "status": "OK", "target": "end_admin old signature dropped, three-parameter version created (infrastructure-specification.md, Postgres)" },
+    { "id": "NFR8.4", "status": "OK", "target": "browser flow per route and role in three browsers (cicd-pipeline.md)" },
+    { "id": "NFR9.8", "status": "OK", "target": "group page timing on db:seed:large (monitoring-design.md, Metrics)" },
+    { "id": "NFR9.9", "status": "OK", "target": "existing indexes, no new index (infrastructure-specification.md, Postgres)" },
+    { "id": "NFR9.10", "status": "OK", "target": "command timing test (monitoring-design.md, Metrics)" },
+    { "id": "NFR9.11", "status": "OK", "target": "redefined directory_list and lifecycle_run_core in the same migration; existing timing tests (infrastructure-specification.md)" },
+    { "id": "NFR10.5", "status": "OK", "target": "working_group target type and two notice kinds added to U5's registries (infrastructure-specification.md, Postgres)" }
+  ]
+}

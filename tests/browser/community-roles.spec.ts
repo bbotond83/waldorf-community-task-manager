@@ -101,7 +101,8 @@ test("Munkacsoportok shows the six working groups read-only, by keyboard and at 
     await expect(page.getByRole("heading", { level: 2, name, exact: true })).toBeVisible();
   }
   await expect(page.getByTestId("workgroup-list").getByRole("button")).toHaveCount(0);
-  await expect(page.getByTestId("workgroup-list").getByRole("link")).toHaveCount(0);
+  // One link per card, to the group page (U4); the list itself still holds no other control.
+  await expect(page.getByTestId("workgroup-list").getByRole("link")).toHaveCount(6);
   await page.setViewportSize({ width: 360, height: 800 });
   const overflow = await page.evaluate(
     () => document.documentElement.scrollWidth - document.documentElement.clientWidth,

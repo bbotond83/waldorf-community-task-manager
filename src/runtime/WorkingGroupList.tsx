@@ -12,12 +12,23 @@ function byYear(items: readonly WorkingGroupItem[]) {
   return [...years.entries()];
 }
 
-function WorkingGroupCards({ items }: Readonly<{ items: readonly WorkingGroupItem[] }>) {
+function WorkingGroupCards({
+  items,
+  basePath,
+}: Readonly<{ items: readonly WorkingGroupItem[]; basePath: string }>) {
   return (
     <ul className="workgroup-list" data-testid="workgroup-list">
       {items.map((group) => (
         <li className="workgroup-card" key={group.id} data-testid={`workgroup-card-${group.id}`}>
-          <h2>{group.name}</h2>
+          <h2>
+            <a
+              className="workgroup-card-link"
+              href={`${basePath}/${group.id}`}
+              data-testid={`workgroup-link-${group.id}`}
+            >
+              {group.name}
+            </a>
+          </h2>
           <p>{group.description}</p>
         </li>
       ))}
@@ -56,7 +67,8 @@ function StateMessage({ result }: Readonly<{ result: ApplicationResult<WorkingGr
  */
 export function WorkingGroupList({
   result,
-}: Readonly<{ result: ApplicationResult<WorkingGroupListModel> }>) {
+  basePath,
+}: Readonly<{ result: ApplicationResult<WorkingGroupListModel>; basePath: string }>) {
   const years =
     result.state === "success" || result.state === "recovery" ? byYear(result.data.items) : [];
   const [first, ...older] = years;
@@ -69,11 +81,15 @@ export function WorkingGroupList({
         </h1>
         <p>A közösség munkacsoportjai ebben a nevelési évben.</p>
       </header>
-      {first ? <WorkingGroupCards items={first[1]} /> : <StateMessage result={result} />}
+      {first ? (
+        <WorkingGroupCards items={first[1]} basePath={basePath} />
+      ) : (
+        <StateMessage result={result} />
+      )}
       {older.map(([year, items]) => (
         <section key={year}>
           <p className="eyebrow">{year}-es nevelési év</p>
-          <WorkingGroupCards items={items} />
+          <WorkingGroupCards items={items} basePath={basePath} />
         </section>
       ))}
     </section>

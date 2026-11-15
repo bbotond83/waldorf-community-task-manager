@@ -72,7 +72,9 @@ const ACTIONS: readonly AuthorizationAction[] = Object.freeze([
 const FAMILY_ONLY_ACTIONS: readonly AuthorizationAction[] = Object.freeze(["respond", "withdraw"]);
 // A parent's own details, sharing choice, password and sign-in email belong to the parent themself: no other role
 // holds them, a super admin included (BR31.2, BR32.1, NFR3.4).
-const PARENT_ONLY_RESOURCES = new Set(["own_profile", "own_account"]);
+// Joining and leaving a working group is the parent's own act too (BR40): the database acts for the caller's own
+// current parent, so a super admin has no right to it.
+const PARENT_ONLY_RESOURCES = new Set(["own_profile", "own_account", "working_group_membership"]);
 export function grantAllows(
   grant: Pick<RoleGrant, "role" | "scope" | "revokedAt">,
   request: AuthorizationRequest,
@@ -124,6 +126,9 @@ function parentCan({ action, resource }: AuthorizationRequest): boolean {
     case "own_profile":
     case "own_account":
       return action === "read" || action === "update";
+    // Joining a working group and leaving it (BR40).
+    case "working_group_membership":
+      return action === "create" || action === "update";
     // A duty card of the family's own rota duty; the database checks that the family holds it (BR24.2). This also
     // serves a group admin who is a parent: the parent grant carries the read, the group admin grant adds nothing.
     case "rota_duty":

@@ -179,7 +179,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
         "23505",
       );
       await db.query(
-        "update group_memberships set status = 'ended', ended_at = now() where parent_id = $1 and group_id = $2",
+        "update group_memberships set status = 'ended', ended_at = now(), end_reason = 'left' where parent_id = $1 and group_id = $2",
         [PARENT_ROW_F1, GROUP_1],
       );
       await db.query(

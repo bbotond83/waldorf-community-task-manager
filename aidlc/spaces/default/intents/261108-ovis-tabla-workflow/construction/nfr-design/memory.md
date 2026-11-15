@@ -17,6 +17,8 @@
 - 2026-11-09T07:33:31Z [unit u1-community-foundation] — The clean-start deletion has no guard of its own and is recorded as an accepted risk; a guard would have to tell test data from real data, and real data cannot exist before the hosting work.
 - 2026-11-14T07:30:00Z [unit u3-directory-and-profile] — The password-change audit row is written by the app server after the sign-in service confirms, not in one transaction; a failed write is an event line and the change stands, so the parent is never locked out.
 - 2026-11-14T07:30:00Z [unit u3-directory-and-profile] — The resend limit counts accepted sends only, in a small table keyed by the hashed address, under a per-hash advisory lock so two requests at once cannot both take the last slot; new refusal code EMAIL_RATE_LIMITED.
+- 2026-11-15T13:50:00Z [unit u4-working-groups] — Join takes share locks on the family and parent rows, so it waits for a removal running at the same time instead of racing it; the cost is a short wait, and no lock is ever taken in the opposite order.
+- 2026-11-15T13:50:00Z [unit u4-working-groups] — A new unit test checks the authorization matrix has a row per group route and role, because the existing checks stay green without such rows (the remaining minor point of the NFR requirements review).
 
 ## Open questions
 <!-- example: 2026-05-29T10:14:32Z — confirm the retention window with compliance before the next stage hardens the schema -->

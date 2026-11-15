@@ -85,6 +85,15 @@ export const AUTHORIZATION_MATRIX: readonly MatrixRow[] = Object.freeze([
     fields: [],
   },
   {
+    // Joining and leaving a working group is the parent's own act (BR40). The database acts for the caller's own
+    // current parent, so no other role holds it, a super admin included.
+    id: "AUTH-PARENT-GROUP-MEMBERSHIP",
+    roles: ["parent"],
+    actions: ["create", "update"],
+    resources: ["working_group_membership"],
+    fields: [],
+  },
+  {
     // The published rota: every signed-in role reads it (BR24.1). The menus are in `src/runtime/navigation.ts`.
     id: "AUTH-ROTA-OVERVIEW",
     roles: ["parent", "group_admin", "kindergarten_teacher", "super_admin"],
@@ -141,6 +150,8 @@ export const AUTHORIZATION_MATRIX: readonly MatrixRow[] = Object.freeze([
       "lifecycle",
       "settings",
       "invitation",
+      // Appointing and revoking a coordinator is a super admin's alone (BR41.1).
+      "working_group_coordinator",
     ],
     fields: DISPLAY_NAME_FIELDS,
     navigation: { id: "admin-dashboard", label: "Áttekintés", href: "/admin" },

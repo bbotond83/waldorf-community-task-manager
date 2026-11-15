@@ -175,3 +175,36 @@ describe("the directory and the own account follow the access rules (BR30, BR31.
     expect(roleProfile("parent").navigation.map((item) => item.href)).toContain("/szulo/fiokom");
   });
 });
+
+describe("the working-group pages follow the access rules (BR42, BR40, BR41, NFR3.16)", () => {
+  const DETAIL_ROUTES = [
+    "/szulo/munkacsoportok/[id]",
+    "/teacher/munkacsoportok/[id]",
+    "/admin/munkacsoportok/[id]",
+  ] as const;
+
+  it("opens each group page from the Munkacsoportok list of the same area, and adds no menu entry of its own", () => {
+    for (const profile of ROLE_PROFILES) {
+      const entries = profile.navigation.filter((item) => item.label === "Munkacsoportok");
+      expect(entries, profile.id).toHaveLength(1);
+      expect(DETAIL_ROUTES).toContain(`${entries[0]!.href}/[id]`);
+      for (const item of profile.navigation) expect(item.href).not.toContain("[id]");
+    }
+  });
+
+  it("lets every role read a group, only the parent join and leave, and only the super admin appoint", () => {
+    for (const role of ["parent", "group_admin", "kindergarten_teacher", "super_admin"] as const) {
+      expect(mayOpen(role, "/szulo/munkacsoportok"), role).toBe(true);
+    }
+    const holders = (resource: string, action: string) =>
+      AUTHORIZATION_MATRIX.filter(
+        (row) =>
+          row.resources.includes(resource) &&
+          row.actions.includes(action as (typeof row.actions)[number]) &&
+          !row.explicitDeny,
+      ).flatMap((row) => row.roles);
+    expect([...new Set(holders("working_group_membership", "create"))]).toEqual(["parent"]);
+    expect([...new Set(holders("working_group_membership", "update"))]).toEqual(["parent"]);
+    expect([...new Set(holders("working_group_coordinator", "manage"))]).toEqual(["super_admin"]);
+  });
+});

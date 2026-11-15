@@ -82,6 +82,44 @@ export const DIRECTORY_REFUSAL_MESSAGES: Readonly<Record<string, string>> = Obje
 
 export const DIRECTORY_REFUSAL_FALLBACK = "A művelet most nem hajtható végre.";
 
+export type WorkingGroupAction = "join" | "leave" | "appoint" | "revoke";
+
+/**
+ * What a person reads for each answer of the working-group commands (U4, the table of `rules.md`). `NOT_A_MEMBER`
+ * means something different for each command, so it is listed per command; every other code reads the same
+ * wherever it comes from. `ALREADY_MEMBER` is a success of a repeated join and is shown as a note, not an error.
+ */
+const WORKING_GROUP_CODE_MESSAGES: Readonly<Record<string, string>> = Object.freeze({
+  ALREADY_MEMBER: "Már tagja vagy ennek a csoportnak.",
+  ALREADY_COORDINATOR: "Ő már koordinátora ennek a csoportnak.",
+  NOT_COORDINATOR: "Ő már nem koordinátora ennek a csoportnak.",
+  ACCOUNT_REQUIRED: "Csak aktív fiókkal rendelkező szülő lehet koordinátor.",
+  VERSION_CONFLICT: "Az oldal közben megváltozott. Frissítsd, és próbáld újra.",
+  GROUP_UNAVAILABLE: "Ez a munkacsoport nem érhető el.",
+});
+
+const NOT_A_MEMBER_MESSAGES: Readonly<Record<WorkingGroupAction, string>> = Object.freeze({
+  join: "A művelet most nem hajtható végre.",
+  leave: "Már nem vagy tagja ennek a csoportnak.",
+  appoint:
+    "Koordinátor csak a csoport tagja lehet. Kérd meg a szülőt, hogy előbb csatlakozzon a csoporthoz.",
+  revoke: "Ő már nem tagja ennek a csoportnak.",
+});
+
+/**
+ * The words for one answer. An access refusal (a missing, archived or other-community group, or someone else's
+ * membership) reads as the unavailable group, so a person cannot tell which of these it was (BR42.1). A code this
+ * table does not know is shown with the general fallback and never its raw text.
+ */
+export function workingGroupMessage(
+  action: WorkingGroupAction,
+  answer: { state: string; code?: string | undefined },
+): string {
+  if (answer.state === "denied") return WORKING_GROUP_CODE_MESSAGES.GROUP_UNAVAILABLE!;
+  if (answer.code === "NOT_A_MEMBER") return NOT_A_MEMBER_MESSAGES[action];
+  return (answer.code && WORKING_GROUP_CODE_MESSAGES[answer.code]) || DIRECTORY_REFUSAL_FALLBACK;
+}
+
 export function directoryRefusalMessage(code: string | undefined): string {
   return (code && DIRECTORY_REFUSAL_MESSAGES[code]) || DIRECTORY_REFUSAL_FALLBACK;
 }

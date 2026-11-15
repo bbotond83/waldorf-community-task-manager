@@ -97,6 +97,21 @@ for (const schema of DIRECTORY_SCHEMAS) {
         [subject, role, type, scope, ORGANIZATION],
       );
 
+    /** Since U4 the group-admin right is given and taken by the coordinator actions, which work on a membership. */
+    const memberOf = async (parentRow: string, group: string) =>
+      (
+        await db.query(
+          "insert into group_memberships (organization_id, parent_id, group_id) values ($1, $2, $3) returning id",
+          [ORGANIZATION, parentRow, group],
+        )
+      ).rows[0].id as string;
+    const appoint = (membership: string, key = nextKey("appoint"), version = 1) =>
+      call(SUPER_ADMIN, "coordinator_appoint($1, $2, $3)", [key, membership, version]);
+    const revokeCoordinator = (membership: string, key = nextKey("revoke"), version = 1) =>
+      call(SUPER_ADMIN, "coordinator_revoke($1, $2, $3)", [key, membership, version]);
+    /** ADMIN_G1 holds the right through the shared world's grant; this gives them the membership that goes with it. */
+    const adminG1Membership = () => memberOf(PARENT_ROW_ADMIN_G1, GROUP_1);
+
     it("BR3.1 each pair", async () => {
       const subject = uuid(90001);
       await addGrant(subject, "parent", "family", FAMILY_1);
@@ -322,13 +337,23 @@ for (const schema of DIRECTORY_SCHEMAS) {
     });
 
     it("BR3.6 allowed", async () => {
-      const result = await grant(SUPER_ADMIN, "add", PARENT_F1, "group_admin", "group", GROUP_2);
+      const result = await appoint(await memberOf(PARENT_ROW_F1, GROUP_2));
       assert.equal(result.state, "success");
       assert.equal(await canManage(PARENT_F1, GROUP_2), true);
     });
     it("BR3.6 no parent, invitation refused", async () => {
-      const noParent = await grant(SUPER_ADMIN, "add", OUTSIDER, "group_admin", "group", GROUP_1);
-      assert.deepEqual([noParent.state, noParent.code], ["validation", "parent_required"]);
+      // The old route is closed for this role (BR41.7); the coordinator action needs a signed-in parent.
+      const oldRoute = await grant(SUPER_ADMIN, "add", OUTSIDER, "group_admin", "group", GROUP_1);
+      assert.deepEqual(
+        [oldRoute.state, oldRoute.code],
+        ["validation", "GRANT_USE_COORDINATOR_ACTION"],
+      );
+      await db.query(
+        "insert into parents (id, organization_id, family_id, display_name) values ($1, $2, $3, 'Fiók Nélküli')",
+        [uuid(90040), ORGANIZATION, FAMILY_1],
+      );
+      const noAccount = await appoint(await memberOf(uuid(90040), GROUP_2));
+      assert.deepEqual([noAccount.state, noAccount.code], ["validation", "ACCOUNT_REQUIRED"]);
       const invitation = await call(
         SUPER_ADMIN,
         "invitation_create($1, $2, 'group_admin', 'group', $3, $4)",
@@ -337,28 +362,15 @@ for (const schema of DIRECTORY_SCHEMAS) {
       assert.deepEqual([invitation.state, invitation.code], ["validation", "invitation_invalid"]);
     });
     it("BR3.6 other community", async () => {
-      const result = await grant(
-        SUPER_ADMIN,
-        "add",
-        PARENT_F1,
-        "group_admin",
-        "group",
-        GROUP_OTHER,
-      );
-      assert.deepEqual([result.state, result.code], ["validation", "scope_not_found"]);
+      // A membership id the caller's community does not hold answers like a missing one.
+      const result = await appoint(uuid(90041));
+      assert.deepEqual([result.state, result.code], ["denied", "GROUP_UNAVAILABLE"]);
     });
     it("BR3.6 repeat", async () => {
       const key = nextKey("grant");
-      await grant(SUPER_ADMIN, "add", PARENT_F1, "group_admin", "group", GROUP_2, key);
-      const again = await grant(
-        SUPER_ADMIN,
-        "add",
-        PARENT_F1,
-        "group_admin",
-        "group",
-        GROUP_2,
-        key,
-      );
+      const membership = await memberOf(PARENT_ROW_F1, GROUP_2);
+      await appoint(membership, key);
+      const again = await appoint(membership, key);
       assert.equal(again.code, "replayed");
       assert.equal(
         await count(db, "app_role_grants", `subject_id = '${PARENT_F1}' and role = 'group_admin'`),
@@ -366,10 +378,11 @@ for (const schema of DIRECTORY_SCHEMAS) {
       );
     });
     it("BR3.6 two grants", async () => {
-      const sql = "grant_change($1, 'add', $2, 'group_admin', 'group', $3)";
+      const membership = await memberOf(PARENT_ROW_F1, GROUP_2);
+      const sql = "coordinator_appoint($1, $2, 1)";
       const results = await Promise.all([
-        call(SUPER_ADMIN, sql, [nextKey("a"), PARENT_F1, GROUP_2]),
-        callSecond(SUPER_ADMIN, sql, [nextKey("b"), PARENT_F1, GROUP_2]),
+        call(SUPER_ADMIN, sql, [nextKey("a"), membership]),
+        callSecond(SUPER_ADMIN, sql, [nextKey("b"), membership]),
       ]);
       assert.deepEqual(results.map((result) => result.state).sort(), ["conflict", "success"]);
     });
@@ -566,7 +579,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
       assert.equal((await saveEvent(ADMIN_G1, eventBody(GROUP_1))).state, "success");
     });
     it("BR3.11 next request denied", async () => {
-      await grant(SUPER_ADMIN, "revoke", ADMIN_G1, "group_admin", "group", GROUP_1);
+      await revokeCoordinator(await adminG1Membership());
       assert.equal((await saveEvent(ADMIN_G1, eventBody(GROUP_1))).state, "denied");
       assert.equal(await countAs(db, schema, ADMIN_G1, "events", `group_id = '${GROUP_1}'`), 0);
       await db.query("update families set status = 'archived', archived_at = now() where id = $1", [
@@ -577,28 +590,19 @@ for (const schema of DIRECTORY_SCHEMAS) {
     });
     it("BR3.11 repeat revoke", async () => {
       const key = nextKey("grant");
-      await grant(SUPER_ADMIN, "revoke", ADMIN_G1, "group_admin", "group", GROUP_1, key);
-      const again = await grant(
-        SUPER_ADMIN,
-        "revoke",
-        ADMIN_G1,
-        "group_admin",
-        "group",
-        GROUP_1,
-        key,
-      );
+      const membership = await adminG1Membership();
+      await revokeCoordinator(membership, key);
+      const again = await revokeCoordinator(membership, key);
       assert.equal(again.code, "replayed");
-      const missing = await grant(SUPER_ADMIN, "revoke", ADMIN_G1, "group_admin", "group", GROUP_1);
-      assert.equal(missing.code, "grant_not_found");
+      // The membership moved to version 2 with the first revoke, so a fresh revoke finds no coordinator.
+      const missing = await revokeCoordinator(membership, nextKey("revoke"), 2);
+      assert.equal(missing.code, "NOT_COORDINATOR");
     });
     it("BR3.11 revoke while acting", async () => {
+      const membership = await adminG1Membership();
       const results = await Promise.all([
         saveEvent(ADMIN_G1, eventBody(GROUP_1)),
-        callSecond(SUPER_ADMIN, "grant_change($1, 'revoke', $2, 'group_admin', 'group', $3)", [
-          nextKey("g"),
-          ADMIN_G1,
-          GROUP_1,
-        ]),
+        callSecond(SUPER_ADMIN, "coordinator_revoke($1, $2, 1)", [nextKey("g"), membership]),
       ]);
       assert.ok(["success", "denied"].includes(results[0].state));
       assert.equal(results[1].state, "success");
@@ -606,14 +610,15 @@ for (const schema of DIRECTORY_SCHEMAS) {
     });
 
     it("BR3.12 event written", async () => {
-      await grant(SUPER_ADMIN, "add", PARENT_F1, "group_admin", "group", GROUP_2);
-      await grant(SUPER_ADMIN, "revoke", PARENT_F1, "group_admin", "group", GROUP_2);
+      const membership = await memberOf(PARENT_ROW_F1, GROUP_2);
+      await appoint(membership);
+      await revokeCoordinator(membership, nextKey("revoke"), 2);
       const events = (await auditEvents(db)).filter((event) => event.target_id === PARENT_F1);
       assert.deepEqual(
         events.map((event) => [event.action, event.group_id, event.details]),
         [
           ["role.grant", GROUP_2, "grant:group_admin"],
-          ["role.revoke", GROUP_2, "grant:group_admin"],
+          ["role.revoke", GROUP_2, "grant:group_admin:revoked"],
         ],
       );
       assert.ok(!JSON.stringify(events).includes("Fenyő"));
@@ -625,7 +630,8 @@ for (const schema of DIRECTORY_SCHEMAS) {
         "create trigger audit_refuse_test before insert on audit_events for each row execute function audit_refuse_test()",
       );
       try {
-        await assert.rejects(grant(SUPER_ADMIN, "add", PARENT_F1, "group_admin", "group", GROUP_2));
+        const membership = await memberOf(PARENT_ROW_F1, GROUP_2);
+        await assert.rejects(appoint(membership));
         assert.equal(
           await count(
             db,
@@ -641,8 +647,9 @@ for (const schema of DIRECTORY_SCHEMAS) {
     });
     it("BR3.12 one event on repeat", async () => {
       const key = nextKey("grant");
-      await grant(SUPER_ADMIN, "add", PARENT_F1, "group_admin", "group", GROUP_2, key);
-      await grant(SUPER_ADMIN, "add", PARENT_F1, "group_admin", "group", GROUP_2, key);
+      const membership = await memberOf(PARENT_ROW_F1, GROUP_2);
+      await appoint(membership, key);
+      await appoint(membership, key);
       assert.equal(
         (await auditEvents(db)).filter((event) => event.target_id === PARENT_F1).length,
         1,

@@ -1,0 +1,43 @@
+{
+  "stage": "code-generation",
+  "unit": "u4-working-groups",
+  "upstream_ids": [
+    "US2.1", "US2.2", "US2.3",
+    "AC2.1.1", "AC2.1.2", "AC2.1.3", "AC2.1.4", "AC2.1.5", "AC2.1.6",
+    "AC2.2.1", "AC2.2.2",
+    "AC2.3.1", "AC2.3.2", "AC2.3.3", "AC2.3.4",
+    "BR40", "BR41", "BR42", "BR43", "BR44",
+    "NFR1", "NFR3", "NFR4", "NFR5", "NFR6", "NFR7", "NFR9", "NFR10", "NFR11"
+  ],
+  "coverage": [
+    { "id": "US2.1", "status": "OK", "target": "tests/browser/working-groups.spec.ts" },
+    { "id": "US2.2", "status": "OK", "target": "tests/database/working-groups.test.ts" },
+    { "id": "US2.3", "status": "OK", "target": "tests/database/working-groups.test.ts" },
+    { "id": "AC2.1.1", "status": "OK", "target": "tests/integration/working-group-pages.test.tsx" },
+    { "id": "AC2.1.2", "status": "OK", "target": "tests/database/working-groups.test.ts" },
+    { "id": "AC2.1.3", "status": "OK", "target": "tests/database/working-groups.test.ts" },
+    { "id": "AC2.1.4", "status": "OK", "target": "tests/database/working-groups.test.ts" },
+    { "id": "AC2.1.5", "status": "OK", "target": "tests/database/working-groups.test.ts" },
+    { "id": "AC2.1.6", "status": "OK", "target": "tests/integration/working-group-pages.test.tsx" },
+    { "id": "AC2.2.1", "status": "OK", "target": "tests/database/working-groups.test.ts" },
+    { "id": "AC2.2.2", "status": "OK", "target": "tests/database/working-groups.test.ts" },
+    { "id": "AC2.3.1", "status": "OK", "target": "tests/database/working-groups.test.ts" },
+    { "id": "AC2.3.2", "status": "OK", "target": "tests/database/working-groups.test.ts" },
+    { "id": "AC2.3.3", "status": "OK", "target": "tests/database/working-groups.test.ts" },
+    { "id": "AC2.3.4", "status": "OK", "target": "tests/database/working-groups.test.ts" },
+    { "id": "BR40", "status": "OK", "target": "tests/database/working-groups.test.ts" },
+    { "id": "BR41", "status": "OK", "target": "tests/database/working-groups.test.ts" },
+    { "id": "BR42", "status": "OK", "target": "tests/database/working-groups.test.ts" },
+    { "id": "BR43", "status": "OK", "target": "tests/database/working-groups.test.ts" },
+    { "id": "BR44", "status": "OK", "target": "tests/database/working-groups.test.ts" },
+    { "id": "NFR1", "status": "OK", "target": "tests/database/seed.test.ts" },
+    { "id": "NFR3", "status": "OK", "target": "tests/database/working-groups-races.test.ts" },
+    { "id": "NFR4", "status": "OK", "target": "tests/browser/working-groups.spec.ts" },
+    { "id": "NFR5", "status": "OK", "target": "tests/database/working-groups-races.test.ts" },
+    { "id": "NFR6", "status": "OK", "target": "tests/database/seed.test.ts" },
+    { "id": "NFR7", "status": "OK", "target": "tests/database/working-groups.test.ts" },
+    { "id": "NFR9", "status": "OK", "target": "tests/browser/working-groups-timing.spec.ts" },
+    { "id": "NFR10", "status": "OK", "target": "tests/database/working-groups.test.ts" },
+    { "id": "NFR11", "status": "OK", "target": "tests/database/working-groups.test.ts" }
+  ]
+}

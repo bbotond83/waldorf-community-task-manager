@@ -33,7 +33,7 @@ import {
   TEACHER_G1,
   uuid,
 } from "./directory-support.ts";
-import { auditEvents, count } from "./identity-support.ts";
+import { auditEvents, count, PARENT_ROW_ADMIN_G1 } from "./identity-support.ts";
 import { ensureAccount, openDatabase } from "./stack-support.ts";
 
 type Result = Awaited<ReturnType<typeof callFunction>>;
@@ -468,30 +468,139 @@ for (const schema of DIRECTORY_SCHEMAS) {
       ) => fn(account, "governance_revoke($1, $2, $3)", [key, grant, version]);
 
       it("revokes another admin's grant through U2's function, raising the authorization version and auditing it", async () => {
-        const grant = await grantOf(ADMIN_G1, "group_admin");
-        const result = await revoke(SUPER_ADMIN, grant, await authVersion(ADMIN_G1));
+        // Since U4 the group-admin right is taken only by the coordinator action, so this fixture is the teacher grant.
+        const grant = await grantOf(TEACHER_G1, "kindergarten_teacher");
+        refused(
+          await revoke(ADMIN_G2, grant, await authVersion(TEACHER_G1)),
+          "denied",
+          "authorization_denied",
+        );
+        const result = await revoke(SUPER_ADMIN, grant, await authVersion(TEACHER_G1));
         assert.equal(result.state, "success");
         assert.equal(result.authorization_version, 2);
         assert.equal(
           await count(db, "app_role_grants", `id = '${grant}' and revoked_at is not null`),
           1,
         );
-        const [event] = await auditEvents(db);
+        const events = (await auditEvents(db)).filter((event) => event.outcome === "success");
         assert.deepEqual(
-          [event!.action, event!.outcome, event!.target_id, event!.actor_account_id],
-          ["role.revoke", "success", ADMIN_G1, SUPER_ADMIN],
+          events.map((event) => [event.action, event.target_id, event.actor_account_id]),
+          [["role.revoke", TEACHER_G1, SUPER_ADMIN]],
         );
-        // A group admin may revoke a teacher grant of their own group, not of another.
-        const teacher = await grantOf(TEACHER_G1, "kindergarten_teacher");
-        refused(
-          await revoke(ADMIN_G2, teacher, await authVersion(TEACHER_G1)),
-          "denied",
-          "authorization_denied",
-        );
-        assert.equal(
-          (await revoke(SUPER_ADMIN, teacher, await authVersion(TEACHER_G1))).state,
-          "success",
-        );
+      });
+
+      describe("a group-admin grant goes through the coordinator revoke (BR41.7)", () => {
+        const withMembership = async () => {
+          await db.query(
+            "insert into group_memberships (organization_id, parent_id, group_id) values ($1, $2, $3)",
+            [ORGANIZATION, PARENT_ROW_ADMIN_G1, GROUP_1],
+          );
+        };
+
+        it("allowed: revokes the grant, moves the authorization version, audits the reason and tells the person", async () => {
+          await withMembership();
+          const grant = await grantOf(ADMIN_G1, "group_admin");
+          const version = await authVersion(ADMIN_G1);
+          const result = await revoke(SUPER_ADMIN, grant, version);
+          assert.equal(result.state, "success");
+          assert.equal(result.authorization_version, version + 1);
+          assert.equal(
+            await count(db, "app_role_grants", `id = '${grant}' and revoked_at is not null`),
+            1,
+          );
+          const events = (await auditEvents(db)).filter((event) => event.outcome === "success");
+          assert.deepEqual(
+            events.map((event) => [event.action, event.details, event.target_id]),
+            [["role.revoke", "grant:group_admin:revoked", ADMIN_G1]],
+          );
+          assert.equal(
+            await count(db, "notifications", `kind = 'coordinator_revoked'`),
+            1,
+            "the person gets the coordinator notice",
+          );
+          assert.equal(
+            await count(
+              db,
+              "group_memberships",
+              `parent_id = '${PARENT_ROW_ADMIN_G1}' and status = 'active'`,
+            ),
+            1,
+            "the membership stays",
+          );
+        });
+
+        it("refused: not a super admin, a stale version and a repeated revoke change nothing more", async () => {
+          await withMembership();
+          const grant = await grantOf(ADMIN_G1, "group_admin");
+          const version = await authVersion(ADMIN_G1);
+          refused(await revoke(ADMIN_G2, grant, version), "denied", "authorization_denied");
+          refused(await revoke(SUPER_ADMIN, grant, version + 5), "invalidated", "GRANT_STALE");
+          assert.equal(
+            await count(db, "app_role_grants", `id = '${grant}' and revoked_at is null`),
+            1,
+            "still untouched",
+          );
+          const key = nextKey("coord-same");
+          assert.equal((await revoke(SUPER_ADMIN, grant, version, key)).state, "success");
+          assert.equal((await revoke(SUPER_ADMIN, grant, version, key)).code, "replayed");
+          refused(await revoke(SUPER_ADMIN, grant, version), "denied", "authorization_denied");
+          assert.equal(
+            await count(db, "audit_events", `action = 'role.revoke' and outcome = 'success'`),
+            1,
+            "one event only",
+          );
+        });
+
+        it("out of reach and outdated screen: a grant of another community is denied; a membership that moved reads as a stale grant", async () => {
+          await withMembership();
+          const grant = await grantOf(ADMIN_G1, "group_admin");
+          refused(
+            await fn(OTHER_ADMIN, "governance_revoke($1, $2, 1)", [nextKey("o"), grant]),
+            "denied",
+            "authorization_denied",
+          );
+          await db.query(
+            "update group_memberships set status = 'ended', ended_at = now(), end_reason = 'left' where parent_id = $1",
+            [PARENT_ROW_ADMIN_G1],
+          );
+          // No active membership behind the grant (BR41.8 forbids it): the old refusal stands and nothing changes.
+          refused(
+            await revoke(SUPER_ADMIN, grant, await authVersion(ADMIN_G1)),
+            "validation",
+            "GRANT_USE_COORDINATOR_ACTION",
+          );
+          assert.equal(
+            await count(db, "app_role_grants", `id = '${grant}' and revoked_at is null`),
+            1,
+          );
+        });
+
+        it("two at once: a revoke through Settings and a coordinator revoke end with one revoked grant and no error", async () => {
+          await withMembership();
+          const grant = await grantOf(ADMIN_G1, "group_admin");
+          const membership = (
+            await db.query("select id, version from group_memberships where parent_id = $1", [
+              PARENT_ROW_ADMIN_G1,
+            ])
+          ).rows[0] as { id: string; version: number };
+          const results = await Promise.all([
+            revoke(SUPER_ADMIN, grant, await authVersion(ADMIN_G1)),
+            fn(SUPER_ADMIN, "coordinator_revoke($1, $2, $3)", [
+              nextKey("c"),
+              membership.id,
+              membership.version,
+            ]),
+          ]);
+          assert.ok(results.some((result) => result.state === "success"));
+          assert.equal(
+            await count(db, "app_role_grants", `id = '${grant}' and revoked_at is not null`),
+            1,
+          );
+          assert.equal(
+            await count(db, "audit_events", `action = 'role.revoke' and outcome = 'success'`),
+            1,
+          );
+        });
       });
 
       it("refuses a stale version, an admin's own grant and a grant outside the reach", async () => {
@@ -549,9 +658,9 @@ for (const schema of DIRECTORY_SCHEMAS) {
       });
 
       it("returns the stored answer for a repeated key", async () => {
-        const grant = await grantOf(ADMIN_G1, "group_admin");
+        const grant = await grantOf(TEACHER_G1, "kindergarten_teacher");
         const key = nextKey("same-grant");
-        const version = await authVersion(ADMIN_G1);
+        const version = await authVersion(TEACHER_G1);
         const first = await revoke(SUPER_ADMIN, grant, version, key);
         const again = await revoke(SUPER_ADMIN, grant, version, key);
         assert.deepEqual(
