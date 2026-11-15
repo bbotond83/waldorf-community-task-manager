@@ -4,7 +4,9 @@ import { describe, it } from "node:test";
 import { COPY } from "./copy.ts";
 import {
   buildInvitationMessage,
+  buildNoticeMessage,
   createInvitationMailer,
+  createNoticeMailer,
   createSmtpTransport,
   type MailTransport,
 } from "./mail.ts";
@@ -91,5 +93,153 @@ describe("invitation email (BR2.10, NFR2.3)", () => {
       ok: false,
       reason: "mail_unavailable",
     });
+  });
+});
+
+describe("notice email (outbox)", () => {
+  const input = {
+    to: "person@example.test",
+    title: "Emlékeztető: <takarítás>",
+    itemName: "Benti takarítás & rend",
+    itemDate: "2026. 11. 20.",
+    path: "/szulo/feladatok/abc",
+  };
+  const base = "http://127.0.0.1:3000";
+
+  it("uses the title as the subject and holds item, date, link and the automatic-email line", () => {
+    const message = buildNoticeMessage(input, base);
+    assert.equal(message.subject, input.title);
+    assert.equal(message.to, input.to);
+    for (const part of [input.itemName, input.itemDate, `${base}/szulo/feladatok/abc`]) {
+      assert.ok(message.text.includes(part), part);
+    }
+    assert.ok(message.text.includes(COPY.mail.deliveryAutomatic));
+    assert.ok(message.html.includes("Benti takarítás &amp; rend"));
+    assert.ok(!message.html.includes("<takarítás>"));
+  });
+
+  const mailerWith = (send: MailTransport["send"], timeoutMs?: number) =>
+    createNoticeMailer({
+      transport: { send },
+      from: "sender@example.test",
+      appUrl: base,
+      timeoutMs,
+    });
+
+  it("sends once as the configured sender", async () => {
+    const sent: unknown[] = [];
+    const outcome = await mailerWith(async (message) => void sent.push(message)).sendNotice(input);
+    assert.deepEqual(outcome, { ok: true });
+    assert.equal((sent[0] as { from: string }).from, "sender@example.test");
+  });
+
+  it("maps a server outage to mail_unavailable and a permanent refusal to mail_rejected, without the error text", async () => {
+    const down = await mailerWith(async () => {
+      throw new Error("connect ECONNREFUSED person@example.test");
+    }).sendNotice(input);
+    assert.deepEqual(down, { ok: false, reason: "mail_unavailable" });
+    const rejected = await mailerWith(async () => {
+      throw Object.assign(new Error("550 person@example.test unknown"), { responseCode: 550 });
+    }).sendNotice(input);
+    assert.deepEqual(rejected, { ok: false, reason: "mail_rejected" });
+    const temporary = await mailerWith(async () => {
+      throw Object.assign(new Error("451 try later"), { responseCode: 451 });
+    }).sendNotice(input);
+    assert.deepEqual(temporary, { ok: false, reason: "mail_unavailable" });
+    assert.ok(!JSON.stringify([down, rejected, temporary]).includes("example.test"));
+  });
+
+  it("gives up on a slow server after the overall timeout", async () => {
+    const outcome = await mailerWith(() => new Promise<void>(() => undefined), 20).sendNotice(
+      input,
+    );
+    assert.deepEqual(outcome, { ok: false, reason: "mail_unavailable" });
+  });
+});
+
+describe("notice email, blank parts and aborting", () => {
+  const base = "http://127.0.0.1:3000";
+  const input = {
+    to: "person@example.test",
+    title: "Beosztás közzétéve",
+    itemName: "",
+    itemDate: "",
+    path: "/szulo/beosztas",
+  };
+
+  it("leaves out the item and date lines when there is no name or date", () => {
+    const message = buildNoticeMessage(input, base);
+    assert.ok(!message.text.includes(COPY.mail.deliveryItem));
+    assert.ok(!message.text.includes(COPY.mail.deliveryDate));
+    assert.ok(!message.html.includes(COPY.mail.deliveryItem));
+    assert.ok(!message.html.includes(COPY.mail.deliveryDate));
+    assert.ok(message.text.includes(`${base}/szulo/beosztas`));
+    const dated = buildNoticeMessage({ ...input, itemName: "Sütés", itemDate: " " }, base);
+    assert.ok(dated.text.includes(`${COPY.mail.deliveryItem} Sütés`));
+    assert.ok(!dated.text.includes(COPY.mail.deliveryDate));
+  });
+
+  it("aborts the send when the timeout passes, so it cannot finish later", async () => {
+    let signal: AbortSignal | undefined;
+    const transport: MailTransport = {
+      send: (_message, options) => {
+        signal = options?.signal;
+        return new Promise<void>(() => undefined);
+      },
+    };
+    const outcome = await createNoticeMailer({
+      transport,
+      from: "sender@example.test",
+      appUrl: base,
+      timeoutMs: 20,
+    }).sendNotice({ ...input, itemName: "Sütés" });
+    assert.deepEqual(outcome, { ok: false, reason: "mail_unavailable" });
+    assert.equal(signal?.aborted, true);
+  });
+
+  it("does not abort a send that finished in time", async () => {
+    let signal: AbortSignal | undefined;
+    const transport: MailTransport = {
+      send: async (_message, options) => {
+        signal = options?.signal;
+      },
+    };
+    await createNoticeMailer({ transport, from: "sender@example.test", appUrl: base }).sendNotice(
+      input,
+    );
+    assert.equal(signal?.aborted, false);
+  });
+
+  it("closes the real SMTP connection when the send is aborted", async () => {
+    let closed: () => void = () => undefined;
+    const gone = new Promise<void>((resolve) => (closed = resolve));
+    const sockets: Socket[] = [];
+    const server = createServer((socket) => {
+      sockets.push(socket);
+      socket.write("220 stalled ESMTP\r\n"); // greets, then never answers
+      socket.resume(); // read the client's words so its closing is noticed
+      socket.on("close", closed);
+      socket.on("error", () => undefined);
+    });
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+    const port = (server.address() as { port: number }).port;
+    const controller = new AbortController();
+    const sending = createSmtpTransport({ host: "127.0.0.1", port }).send(
+      {
+        to: "person@example.test",
+        subject: "x",
+        text: "x",
+        html: "<p>x</p>",
+        from: "sender@example.test",
+      },
+      { signal: controller.signal },
+    );
+    sending.catch(() => undefined);
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    controller.abort();
+    await gone;
+    await assert.rejects(sending);
+    for (const socket of sockets) socket.destroy();
+    await new Promise<void>((resolve) => server.close(() => resolve()));
   });
 });

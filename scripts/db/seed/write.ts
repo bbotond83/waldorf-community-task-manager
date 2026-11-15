@@ -1,5 +1,6 @@
 import type { SqlClient } from "../common.ts";
 import type { SeedPlan } from "./data.ts";
+import { seedId } from "./ids.ts";
 
 const quote = (identifier: string) => `"${identifier.replace(/"/g, '""')}"`;
 
@@ -264,9 +265,150 @@ export async function writeSeedPlan(client: SqlClient, plan: SeedPlan): Promise<
         assignment.source,
       ]),
     );
+    await writeNotices(client, plan);
     await client.query("commit");
   } catch (error) {
     await client.query("rollback").catch(() => undefined);
     throw error;
   }
+}
+
+/**
+ * The invented notices, their email deliveries and tries, and the invented run records. Only ids, states and counts are
+ * written: no address is stored in a delivery, and a failed delivery has three failed tries in its first round, so the
+ * failure screen has something to show.
+ */
+async function writeNotices(client: SqlClient, plan: SeedPlan): Promise<void> {
+  const organization = plan.organization.id;
+  await insertRows(
+    client,
+    "notifications",
+    [
+      "id",
+      "organization_id",
+      "parent_id",
+      "kind",
+      "target_type",
+      "target_ref",
+      "task_id",
+      {
+        name: "task_starts_at",
+        sql: (placeholder) => `(select t.starts_at from tasks t where t.id = ${placeholder}::uuid)`,
+      },
+      "dedupe_key",
+    ],
+    plan.notices.map((notice) => [
+      notice.id,
+      organization,
+      notice.parentId,
+      "sign_up_confirmed",
+      "task",
+      notice.taskId,
+      notice.taskId,
+      notice.taskId,
+      `seed:${notice.id}`,
+    ]),
+  );
+  const nowWhen = (name: string): Column => ({
+    name,
+    sql: (placeholder) => `case when ${placeholder}::boolean then now() end`,
+  });
+  await insertRows(
+    client,
+    "email_deliveries",
+    [
+      "id",
+      "organization_id",
+      "notice_id",
+      "parent_id",
+      "kind",
+      "target_type",
+      "target_id",
+      {
+        name: "item_date",
+        sql: (placeholder) =>
+          `(select (t.starts_at at time zone 'Europe/Budapest')::date from tasks t where t.id = ${placeholder}::uuid)`,
+      },
+      "status",
+      "attempts_in_round",
+      nowWhen("last_attempt_at"),
+      nowWhen("finished_at"),
+    ],
+    plan.notices.map((notice) => [
+      notice.deliveryId,
+      organization,
+      notice.id,
+      notice.parentId,
+      "sign_up_confirmed",
+      "task",
+      notice.taskId,
+      notice.taskId,
+      notice.deliveryStatus,
+      notice.deliveryStatus === "failed" ? 3 : notice.deliveryStatus === "sent" ? 1 : 0,
+      notice.deliveryStatus !== "queued",
+      notice.deliveryStatus !== "queued",
+    ]),
+  );
+  await insertRows(
+    client,
+    "email_attempts",
+    ["id", "delivery_id", "round", "attempt_number", "outcome", "reason_code"],
+    plan.notices.flatMap((notice) =>
+      notice.deliveryStatus === "sent"
+        ? [
+            [
+              seedId(plan.schema, `attempt:${notice.deliveryId}:1`),
+              notice.deliveryId,
+              1,
+              1,
+              "sent",
+              null,
+            ],
+          ]
+        : notice.deliveryStatus === "failed"
+          ? [1, 2, 3].map((attempt) => [
+              seedId(plan.schema, `attempt:${notice.deliveryId}:${attempt}`),
+              notice.deliveryId,
+              1,
+              attempt,
+              "failed",
+              "mail_unavailable",
+            ])
+          : [],
+    ),
+  );
+  await insertRows(
+    client,
+    "timed_runs",
+    ["id", "run_kind", atHours("run_at"), atHours("finished_at")],
+    plan.timedRuns.map((run) => [run.id, run.runKind, run.atHours, run.atHours]),
+  );
+  await insertRows(
+    client,
+    "timed_check_runs",
+    [
+      "id",
+      "run_id",
+      "check_name",
+      "run_kind",
+      atHours("started_at"),
+      "outcome",
+      "created",
+      "skipped",
+      "error_code",
+    ],
+    plan.timedRuns.flatMap((run) =>
+      run.checks.map((check) => [
+        check.id,
+        run.id,
+        check.name,
+        run.runKind,
+        run.atHours,
+        check.outcome,
+        check.created,
+        0,
+        check.errorCode,
+      ]),
+    ),
+  );
 }

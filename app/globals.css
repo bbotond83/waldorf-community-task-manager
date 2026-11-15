@@ -2689,3 +2689,179 @@ nav a:hover {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+/* Kézbesítési hibák (Stitch screen): failed-email groups and the failed-checks table; no card inside a card. */
+.admin-delivery-page > section {
+  margin-bottom: 2.5rem;
+}
+
+.admin-delivery-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.35rem;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 0.5rem;
+}
+
+.admin-delivery-heading h2 {
+  margin: 0;
+}
+
+.admin-delivery-count,
+.admin-delivery-page .status-badge {
+  border-radius: var(--radius-pill);
+  padding: 0.2rem 0.75rem;
+  color: var(--color-primary);
+  background: var(--color-danger-bg);
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.35;
+  white-space: nowrap;
+}
+
+.admin-delivery-page .status-badge:has(.status-badge-icon-pending) {
+  color: var(--color-primary-dark);
+  background: var(--color-info-bg);
+}
+
+.admin-delivery-groups,
+.admin-delivery-check-cards {
+  display: grid;
+  gap: 1rem;
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.admin-delivery-group {
+  border: 1px solid var(--color-border);
+  border-left: 0.35rem solid var(--color-primary);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  background: var(--color-surface);
+  box-shadow: var(--shadow);
+}
+
+.admin-delivery-group-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 0.75rem;
+}
+
+.admin-delivery-group-head h3 {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--text-headline-sm);
+  overflow-wrap: anywhere;
+}
+
+.admin-delivery-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  gap: 0.75rem;
+  margin: 1rem 0;
+  border-top: 1px solid var(--color-border);
+  padding-top: 0.75rem;
+}
+
+.admin-delivery-facts dt {
+  color: var(--color-muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.admin-delivery-facts dd {
+  margin: 0.2rem 0 0;
+}
+
+/* The retry form sits inside the group's own panel: it drops its own panel look. */
+.admin-delivery-group .admin-form {
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.admin-delivery-notice {
+  margin-top: 1rem;
+  border: 1px solid var(--color-border);
+  border-left: 0.35rem solid var(--color-success);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  background: var(--color-surface);
+}
+
+.admin-delivery-notice p {
+  margin: 0.25rem 0 0;
+  color: var(--color-muted);
+}
+
+.admin-delivery-notice-ok strong {
+  color: var(--color-success);
+  font-family: var(--font-heading);
+}
+
+.admin-delivery-notice-error {
+  border-left-color: var(--color-primary);
+  background: var(--color-danger-bg);
+}
+
+.admin-delivery-table-wrapper {
+  margin-top: 1rem;
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  box-shadow: var(--shadow);
+}
+
+.admin-delivery-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-delivery-table th,
+.admin-delivery-table td {
+  border-top: 1px solid var(--color-border);
+  padding: 0.85rem 1rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.admin-delivery-table thead th {
+  border-top: 0;
+  color: var(--color-muted);
+  background: var(--color-info-bg);
+  font-size: var(--text-eyebrow);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.admin-delivery-check-cards {
+  display: none;
+}
+
+.admin-delivery-check-cards li {
+  display: grid;
+  gap: 0.35rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  background: var(--color-surface);
+}
+
+@media (max-width: 44rem) {
+  .admin-delivery-table-wrapper {
+    display: none;
+  }
+
+  .admin-delivery-check-cards {
+    display: grid;
+  }
+}

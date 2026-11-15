@@ -1,0 +1,211 @@
+{
+  "stage": "code-generation",
+  "unit": "u5-reminders-and-email",
+  "version": 1,
+  "writes": [
+    {
+      "path": "README.md"
+    },
+    {
+      "path": "app/admin/advanced-actions.ts"
+    },
+    {
+      "path": "app/admin/emlekeztetok/page.tsx"
+    },
+    {
+      "path": "app/globals.css"
+    },
+    {
+      "path": "app/szulo/ertesitesek/page.tsx"
+    },
+    {
+      "path": "package.json"
+    },
+    {
+      "path": "scripts/db/reset.ts"
+    },
+    {
+      "path": "scripts/db/seed/commands.test.ts"
+    },
+    {
+      "path": "scripts/db/seed/data.test.ts"
+    },
+    {
+      "path": "scripts/db/seed/data.ts"
+    },
+    {
+      "path": "scripts/db/seed/write.test.ts"
+    },
+    {
+      "path": "scripts/db/seed/write.ts"
+    },
+    {
+      "path": "scripts/db/shuffled-tests.ts"
+    },
+    {
+      "path": "scripts/db/worker.ts"
+    },
+    {
+      "path": "scripts/timed-run.test.ts"
+    },
+    {
+      "path": "scripts/timed-run.ts"
+    },
+    {
+      "path": "src/access/role-policy.test.ts"
+    },
+    {
+      "path": "src/application/admin-facade.ts"
+    },
+    {
+      "path": "src/application/contracts.ts"
+    },
+    {
+      "path": "src/application/delivery-labels.test.ts"
+    },
+    {
+      "path": "src/application/delivery-labels.ts"
+    },
+    {
+      "path": "src/application/notification-context.test.ts"
+    },
+    {
+      "path": "src/data/admin-port.ts"
+    },
+    {
+      "path": "src/data/notifications.test.ts"
+    },
+    {
+      "path": "src/data/notifications.ts"
+    },
+    {
+      "path": "src/data/parent-port.test.ts"
+    },
+    {
+      "path": "src/identity/admin-client.ts"
+    },
+    {
+      "path": "src/identity/copy.ts"
+    },
+    {
+      "path": "src/identity/mail.test.ts"
+    },
+    {
+      "path": "src/identity/mail.ts"
+    },
+    {
+      "path": "src/runtime/navigation.ts"
+    },
+    {
+      "path": "supabase/migrations/20261050_notices_and_timed_run.sql"
+    },
+    {
+      "path": "tests/browser/admin-advanced.spec.ts"
+    },
+    {
+      "path": "tests/browser/delivery-problems.spec.ts"
+    },
+    {
+      "path": "tests/browser/list-polish.spec.ts"
+    },
+    {
+      "path": "tests/browser/notices-screenshots.spec.ts"
+    },
+    {
+      "path": "tests/browser/notices-timing.spec.ts"
+    },
+    {
+      "path": "tests/coverage/admin-actions.test.ts"
+    },
+    {
+      "path": "tests/coverage/admin-functional-fixes.test.tsx"
+    },
+    {
+      "path": "tests/coverage/admin-pages.test.tsx"
+    },
+    {
+      "path": "tests/coverage/production-inventory.test.ts"
+    },
+    {
+      "path": "tests/database/community-roles.test.ts"
+    },
+    {
+      "path": "tests/database/dataset.ts"
+    },
+    {
+      "path": "tests/database/identity-catalogue.test.ts"
+    },
+    {
+      "path": "tests/database/migrations.test.ts"
+    },
+    {
+      "path": "tests/database/notices-delivery.test.ts"
+    },
+    {
+      "path": "tests/database/notices-failures.test.ts"
+    },
+    {
+      "path": "tests/database/notices-mail-catcher.test.ts"
+    },
+    {
+      "path": "tests/database/notices-migration.test.ts"
+    },
+    {
+      "path": "tests/database/notices-run.test.ts"
+    },
+    {
+      "path": "tests/database/notices-send.test.ts"
+    },
+    {
+      "path": "tests/database/notifications-adapters.test.ts"
+    },
+    {
+      "path": "tests/database/notifications-functions.test.ts"
+    },
+    {
+      "path": "tests/database/notifications-handoff.test.ts"
+    },
+    {
+      "path": "tests/database/notifications-schema.test.ts"
+    },
+    {
+      "path": "tests/database/notifications-support.ts"
+    },
+    {
+      "path": "tests/database/notifications-timing.test.ts"
+    },
+    {
+      "path": "tests/database/reset.test.ts"
+    },
+    {
+      "path": "tests/database/rota-plan.test.ts"
+    },
+    {
+      "path": "tests/database/seed-support.ts"
+    },
+    {
+      "path": "tests/integration/notifications-wiring.test.ts"
+    },
+    {
+      "path": "tests/support/port-doubles.ts"
+    },
+    {
+      "path": "tests/unit/navigation-access.test.ts"
+    },
+    {
+      "path": "verification/AUTHORIZATION.md"
+    },
+    {
+      "path": "verification/authorization-matrix.json"
+    },
+    {
+      "path": "verification/reports/local-acceptance.json"
+    },
+    {
+      "path": "verification/reports/local-acceptance.md"
+    },
+    {
+      "path": "verification/reports/outstanding-targets.md"
+    }
+  ]
+}

@@ -20,8 +20,8 @@ export const datasetTask = (t: number) => uuid(3000 + t);
 export const NOTIFICATION_DATASET = { notifications: 3000, jobs: 600, heavyParent: 1000 } as const;
 
 /**
- * Adds the notifications and reminder jobs of `NOTIFICATION_DATASET` on top of `loadDataset`. The jobs are due (scheduled
- * a minute ago) and queued, so the tick has all 600 to run; the notifications are spread over the parents of the data
+ * Adds the notifications and reminder jobs of `NOTIFICATION_DATASET` on top of `loadDataset`. The jobs are due (their due
+ * date is yesterday) and queued, so the daily run has all 600 to run; the notifications are spread over the parents of the data
  * set, and `heavyParent` of them belong to the given parent row. Rows are written as the schema owner.
  */
 export async function loadNotificationDataset(
@@ -30,8 +30,8 @@ export async function loadNotificationDataset(
 ): Promise<void> {
   const org = `'${ORGANIZATION}'::uuid`;
   await db.query(
-    `insert into reminder_jobs (organization_id, task_id, threshold, task_starts_at, scheduled_for, correlation_id)
-     select ${org}, t.id, th.v, t.starts_at, now() - interval '1 minute', left(md5(t.id::text || th.v), 12)
+    `insert into reminder_jobs (organization_id, task_id, threshold, task_starts_at, due_on, correlation_id)
+     select ${org}, t.id, th.v, t.starts_at, (now() at time zone 'Europe/Budapest')::date - 1, left(md5(t.id::text || th.v), 12)
        from tasks t cross join (values ('7d'), ('24h')) th(v) where t.title like 'Adat feladat%'`,
   );
   await db.query(

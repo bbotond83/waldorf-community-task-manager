@@ -189,6 +189,8 @@ new_values: kind and target_type are extended by the unit that needs a new value
 
 U2 uses today's notice function until U6 moves its publishing notice onto `notice_send`.
 
+Amended in U5 code generation: target type `duty` is stored as `task` (the duty's own task row), and `rota_plan` is a registered target type; kinds and target types are registered values (`notice_kinds`, `notice_targets`) added by each unit's migration. The email is a queued `email_deliveries` row; the delivery pass (claim, sweep, record) is service-role only and is run by `npm run timed:run`.
+
 ### C9 The daily run
 
 ```yaml
@@ -217,6 +219,8 @@ failure:
     visible_to: super admins, on the same screen as failed emails (C8)
 checks: [weekend picks reminder, weekend picks alert (friday_noon), swap expiry, empty slots, fair share, recurring occurrences, event notices, unclaimed tasks, books held by leaving families]
 ```
+
+Amended in U5 code generation (C9): the registry also holds `lock_step` (the order checks run in); `timed_checks_run_system(run_kind, moment)` takes an optional moment (default: now); a check record also keeps the SQLSTATE `error_code` of a failed check; a registered function that does not exist is recorded with outcome `missing`; and the delivery pass (`notice_email_sweep`, `notice_email_claim`, `notice_email_record`) is service-role only beside the run.
 
 ### C10 May this family hold a duty
 

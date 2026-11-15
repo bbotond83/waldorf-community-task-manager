@@ -44,7 +44,7 @@ export const SUPER_ADMIN_NAVIGATION: readonly NavigationItem[] = [
   { id: "admin-school-year", label: "Tanév", href: "/admin/tanev" },
   { id: "admin-rota", label: "Beosztás", href: "/admin/beosztas" },
   { id: "admin-directory", label: "Szülők", href: "/admin/szulok" },
-  { id: "admin-reminders", label: "Emlékeztetők", href: "/admin/emlekeztetok" },
+  { id: "admin-reminders", label: "Kézbesítési hibák", href: "/admin/emlekeztetok" },
   { id: "admin-privacy", label: "Adatvédelem", href: "/admin/adatvedelem" },
   { id: "admin-settings", label: "Beállítások", href: "/admin/beallitasok" },
 ];

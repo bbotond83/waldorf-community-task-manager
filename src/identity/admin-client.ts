@@ -52,6 +52,10 @@ export const ADMIN_FUNCTIONS = [
   "email_change_request",
   "email_change_cancel",
   "email_change_confirm",
+  "timed_checks_run_system",
+  "notice_email_claim",
+  "notice_email_sweep",
+  "notice_email_record",
 ] as const;
 export type AdminFunctionName = (typeof ADMIN_FUNCTIONS)[number];
 

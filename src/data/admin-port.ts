@@ -21,7 +21,7 @@ import {
   saveTask,
 } from "./admin-tasks.ts";
 import { DataGateway } from "./gateway.ts";
-import { listReminders, retryReminder } from "./notifications.ts";
+import { listDeliveryProblems, retryDeliveries } from "./notifications.ts";
 import type { Payload } from "./payload.ts";
 import { listFamilyNames } from "./working-groups.ts";
 
@@ -144,9 +144,9 @@ export class DatabaseAdminPort implements AdminApplicationPort {
       case "families.names":
         return listFamilyNames(this.gateway);
       case "reminders.list":
-        return listReminders(this.gateway, input.payload);
+        return listDeliveryProblems(this.gateway);
       case "reminders.retry":
-        return retryReminder(this.gateway, call);
+        return retryDeliveries(this.gateway, call);
       default:
         return Promise.resolve({ state: "denied" });
     }

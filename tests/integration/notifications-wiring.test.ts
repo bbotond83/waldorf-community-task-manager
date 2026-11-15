@@ -78,18 +78,14 @@ describe("production mode builds the notification operations (BR42.1)", () => {
                   link: "/szulo/feladatok/x",
                   is_read: false,
                   timing: "24-hour",
-                  provider_status: "simulated-sent",
                 },
               ],
             })
-          : envelope("success", null, { run: 0, sent: 0, failed: 0, dropped: 0 }),
+          : ok(envelope("success").data),
     });
     const result = await services.parent.listNotifications(session("parent"), familyScope);
     expect(result.state).toBe("success");
-    expect(fake.rpcCalls.map((call) => call.name)).toEqual([
-      "reminder_run_due",
-      "notification_list",
-    ]);
+    expect(fake.rpcCalls.map((call) => call.name)).toEqual(["notification_list"]);
   });
 
   it("marks a notification read through the database and returns its link", async () => {
@@ -111,17 +107,17 @@ describe("production mode builds the notification operations (BR42.1)", () => {
     expect(fake.rpcCalls[0]?.name).toBe("notification_mark_read");
   });
 
-  it("serves the reminders list from the database, with no interim answer", async () => {
+  it("serves the failure list from the database, with no interim answer", async () => {
     const { fake, services } = production({
       rpc: (name) =>
-        name === "reminder_list"
-          ? envelope("success", null, { items: [] })
+        name === "delivery_problems_list"
+          ? envelope("success", null, { groups: [], checks: [] })
           : ok(envelope("success").data),
     });
     expect((await services.admin.reminders.list(session("super_admin"), scope)).state).toBe(
       "empty",
     );
-    expect(fake.rpcCalls.map((call) => call.name)).toEqual(["reminder_run_due", "reminder_list"]);
+    expect(fake.rpcCalls.map((call) => call.name)).toEqual(["delivery_problems_list"]);
   });
 
   it("builds the production composition, whose source names the removed import nowhere (BR7.1)", () => {

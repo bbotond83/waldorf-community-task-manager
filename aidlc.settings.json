@@ -2,6 +2,13 @@
   "schemaVersion": 1,
   "models": {
     "schemaVersion": 1,
-    "preset": "balanced"
+    "preset": "balanced",
+    "agents": {
+      "developer": {
+        "model": {
+          "claude": "claude-sonnet-5-5"
+        }
+      }
+    }
   }
 }

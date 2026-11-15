@@ -5,7 +5,11 @@ import { connectPostgres } from "../../scripts/db/postgres.ts";
 import { main as resetMain, resetSchema } from "../../scripts/db/reset.ts";
 import { seedSchema } from "../../scripts/db/seed.ts";
 import { buildSeedPlan, SEED_PASSWORDS, seedAccount } from "../../scripts/db/seed/index.ts";
-import { resetWorkerData, workerAccountEmail } from "../../scripts/db/worker.ts";
+import {
+  MIGRATION_DATA_TABLES,
+  resetWorkerData,
+  workerAccountEmail,
+} from "../../scripts/db/worker.ts";
 import { insertJob } from "./notifications-support.ts";
 import {
   dumpSchema,
@@ -42,12 +46,17 @@ describe("reset on the real stack", () => {
   const seed = async (schema: string) => {
     return seedSchema(realSeedDeps().deps, { schema, size: "small" });
   };
+  /** The daily checks run before the emptying and leave their run records; those are not what the emptying protects. */
+  const RUN_RECORDS = ["timed_runs", "timed_check_runs"];
   const tableNames = async (schema: string) =>
     (
       await db.query("select tablename from pg_tables where schemaname = $1 order by tablename", [
         schema,
       ])
-    ).rows.map((row) => String(row.tablename));
+    ).rows
+      .map((row) => String(row.tablename))
+      // The registries are written by migration files only: part of the schema, so a reset leaves them.
+      .filter((table) => !(MIGRATION_DATA_TABLES as readonly string[]).includes(table));
 
   before(async () => {
     db = await openDatabase();
@@ -86,6 +95,9 @@ describe("reset on the real stack", () => {
       assert.equal(await rowCount(db, A, table), 0, `${table} is empty after the reset`);
     }
     assert.deepEqual(await schemaUsers(db, A), []);
+    for (const table of MIGRATION_DATA_TABLES) {
+      assert.ok((await rowCount(db, A, table)) > 0, `${table} keeps the rows its migration wrote`);
+    }
   });
 
   it("removes only the schema's own sign-in users and leaves another schema's data and accounts untouched", async () => {
@@ -156,7 +168,7 @@ describe("reset on the real stack", () => {
     }
   });
 
-  it("runs the expiry and tick functions first, with effect, and only then empties the schema", async () => {
+  it("runs the expiry function and the daily checks first, with effect, and only then empties the schema", async () => {
     await seed(A);
     // The helpers below insert into unqualified tables: bind the connection to the schema under test first.
     await bindSchema(db, A);
@@ -171,7 +183,6 @@ describe("reset on the real stack", () => {
       organization,
       status: "queued",
       startsAt: startsAt.toISOString(),
-      scheduledFor: new Date(Date.now() - 60_000).toISOString(),
     });
 
     const seen: Record<string, unknown> = {};
@@ -181,11 +192,12 @@ describe("reset on the real stack", () => {
         const query = client.query.bind(client);
         client.query = async (sql: string, values?: unknown[]) => {
           if (sql === "begin") {
-            // The emptying starts now: what the functions did must already be there.
+            // The emptying starts now: what the functions did must already be there (the seed wrote one run record, the
+            // reset's own daily run is the second).
             seen.job = (
               await db.query(`select status from "${A}".reminder_jobs where id = $1`, [job])
             ).rows[0]?.status;
-            seen.attempts = await rowCount(db, A, "reminder_attempts");
+            seen.runs = await rowCount(db, A, "timed_runs");
           }
           return query(sql, values);
         };
@@ -193,14 +205,14 @@ describe("reset on the real stack", () => {
       },
     });
     assert.equal(await resetMain(["--schema", A], deps), 0, lines.join("\n"));
-    assert.deepEqual(seen, { job: "sent", attempts: 1 });
+    assert.deepEqual(seen, { job: "sent", runs: 2 });
     assert.match(lines[0]!, /^RESET ok schema=worker_3 organizations_processed=1$/);
     assert.equal(await rowCount(db, A, "reminder_jobs"), 0);
   });
 
   it("changes nothing when the emptying fails: the schema and its accounts are as they were", async () => {
     await seed(A);
-    const before = await dumpSchema(db, A);
+    const before = await dumpSchema(db, A, RUN_RECORDS);
     const { deps, lines } = realSeedDeps({
       connect: async (url) => {
         const client = await connectPostgres(url);
@@ -215,7 +227,7 @@ describe("reset on the real stack", () => {
     assert.equal(await resetMain(["--schema", A], deps), 1);
     assert.match(lines[0]!, /^RESET FAILED step=empty schema=worker_3: injected failure/);
     assert.deepEqual(
-      await dumpSchema(db, A),
+      await dumpSchema(db, A, RUN_RECORDS),
       before,
       "the truncate was rolled back with the failed deletion",
     );

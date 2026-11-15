@@ -204,7 +204,15 @@ it("sends no scenario value in any admin payload, whatever the form carries", as
   await core.archiveRecordAction(initial, form({ id: "family-feny", scenario: "terminal" }));
   await advanced.retryReminderAction(
     initial,
-    form({ jobId: "job-lampas", correlationId: "coverage:correlation:0001", scenario: "terminal" }),
+    form({
+      targetId: "11111111-0000-4000-8000-0000000000a1",
+      kind: "reminder_24h",
+      targetType: "task",
+      expected: JSON.stringify([{ id: "22222222-0000-4000-8000-0000000000b1", tryCount: 3 }]),
+      expectedVersion: "1",
+      idempotencyKey: "coverage:retry:0001",
+      scenario: "terminal",
+    }),
   );
   expect(seen.length).toBeGreaterThanOrEqual(4);
   for (const payload of seen) expect(payload).not.toHaveProperty("scenario");

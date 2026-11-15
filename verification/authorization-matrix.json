@@ -422,6 +422,26 @@
       "effect": "allow"
     },
     {
+      "id": "AUTH-DELIVERY-PROBLEMS-SUPER-ADMIN-ALLOW",
+      "role": "super_admin",
+      "scope": "organization",
+      "route": "/admin/emlekeztetok",
+      "actions": ["read", "update"],
+      "resources": ["reminder"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-DELIVERY-PROBLEMS-NON-SUPER-DENY",
+      "role": "any_authenticated",
+      "scope": "non-super-role",
+      "route": "/admin/emlekeztetok",
+      "actions": ["read", "update"],
+      "resources": ["reminder"],
+      "fields": [],
+      "effect": "deny"
+    },
+    {
       "id": "AUTH-UNKNOWN-ROLE-DENY",
       "role": "anonymous_or_unknown",
       "scope": "none",

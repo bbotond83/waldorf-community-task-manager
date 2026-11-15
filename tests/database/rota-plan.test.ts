@@ -846,11 +846,11 @@ for (const schema of DIRECTORY_SCHEMAS) {
       assert.equal(await count(db, "notifications", "kind in ('reminder_7d', 'reminder_24h')"), 0);
     });
 
-    it("BR23.6 tick twice", async () => {
+    it("BR23.6 daily run twice", async () => {
       await published();
       await db.query("select reminder_plan_organization($1)", [ORGANIZATION]);
-      await db.query("select reminder_run_due_system($1)", [ORGANIZATION]);
-      await db.query("select reminder_run_due_system($1)", [ORGANIZATION]);
+      await db.query("select timed_checks_run_system('daily')");
+      await db.query("select timed_checks_run_system('daily')");
       assert.equal(
         await count(
           db,

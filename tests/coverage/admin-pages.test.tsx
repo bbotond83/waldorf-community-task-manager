@@ -221,8 +221,13 @@ it("renders permitted reminders with real projections", async () => {
     input: ReturnType<typeof props>,
   ) => ReactNode | Promise<ReactNode>;
   const output = html(await page(props("")));
-  expect(output.toLocaleLowerCase("hu")).toContain("emlékeztet");
-  expect(output).not.toContain("protectedReason");
+  expect(output).toContain("Kézbesítési hibák");
+  expect(output).toContain("a levelezőszerver nem elérhető");
+  expect(output).toContain("2026. 12. 04. 09:15");
+  expect(output).toContain("0 létrehozva / 12 kihagyva");
+  expect(output).toContain("Hibás");
+  expect(output).toContain("Hiányzik");
+  expect(output).not.toMatch(/SMTP|mail_unavailable|protectedReason/);
 });
 it("withholds reminders content without session", async () => {
   const page = (await import("../../app/admin/emlekeztetok/page.tsx")).default as (

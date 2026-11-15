@@ -114,5 +114,11 @@ export const COPY = {
     noticeBody:
       "A Waldorf közösségi feladatkezelőben a fiókja e-mail-címét megváltoztatták. Ezentúl az új címmel jelentkezhet be.",
     noticeContact: "Ha nem Ön kérte a változtatást, azonnal forduljon az óvoda adminisztrátorához.",
+    deliveryGreeting: "Üdvözöljük!",
+    deliveryItem: "Feladat:",
+    deliveryDate: "Időpont:",
+    deliveryLink: "Részletek a feladatkezelőben:",
+    deliveryAutomatic:
+      "Ezt a levelet a Waldorf közösségi feladatkezelő automatikusan küldte, kérjük, ne válaszoljon rá.",
   },
 } as const;

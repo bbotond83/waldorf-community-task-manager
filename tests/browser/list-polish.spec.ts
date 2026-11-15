@@ -289,12 +289,6 @@ const FORMS = [
     count: 1,
   },
   {
-    profile: "super-admin",
-    path: "/admin/emlekeztetok",
-    form: '[data-testid="admin-reminder-filter"]',
-    count: 1,
-  },
-  {
     profile: "group-admin-1",
     path: "/admin/nyilvantartasok/uj",
     form: '[data-testid="admin-record-create-form"]',
@@ -458,13 +452,6 @@ test.describe("status symbols", () => {
         ...options,
       ]);
     }
-    await page.goto("/admin/emlekeztetok");
-    await expect(page.locator("#status option")).toHaveText([
-      "Mind",
-      "↻ Újrapróbálható",
-      "→ Elküldve",
-      "△ Elavult",
-    ]);
   });
 
   test("the parent duty list and filter show the symbols", async ({ page }) => {

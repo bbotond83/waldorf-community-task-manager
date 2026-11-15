@@ -33,8 +33,8 @@ import {
   type RemovedParentModel,
   type VersionModel,
   type ParentApplicationPort,
-  type ReminderListModel,
-  type ReminderOutcome,
+  type DeliveryProblemsModel,
+  type DeliveryRetryOutcome,
   type RequestModel,
   type SwapCandidateListModel,
   type SwapRequestListModel,
@@ -123,7 +123,6 @@ const NOTIFICATION_FIXTURES: readonly NotificationModel[] = Object.freeze([
     link: "/szulo/feladatok/duty-assigned",
     isRead: false,
     timing: "7-day" as const,
-    providerStatus: "simulated-sent" as const,
   }),
   Object.freeze({
     id: "notice-24-hour",
@@ -131,7 +130,6 @@ const NOTIFICATION_FIXTURES: readonly NotificationModel[] = Object.freeze([
     link: "/szulo/feladatok/duty-garden",
     isRead: false,
     timing: "24-hour" as const,
-    providerStatus: "simulated-retry" as const,
   }),
   Object.freeze({
     id: "notice-stale",
@@ -139,7 +137,6 @@ const NOTIFICATION_FIXTURES: readonly NotificationModel[] = Object.freeze([
     link: "/szulo/ertesitesek",
     isRead: true,
     timing: "stale" as const,
-    providerStatus: "simulated-cancelled" as const,
   }),
 ]);
 
@@ -478,36 +475,21 @@ const INITIAL_APPROVALS: readonly AdminItem[] = [
   },
 ];
 
-const INITIAL_REMINDERS: ReminderListModel["jobs"] = [
+const INITIAL_DELIVERY_GROUPS: DeliveryProblemsModel["groups"][number][] = [
   {
-    id: "job-lampas",
-    title: "Lámpás ünnep — 24 órás emlékeztető",
-    status: "retryable",
-    attempt: 1,
-    correlationId: "corr-lampas-01",
-    recipientSummary: "3 kijelölt család",
-    providerLabel: "Szimulált kézbesítés",
-    version: 1,
-  },
-  {
-    id: "job-kert",
-    title: "Kerti előkészületek — 7 napos emlékeztető",
-    status: "sent",
-    attempt: 1,
-    correlationId: "corr-kert-01",
-    recipientSummary: "2 kijelölt család",
-    providerLabel: "Szimulált kézbesítés",
-    version: 1,
-  },
-  {
-    id: "job-regi",
-    title: "Lezárt feladat emlékeztetője",
-    status: "stale",
-    attempt: 2,
-    correlationId: "corr-regi-01",
-    recipientSummary: "Nincs aktív címzett",
-    providerLabel: "Szimulált kézbesítés",
-    version: 2,
+    kind: "reminder_24h",
+    kindLabel: "Emlékeztető 24 órával előtte",
+    targetType: "task",
+    targetId: "11111111-0000-4000-8000-0000000000a1",
+    title: "Emlékeztető 24 órával előtte – 2026. 12. 05.",
+    latestTryAt: "2026-12-04T08:15:00Z",
+    failedCount: 3,
+    reason: "mail_unavailable",
+    deliveries: [
+      { id: "22222222-0000-4000-8000-0000000000b1", tryCount: 3 },
+      { id: "22222222-0000-4000-8000-0000000000b2", tryCount: 3 },
+      { id: "22222222-0000-4000-8000-0000000000b3", tryCount: 6 },
+    ],
   },
 ];
 const INITIAL_GRANTS: GrantListModel["grants"] = [
@@ -562,7 +544,7 @@ export class AdminPortDouble implements AdminApplicationPort {
   private records = INITIAL_RECORDS.map((item) => ({ ...item }));
   private tasks = INITIAL_TASKS.map((item) => ({ ...item }));
   private approvals = INITIAL_APPROVALS.map((item) => ({ ...item }));
-  private reminders = INITIAL_REMINDERS.map((job) => ({ ...job }));
+  private deliveryGroups = INITIAL_DELIVERY_GROUPS.map((group) => ({ ...group }));
   private grants = INITIAL_GRANTS.map((grant) => ({ ...grant }));
   private lastGrantOutcome?: GrantOutcome;
   private lifecycle = INITIAL_LIFECYCLE.map((candidate) => ({ ...candidate }));
@@ -645,7 +627,7 @@ export class AdminPortDouble implements AdminApplicationPort {
       case "notes.save":
         return this.saveNotes(scope, payload);
       case "reminders.list":
-        return this.listReminders(payload);
+        return this.listReminders();
       case "reminders.retry":
         return this.retryReminder(payload);
       case "governance.list":
@@ -830,28 +812,52 @@ export class AdminPortDouble implements AdminApplicationPort {
     return { state: "success", data: toAdminItem(updated) };
   }
 
-  private listReminders(
-    payload: Readonly<Record<string, unknown>>,
-  ): DomainOutcome<ReminderListModel> {
-    const status = String(payload.status ?? "");
-    const jobs = this.reminders.filter((job) => !status || job.status === status);
-    return jobs.length
-      ? { state: "success", data: { jobs: jobs.map((job) => ({ ...job })) } }
+  private listReminders(): DomainOutcome<DeliveryProblemsModel> {
+    return this.deliveryGroups.length
+      ? {
+          state: "success",
+          data: {
+            groups: this.deliveryGroups.map((group) => ({ ...group })),
+            checks: [
+              {
+                checkName: "duty_reminders",
+                runKind: "daily",
+                startedAt: "2026-12-04T02:00:00Z",
+                outcome: "failed",
+                created: 0,
+                skipped: 12,
+              },
+              {
+                checkName: "housekeeping",
+                runKind: "daily",
+                startedAt: "2026-12-03T02:00:00Z",
+                outcome: "missing",
+                created: 0,
+                skipped: 0,
+              },
+            ],
+          },
+        }
       : { state: "empty" };
   }
 
+  /** Try again: refuses when the list the screen showed (id and try count of each email) is not the current one. */
   private retryReminder(
     payload: Readonly<Record<string, unknown>>,
-  ): DomainOutcome<ReminderOutcome> {
-    const job = this.reminders.find((candidate) => candidate.id === payload.id);
-    if (!job) return { state: "denied" };
-    if (job.status !== "retryable") return { state: "conflict", code: "REMINDER_NOT_RETRYABLE" };
-    if (job.version !== payload.expectedVersion)
+  ): DomainOutcome<DeliveryRetryOutcome> {
+    const group = this.deliveryGroups.find(
+      (candidate) => candidate.kind === payload.kind && candidate.targetId === payload.id,
+    );
+    if (!group) return { state: "conflict", code: "REMINDER_NOT_RETRYABLE" };
+    const expected = Array.isArray(payload.expected) ? payload.expected : [];
+    const current = JSON.stringify(group.deliveries);
+    if (JSON.stringify(expected) !== current)
       return { state: "invalidated", code: "REMINDER_STALE" };
-    job.status = "retrying";
-    job.attempt += 1;
-    job.version += 1;
-    return { state: "success", data: { jobId: job.id, status: "retry-scheduled" } };
+    this.deliveryGroups = this.deliveryGroups.filter((candidate) => candidate !== group);
+    return {
+      state: "success",
+      data: { targetId: group.targetId, restarted: group.deliveries.length },
+    };
   }
 
   private updateGrant(

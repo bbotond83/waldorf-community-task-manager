@@ -190,8 +190,8 @@ for (const schema of DIRECTORY_SCHEMAS) {
 
     it("BR3.4 every command", async () => {
       await db.query(
-        `insert into reminder_jobs (id, organization_id, task_id, threshold, task_starts_at, scheduled_for, correlation_id)
-         values ($1, $2, $3, '7d', now(), now(), 'abcdef')`,
+        `insert into reminder_jobs (id, organization_id, task_id, threshold, task_starts_at, due_on, correlation_id)
+         values ($1, $2, $3, '7d', now(), current_date, 'abcdef')`,
         [uuid(90010), ORGANIZATION, TASK_3],
       );
       const community = uuid(90011);
@@ -217,7 +217,11 @@ for (const schema of DIRECTORY_SCHEMAS) {
         ["assignment_assign($1, $2, $3, 1)", [key(), TASK_3, FAMILY_1]],
         ["assignment_assign($1, $2, $3, 1)", [key(), community, FAMILY_1]],
         ["assignment_remove($1, $2, 1)", [key(), ASSIGNMENT_F2_T3]],
-        ["reminder_retry($1, $2, 1)", [key(), uuid(90010)]],
+        [
+          "delivery_retry($1, 'reminder_7d', 'task', $2, $3::jsonb)",
+          [key(), TASK_3, JSON.stringify([{ id: uuid(90010), try_count: 1 }])],
+        ],
+        ["delivery_problems_list()", []],
         ["directory_save($1, $2::jsonb)", [key(), JSON.stringify({ display_name: "Új" })]],
         [
           "structure_save($1, 'group', $2::jsonb)",

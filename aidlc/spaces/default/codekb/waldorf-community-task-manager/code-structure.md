@@ -1,249 +1,89 @@
 # Code Structure
 
-Full rescan 2026-10-12 (HEAD `80bd4f4`), focused update 2026-10-27 (HEAD `5d2b484`, intent `denied-audit-ratelimit`), focused update 2026-11-02 (HEAD `3456409`, intent `empty-nav-after-login`; new section "Sign-in and shell files (2026-11-02)"), focused update 2026-11-02 (HEAD `1070fd6`, intent `no-access-signout`; the sign-in rows corrected and the section "Denied pages and tests (2026-11-02, after 1070fd6)" added), focused update 2026-11-04 (HEAD `251c4b3`, intent `stitch-design-update`; new sections "app/ file map for the restyle (2026-11-04)" and "Browser test layout (2026-11-04)"; rows for files changed by `78a0ab5` corrected in place). The 2026-10-27 update rewrote "SQL migrations" and added "Database tests"; the `supabase/` and `tests/` rows of the layout table are updated. Other sections are kept from 2026-10-12 and do not show modules added since (for example `src/data/`, `src/identity/`, `scripts/db/`), which were not re-scanned.
+## Repository Layout
 
-## Top-level layout
+```text
+app/                    Next.js routes, server actions and screen components
+  _identity/            Session lookup, sign-out, role home, access-state exit
+  admin/                Admin screens, _components, _lib, actions.ts, advanced-actions.ts
+  api/readiness/        Readiness endpoint
+  bejelentkezes/        Sign-in
+  hozzaferes-megtagadva/ No-access page
+  jelszo-visszaallitas/ Password reset request and new password
+  meghivas/[token]/     Invitation acceptance
+  munkatars/beosztas/   Old teacher links, redirect only
+  szulo/                Parent screens, _components, _lib, actions.ts
+  teacher/              Teacher screens, _components, _lib
+  fonts/, globals.css   Self-hosted fonts, the one stylesheet
+src/
+  access/               Roles, scopes, grant rules
+  application/          Facades, pipeline, contracts, authorization matrix, status labels
+  data/                 Database adapters behind the application ports
+  identity/             Sign-in, sessions, invitations, password reset, mail
+  import-parser/        Workbook template, reader, limits
+  runtime/              Composition, configuration, shell components, database client
+supabase/
+  migrations/           41 forward-only SQL files, applied in file-name order
+  config.toml, roles.sql, templates/recovery.html
+scripts/
+  db/                   Stack, migration, seed, reset, worker tools
+  verification/         Local verification, evidence and scans
+tests/
+  unit/, integration/, coverage/, database/, browser/, support/
+verification/           Manifests, runbook, reports
+source-materials/       Product requirements document
+qa-results/             Historical QA records
+proxy.ts                Session refresh and content security policy
+```
 
-| Path | Contents |
+## File Classification
+
+| Category | Where |
 |---|---|
-| `app/` | Next.js App Router: pages, layouts, server actions, API routes, `_lib` resolvers, `globals.css` (2026-11-04: 99 tracked files, 29 pages, 5 layouts) |
-| `src/` | Domain and application modules (14 modules at the 2026-10-12 scan; later additions not re-scanned) |
-| `proxy.ts`, `next.config.ts` | CSP nonce proxy; security headers |
-| `public/brand/` | (2026-11-04) `logo.png` (used by `BrandMark`), `cover.jpg` (referenced by no code) |
-| `DESIGN.md` | (2026-11-04) the visual system in words for design tools; says the CSS wins and "No webfonts" |
-| `supabase/` | (2026-10-27) `config.toml` (local stack), `roles.sql`, `templates/` (Hungarian recovery e-mail), `migrations/` (39 SQL files) |
-| `tests/` | `unit`, `integration`, `coverage`, `browser` (Playwright), `database` (2026-10-27: 55 files against the real local stack), plus `support` helpers |
-| `scripts/` | `start-smoke.mjs`, `validate-runtime-config.ts`, `validate-toolchain.mjs`, `verification/*`; `db/*` (stack, migrate, worker, seed, reset, shuffled tests; skimmed 2026-10-27) |
-| `verification/` | Manifests: `authorization-matrix.json`, `fixtures.json`, `scenarios.json`, `sensitive-fields.json`, `evidence.schema.json`, `AUTHORIZATION.md`, `RUNBOOK.md`, `reports/` |
-| `source-materials/waldorf-community-app/` | PRD and workbook `Ovis tabla v2.xlsx` (17 sheets) |
-| `.github/workflows/ci.yml` | CI |
-| Config files | `package.json`, `tsconfig.json`, `eslint.config.mjs`, `vitest.config.ts`, `playwright*.config.ts`, `.prettierrc.json`, `.nvmrc` (24), `.npmrc`, `.env.example` |
-| Docs | `README.md`, `HASZNALATI_UTMUTATO_HU.md`, `AGENTS.md` |
+| Model and schema | `supabase/migrations/*_schema.sql`, `src/application/contracts.ts`, `src/access/types.ts` |
+| Controller and handler | `app/**/actions.ts`, `app/**/route.ts`, `app/**/page.tsx`, `proxy.ts` |
+| Service and use case | `src/application/*-facade.ts`, named functions in `supabase/migrations/` (`*_functions.sql`, `*_kernel_*.sql`, `*_commit.sql`) |
+| Repository and data access | `src/data/*-port.ts`, `src/data/admin-*.ts`, `src/data/imports.ts`, `src/data/notifications.ts`, `src/data/gateway.ts` |
+| Utility | `src/application/budapest-time.ts`, `validation.ts`, `src/data/values.ts`, `src/data/payload.ts`, `src/runtime/hyphenation.ts` |
+| Configuration | `next.config.ts`, `src/runtime/config.ts`, `src/runtime/database/config.ts`, `supabase/config.toml` |
+| Middleware | `proxy.ts`, `src/application/facade-pipeline.ts` |
+| Test | `*.test.ts(x)`, `tests/**`, `tests/browser/*.spec.ts` |
+| Migration | `supabase/migrations/*.sql`, `scripts/db/runner.ts` |
+| Static | `app/globals.css`, `app/fonts/`, `public/brand/` |
 
-## app/ file map for the restyle (2026-11-04, after 251c4b3)
+## Migration Map
 
-Classification per the code-analysis guide. "Look" lists the CSS classes a file puts on screen; those are the hooks a restyle edits. Route names are Hungarian, identifiers English.
-
-### Root and shared
-
-| Path | Classification | Look (classes) |
-|---|---|---|
-| `app/layout.tsx` | Configuration | imports `globals.css`; `<html lang="hu">`; the one place a font would be attached |
-| `app/globals.css` | Static/Asset | 1418 lines, the whole look (map below) |
-| `app/page.tsx` | Controller | `centered-panel`, `button-link` (signed-out panel, no-role panel with `SignOutButton`, unavailable alert) |
-| `app/_identity/SignOutButton.tsx` | Controller (client) | `secondary-button` |
-| `app/_identity/AccessStateExit.tsx` | UI (2026-11-04, from `78a0ab5`) | explanation `p[data-testid=access-guidance]` plus `SignOutButton` |
-| `app/_identity/shell-action.tsx` | Service | gives `SignOutButton` to the shell header |
-| `app/hozzaferes-megtagadva/page.tsx` | Controller | `centered-panel`, `BrandMark` |
-
-### Sign-in family (outside any role layout, no shell)
-
-| Path | Look |
+| File group | Block |
 |---|---|
-| `app/bejelentkezes/page.tsx` | `main.centered-panel.parent-public-page`, `skip-link`, `BrandMark`, `h1`, forgot link |
-| `app/bejelentkezes/SignInForm.tsx` | `form.parent-form.identity-form`; error `p[role=alert]` (live region); inputs with `aria-invalid` and `aria-describedby`; submit `button` (disabled while pending) |
-| `app/jelszo-visszaallitas/page.tsx`, `RequestResetForm.tsx`, `uj/page.tsx`, `uj/SetPasswordForm.tsx` | same classes |
-| `app/meghivas/[token]/page.tsx`, `AcceptInvitationForm.tsx` | same classes |
+| `20260806`, `20261006` | First access tables and the role conversion |
+| `20261012`, `20261013` | Platform: audit, holds, idempotency, result envelope |
+| `20261014` to `20261023` | Identity: accounts, sessions, sign-in lockout, invitations, grants, privileges, password hook, email-change guard |
+| `20261024`, `20261025` | Directory and settings |
+| `20261026`, `20261027` | Coordination schema, events, tasks, notes |
+| `20261028` to `20261030` | Kernel: sign-up, swaps and cancellations, family archive, dashboard, governance |
+| `20261031`, `20261032` | Teacher schedule, lifecycle |
+| `20261033` to `20261035_*` | Group reach rewrite, policy speed, repairs, placeholder drop |
+| `20261036` to `20261038` | Notifications and the wrappers around the kernel |
+| `20261039` to `20261042` | Import and its dashboard and lifecycle links |
+| `20261043` to `20261046` | Repairs, audit purge, denied-audit limit |
 
-### Parent area (`app/szulo`, layout wraps `AppShell` or `ParentAccessState`)
+## Code Patterns
 
-| Path | Page name | Look (classes) |
-|---|---|---|
-| `layout.tsx` | | shell or `centered-panel` access state |
-| `ertesitesek/page.tsx` | "Értesítések" (home) | `parent-page`, `eyebrow`, `parent-collection`, `parent-card notification-card[ notification-card-read]`, `parent-card-link`, `delivery-note` |
-| `feladatok/page.tsx` | "Családi feladatok" | `parent-page`, `eyebrow`, `form.parent-filter`, `filter-field`, `filter-actions`, `parent-collection`, `parent-card`, `parent-card-link`, `parent-state-badge` (with `StatusBadge`), empty state via `parent-state` |
-| `feladatok/[id]/page.tsx` | "Feladat részletei" | `parent-page`, `eyebrow`, `parent-detail-grid`, `parent-notice`, `parent-page-actions`, `parent-note-panel`, `form-hint`, `ParentMutationForm` |
-| `feladatok/[id]/csere/page.tsx` | "Cserekérelem" | `parent-page`, `parent-form`, `swap-partner-list`, `parent-collection`, `parent-card`, `parent-notice`, `form-hint` |
-| `feladatok/[id]/lemondas/page.tsx` | "Lemondási kérelem" | `parent-page`, `parent-form`, `form-hint` |
-| `cserek/page.tsx` | "Cserék és kérelmek" | `parent-page`, `eyebrow`, `SwapRequestsBoard` |
-| `_components/ParentMutationForm.tsx` | client form | `parent-form`, result `div.parent-action-state.parent-action-state-<state>` with `role` and focus |
-| `_components/ParentStatePanel.tsx` | state panel | `parent-state` (heading "Nincs megjeleníthető elem" or "Hiba történt") |
-| `_components/PendingRequestNotice.tsx` | notice | `parent-notice parent-pending-notice` |
-| `_components/NotificationReadForm.tsx` | client form | `notification-read-form`, `notification-read-label`, `notification-read-state`, `visually-hidden` |
-| `_components/SwapRequestsBoard.tsx` | board | `parent-collection`, `parent-card swap-request-card`, `swap-request-form`, `swap-request-text`, `swap-request-actions`, `secondary-button`, `parent-action-state` |
-| `_components/ParentAccessState.tsx` | access state | `centered-panel`, uses `AccessStateExit` (2026-11-04) |
+- **Database use-case template**: active session check, idempotency key check, `identity_actor_organization()`, fingerprint, `platform_idempotency_check`, inner block with `platform_abort` for refusals, store on success, catch `U3R00`. New functions should copy it.
+- **Wrapper around a core**: `alter function x rename to x_core`, then a new `x` that calls it and adds side effects only on a fresh success.
+- **Result envelope**: `{state, reference, code}` plus extras such as `items` or `version`.
+- **Expected version**: `version` columns raised by the `platform_touch_version` trigger, compared in functions.
+- **Reach helpers**: `has_super_scope`, `has_core_scope`, `directory_reaches_family`, `directory_group_visible`, `coordination_task_reached`.
+- **Ports with optional members**: a test double may omit a port method; the facade answers `denied`.
+- **Frozen read models**: facades return `Object.freeze`d projections.
+- **Forms**: hidden `id`, `expectedVersion`, `idempotencyKey`; a `useActionState` wrapper (`ParentMutationForm`, `AdminMutationForm`) shows outcomes.
+- **Session resolvers**: each area has `_lib/session.ts`, `_lib/facade.ts` and an access-state component; `layout.tsx` blocks the page when access fails.
+- **Styling hooks**: kebab-case classes with an area prefix (`parent-`, `teacher-`, `admin-`, `filter-`) and `data-testid` attributes, which browser specs rely on.
 
-There is no `app/szulo/page.tsx` and no "Saját vállalásaim" page.
+## Conventions
 
-### Teacher area (`app/teacher`)
-
-| Path | Look |
-|---|---|
-| `layout.tsx` | shell or `TeacherAccessState` (`centered-panel teacher-state`) |
-| `schedule/page.tsx` ("Beosztás") | `teacher-page`, `eyebrow`, filter (`ScheduleFilter`: `teacher-filter`, `filter-field`, `filter-actions`, `button-link button-link-secondary`), `ScheduleCollection` |
-| `schedule/_components/ScheduleCollection.tsx` | `teacher-table-wrapper` + `teacher-table` (desktop), `teacher-card-list` + `teacher-card` (under 44rem), links `teacher-row-link`, `teacher-card-link`; `StatusBadge` |
-| `schedule/[id]/page.tsx` | `teacher-page`, `teacher-detail-grid`, back link |
-| `_components/TeacherStatePanel.tsx`, `FocusedStateSection.tsx`, `error.tsx`, `loading.tsx` | `teacher-state[ teacher-state-error]`, `button-link button-link-secondary` |
-
-### Admin area (`app/admin`)
-
-| Path | Look |
-|---|---|
-| `layout.tsx`, `_components/AdminAccessState.tsx` | shell, or `centered-panel admin-state` / `admin-page admin-state` |
-| `page.tsx` ("Áttekintés") | `admin-page`, `admin-dashboard-grid`, `admin-dashboard-panel dashboard-link` |
-| `jovahagyasok/page.tsx` ("Jóváhagyások") | `admin-page`, `AdminFilterBar` (`admin-filter`, `filter-field`, `filter-actions`), `ResponsiveCollection` (`admin-collection`, `admin-card`, `admin-card-link`, `admin-state-badge` with `StatusBadge`), `AdminPagination` |
-| `jovahagyasok/[id]/page.tsx` ("Kérelem elbírálása") | `admin-page`, `admin-detail-grid`, `admin-safe-reason`, `AdminMutationForm` (`admin-form`, `admin-action-state`, fieldset with two radios), `form-hint` |
-| `nyilvantartasok/*`, `feladatok/*`, `archivum/*` | `admin-page`, list and form components as above, `admin-page-actions`, `button-link` |
-| `import`, `emlekeztetok`, `adatvedelem`, `beallitasok` | `advanced-*`, `import-stepper`, `blocked-panel`, `success-panel` |
-| `_components/*` | `AdminMutationForm` (`admin-form`, field errors `admin-field-error`), `RecordFields`, `TaskFields`, `ImportWorkflow`, `DeveloperDetails` (`developer-details`), `AdminBackLink` (`admin-back-link`) |
-
-### Other routes
-
-`app/api/readiness/route.ts` (GET, 200 `ready` or 503), `app/munkatars/beosztas/route.ts` and `[id]/route.ts` (307 to `/teacher/schedule`). Server actions: `app/szulo/actions.ts` (8), `app/admin/actions.ts` (7), `app/admin/advanced-actions.ts` (9), `app/bejelentkezes/actions.ts`, `app/_identity/actions.ts`, and one each in `jelszo-visszaallitas`, `jelszo-visszaallitas/uj`, `meghivas/[token]`. Resolvers: `_lib/session.ts` and `_lib/facade.ts` in each of `szulo`, `teacher`, `admin`.
-
-### `app/globals.css` map (line ranges at 251c4b3)
-
-| Lines | Content |
-|---|---|
-| 1-28 | `:root` tokens and the system font stack |
-| 30-105 | reset-like base: `*`, `html`, `body` (gradient), `a`, `button`, `summary`, `:focus-visible`, `[tabindex="-1"]`, `.skip-link` |
-| 107-262 | page widths (`.centered-panel`, `.app-shell` live; `.selector-page` dead), `.eyebrow`, `h1`, dead `.profile-grid`, `.profile-card*`, `.selector-hero*`, then `.brand-link`, `.brand-mark`, `.centered-panel`, `.site-header*`, `.profile-summary` |
-| 289-329 | `.secondary-button`, `.button-link`, `.button-link-secondary` |
-| 331-415 | navigation: `.navigation-panel`, `nav ul`, `nav a`, `.nav-button` states, `.visually-hidden` |
-| 417-480 | admin page, dashboard panels, `.dashboard-link` |
-| 476-535 | shared filter grid and `.filter-field`, `.filter-actions` |
-| 537-736 | admin form, collection, cards, status badge, action states, developer details, pagination, fieldsets |
-| 737-837 | advanced panels, import stepper, blocked and success panels, 44rem rule |
-| 839-1151 | parent: page, filter/form, cards, notices, detail grid, swap list, swap requests, notification cards |
-| 1153-1325 | teacher: page, filter, table, cards, detail grid, state |
-| 1327-1401 | responsive rules at `44rem` and `20rem`, `prefers-reduced-motion`, table cell wrapping |
-| 1403-1418 | identity form alerts and invalid field |
-
-## Browser test layout (2026-11-04, after 251c4b3)
-
-`tests/browser/` holds 13 specs and 4 support modules (17 tracked files). Each spec calls `bindSeededSchema()` (a comment in `seeded-schema.ts` says a test, `tests/browser/support/uses-seeded-schema.test.ts`, enforces it; that file is not among the tracked files of this directory), so it runs on the database schema of its Playwright project (`projects.ts`: chromium `worker_1` port 3100, firefox `worker_2` 3101, mobile-chrome `worker_3` 3102).
-
-| Spec | Declared tests | Restyle-relevant content |
-|---|---|---|
-| `visual-overhaul.spec.ts` | 7 (+ loops) | sign-in at 320 and 375 px: no overflow, no clipped child; keyboard sign-in; heading focus with outline `none`; brand link; admin card to approvals; whole parent card click; sign-in stable when images fail; role landings with axe |
-| `navigation-polish.spec.ts` | 11 (+ loops over 4 roles) | menu on every page, current item, 44 px links, 320 px overflow, notification card padding and checkbox 44 px, focus ring >= 3 px, Hungarian status words |
-| `list-polish.spec.ts` | 17 | labels above fields (8 forms, 320 and 1280 px), filter button alignment, create links look like "Szűrés", status icons, dropdown symbols, back links, axe |
-| `functional-fixes.spec.ts` | 17 | read versus unread notification colour, notification flow, pending request flow, axe on four screens |
-| `parent-web.spec.ts` | 10 | sign-up, full duty, swap, cancellation, notification read, allergen note, privacy, keyboard/zoom/axe flow |
-| `teacher-web.spec.ts` | 9 | schedule, filters, mobile cards, 44 px link, zoom 2, axe |
-| `identity.spec.ts` | 11 | sign-in, reset, invitation, sign-out, "Nincs jogosultság" with sign-out, axe |
-| `admin-core.spec.ts`, `admin-advanced.spec.ts`, `directory-coordination.spec.ts`, `notifications-import.spec.ts`, `runtime-foundation.spec.ts`, `sign-in-timing.spec.ts` | 7, 7, 9, 9, 4, 2 | admin flows, import, reminders, directory, root page axe, sign-in timing; two of them use wcag22aa tags |
-
-Support modules: `projects.ts`, `seeded-schema.ts` (`bindSeededSchema`, `signInAs`, `signOut`, `signInAndOpen`, `expectSignedIn`, `SERIOUS`), `scenarios.ts` (`requestCancellation`, `signUpForDecorating`, `addCleaningNotice`, `withOtherPage`), `dates.ts`.
-
-## src modules: ports and adapters (2026-10-12)
-
-Counts: LOC (non-test) / src files / tests, as of 2026-10-12.
-
-### src/application (2,439 / 14 / 8) - wired
-- Files: `contracts.ts`, `authorization.ts`, `facade-pipeline.ts`, `idempotency.ts`, `evidence.ts`, `session-facade.ts`, `parent-facade.ts`, `teacher-facade.ts`, `admin-facade.ts`, `status-labels.ts`, `validation.ts`, `results.ts`, projection guard.
-- Ports: `AdminApplicationPort.execute({actorId, operation, scope, payload})`, `ParentApplicationPort`, `TeacherApplicationPort.getSchedule`, `SessionGateway`, `AuthorizationVersionPort`, `IdempotencyStore`, `EventPublisher`, `EvidencePort`, `Clock`, `IdGenerator`.
-
-### src/runtime (514 / 10 / 1) - wired
-- `config.ts`, `composition.ts`, `types.ts`, `production/composition.ts`, `synthetic/{composition,profiles,access-state}.ts`, `session/session.ts`, `security/origin.ts`, UI shell components. (Synthetic parts gone at 2026-11-02; see "Sign-in and shell files".)
-
-### src/parent-web, src/admin-core, src/admin-advanced, src/teacher-web - wired synthetic adapters
-- In-memory ports on `globalThis[Symbol.for(...)]` stores with fixtures (see `component-inventory.md`).
-
-### src/teacher-tracking - partly wired; src/access - mostly unwired
-- `tracking-model.ts` live; `TeacherScheduleService` unwired. `src/access` live pieces: `types.ts`, `role-policy.ts`, `session-grants.ts`.
-
-### Family B (unwired at 2026-10-12)
-- `src/coordination`, `src/directory`, `src/import-migration`, `src/notifications`, `src/parent-experience`, `src/privacy-audit`, `src/admin-experience`: synchronous repository ports with in-memory implementations.
-
-## app/ route inventory (2026-10-12)
-
-- Pages: `/`, `/belepes`, `/meghivas/[token]`, `/hozzaferes-megtagadva`; parent `/szulo/...`; admin `/admin/...`; teacher `/teacher/schedule(/[id])`; legacy redirects `/munkatars/beosztas(/[id])`.
-- API: `/api/readiness` (GET), `/api/synthetic/session` (POST), `/api/synthetic/reset` (POST).
-- Server actions: `app/szulo/actions.ts`, `app/admin/actions.ts`, `app/admin/advanced-actions.ts`, `app/belepes/actions.ts`, `app/meghivas/[token]/actions.ts`.
-
-## Sign-in and shell files (2026-11-02)
-
-| Path | Classification | Role |
-|---|---|---|
-| `app/bejelentkezes/page.tsx` | Controller (page) | Sign-in screen; form for signed-out, `signed-in-panel` for signed-in (2026-11-04: a signed-in visitor is redirected to `/`; no panel) |
-| `app/bejelentkezes/SignInForm.tsx` | Controller (client component) | `useActionState(signInAction)`, client-side required-field checks, error live region |
-| `app/bejelentkezes/actions.ts` | Controller (server action) | `signInAction`: runs `signIn`, writes cookies, then `redirect("/")` (since `1070fd6`; `redirect("/bejelentkezes")` at `3456409`) |
-| `app/page.tsx` | Controller (page) | `/`: composes the runtime, redirects a signed-in person to the role home or shows sign-in, no-role (with `SignOutButton`), unavailable panels |
-| `app/_identity/current-session.ts` | Service | Real session for pages (no refresh) |
-| `app/_identity/production-request.ts` | Service | Memoised `ready / signed-out / unavailable` plus per-request facades |
-| `app/_identity/production-home.ts` | Service | `resolveProductionHome()` |
-| `app/_identity/actions.ts`, `SignOutButton.tsx`, `shell-action.tsx` | Controller | Sign-out action, its button, and the header control used by the shell |
-| `proxy.ts` | Middleware | CSP nonce and session cookie renewal or clearing; no role routing |
-| `src/runtime/navigation.ts` | Configuration | Four constant menu lists (parent 3, teacher 0, group admin 5, super admin 9) |
-| `src/runtime/AppShell.tsx`, `AppNav.tsx`, `shell-profile.ts` | UI shell | Header, sign-out slot, menu (shown only when non-empty), `ShellProfile` type |
-| `src/runtime/BackToHomeLink.tsx`, `BrandMark.tsx` | UI | Link back to a home path; brand mark (2026-11-02, after 1070fd6) |
-| `src/runtime/production/access.ts` | Service | `resolveParentAccess`, `resolveAdminAccess`, `resolveTeacherAccess`, `HOME`, `HOME_ORDER`, `deniedFor` |
-| `src/runtime/production/{composition,services}.ts`, `src/runtime/composition.ts` | Configuration | Production-only composition and per-request facades |
-| `src/identity/*` | Service | Sign-in, sessions, cookies, refresh, invitations, reset, accounts, copy (Hungarian texts, `COPY.signOut`), events; each with a colocated `*.test.ts` |
-| `tests/browser/support/seeded-schema.ts` | Test support | `bindSeededSchema`, `signInAs`, `signOut`, `signInAndOpen`, `expectSignedIn`, `SERIOUS` |
-| `tests/browser/support/{projects,dates,scenarios}.ts` | Test support | Schema and port per browser project, dates, scenarios |
-| `tests/integration/*.test.ts(x)` | Test | Vitest tests with mocked `next/*`; sign-in behaviour pinned in `identity-actions`, `identity-screens`, `production-home`, `identity-proxy` |
-
-Route notes: `app/szulo/` has no root page (parent home is `/szulo/ertesitesek`); `app/teacher/schedule/` holds the teacher's only page; `/hozzaferes-megtagadva` is a static denied page that no code in `app/` or `src/` redirects to. The `app/belepes` route and `app/api/synthetic/*` listed in the 2026-10-12 inventory are not present at this commit.
-
-## Denied pages and tests (2026-11-02, after 1070fd6)
-
-| Path | Classification | Role |
-|---|---|---|
-| `app/szulo/layout.tsx` | Controller (layout) | Resolves parent access; renders `ParentAccessState` (denied, configuration-error, signed-out) instead of the shell, or `AppShell` |
-| `app/szulo/_components/ParentAccessState.tsx` | UI | The "Nincs jogosultság" page of the parent area (no sign-out at `1070fd6`; 2026-11-04: ends with `AccessStateExit`) |
-| `app/szulo/_lib/session.ts` | Service | Parent session resolver |
-| `app/admin/layout.tsx`, `app/admin/_components/AdminAccessState.tsx`, `app/admin/_lib/session.ts` | Controller, UI, Service | Same pattern for admins; signed-out redirects to `/` |
-| `app/teacher/layout.tsx`, `app/teacher/_components/TeacherAccessState.tsx`, `app/teacher/_lib/session.ts` | Controller, UI, Service | Same pattern for teachers; link goes to `/` |
-| `app/hozzaferes-megtagadva/page.tsx` | Controller (static page) | Generic denied page; no inbound redirect |
-| `tests/integration/parent-components.test.tsx`, `admin-components.test.tsx` | Test | `describe("ParentAccessState")` and the `AdminAccessState` block: heading, home-link testid and href |
-| `tests/integration/identity-screens.test.tsx` | Test | `describe("SignOutButton (BR2.8)")`: mocks `app/_identity/actions`, submits `sign-out-form` |
-| `tests/integration/production-home.test.tsx` | Test | No-role panel shows `sign-out-button`; mocks `signOutAction`, `server-only`, `next/navigation` |
-| `tests/coverage/parent-pages.test.tsx`, `app-entrypoints.test.tsx` | Test | Layout denial with `requestWorld.signIn("teacher")`; static denied page render |
-| `tests/support/request-world.ts` | Test support | `requestWorld.signIn(role)`, `access.parent.grants`, `access.parent.parent` |
-| `tests/browser/*.spec.ts` | Test | Denied pages reached by heading name; axe via `SERIOUS` |
-
-Conventions seen (handoff, 2026-11-02): colocated `*.test.ts` for `src/`; page and component tests under `tests/integration` and `tests/coverage`; `data-testid` on every asserted or interactive element (kebab-case, area-prefixed); Hungarian text, English identifiers; identity copy in `COPY`, role-page copy inline; Prettier width 100, double quotes, semicolons, trailing commas; ESLint with zero warnings; strict TypeScript. (2026-11-04: confirmed in `app/` and `tests/browser/`; no `TODO`, `FIXME`, `eslint-disable` or `@ts-ignore` there; component and test-id names are stable hooks the browser specs use.)
-
-## SQL migrations (2026-10-27)
-
-### Naming and ordering
-- `supabase/migrations/<8 digits>_<snake_case_name>.sql`. The 8 digits start as a date (`20260806`, `20261006`) and continue as a running number past real calendar days (`20261035` to `20261045`). Files are applied in plain file-name sort order (`readMigrationFiles` sorts names, `scripts/db/runner.ts:30`).
-- Four files share `20261035_` (`governance_list`, `integrity_directory_reads`, `integrity_lifecycle`, `placeholder_drop`); `migrations.test.ts` asserts that `20261035_placeholder_drop.sql` sorts last in U3.
-- The last file at HEAD (2026-11-02) is `20261046_audit_denied_rate_limit.sql` (follow-up B3, header read only); the next free number is `20261047`. The folder holds 40 files.
-- Each file opens with a comment naming the unit or follow-up, the rule ids (BR, NFR, FR) and, for a change to earlier objects, "Forward-only: the merged file(s) ... (is/are) not edited" and the list of changes.
-
-### Unit map
-| Files | Unit | Main objects |
-|---|---|---|
-| 20260806, 20261006 | baseline | `app_role_grants`, `app_authorization_versions`, conversion evidence, `has_*_scope` helpers |
-| 20261012 | U1 platform | `platform_system_account`, `platform_caller_is_system`, `platform_actor_account`, `platform_actor_role`, `audit_events` + append-only trigger, `platform_audit_write`, `platform_touch_version`, `lifecycle_holds` |
-| 20261013 | U1 platform | `idempotency_records`, `platform_result`, `platform_idempotency_check`, `platform_idempotency_store`, `platform_finish_operation`, `platform_cleanup_expired`, `lifecycle_hold_place`, `lifecycle_hold_release` |
-| 20261014-20261023, 20261033 | U2 identity | accounts, sign-in attempts and lockout, sessions check, invitations, grants and account changes, privileges, password hook, group reach |
-| 20261024-20261035 | U3 | directory, coordination, kernel sign-up/swaps/family, schedule, lifecycle, integrity fixes, placeholder drop |
-| 20261036-20261043 | U4 | notifications schema/functions/hooks, import schema/functions/commit/dashboard, U4 repairs |
-| 20261044 | U5 | `audit_purge`, relaxed `audit_events_refuse_change`, `identity_housekeeping` calls the purge |
-| 20261045 | follow-up B1 | `audit_purge` capped at 5000 rows, purge isolated in a sub-transaction |
-| 20261046 | follow-up B3 | `platform_audit_write` redefined with a limit of 20 denied events per account per 60 minutes (header read, not analyzed) |
-
-### Audit write call graph
-- `platform_audit_write` (defined in 20261012:94-108; redefined with the same signature by 20261046, not analyzed) is called by:
-  - `platform_finish_operation` (20261013:90-92) for `success` and `denied`. Callers of `platform_finish_operation`: 20261013 (holds), 20261017 and 20261021 (invitations), 20261018 and 20261033 (grants, account changes), plus `identity_deny` (20261015:120-126), which 20261017, 20261018, 20261021, 20261030 and 20261033 use.
-  - Direct, success only: 20261018:277 (`role.first_super_admin`), 20261029:677 and 682 (`approval.approve`/`approval.reject`), 20261032:172 and 178 and 20261035_integrity_lifecycle:119 and 125 (`lifecycle.anonymize`/`lifecycle.delete`, return value kept in `v_audit`), 20261041:438 (`import.commit`).
-- Coordination, kernel sign-up/swaps, directory, notifications and import functions answer `platform_result('denied', ...)` without an audit event.
-
-## Database tests (2026-10-27)
-
-- Location `tests/database/`, runner `node --experimental-strip-types --test <files>`, real local Supabase stack (start with `npm run db:start`; connection from `scripts/db/common.ts` settings). 58 entries at HEAD (2026-11-02 listing; 55 at 2026-10-27, the new ones include `audit-denied-limit.test.ts`): `*.test.ts` plus support modules `stack-support.ts`, `identity-support.ts`, `directory-support.ts`, `import-support.ts`, `notifications-support.ts`, `seed-support.ts`, `dataset.ts`, `fixtures/`.
-- `stack-support.ts` exports: `openDatabase`, `lockSchemas` (advisory lock per schema so files sharing a schema run one at a time), `prepareSchema` (migrate `public` with the runner, or set up a worker schema), `ensureAccount` (real `auth.users`, `accounts`, `auth.sessions` rows), `seedGrants`, `asActor` (one transaction, `set local role`, JWT claims via `request.jwt.claims`), `failureOf`, `placeHold`, `useSchema`/`bindSchema`, `report` (TAP comment), and ids `ORGANIZATION`, `OTHER_ORGANIZATION`, `SUPER_ADMIN`, `PARENT`, `OUTSIDER`, `OTHER_ADMIN`, `SYSTEM_ACCOUNT`, `uuid(n)`.
-- File shape (`audit.test.ts`, `audit-purge.test.ts`): `for (const schema of ["worker_1", "public"]) describe(...)`; `before`: `openDatabase`, `lockSchemas`, `prepareSchema`; `beforeEach`: `useSchema`, `resetWorkerData` (truncates every table of the schema), `seedGrants`. Aged rows are inserted through the owner connection with an explicit `occurred_at`, never by waiting.
-- Registration: a file runs only when listed in an npm script (`test:database:stack`, `:identity`, `:directory`, `:notifications-import`, `:seed`, `:roles`) and in `scripts/db/shuffled-tests.ts`; `verify:local` runs all of them.
-
-### Audit-area file facts (2026-11-02, audit re-verified)
-- `20261012_platform_audit.sql` (159 lines): actor helpers, `audit_events` with trigger, `platform_audit_write`, `platform_touch_version` (generic optimistic-version trigger), `lifecycle_holds` with release-only guard.
-- `20261013_platform_idempotency.sql` (216 lines): `idempotency_records`, `platform_result`, idempotency check and store, `platform_finish_operation`, `platform_cleanup_expired`, the two hold functions.
-- `20261015_identity_session.sql` (174 lines): `current_session_is_active`, helper redefinitions, `identity_*` helpers, `identity_deny`, policies of the identity tables and `audit_events`, column-level `select` grant on `invitations` without the token hash.
-- `20261019_identity_privileges.sql` (67 lines): conditional drop of `app_audit_events`, service-role sweep, execute-right sweep, the ten service-role grants.
-- `20261044_audit_purge.sql` (80 lines) and `20261045_audit_purge_isolation.sql` (82 lines): trigger relaxation, `audit_purge`, `identity_housekeeping` (restated in full in both).
-- `supabase/config.toml` (95 lines): see `architecture.md` "Local stack configuration".
-- `tests/database/stack-support.ts` (247 lines): exports listed above; `SESSION_NAMESPACE` is a per-process random prefix for test session ids (line 89), `ensureAccount` removes sessions of the shared identities older than 2 hours, `asActor` sets both `request.jwt.claims` and `request.jwt.claim.sub`; `useSchema` and `bindSchema` are the same function.
-- `audit.test.ts` (331 lines, 14 cases), `audit-purge.test.ts` (287 lines, 14 cases), `migrations.test.ts` (467 lines, about 14 cases): both audit files loop over `worker_1` and `public`.
-
-## Code patterns
-
-- Erasable TypeScript only in code reachable from node tests or scripts (no enums, namespaces, constructor parameter properties).
-- Result-state returns instead of exceptions for expected failures; in SQL, `platform_result(state, reference, code)`; unexpected failures raise with SQLSTATE codes (`28000`, `42501`, `22023`, `23505`).
-- SQL (2026-10-27): `create or replace function ... language plpgsql security definer set search_path from current`, followed by `revoke all on function ... from public, anon, authenticated, service_role` and explicit grants.
-- Hungarian route names and UI copy; English identifiers.
-- UI (2026-11-04): pages are `<section className="<area>-page" data-testid="...">`; each page header is `<p className="eyebrow">` plus `<h1 tabIndex={-1}>` (list and home pages add `autoFocus`); every interactive or asserted element has a kebab-case `data-testid`; list items are one whole-card link; result panels carry `role`, `aria-live` and `tabIndex={-1}` so focus can move to them; icons are decorative SVG with `aria-hidden`.
+- English identifiers, Hungarian user text. Tests sit beside code (`src/**/*.test.ts`) or in `tests/`.
+- Imports include the `.ts` extension in `src/` so Node can run them directly.
+- Times are stored in UTC and shown in Europe/Budapest.
+- Every new database function needs `revoke all` followed by explicit `grant execute`.
+- Function and table names are snake_case, and every `create` is schema-neutral.

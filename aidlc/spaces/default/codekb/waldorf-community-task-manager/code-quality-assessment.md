@@ -1,154 +1,78 @@
 # Code Quality Assessment
 
-Full rescan 2026-10-12 (HEAD `80bd4f4`), focused update 2026-10-27 (HEAD `5d2b484`, intent `denied-audit-ratelimit`), focused update 2026-11-02 (HEAD `3456409`, intent `empty-nav-after-login`; section "Sign-in, shell and navigation area (2026-11-02)"). Revision 2 on 2026-11-02 (same intent, owner asked to also scan the audit area) re-read the audit migrations 20261012, 20261013, 20261015, 20261019, 20261044 and 20261045, `supabase/config.toml` and the database test support, `audit`, `audit-purge` and `migrations` tests; sections marked "(2026-11-02, audit re-verified)" come from it. The section "Database layer and audit area" was re-verified and extended. Focused update 2026-11-02 (HEAD `1070fd6`, intent `no-access-signout`): section "Denied pages and sign-out area (2026-11-02, after 1070fd6)"; the sign-in defect findings below describe `3456409` and are marked as fixed by `1070fd6`. Focused update 2026-11-04 (HEAD `251c4b3`, intent `stitch-design-update`): new section "Styling area (2026-11-04, after 251c4b3)"; finding 1 of the denied-pages section is marked as fixed by `78a0ab5`. All focused updates were read-only (no test, build or program run); the 2026-10-12 sections below record results executed then and are not current (per project rule, current executable results are authoritative over these counts).
+## Summary
 
-## Styling area (2026-11-04, after 251c4b3)
+The code is careful and disciplined, especially around concurrency, privacy and failure states. The main costs are the size of the SQL layer, repeated boilerplate and functions redefined across many files. This scan did not run any checks, so nothing here states a current pass or a coverage figure.
 
-Read-only run; nothing executed (no tests, build, linter or server), so test and coverage results are not re-measured. The area is the single stylesheet `app/globals.css` (1418 lines), the markup hooks the pages put on it, and the browser specs that assert on its output.
+## Quality Gates
 
-### Findings
-1. **Dead CSS**: the profile-picker rules (`.selector-*`, `.profile-grid`, `.profile-card*`, about 100 lines between lines 107 and 240) have no markup using them. A restyle should delete them rather than restyle them; a grep for each class across `app/` and `src/` before deletion is the safe check.
-2. **No scale tokens**: 18 custom properties exist (16 colours, `--shadow`, `--radius`). Font sizes, spacing, line heights, border widths and the 44 px target size are repeated literals throughout the file, and the font stack is set once on `:root` with no variable. A new font pair (Vollkorn headings, Karla body) therefore needs new tokens or a single edit point, otherwise it will be repeated.
-3. **Grouped selectors couple areas**: hover and pressed rules list five card classes together, one filter grid rule covers four classes, and `.parent-form` is reused by the sign-in form while `.centered-panel` has 11 uses. Changing one member changes the others; per-flow restyling must check each group.
-4. **Triple declaration**: `.parent-card` is declared three times in different parts of the file; later declarations override earlier ones, so the effective value is only visible by reading all three.
-5. **Inconsistent empty and state treatments**: empty states, status badges (`status-badge`, `parent-state-badge`) and notification cards are styled with separate rule sets and slightly different spacing and colours.
-6. **Stale copy**: the dead profile-picker area carries (or carried) the wording "válasszon óvónői profilt", which no live screen uses; the live sign-in is `/bejelentkezes`.
-7. **Dependency pins**: `react`, `react-dom`, `zod`, `@axe-core/playwright` and `@playwright/test` are `latest`, so an axe rule update can turn a green accessibility check red without a code change (relevant to a colour change).
-8. **Test fragility against a restyle**: browser specs assert computed styles (heading outline `none` after focus, focus-ring width at least 3 px, create links looking like the "Szűrés" button, read versus unread notification background), sizes (44 px targets, notification label at least 44x44, title at least 12 px from the card edge), layout (label above control on 8 forms at 320 and 1280 px, filter alignment, no overflow at 320, 375 and zoom 2, sign-in heading Y position stable when images fail) and class hooks (`.admin-collection`, `.status-badge`, `.parent-state-badge`, `.button-link`, `.notification-card-read`, `.filter-field`, `.filter-actions`, `.teacher-table`). Renaming a class or changing a token can break these without a visible defect.
-9. **Accessibility contrast risk**: axe runs in about 40 places on serious and critical violations, and colour contrast is part of the default rules; two specs add the `wcag22aa` tags. A Stitch palette with lighter text, coloured buttons or tinted badges must be checked against 4.5:1 (text) and 3:1 (large text and controls) on every surface it is used on.
-10. **Documentation contradiction**: `DESIGN.md` (added by `251c4b3`) says "No webfonts; keep it that way". The intent adds webfonts, so the file must be updated with the change or it will mislead later work.
-11. **Missing screen**: "Saját vállalásaim" is named in the design flows but has no page, route or string in the code. The owner must map it to an existing screen (for example the parent's own signups list) or confirm it is out of scope under "no new features".
-12. **Formatting is automatic, linting is not**: Prettier formats and checks the CSS (width 100); ESLint and Stylelint do not cover it, so invalid or unused CSS is not caught by any gate except the browser specs.
-13. **Positive**: no `TODO`, `FIXME` or `eslint-disable` in the analysed area; the CSP (`font-src 'self'`) already allows self-hosted fonts.
+| Gate | Tool | Blocking in CI |
+|---|---|---|
+| Format | Prettier | Yes, through `verify:local` |
+| Lint | ESLint, zero warnings | Yes |
+| CSS | Stylelint on `app/globals.css` | Yes (`lint-css` step in `scripts/verification/run-local-verification.ts`) |
+| Types | `tsc --noEmit`, strict | Yes |
+| Tests | Node test runner, Vitest | Yes |
+| Coverage | 80% lines, branches, functions | Yes |
+| Database | Per-group suites, shuffled run, timing | Yes |
+| Browser | Playwright with three browsers, axe | Yes |
+| Security | Privacy, secret, SAST and no-deploy scans, `npm audit` for high and critical | Yes |
 
-### Ratings (code-analysis guide scale)
+`src/access/` is outside the `lint` and `format` paths in `package.json`.
+
+## Rating
+
 | Aspect | Rating | Evidence |
 |---|---|---|
-| Naming clarity | good | area-prefixed kebab-case classes (`parent-`, `teacher-`, `admin-`, `filter-`); stable `data-testid` hooks |
-| Function size | not applicable | stylesheet; the area has no functions of its own |
-| Error handling | not applicable | `prefers-reduced-motion` and 20rem breakpoint rules show care for edge cases |
-| Test presence | good | many computed-style, size, layout and axe checks in three browser projects; none cover the dead CSS |
-| Duplication | fair | repeated literals, triple `.parent-card`, shared selector groups |
-| Dead code | fair | about 100 lines of unused profile-picker CSS |
-| Token coverage | fair | colours tokenised; type, spacing and font family are not |
+| Naming | Good | Clear, consistent identifiers; SQL comments cite business rules |
+| Function size | Fair | SQL use cases are long (for example `directory_save`, about 300 lines, and `import_match`) but follow one template |
+| Error handling | Good | Explicit result states; no raw database text reaches a screen |
+| Test presence | Good | Tests at every layer, including concurrency races and privacy checks |
+| Duplication | Fair | The idempotency preamble is copied into every function; `invitation_create` and others repeat whole bodies when replaced |
+| Dead code | Fair | Placeholder tables and test-only access classes remain |
 
-## Denied pages and sign-out area (2026-11-02, after 1070fd6)
+## Test Coverage
 
-Read-only run; nothing executed (no tests, build or server), so test results are not re-measured.
+- Test layers: `src/**/*.test.ts`, `scripts/**/*.test.ts`, `tests/unit`, `tests/integration`, `tests/coverage`, `tests/database`, `tests/browser`.
+- Coverage: Istanbul with 80/80/80 thresholds over production source.
+- Browser specs assert computed styles, sizes, layouts and class hooks, so visual or structural changes to screens can fail them.
+- Last recorded acceptance report: 33 pass, 0 fail, 6 outstanding, bound to older commit `8f1cefa`. Treat current executable results as authoritative.
+- Outstanding evidence: Safari desktop and mobile, hosted Supabase auth and persistence, scheduler and provider, Vercel preview or staging.
 
-### Findings
-1. **No exit on the denied pages** (fixed by `78a0ab5`, 2026-11-04: `AccessStateExit` adds sign-out and Hungarian guidance to the denied states): `ParentAccessState`, `AdminAccessState`, `TeacherAccessState` and `app/hozzaferes-megtagadva/page.tsx` rendered outside `AppShell` and had no sign-out. The tools to add one already exist (`SignOutButton`, `signOutAction`, used in `app/page.tsx` and the shell header) and need no change. After `1070fd6` more accounts reach the parent denied page right after sign-in (role without linked record), and `signInAs` in the browser support would start to succeed for such an account only if the denied page gains a `sign-out-button`.
-2. **Back-link loop**: `deniedFor` in `src/runtime/production/access.ts` returns the strongest role's `homePath`; for a parent without a linked record that is the page being shown, so "Vissza a biztonságos kezdőoldalra" reloads the same denied page. The teacher link to `/` redirects and loops the same way for a role holder without a usable page. (2026-11-06 at `1672d98`: the parent and admin states hide the link inside their own area, `ParentAccessState.tsx` line 35 and `AdminAccessState.tsx` line 32; the loop is gone for them. The teacher link still goes to `/`; it leads to the role home, so it is not a loop unless the account has no usable role, and then `/` shows the no-role panel.)
-3. **Duplication**: five separate "Nincs jogosultság" renderings with similar markup and slightly different copy and link text; no shared presentational component. Page structure varies in testids (`parent-access-denied`, `admin-denied`, `teacher-denied`, `access-denied-state`).
-4. **Shared component risk**: `ParentAccessState kind="denied"` is also what a teacher or admin sees on a parent page, and the `configuration-error` kind reuses the markup. New explanation text must be correct for all of them or be limited to the case with no usable home. Existing specs (`navigation-polish.spec.ts`, `teacher-web.spec.ts`) click "Vissza a beosztáshoz" on the denied page, so labels and testids must stay stable.
-5. **Possible dead page**: `app/hozzaferes-megtagadva/page.tsx` has no inbound redirect in `app/` or `src/`; only a coverage test renders it. Confirm the owner means the parent denied page. (2026-11-06 at `1672d98`: still no sign-out and no guidance, `app/hozzaferes-megtagadva/page.tsx` lines 4-15. This is the one no-access screen that offers no way out.)
-6. **Accessibility**: the parent denied element is a `<section>` without a `<main>` landmark; it carries `id="hozzaferes-megtagadva"` and `tabIndex={-1}` as the focus target. Adding a form and button must keep the single `<h1>` and pass axe (serious and critical violations block the critical flow).
-7. **Dependency pinning**: `react`, `react-dom`, `zod` and several dev tools are `latest` in `package.json`.
-8. **Test gaps**: (2026-11-06 at `1672d98`, checked in `tests/coverage` only) the parent denied screen is tested for guidance and sign-out (`tests/coverage/parent-pages.test.tsx` lines 237-248, role without linked record); the static page is tested without any sign-out assertion (`tests/coverage/app-entrypoints.test.tsx` lines 119-131); no file in `tests/coverage` renders the admin or teacher denied screens, so their sign-out is covered only by the older integration tests (not opened in this run). No browser test models "role but no linked parent record" (the seeded accounts were not checked); earlier note: component tests for the denied states exist for parent and admin only by heading, home-link testid and href.
+## Defects Found
 
-### Ratings (code-analysis guide scale)
-| Aspect | Rating | Evidence |
+| Severity | Finding | Location |
 |---|---|---|
-| Naming clarity | good | `ParentAccessState`, `SignOutButton`, `resolveParentAccess`, kebab-case testids with area prefixes |
-| Function size | good | components under 50 lines (handoff) |
-| Error handling | good | explicit `denied / signed-out / unavailable` result states; sign-out tolerates missing configuration |
-| Test presence | good | component, page, layout, sign-out and browser tests exist for this area; gaps in finding 8 |
-| Duplication | fair | five denied renderings, three role resolvers with a shared load pattern |
-| Dead code | fair | `app/hozzaferes-megtagadva/page.tsx` possibly unreachable |
+| Medium | The reason a parent must type for a swap or cancellation is validated, then dropped: the action never passes it to the facade, so `change_requests.reason` stays empty | `app/szulo/actions.ts` lines 33 to 47 and 136 to 146 |
+| Low | Text limit mismatches: contribution note 300 in the screen and 500 in the database; title 120 in the action and 200 in the database | `app/szulo/actions.ts` line 184, `app/admin/actions.ts` line 32 |
+| Low | Leftover demo wording on the parent list ("kitalált család") | `app/szulo/feladatok/page.tsx` line 32 |
 
-## Sign-in, shell and navigation area (2026-11-02, state at 3456409)
+## Technical Debt
 
-Read-only run; nothing executed (no tests, build or server), so test results below are not re-measured.
-
-### Findings
-1. **Defect located (fixed by `1070fd6`)**: `signInAction` redirected to `/bejelentkezes` (`app/bejelentkezes/actions.ts:45`) and `SignInPage` renders a shell-less `signed-in-panel` for a signed-in visitor (`app/bejelentkezes/page.tsx:19-24`). The role home resolver exists and works (`app/_identity/production-home.ts`, used by `app/page.tsx:16-17`) but the sign-in flow never called it. Commit `1070fd6` changed the redirect to `/`. The role shells, menus and role access resolvers are correct for all four roles. (2026-11-04: the sign-in page now redirects a signed-in visitor to `/`.)
-2. **Intended emptiness**: `TEACHER_NAVIGATION` is `[]` (`src/runtime/navigation.ts:13-14`), so a teacher home page shows header and sign-out but no menu. Not a defect.
-3. **Tests pinned the defect** (at `3456409`): `identity-actions.test.ts:122` expected the redirect `/bejelentkezes`; `identity-screens.test.tsx:268-282` expects the signed-in panel; `signInAs` (`tests/browser/support/seeded-schema.ts:72`) and 12 spec lines waited for `signed-in-panel`. `1070fd6` updated the affected tests per its title; not re-read here.
-4. **Shared destination**: password reset (`jelszo-visszaallitas/uj/actions.ts:38`) and invitation acceptance (`meghivas/[token]/actions.ts:41,43`) also ended on `/bejelentkezes` at `3456409`, with tests at `identity-actions.test.ts:243,282,299`.
-5. **Inconsistency**: signed-out handling differs by area (admin and teacher `redirect("/")`; parent renders `ParentAccessState`).
-6. **Naming**: `resolveProductionHome` relies on `resolveAdminAccess` being the generic resolver (its `denied` carries the strongest role's home); this is documented in a comment but easy to misread.
-
-### Ratings (code-analysis guide scale)
-| Aspect | Rating | Evidence |
+| Item | Effect | Location |
 |---|---|---|
-| Naming clarity | good | `signed-in-panel`, `resolveProductionHome`, `ShellProfile`; Hungarian copy centralised in `src/identity/copy.ts` |
-| Function size | good | actions and resolvers under 50 lines |
-| Error handling | good | explicit state unions (`ready / signed-out / no-role / unavailable`); config problems become a Hungarian message |
-| Test presence | good | colocated tests for every `src/identity` module, integration tests for actions and screens, browser specs for the flow |
-| Duplication | fair | three role resolvers share the load pattern; menu lists are constants |
-| Dead code | good | none seen in the area |
+| Function bodies spread across files (`lifecycle_run` five times, `identity_housekeeping` four times) | Hard to find the current behaviour, easy to copy an old body | `supabase/migrations/` |
+| Copied use-case preamble | Mechanical cost per function; future change touches about 40 functions | `supabase/migrations/` |
+| `app_import_runs` still read by `scope_probe` although imports use `import_runs` | The `import_run` probe answers from an empty placeholder | `20261033` |
+| `app_audit_events`, `organization_settings` unused by application code (schema tests and privilege statements name them) | Clutter | `20260806`, `20261024` |
+| `AccessService` and in-memory adapters only used by tests | Second, unused model of grants | `src/access/` |
+| Admin list reads capped at 1000 rows; task detail fetches the whole list | Silent truncation once rotas add thousands of rows | `src/data/admin-tasks.ts`, `src/data/admin-records.ts`, `app/admin/feladatok/[id]/page.tsx` |
+| `duty_list` returns all tasks of the group, past included; filtering happens in the browser | Grows with each year of rotas | `20261028`, `app/szulo/feladatok/page.tsx` |
+| Group-admin scope picks the first grant only for the page scope | Multi-group admins depend on database reach, not on the chosen scope | `src/runtime/production/access.ts` |
+| Page file exports a helper used by others | Fragile with framework rules | `app/szulo/feladatok/page.tsx` |
 
-## Database layer and audit area (2026-10-27)
+## Known Limits Recorded by the Project
 
-### Tests
-| Layer | Runner | Size | Notes |
-|---|---|---|---|
-| Database (real local stack) | `node --experimental-strip-types --test`, `pg` client | 58 entries in `tests/database/` at HEAD (55 at 2026-10-27) (test files, support modules and one SQL fixture) | Every file runs against the started Supabase stack; files that share a schema serialize through advisory locks; each test starts from `resetWorkerData`; most audit files run twice, in `worker_1` and in `public` |
+From `verification/reports/u5-workbook-and-known-limits.md`:
 
-- The audit area is well covered: refused rights for every application role, append-only behaviour, actor attribution (including `none` and `system`), denied event committed with the denied result, atomic rollback, `details` format, check lists, indexes, overhead under 50 ms per operation (NFR4.5), purge boundaries and the 5000-row cap.
-- Not covered by the files analyzed here: the denied-event limit (its tests are in `audit-denied-limit.test.ts`, not read), concurrent denials from one account.
-- Re-verified 2026-11-02: `audit.test.ts` pins refused rights for `anon`, `authenticated` and `service_role`, the read policy, append-only (even for the owner), actor attribution, atomic rollback via an injected trigger, `details` format, check lists, indexes and the 50 ms overhead; `audit-purge.test.ts` pins the 365-day boundary, system-caller-only, setting scope, no leak, 5000 cap and security-definer pinning; `migrations.test.ts` pins ordering, second-run no-op, pinned search paths and platform privileges.
-- Test hygiene: each test file builds its own session ids (`SESSION_NAMESPACE`) and takes a per-schema advisory lock, so files can run in parallel and shuffled; aged events are inserted with an explicit `occurred_at`, never by waiting.
-- No SQL coverage measurement; the 80/80/80 coverage floor applies to TypeScript production files only.
+- Reminders are not re-planned when a family changes group.
+- Staged import data expires only when someone signs in or the screen is opened; no scheduler.
+- Invitations cannot be sent from a screen.
+- Hungarian notice titles have not been reviewed by the owner.
 
-### Ratings (code-analysis guide scale)
-| Aspect | Rating | Evidence |
-|---|---|---|
-| Naming clarity | good | `platform_*`, `identity_*`, `audit_*` prefixes; header comments cite rule ids |
-| Function size | good | audit write 15 lines; finish-operation 14 lines |
-| Error handling | good | expected outcomes as `platform_result` states; unexpected as SQLSTATE exceptions (`28000`, `42501`, `22023`, `23505`) |
-| Test presence | good | each migration unit and follow-up has real-stack tests and an ordering test in `migrations.test.ts` |
-| Duplication | fair | follow-up files restate whole functions (for example `identity_housekeeping` in 20261044 and 20261045), which is the forward-only cost |
-| Dead code | good | superseded `app_audit_events` dropped by catalogue check (20261019:7-19) |
+## Risk Notes for the Ovis Tábla Intent
 
-### Audit-area findings, revision 2 (2026-11-02)
-1. D1 The execute-right sweep of 20261019 is a one-time loop over existing functions; functions created later keep PostgreSQL's default PUBLIC execute unless their file restates the revoke (20261019:28-30, 42-53). Convention and `migrations.test.ts` cover it for the platform functions only.
-2. D2 `identity_housekeeping` swallows every purge error (`exception when others`, 20261045:65-69) and reports only a boolean; a permanently failing purge shows as a flag in a result nobody may read.
-3. D3 Whole-function restatement: `identity_housekeeping` is defined in full in 20261044 and again in 20261045 (and earlier in 20261043), so a reader must find the last definition by file order.
-4. D4 `lifecycle_hold_place` and `_release` compute the request fingerprint from the arguments before authorization; a denied call is stored for replay, which is intended (BR3.6) but means the denied result of a later-authorized caller is replayed for 24 hours per key.
-5. D5 Test code: `useSchema` / `bindSchema` duplicate one function; `stack-support.ts` mixes pure helpers and database access (247 lines, acceptable).
-6. D6 The published store was stale by one migration: 20261046 exists at HEAD; items A1, A3 and A5 below describe the state before it and are addressed by it per its header (not analyzed here).
-7. No finding in the audit area touches the sign-in redirect defect or the denied pages.
-
-### Technical debt and risks for intent `denied-audit-ratelimit` (2026-10-27, state before 20261046)
-1. A1 No volume limit on denied events per account; `audit_events` growth from repeated denials is bounded only by the 365-day purge.
-2. A2 No outcome-aware index; counting an account's denials in the last hour can use `audit_events_actor (actor_account_id, occurred_at desc)` but must filter `outcome` row by row.
-3. A3 No serialization for a count-then-insert cap; concurrent denials of one account can overshoot unless a per-account advisory transaction lock is taken (pattern: 20261013:38).
-4. A4 `occurred_at` is the transaction start time (`now()`); denials in one transaction share a timestamp.
-5. A5 Forward-only is enforced by checksum (`scripts/db/runner.ts:146-151`); a fix must be a new file, which must also restate `revoke all` on the function.
-6. A6 Test registration is manual in two places (npm script and `scripts/db/shuffled-tests.ts`); a new test file missing from either does not run in `verify:local`.
-7. A7 Existing tests that create 20 or more denials for one account inside one test would change behaviour under a cap; a grep found none (loops of 20 or more are reads or successes), but this is unverified until the database suites run.
-8. A8 Four files share the prefix `20261035_`; ordering relies on the full file-name sort.
-
-## Tests, layers and synthetic state (2026-10-12)
-
-| Layer | Runner | Size then | Note |
-|---|---|---|---|
-| Domain unit | `node --test` (`npm run test:domain`) | 32 files, 258 tests, pass | In-memory adapters |
-| Vitest delivery | Vitest 4.1.11, jsdom | 42 files, 531 tests, pass | About 40 files referenced synthetic state |
-| Browser | Playwright 1.62.1 (chromium, firefox, mobile-chrome) | 11 specs | Nine specs called `POST /api/synthetic/reset` |
-| Database | `node:test`, `psql` | 1 file, 9 cases | Superseded by the 55-file real-stack suite above |
-| Accessibility | `@axe-core/playwright` | serious/critical violations block | Synthetic data |
-
-Coverage: 80/80/80 lines/branches/functions with an honest denominator (`tests/coverage/support/production-coverage-reporter.ts`); config in `vitest.config.ts` (istanbul, includes `app/**`, `src/**`, `proxy.ts`).
-
-## Lint, format, types (2026-10-12)
-
-- ESLint 9 flat config, `--max-warnings=0`; Prettier; `tsc --noEmit`. Other `src/*` modules were outside lint and format scope then. (2026-11-04: Prettier also formats `app/globals.css`; ESLint does not lint CSS.)
-
-## CI
-
-- 2026-10-12: job `validate` runs `npm ci`, Playwright install, `npm run verify:local`; job `build_evidence` builds, CycloneDX SBOM, build tarball, metadata, SHA256SUMS, 14-day private artifacts (not cryptographic attestations). Actions pinned by SHA.
-- 2026-10-27 skim: `validate` now starts the local Supabase stack (`npm run db:start`) before `npm run verify:local` and stops it after; `verify:local` runs every `test:database:*` script and the shuffled order run. At `1070fd6` (commit `3456409`) CI runs every browser on every run.
-
-## Documentation
-
-`README.md` (sections "Run the application locally" and "Test phases and quality checks"), Hungarian user guide, `verification/RUNBOOK.md`, `AUTHORIZATION.md`, PRD. SQL migrations carry purposeful header comments with rule ids and forward-only notes (2026-10-27). Identity code carries doc comments with requirement ids (BR/FR). (2026-11-04: `DESIGN.md` describes the visual system and currently says "No webfonts".)
-
-## Technical debt and risks recorded 2026-10-12 (not re-verified)
-
-R1 first migration not applicable (since fixed, FR1.2); R2 thin SQL coverage (since extended); R3 uuid versus slug ids; R4 synchronous Family B ports; R5 Family B dead code; R6 fake behaviours; R7 single-parent design; R8 hardcoded session secret; R9 global mutable state; R10 test isolation for in-memory state; R11 evidence tooling encodes synthetic mode; R12 production config demands `https://`; R13 coverage and lint scope for new directories; R14 local environment constraints; R15 AI-DLC records coupled into a unit test; R16 no gating in `proxy.ts`; floating `latest` ranges; fake-feature hooks in production code; secret-like constant in source.
-
-## Quality strengths
-
-Strict TypeScript; explicit result states in TypeScript and SQL; enforced coverage floor; pinned CI actions; secret scanning and SAST per team rules; accessibility checks in the critical browser flow; forward-only, schema-neutral, checksum-tracked migrations with real-stack tests (2026-10-27); a broad computed-style and layout browser suite guarding the visual contract (2026-11-04).
+- The group concept reaches into policies, helpers, the import and tests, so its change needs a careful migration and broad test updates.
+- A new bulk rota function must follow the fixed lock order and respect the 50-capacity and one-place-per-family rules.
+- Adding a role requires updating the constraint, helpers, matrix, navigation and verification manifests together.
+- Privacy scan and team rules forbid real names in the repository, and the one-off migration script must be developed against the anonymised copy only.

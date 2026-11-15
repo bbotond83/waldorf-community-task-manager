@@ -184,23 +184,38 @@ export const ELEVATED: Record<
   //  notification_actor_parent: the reader of the notification policies (the parent row linked to the account);
   //  notification_list, notification_mark_read: a parent reads only their own notices, and the title and link are
   //    built from the task and the request, which the parent reads through no table;
-  //  reminder_list, reminder_retry: an admin sees and retries reminder jobs, which no role reads as a table;
-  //  reminder_run_due: the lazy simulated tick, callable by any member of the organization for their own
-  //    organization; reminder_run_due_system is the same tick for the system caller (service-role key);
+  // U5 (BR52): delivery_problems_list and delivery_retry are the super admin's list and Try again (no role reads the
+  //    delivery tables); timed_checks_run_system, notice_email_claim, notice_email_sweep and notice_email_record are
+  //    the command's own functions, callable by the service role only; notice_send, the facts functions, the
+  //    checks and the housekeeping are internal;
   //  reminder_plan and the helpers around it: the planner that the U3 use cases call inside their transaction.
   notification_actor_parent: "authenticated",
   notification_list: "authenticated",
   notification_mark_read: "authenticated",
-  reminder_list: "authenticated",
-  reminder_retry: "authenticated",
-  reminder_run_due: "authenticated",
-  reminder_run_due_system: "service_role",
+  delivery_problems_list: "authenticated",
+  delivery_retry: "authenticated",
+  timed_checks_run_system: "service_role",
+  notice_email_claim: "service_role",
+  notice_email_sweep: "service_role",
+  notice_email_record: "service_role",
+  notice_send: INTERNAL,
+  notice_send_core: INTERNAL,
+  notice_describe: INTERNAL,
+  notice_facts_task: INTERNAL,
+  notice_facts_change_request: INTERNAL,
+  notice_facts_rota_plan: INTERNAL,
+  duty_reminders_due_check: INTERNAL,
+  housekeeping_due_check: INTERNAL,
+  email_delivery_record: INTERNAL,
+  notifications_removal_parents: INTERNAL,
+  notifications_removal_preview: INTERNAL,
+  notifications_remove_core: INTERNAL,
+  notifications_removal_apply: INTERNAL,
   reminder_setting_for: INTERNAL,
   reminder_plan: INTERNAL,
   reminder_plan_tasks: INTERNAL,
   reminder_plan_organization: INTERNAL,
   reminder_family_tasks: INTERNAL,
-  reminder_run_jobs: INTERNAL,
   //  the notice and job writes inside the use cases of U3's hand-off list (BR40.9): each use case keeps its name
   //    and signature and calls its renamed core (internal, the unchanged function of U3) and then the helper that
   //    writes the notices and re-plans the reminders, all in the caller's transaction.
@@ -303,7 +318,13 @@ const POLICY_TEST_COVERAGE: Record<string, string> = {
   notifications: "notifications-schema.test.ts (role matrix)",
   reminder_jobs: "notifications-schema.test.ts (no policy: no direct access for any role)",
   reminder_recipients: "notifications-schema.test.ts (no policy: no direct access for any role)",
-  reminder_attempts: "notifications-schema.test.ts (no policy: no direct access for any role)",
+  notice_kinds: "notifications-schema.test.ts (no policy: no direct access for any role)",
+  notice_targets: "notifications-schema.test.ts (no policy: no direct access for any role)",
+  timed_check_registry: "notifications-schema.test.ts (no policy: no direct access for any role)",
+  email_deliveries: "notifications-schema.test.ts (no policy: no direct access for any role)",
+  email_attempts: "notifications-schema.test.ts (no policy: no direct access for any role)",
+  timed_runs: "notifications-schema.test.ts (no policy: no direct access for any role)",
+  timed_check_runs: "notifications-schema.test.ts (no policy: no direct access for any role)",
   break_weeks: "rota-plan.test.ts (BR27.2 table access)",
   rota_plans: "rota-plan.test.ts (BR27.2 table access)",
   rota_weeks: "rota-plan.test.ts (BR27.2 table access)",
@@ -350,7 +371,13 @@ const PROBE_DECISION: Record<string, string> = {
   notifications: "none: U4 table, never a detail screen",
   reminder_jobs: "none: U4 table, never a detail screen",
   reminder_recipients: "none: U4 table, never a detail screen",
-  reminder_attempts: "none: U4 table, never a detail screen",
+  notice_kinds: "none: U5 registry, never a detail screen",
+  notice_targets: "none: U5 registry, never a detail screen",
+  timed_check_registry: "none: U5 registry, never a detail screen",
+  email_deliveries: "none: U5 table, never a detail screen",
+  email_attempts: "none: U5 table, never a detail screen",
+  timed_runs: "none: U5 table, never a detail screen",
+  timed_check_runs: "none: U5 table, never a detail screen",
 };
 
 for (const schema of IDENTITY_SCHEMAS) {
