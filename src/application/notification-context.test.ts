@@ -13,7 +13,6 @@ const notice = (id: string, link: string): NotificationModel => ({
   link,
   isRead: false,
   timing: "7-day",
-  providerStatus: "simulated-sent",
 });
 
 const notifications = [

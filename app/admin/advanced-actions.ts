@@ -15,13 +15,33 @@ export async function retryReminderAction(
   if (!boundary.ok) return boundary.state;
   const result = await boundary.facade.reminders.retry(boundary.session.applicationSession, {
     scope: boundary.session.scope,
-    id: text(formData, "jobId"),
+    id: text(formData, "targetId"),
     expectedVersion: number(formData, "expectedVersion"),
-    idempotencyKey: text(formData, "correlationId"),
-    payload: {},
+    idempotencyKey: text(formData, "idempotencyKey"),
+    payload: {
+      kind: text(formData, "kind"),
+      targetType: text(formData, "targetType"),
+      expected: expectedDeliveries(text(formData, "expected")),
+    },
   });
-  revalidatePath("/admin/emlekeztetok");
-  return mapAdvancedResult(result, "Az újrapróbálás az eredeti korrelációs azonosítóval ütemezve.");
+  // No revalidation here: the page would redraw without the restarted group and the success message would go with it.
+  // The list is up to date on the next visit.
+  return mapAdvancedResult(result, "Az újrapróbálás elindult.");
+}
+
+/** The (delivery id, try count) list the screen showed, read back from its hidden field; anything else reads as none. */
+function expectedDeliveries(raw: string): { id: string; tryCount: number }[] {
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.flatMap((entry: unknown) => {
+      if (!entry || typeof entry !== "object") return [];
+      const { id, tryCount } = entry as { id?: unknown; tryCount?: unknown };
+      return typeof id === "string" && typeof tryCount === "number" ? [{ id, tryCount }] : [];
+    });
+  } catch {
+    return [];
+  }
 }
 
 export async function updateGrantAction(
@@ -85,8 +105,10 @@ function mapAdvancedResult<T>(
 ): AdminActionState {
   const mapped = mapApplicationResult(result, successMessage);
   const messages: Record<string, string> = {
-    REMINDER_NOT_RETRYABLE: "Ez az emlékeztető nem próbálható újra.",
-    REMINDER_STALE: "A feladat állapota megváltozott.",
+    REMINDER_NOT_RETRYABLE: "Ehhez nincs már sikertelen e-mail.",
+    REMINDER_TOO_LARGE:
+      "Ebben a csoportban túl sok a sikertelen e-mail az egyszeri újrapróbáláshoz (legfeljebb 5000).",
+    REMINDER_STALE: "A lista időközben megváltozott; töltse be újra az oldalt.",
     GRANT_SELF_LOCKOUT: "Saját hozzáférését ebben a műveletben nem vonhatja vissza.",
     GRANT_LAST_SUPER_ADMIN: "Az utolsó szuperadminisztrátor nem távolítható el.",
     GRANT_STALE: "A jogosultság verziója megváltozott.",

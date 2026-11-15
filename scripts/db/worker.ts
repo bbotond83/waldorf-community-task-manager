@@ -122,11 +122,21 @@ export interface WorkerSetupResult {
   durationMs: number;
 }
 
-/** Empties every table of the worker schema and removes the worker's accounts. */
+/**
+ * The registries of Notifications are written by migration files only (NFR3.7): they are part of the schema, not
+ * test data, so emptying a schema leaves them as the migrations made them.
+ */
+export const MIGRATION_DATA_TABLES = [
+  "notice_kinds",
+  "notice_targets",
+  "timed_check_registry",
+] as const;
+
+/** Empties every table of the worker schema (the migration-written registries stay) and removes the worker's accounts. */
 export async function resetWorkerData(client: SqlClient, worker: string): Promise<void> {
   const tables = await client.query(
-    "select tablename from pg_tables where schemaname = $1 order by tablename",
-    [worker],
+    "select tablename from pg_tables where schemaname = $1 and tablename <> all ($2::text[]) order by tablename",
+    [worker, MIGRATION_DATA_TABLES],
   );
   if (tables.rows.length > 0) {
     const list = tables.rows

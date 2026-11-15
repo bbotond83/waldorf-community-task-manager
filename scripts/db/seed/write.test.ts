@@ -59,6 +59,11 @@ describe("seed writer", () => {
       "events",
       "tasks",
       "assignments",
+      "notifications",
+      "email_deliveries",
+      "email_attempts",
+      "timed_runs",
+      "timed_check_runs",
     ]);
   });
 

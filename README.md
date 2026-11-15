@@ -77,7 +77,7 @@ or that does not identify itself as the local stack, and they change nothing whe
 | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `npm run db:seed`       | Fills one schema with invented data: the small set (the six working groups, 6 families with parents and children, a super admin, two group admins who are also parents, one of them holding two groups, a teacher of the whole community, a few group and community-wide events and tasks) and creates the sign-in accounts. One transaction: all of it or nothing. Running it again changes nothing. |
 | `npm run db:seed:large` | The 30-family set made by the same rules (used by the timing tests).                                                                                                                                                                                                                                                                                                                                  |
-| `npm run db:reset`      | Empties one schema (every table, the audit log included) and removes only the sign-in accounts whose address starts with `<schema>.`. For the default `public` schema it needs `--yes` (`npm run db:reset -- --yes`), because that is the data you work with; the test schemas need none. It first runs the reminder function for the organizations still in the schema.                              |
+| `npm run db:reset`      | Empties one schema (every table, the audit log included) and removes only the sign-in accounts whose address starts with `<schema>.`. For the default `public` schema it needs `--yes` (`npm run db:reset -- --yes`), because that is the data you work with; the test schemas need none. It first runs the daily timed checks once when the schema still holds an organization.                      |
 
 ### The schema selector
 
@@ -113,6 +113,19 @@ account: after a successful sign-in the app opens the home page of the role (adm
 `/teacher/schedule`, parents `/szulo/ertesitesek`), and a signed-in visit to the sign-in screen is sent there too. A missing or invalid setting stops startup with a message that names the setting.
 `.env.example` lists every setting name, with no values. If the development watcher reports `EMFILE: too many open
 files, watch`, start it with `WATCHPACK_POLLING=true npm run dev`.
+
+### Notices, emails and the timed run
+
+A notice is saved in the database first and an email is queued with it. Nothing is sent from a web page: the command
+`npm run timed:run -- --mode <daily|friday_noon|deliver>` does it. It sweeps emails stuck in sending, runs the checks of
+the mode (`daily` or `friday_noon`; `deliver` runs none) and then sends the due emails: batches of 10, at most 50 in one
+run, no new batch after 2 minutes. Each email has three tries in a round, 15 minutes apart; after that it shows on
+**Kézbesítési hibák** (`/admin/emlekeztetok`, super admin only) with the reason in words, and **Újrapróbálás** starts a
+new round. The command prints counts only (never an address, a name or a mail-server message) and exits with a non-zero
+code when a check failed or an email could not be sent. Locally, mail goes to the mail catcher of the stack
+(`http://127.0.0.1:54324`). It needs the same settings as the app (`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`,
+`APP_PUBLIC_URL`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_FROM`, optional `DATABASE_SCHEMA`) from the environment or from the
+two `.env` files `db:start` writes. Nothing runs it on a schedule yet: that belongs to the hosting work.
 
 ### The school calendar and the cleaning rota
 

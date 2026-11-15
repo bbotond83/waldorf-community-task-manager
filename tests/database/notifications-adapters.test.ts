@@ -9,7 +9,6 @@ import { createDatabaseClient, type DatabaseClient } from "../../src/runtime/dat
 import {
   ADMIN_G1,
   DIRECTORY_SCHEMAS,
-  FAMILY_1,
   FAMILY_2,
   nextKey,
   openDirectoryDatabase,
@@ -24,7 +23,7 @@ import {
   TASK_1,
   TASK_3,
 } from "./directory-support.ts";
-import { insertJob, insertNotification } from "./notifications-support.ts";
+import { insertDelivery, insertJob, insertNotification } from "./notifications-support.ts";
 import { stackSettings } from "./stack-support.ts";
 
 const settings = stackSettings();
@@ -41,11 +40,6 @@ const ACCOUNTS = {
 } as const;
 type Who = keyof typeof ACCOUNTS;
 type Result = DomainOutcome<unknown> & { code?: string };
-
-function must<T>(value: T | undefined | null, what: string): T {
-  assert.ok(value !== undefined && value !== null, what);
-  return value;
-}
 
 /**
  * The notification and reminder adapters against the real local stack, with real sign-in tokens (NFR2.26,
@@ -143,13 +137,12 @@ for (const schema of DIRECTORY_SCHEMAS) {
         target: TASK_3,
       });
       const own = data<{
-        notifications: { title: string; isRead: boolean; link: string; providerStatus: string }[];
+        notifications: { title: string; isRead: boolean; link: string }[];
       }>((await (await parent("parent")).listNotifications({ actorId: "ignored" })) as Result);
       assert.equal(own.notifications.length, 2);
       assert.match(own.notifications[0]!.title, /^A helyed törölve: /, "newest first");
       assert.match(own.notifications[1]!.title, /^Jelentkezés megerősítve: /);
       assert.equal(own.notifications[0]!.isRead, false);
-      assert.equal(own.notifications[0]!.providerStatus, "simulated-sent");
       assert.match(own.notifications[0]!.link, /^\/szulo\//);
       const other = data<{ notifications: unknown[] }>(
         (await (await parent("parentOther")).listNotifications({ actorId: "ignored" })) as Result,
@@ -168,7 +161,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
       );
     });
 
-    it("runs the lazy tick when the list opens: a due reminder job becomes the parent's notice, once (BR40.6)", async () => {
+    it("turns a due reminder job into the parent's notice with the daily run, once, and the list only reads (BR40.6, BR52.5)", async () => {
       const job = await insertJob(db, { task: TASK_3, threshold: "7d" });
       // The task's own start, to the microsecond (a JavaScript date would round it and make the job stale).
       await db.query(
@@ -180,21 +173,29 @@ for (const schema of DIRECTORY_SCHEMAS) {
         [ORGANIZATION, job, FAMILY_2],
       );
       const port = await parent("parentOther");
-      const first = data<{
-        notifications: { title: string; timing: string; providerStatus: string }[];
-      }>((await port.listNotifications({ actorId: "ignored" })) as Result);
+      assert.deepEqual(await port.listNotifications({ actorId: "ignored" }), {
+        state: "empty",
+      });
+      await db.query("select timed_checks_run_system('daily')");
+      const first = data<{ notifications: { title: string; timing: string }[] }>(
+        (await port.listNotifications({ actorId: "ignored" })) as Result,
+      );
       assert.equal(first.notifications.length, 1);
       assert.match(first.notifications[0]!.title, /^Egy hét múlva: Díszítés$/);
       assert.equal(first.notifications[0]!.timing, "7-day");
-      assert.equal(first.notifications[0]!.providerStatus, "simulated-sent");
       assert.equal(
         (await db.query("select status from reminder_jobs where id = $1", [job])).rows[0].status,
         "sent",
       );
+      await db.query("select timed_checks_run_system('daily')");
       const second = data<{ notifications: unknown[] }>(
         (await port.listNotifications({ actorId: "ignored" })) as Result,
       );
-      assert.equal(second.notifications.length, 1, "the tick is idempotent: no duplicate notice");
+      assert.equal(
+        second.notifications.length,
+        1,
+        "a second run on the day adds no duplicate notice",
+      );
     });
 
     it("marks a notice read once and again, and another parent's notice, an unknown one and a malformed id read as denied (BR40.3)", async () => {
@@ -237,93 +238,122 @@ for (const schema of DIRECTORY_SCHEMAS) {
       );
     });
 
-    it("lists the reminder jobs an admin reaches with counts and no names, filters by status, and refuses other roles (BR40.8)", async () => {
-      const startsAt = (await db.query("select starts_at from tasks where id = $1", [TASK_1]))
-        .rows[0].starts_at;
-      const retryable = await insertJob(db, {
+    /** Two failed emails of one kind about one task: the pair a failure group holds. */
+    async function failedPair() {
+      const noticeOne = await insertNotification(db, {
+        parent: PARENT_ROW_F1,
         task: TASK_1,
-        threshold: "24h",
-        status: "retryable",
-        attempt: 1,
-        startsAt,
-        scheduledFor: new Date(Date.now() + 3_600_000).toISOString(),
+        target: TASK_1,
       });
-      await db.query(
-        "insert into reminder_recipients (organization_id, reminder_job_id, family_id) values ($1, $2, $3)",
-        [ORGANIZATION, retryable, FAMILY_1],
-      );
-      const all = data<{
-        jobs: { id: string; status: string; recipientSummary: string; providerLabel: string }[];
+      const noticeTwo = await insertNotification(db, {
+        parent: PARENT_ROW_F2,
+        task: TASK_1,
+        target: TASK_1,
+      });
+      const one = await insertDelivery(db, {
+        notice: noticeOne,
+        parent: PARENT_ROW_F1,
+        target: TASK_1,
+      });
+      const two = await insertDelivery(db, {
+        notice: noticeTwo,
+        parent: PARENT_ROW_F2,
+        target: TASK_1,
+        round: 2,
+      });
+      return { one, two };
+    }
+
+    it("lists the failed emails grouped by kind and item with counts and ids only, and refuses other roles (BR53.1, NFR1.3)", async () => {
+      assert.deepEqual(await admin("super", "reminders.list"), { state: "empty" });
+      const { one, two } = await failedPair();
+      const list = data<{
+        groups: {
+          kind: string;
+          targetId: string;
+          failedCount: number;
+          title: string;
+          deliveries: { id: string; tryCount: number }[];
+        }[];
+        checks: unknown[];
       }>(await admin("super", "reminders.list"));
-      const row = must(
-        all.jobs.find((job) => job.id === retryable),
-        "the job is listed",
+      assert.equal(list.groups.length, 1);
+      const group = list.groups[0]!;
+      assert.deepEqual(
+        [group.kind, group.targetId, group.failedCount],
+        ["sign_up_confirmed", TASK_1, 2],
       );
-      assert.equal(row.status, "retryable");
-      assert.equal(row.recipientSummary, "1 kijelölt család");
-      assert.equal(row.providerLabel, "Szimulált kézbesítés");
-      assert.equal(JSON.stringify(all).includes("Fenyő"), false, "no family name in the list");
-      const filtered = data<{ jobs: { status: string }[] }>(
-        await admin("super", "reminders.list", { status: "retryable" }),
+      assert.deepEqual(
+        [...group.deliveries].sort((a, b) => a.id.localeCompare(b.id)),
+        [
+          { id: one, tryCount: 3 },
+          { id: two, tryCount: 6 },
+        ].sort((a, b) => a.id.localeCompare(b.id)),
+        "the try count is (round - 1) * 3 + tries in the round",
       );
-      assert.ok(
-        filtered.jobs.length >= 1 && filtered.jobs.every((job) => job.status === "retryable"),
-      );
+      const everything = JSON.stringify(list);
       assert.equal(
-        (await admin("super", "reminders.list", { status: "nonsense" })).state,
-        "validation",
+        /@|Fenyő|example\.test/.test(everything),
+        false,
+        "no address and no name in the list",
       );
       assert.equal((await admin("outsider", "reminders.list")).state, "denied");
       assert.equal((await admin("parent", "reminders.list")).state, "denied");
+      assert.equal((await admin("adminSame", "reminders.list")).state, "denied");
     });
 
-    it("retries a retryable job with the codes REMINDER_NOT_RETRYABLE and REMINDER_STALE, and a repeated key answers the same (BR40.7, BR42.3)", async () => {
-      const startsAt = (await db.query("select starts_at from tasks where id = $1", [TASK_1]))
-        .rows[0].starts_at;
-      const job = await insertJob(db, {
-        task: TASK_1,
-        status: "retryable",
-        attempt: 1,
-        startsAt,
-        scheduledFor: new Date(Date.now() + 3_600_000).toISOString(),
+    it("tries a group again with the shown list, refuses an outdated one with REMINDER_STALE, and a repeated key answers the same (BR53.3, NFR5.5)", async () => {
+      const { one, two } = await failedPair();
+      const shown = [
+        { id: one, tryCount: 3 },
+        { id: two, tryCount: 6 },
+      ];
+      const body = {
+        id: TASK_1,
+        expectedVersion: 2,
+        kind: "sign_up_confirmed",
+        targetType: "task",
+      };
+      // Outdated screen: one of the shown emails already had another try.
+      const outdated = await admin("super", "reminders.retry", {
+        ...body,
+        expected: [{ id: one, tryCount: 2 }, shown[1]],
       });
-      const version = (await db.query("select version from reminder_jobs where id = $1", [job]))
-        .rows[0].version as number;
-      const stale = await admin("super", "reminders.retry", {
-        id: job,
-        expectedVersion: version + 5,
-      });
-      assert.deepEqual([stale.state, stale.code], ["invalidated", "REMINDER_STALE"]);
+      assert.deepEqual([outdated.state, outdated.code], ["invalidated", "REMINDER_STALE"]);
       const key = nextKey("retry");
-      const retried = data<{ jobId: string; status: string }>(
-        await admin("super", "reminders.retry", { id: job, expectedVersion: version }, key),
+      const restarted = data<{ targetId: string; restarted: number }>(
+        await admin("super", "reminders.retry", { ...body, expected: shown }, key),
       );
-      assert.deepEqual(retried, { jobId: job, status: "retry-scheduled" });
-      assert.equal(
-        (await db.query("select status from reminder_jobs where id = $1", [job])).rows[0].status,
-        "retrying",
-      );
-      const again = await admin(
-        "super",
-        "reminders.retry",
-        { id: job, expectedVersion: version },
-        key,
-      );
+      assert.deepEqual(restarted, { targetId: TASK_1, restarted: 2 });
+      const states = (
+        await db.query(
+          "select status, round, attempts_in_round from email_deliveries order by round",
+        )
+      ).rows;
+      assert.deepEqual(states, [
+        { status: "queued", round: 2, attempts_in_round: 0 },
+        { status: "queued", round: 3, attempts_in_round: 0 },
+      ]);
+      const again = await admin("super", "reminders.retry", { ...body, expected: shown }, key);
       assert.equal(again.state, "success", "the same key answers the stored result");
-      const notRetryable = await admin("super", "reminders.retry", {
-        id: job,
-        expectedVersion: version + 1,
-      });
-      assert.deepEqual(
-        [notRetryable.state, notRetryable.code],
-        ["conflict", "REMINDER_NOT_RETRYABLE"],
+      assert.equal(
+        (await db.query("select count(*)::int as n from email_deliveries where status = 'queued'"))
+          .rows[0].n,
+        2,
+        "the repeated click started nothing more",
       );
+      const none = await admin("super", "reminders.retry", { ...body, expected: shown });
+      assert.deepEqual([none.state, none.code], ["conflict", "REMINDER_NOT_RETRYABLE"]);
       assert.deepEqual(
-        await admin("super", "reminders.retry", { id: "nope", expectedVersion: 1 }),
+        await admin("super", "reminders.retry", { ...body, id: "nope", expected: shown }),
         { state: "denied" },
       );
       assert.equal(
-        (await admin("outsider", "reminders.retry", { id: job, expectedVersion: 1 })).state,
+        (await admin("outsider", "reminders.retry", { ...body, expected: shown })).state,
+        "denied",
+      );
+      assert.equal(
+        (await admin("adminSame", "reminders.retry", { ...body, expected: shown })).state,
         "denied",
       );
     });

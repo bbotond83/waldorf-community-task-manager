@@ -32,6 +32,16 @@ The database decides again on every call. A draft is never returned to anyone bu
 | E-mail-cím megerősítése (`/email-megerosites/<token>`)                                     | none (single-use link) | Anyone holding the link; the database checks the link and spends it once               | A used, expired or malformed link shows "A hivatkozás már nem érvényes" and names nobody     |
 | Family and parent records, invitations and parent removal (`/admin/nyilvantartasok/...`)   | `record`, `invitation` | Super administrator only                                                               | Denied, including for a group administrator, teacher and parent                              |
 
+## Notices and delivery failures
+
+| Screen or command                                                | Resource       | Who may use it                                                                                          | Everyone else                                                                                   |
+| ---------------------------------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Értesítések (`/szulo/ertesitesek`)                               | `notification` | The signed-in parent, for their own notices only                                                        | Teacher and administrators have no notice page of their own                                     |
+| Kézbesítési hibák (`/admin/emlekeztetok`): list and Újrapróbálás | `reminder`     | Super administrator only (matrix rows `AUTH-DELIVERY-PROBLEMS-SUPER-ADMIN-ALLOW` and `-NON-SUPER-DENY`) | Denied, including for a group administrator (the menu entry is also absent), teacher and parent |
+| The timed run and the email pass (`npm run timed:run`)           | none           | The service role only, from a command on the server; no signed-in role may call it                      | Every signed-in role is refused by the database                                                 |
+
+The failure list holds kinds, item dates, counts and a reason class in words: no address, name, family name or mail-server text. An email address is read for one send and never stored in a delivery record.
+
 Field visibility is decided in the database: a parent who did not tick sharing is returned by full name only, and the children of a family are returned only when every parent of that family shared. The browser search filters data already on the page and sends no request. A removed parent's sign-in user is banned and its sessions ended by the server after the database change is saved; a failure of that follow-up is shown to the administrator and logged.
 
 All denials use the same non-enumerating application contract: HTTP 403 where an HTTP response applies, `AUTHORIZATION_DENIED`, no state mutation, no resource-existence signal, and redacted identifier-only evidence. Grant removal, and archiving a parent or family, is effective on the next protected request and clears protected cached navigation/data.

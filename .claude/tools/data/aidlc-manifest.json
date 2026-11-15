@@ -13,7 +13,7 @@
     ".claude/agents/aidlc-composer-agent.md": "sha256:0c6648fecc2f70406b4cd7a81527cb777b9ba111abcdc99e3eb89c0101a1316a",
     ".claude/agents/aidlc-delivery-agent.md": "sha256:1bf497a935532b470ba577e10d854d4d8564991809265e3c67847a4279c34518",
     ".claude/agents/aidlc-design-agent.md": "sha256:1d297044689066a3d1e8c28c7de7bd03c21108ac49421fc604b345a8c4f1dd7c",
-    ".claude/agents/aidlc-developer-agent.md": "sha256:c7dbad02e2225b08d51912e6a9c63bc5883faa8460261b5b455bd122187f3280",
+    ".claude/agents/aidlc-developer-agent.md": "sha256:57d2926678767db8d8cc3dacb0ed4c605a87658ba891e3ec32f152b5b41ddedd",
     ".claude/agents/aidlc-devsecops-agent.md": "sha256:54f193865d700635667bf340e41baa48162d5156e5510c146f906345a23bc970",
     ".claude/agents/aidlc-operations-agent.md": "sha256:40b25a9aedf1b8b414433f3003e72bcfffc0fa21b97be4ead313180125f95d27",
     ".claude/agents/aidlc-pipeline-deploy-agent.md": "sha256:8b38757ded189cd59cf5e0f3a9f10285f29aea140bb2a7f50aab6e663c1fdf65",

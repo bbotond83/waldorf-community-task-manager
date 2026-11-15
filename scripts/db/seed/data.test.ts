@@ -29,6 +29,8 @@ const allIds = (plan: SeedPlan): string[] => [
   ...plan.events.map((entry) => entry.id),
   ...plan.tasks.map((entry) => entry.id),
   ...plan.assignments.map((entry) => entry.id),
+  ...plan.notices.flatMap((entry) => [entry.id, entry.deliveryId]),
+  ...plan.timedRuns.flatMap((entry) => [entry.id, ...entry.checks.map((check) => check.id)]),
 ];
 
 describe("seed data: the small set", () => {
@@ -44,6 +46,7 @@ describe("seed data: the small set", () => {
       events: 3,
       tasks: 8,
       assignments: 8,
+      notices: 2,
     });
     assert.deepEqual(
       plan.accounts.filter((entry) => entry.role !== "parent").map((entry) => entry.tag),
@@ -213,6 +216,28 @@ describe("seed data: the 30-family set", () => {
       const count = large.children.filter((child) => child.familyId === family.id).length;
       assert.equal(count, number % 3 === 0 ? 2 : 1);
     }
+  });
+
+  it("seeds invented notices for sign-ups of parents with an account, in every delivery state, and one failed check", () => {
+    assert.ok(large.notices.length > 0);
+    const placed = new Set(large.assignments.map((entry) => entry.parentId));
+    for (const notice of large.notices) {
+      const parent = large.parents.find((entry) => entry.id === notice.parentId)!;
+      assert.ok(parent.accountId !== null, "the notice goes to a parent with an account");
+      assert.ok(placed.has(notice.parentId), "and was caused by that parent's own sign-up");
+    }
+    const states = new Set(large.notices.map((entry) => entry.deliveryStatus));
+    assert.deepEqual([...states].sort(), ["failed", "queued", "sent"]);
+    const run = large.timedRuns[0]!;
+    assert.deepEqual(
+      run.checks.map((check) => check.outcome),
+      ["success", "failed"],
+    );
+    assert.ok(
+      run.checks.every(
+        (check) => check.errorCode === null || /^[0-9A-Z]{5}$/.test(check.errorCode),
+      ),
+    );
   });
 });
 

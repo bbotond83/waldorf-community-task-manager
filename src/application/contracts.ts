@@ -150,7 +150,6 @@ export type NotificationModel = Readonly<{
   link: string;
   isRead: boolean;
   timing: "7-day" | "24-hour" | "within-threshold" | "stale" | "cancelled";
-  providerStatus: "simulated-sent" | "simulated-retry" | "simulated-cancelled";
 }>;
 
 export type NotificationListModel = Readonly<{ notifications: readonly NotificationModel[] }>;
@@ -392,23 +391,41 @@ export type AdminItemModel = Readonly<{
 
 export type AdminListModel = Readonly<{ items: readonly AdminItemModel[] }>;
 
-export type ReminderJobModel = Readonly<{
-  id: string;
+/**
+ * One group of emails that could not be sent: the same kind of notice about the same item (BR53.1). It carries
+ * the kind, the item and counts, never an address or a name; `deliveries` is the list a retry sends back, each
+ * entry the delivery id and the number of tries it had when the screen was drawn.
+ */
+export type DeliveryProblemModel = Readonly<{
+  kind: string;
+  kindLabel: string;
+  targetType: string;
+  targetId: string;
   title: string;
-  status: "queued" | "sent" | "retryable" | "retrying" | "stale" | "cancelled" | "terminal";
-  attempt: number;
-  correlationId: string;
-  recipientSummary: string;
-  providerLabel: "Szimulált kézbesítés";
-  version: number;
+  latestTryAt: string;
+  failedCount: number;
+  /** The reason class of the latest failed try (never the mail server's own text). */
+  reason?: string;
+  deliveries: readonly Readonly<{ id: string; tryCount: number }>[];
 }>;
 
-export type ReminderListModel = Readonly<{ jobs: readonly ReminderJobModel[] }>;
-
-export type ReminderOutcome = Readonly<{
-  jobId: string;
-  status: "sent" | "retry-scheduled" | "cancelled";
+/** A timed check that failed or was missing on a recent run (BR52.7). */
+export type TimedCheckProblemModel = Readonly<{
+  checkName: string;
+  runKind: string;
+  startedAt: string;
+  outcome: "failed" | "missing";
+  created: number;
+  skipped: number;
+  errorCode?: string;
 }>;
+
+export type DeliveryProblemsModel = Readonly<{
+  groups: readonly DeliveryProblemModel[];
+  checks: readonly TimedCheckProblemModel[];
+}>;
+
+export type DeliveryRetryOutcome = Readonly<{ targetId: string; restarted: number }>;
 
 export type GrantOutcome = Readonly<{
   grantId: string;

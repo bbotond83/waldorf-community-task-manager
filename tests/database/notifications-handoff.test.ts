@@ -183,14 +183,14 @@ for (const schema of NOTIFICATION_SCHEMAS) {
       assert.equal(await liveJobs(TASK_Q), 0, "other tasks are untouched");
     });
 
-    it("adds a family that signs up later only to the jobs that can still run, never to one that is sent or terminal", async () => {
+    it("adds a family that signs up later only to the jobs that can still run, never to one that is sent or skipped", async () => {
       assert.equal((await signUp(ACCOUNT_A, TASK_P)).state, "success");
       await db.query(
-        "update reminder_jobs set status = 'sent', attempt = 1 where task_id = $1 and threshold = '24h'",
+        "update reminder_jobs set status = 'sent' where task_id = $1 and threshold = '24h'",
         [TASK_P],
       );
       await db.query(
-        "update reminder_jobs set status = 'terminal', attempt = 3 where task_id = $1 and threshold = '7d'",
+        "update reminder_jobs set status = 'skipped' where task_id = $1 and threshold = '7d'",
         [TASK_P],
       );
       assert.equal((await signUp(ACCOUNT_B, TASK_P)).state, "success");
@@ -206,14 +206,14 @@ for (const schema of NOTIFICATION_SCHEMAS) {
         rows.map((row) => [row.threshold, row.status, row.families]),
         [
           ["24h", "sent", [FAMILY_A]],
-          ["7d", "terminal", [FAMILY_A]],
+          ["7d", "skipped", [FAMILY_A]],
         ],
         "the families of the finished jobs are the ones that were planned for them",
       );
       // A job that can still run takes the new family: the same sign-up on a task whose 24-hour job is queued.
       assert.equal((await signUp(ACCOUNT_A, TASK_Q)).state, "success");
       await db.query(
-        "update reminder_jobs set status = 'sent', attempt = 1 where task_id = $1 and threshold = '7d'",
+        "update reminder_jobs set status = 'sent' where task_id = $1 and threshold = '7d'",
         [TASK_Q],
       );
       assert.equal((await signUp(ACCOUNT_B, TASK_Q)).state, "success");

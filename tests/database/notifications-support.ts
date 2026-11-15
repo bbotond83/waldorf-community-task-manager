@@ -15,15 +15,15 @@ export async function insertJob(
     status?: string;
     organization?: string;
     startsAt?: string;
-    scheduledFor?: string;
-    attempt?: number;
+    /** The Budapest date the job is due (default: yesterday, so it is due). */
+    dueOn?: string;
     id?: string;
   },
 ): Promise<string> {
   const result = await db.query(
-    `insert into reminder_jobs (id, organization_id, task_id, threshold, task_starts_at, scheduled_for, status, attempt, correlation_id)
+    `insert into reminder_jobs (id, organization_id, task_id, threshold, task_starts_at, due_on, status, correlation_id)
      values (coalesce($1::uuid, gen_random_uuid()), $2, $3, $4, coalesce($5::timestamptz, now() + interval '10 days'),
-             coalesce($6::timestamptz, now() - interval '1 minute'), $7, $8, $9)
+             coalesce($6::date, (now() at time zone 'Europe/Budapest')::date - 1), $7, $8)
      returning id`,
     [
       args.id ?? null,
@@ -31,9 +31,8 @@ export async function insertJob(
       args.task,
       args.threshold ?? "24h",
       args.startsAt ?? null,
-      args.scheduledFor ?? null,
+      args.dueOn ?? null,
       args.status ?? "queued",
-      args.attempt ?? 0,
       `corr-${Math.random().toString(16).slice(2, 12)}`,
     ],
   );
@@ -72,6 +71,44 @@ export async function insertNotification(
       args.key ?? next("seed"),
       args.readAt ?? null,
       args.createdAt ?? null,
+    ],
+  );
+  return result.rows[0].id as string;
+}
+
+/** Inserts an email delivery for a notice as the schema owner (a failed one by default) and returns its id. */
+export async function insertDelivery(
+  db: pg.Client,
+  args: {
+    notice: string;
+    parent: string;
+    kind?: string;
+    target?: string;
+    status?: "queued" | "sending" | "retry_wait" | "sent" | "failed" | "cancelled";
+    round?: number;
+    attempts?: number;
+    organization?: string;
+  },
+): Promise<string> {
+  const status = args.status ?? "failed";
+  const attempts = args.attempts ?? (status === "failed" ? 3 : 0);
+  const result = await db.query(
+    `insert into email_deliveries (organization_id, notice_id, parent_id, kind, target_type, target_id, item_date,
+                                   status, round, attempts_in_round, claimed_at, last_attempt_at, finished_at)
+     values ($1, $2, $3, $4, 'task', $5, (now() at time zone 'Europe/Budapest')::date + 3, $6, $7, $8,
+             case when $6 = 'sending' then now() end,
+             case when $8 > 0 then now() end,
+             case when $6 in ('sent', 'failed', 'cancelled') then now() end)
+     returning id`,
+    [
+      args.organization ?? ORGANIZATION,
+      args.notice,
+      args.parent,
+      args.kind ?? "sign_up_confirmed",
+      args.target ?? uuid(9001),
+      status,
+      args.round ?? 1,
+      attempts,
     ],
   );
   return result.rows[0].id as string;

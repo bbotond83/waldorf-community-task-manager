@@ -11,8 +11,8 @@ import type {
   FamilyNameListModel,
   LifecycleOutcomeModel,
   LifecycleListModel,
-  ReminderListModel,
-  ReminderOutcome,
+  DeliveryProblemsModel,
+  DeliveryRetryOutcome,
   AdvancedSettingsModel,
   AdvancedSettingsOutcome,
   SessionContext,
@@ -241,7 +241,7 @@ export class AdminReminderApplication {
     session: SessionContext,
     scope: Scope,
     query: Readonly<Record<string, unknown>> = {},
-  ): Promise<ApplicationResult<ReminderListModel>> {
+  ): Promise<ApplicationResult<DeliveryProblemsModel>> {
     return invokeAdmin(this.pipeline, this.domain, session, {
       scope,
       resource: "reminder",
@@ -254,7 +254,7 @@ export class AdminReminderApplication {
   retry(
     session: SessionContext,
     input: AdminCommandInput,
-  ): Promise<ApplicationResult<ReminderOutcome>> {
+  ): Promise<ApplicationResult<DeliveryRetryOutcome>> {
     return invokeAdminCommand(
       this.pipeline,
       this.domain,

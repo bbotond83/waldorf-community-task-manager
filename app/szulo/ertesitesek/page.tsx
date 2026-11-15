@@ -12,12 +12,6 @@ const TIMING_LABEL = {
   cancelled: "Törölt",
 } as const;
 
-const PROVIDER_LABEL = {
-  "simulated-sent": "Szimulált szolgáltató: elküldve",
-  "simulated-retry": "Szimulált szolgáltató: újrapróbálás ütemezve",
-  "simulated-cancelled": "Szimulált szolgáltató: törölve",
-} as const;
-
 export default async function ParentNotificationsPage() {
   const session = await resolveParentSession();
   const facade = await resolveParentFacade();
@@ -33,7 +27,6 @@ export default async function ParentNotificationsPage() {
         <h1 tabIndex={-1} autoFocus>
           Értesítések
         </h1>
-        <p>A szolgáltatói állapotok helyben szimuláltak; valós kézbesítést nem igazolnak.</p>
       </header>
       <ParentStatePanel result={result} emptyMessage="Nincs értesítés." testId="notifications">
         {(model) => (
@@ -54,7 +47,6 @@ export default async function ParentNotificationsPage() {
                     <p data-testid={`notification-text-${notification.id}`}>{notification.text}</p>
                   ) : null}
                   <p>{TIMING_LABEL[notification.timing]}</p>
-                  <p className="delivery-note">{PROVIDER_LABEL[notification.providerStatus]}</p>
                   <strong>{notification.isRead ? "Olvasott" : "Olvasatlan"}</strong>
                 </a>
                 <NotificationReadForm

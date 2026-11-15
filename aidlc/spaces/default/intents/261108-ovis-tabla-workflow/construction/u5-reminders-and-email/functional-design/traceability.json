@@ -1,0 +1,32 @@
+{
+  "stage": "functional-design",
+  "unit": "u5-reminders-and-email",
+  "upstream_ids": ["AC17.1.1", "AC17.1.2", "AC17.1.3", "AC17.1.4", "AC17.1.5", "AC17.1.6"],
+  "coverage": [
+    { "id": "AC17.1.1", "status": "OK", "target": "BR50.1, BR50.6, BR53.3, BR55.1" },
+    { "id": "AC17.1.2", "status": "OK", "target": "BR51.3, BR51.4, BR51.6, BR50.7, BR54.2" },
+    { "id": "AC17.1.3", "status": "OK", "target": "BR50.2, BR51.1, BR52.5, BR53.3" },
+    { "id": "AC17.1.4", "status": "OK", "target": "BR55.2, BR54.2" },
+    { "id": "AC17.1.5", "status": "OK", "target": "BR52.7, BR53.5" },
+    { "id": "AC17.1.6", "status": "OK", "target": "BR50.4, BR55.1" }
+  ],
+  "reverse": [
+    { "id": "BR50.3", "status": "N/A", "target": "validation of the C8 kind and target-type registries" },
+    { "id": "BR50.5", "status": "N/A", "target": "today's read-once rule kept unchanged, from NFR3" },
+    { "id": "BR51.2", "status": "N/A", "target": "no stored address, from ADR-007 and NFR1" },
+    { "id": "BR51.5", "status": "N/A", "target": "repeat-safe recording, from NFR5" },
+    { "id": "BR51.7", "status": "N/A", "target": "service-only access to delivery, from ADR-006 and C2" },
+    { "id": "BR52.1", "status": "N/A", "target": "service-only entry point of the daily run, from ADR-006 and C9" },
+    { "id": "BR52.2", "status": "N/A", "target": "failure isolation of the daily run, from C9" },
+    { "id": "BR52.3", "status": "N/A", "target": "one moment per run in Budapest time, from C9 and ADR-006" },
+    { "id": "BR52.4", "status": "N/A", "target": "the two run kinds, from ADR-006 and C9" },
+    { "id": "BR52.6", "status": "N/A", "target": "delivery pass schedule, owner answer Q3" },
+    { "id": "BR53.1", "status": "N/A", "target": "today's duty-reminder planning kept, owner answer Q1" },
+    { "id": "BR53.2", "status": "N/A", "target": "due dates of the duty reminders, owner answer Q1" },
+    { "id": "BR53.4", "status": "N/A", "target": "one reminder when both are due, owner answer Q1" },
+    { "id": "BR54.1", "status": "N/A", "target": "super-admin-only failure view, from C9 and owner answer Q5" },
+    { "id": "BR54.3", "status": "N/A", "target": "administrator Try again, owner answer Q5" },
+    { "id": "BR54.4", "status": "N/A", "target": "simultaneous Try again, from NFR5" },
+    { "id": "BR56.1", "status": "N/A", "target": "U5's provider step of the removal contract C16, called by U14" }
+  ]
+}

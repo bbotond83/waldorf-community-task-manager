@@ -117,7 +117,6 @@ const technicalText = /Verzió:|Korreláció|Kapacitási helyzet|Forgatókönyv|
 it.each([
   ["task detail", "../../app/admin/feladatok/[id]/page.tsx", "task-kert", ["Verzió:"]],
   ["record detail", "../../app/admin/nyilvantartasok/[id]/page.tsx", "family-feny", ["Verzió:"]],
-  ["reminders", "../../app/admin/emlekeztetok/page.tsx", "", ["Korreláció", "corr-"]],
 ] as const)(
   "keeps the technical text of the %s page in a closed Fejlesztői részletek section",
   async (_name, path, id, texts) => {
@@ -153,9 +152,13 @@ it.each([
   );
 });
 
-it("keeps the retry correlation field of the reminders page and the privacy forms without developer controls", async () => {
+it("keeps the Try again form of the failure list whole (shown list and key) and the privacy forms without developer controls", async () => {
   const privacy = await render("../../app/admin/adatvedelem/page.tsx");
   expect(privacy.querySelectorAll("details.developer-details")).toHaveLength(0);
   const reminders = await render("../../app/admin/emlekeztetok/page.tsx");
-  expect(reminders.querySelector('input[name="correlationId"]')).not.toBeNull();
+  for (const name of ["kind", "targetType", "targetId", "expected", "idempotencyKey"]) {
+    expect(reminders.querySelector(`input[name="${name}"]`), name).not.toBeNull();
+  }
+  expect(reminders.querySelectorAll("details.developer-details")).toHaveLength(0);
+  expect(visibleText(reminders)).not.toMatch(/@|\+36/);
 });

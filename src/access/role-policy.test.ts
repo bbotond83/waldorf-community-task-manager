@@ -323,3 +323,25 @@ test("invitations and family and parent records are a super admin's alone (BR35.
     }
   }
 });
+test("delivery failures (resource reminder) are a super admin's alone, for the list and for Try again", () => {
+  for (const action of ["read", "update"] as const) {
+    assert.equal(
+      grantAllows(grant("super_admin", org), {
+        action,
+        resource: { kind: "reminder", scope: org },
+      }),
+      true,
+    );
+    for (const [role, scope] of [
+      ["group_admin", group],
+      ["kindergarten_teacher", group],
+      ["parent", family],
+    ] as const) {
+      assert.equal(
+        grantAllows(grant(role, scope), { action, resource: { kind: "reminder", scope } }),
+        false,
+        `${role} ${action}`,
+      );
+    }
+  }
+});

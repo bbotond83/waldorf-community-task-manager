@@ -153,6 +153,30 @@ export interface SeedPlan {
     parentId: string | null;
     source: "parent_sign_up" | "admin_assign";
   }[];
+  /**
+   * Invented notices: one sign-up confirmation for each parent who signed up and has an account, each with its email
+   * delivery in the state the screens need to be seen working: queued, sent, or failed after its three tries.
+   */
+  notices: {
+    id: string;
+    parentId: string;
+    taskId: string;
+    deliveryId: string;
+    deliveryStatus: "queued" | "sent" | "failed";
+  }[];
+  /** Invented timed-run records: one daily run whose duty-reminder check succeeded and whose housekeeping check failed. */
+  timedRuns: {
+    id: string;
+    runKind: "daily";
+    atHours: number;
+    checks: {
+      id: string;
+      name: string;
+      outcome: "success" | "failed";
+      created: number;
+      errorCode: string | null;
+    }[];
+  }[];
 }
 
 const SURNAMES = [
@@ -583,6 +607,44 @@ export function buildSeedPlan(schema: string, size: SeedSize): SeedPlan {
     },
   );
 
+  const DELIVERY_STATES = ["queued", "sent", "failed"] as const;
+  const notices: SeedPlan["notices"] = assignments
+    .filter(
+      (assignment) =>
+        assignment.parentId !== null &&
+        parents.some((parent) => parent.id === assignment.parentId && parent.accountId !== null),
+    )
+    .map((assignment, index) => ({
+      id: id(`notice:${assignment.id}`),
+      parentId: assignment.parentId as string,
+      taskId: assignment.taskId,
+      deliveryId: id(`delivery:${assignment.id}`),
+      deliveryStatus: DELIVERY_STATES[index % DELIVERY_STATES.length]!,
+    }));
+  const timedRuns: SeedPlan["timedRuns"] = [
+    {
+      id: id("timed-run:1"),
+      runKind: "daily",
+      atHours: 5,
+      checks: [
+        {
+          id: id("timed-check:1:1"),
+          name: "duty_reminders",
+          outcome: "success",
+          created: 0,
+          errorCode: null,
+        },
+        {
+          id: id("timed-check:1:2"),
+          name: "housekeeping",
+          outcome: "failed",
+          created: 0,
+          errorCode: "40001",
+        },
+      ],
+    },
+  ];
+
   return {
     schema,
     size,
@@ -599,6 +661,8 @@ export function buildSeedPlan(schema: string, size: SeedSize): SeedPlan {
     events,
     tasks,
     assignments,
+    notices,
+    timedRuns,
   };
 }
 
@@ -625,5 +689,6 @@ export function describePlan(plan: SeedPlan): Record<string, number> {
     events: plan.events.length,
     tasks: plan.tasks.length,
     assignments: plan.assignments.length,
+    notices: plan.notices.length,
   };
 }

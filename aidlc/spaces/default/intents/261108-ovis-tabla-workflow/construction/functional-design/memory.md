@@ -13,6 +13,10 @@
 - 2026-11-13T07:07:04Z [unit u3-directory-and-profile] — A parent always sees their own family's children; Q2 put the other parent's contact details under the tick-box rule, but the children are the viewer's own family's data, so BR30.4 shows them to the family itself.
 - 2026-11-13T07:07:04Z [unit u3-directory-and-profile] — A working-group coordinator sees the directory as a parent does; FR3.5 names only teachers and super admins as wider readers, while today's code lets group admins read contacts in reach.
 
+- 2026-11-14T17:09:27Z [unit u5-reminders-and-email] — U5 builds on the existing notifications and reminder tables rather than a fresh set; they already hold notices, jobs, recipients and attempts with read-once and at-most-3 rules, and only their delivery is simulated.
+- 2026-11-14T17:09:27Z [unit u5-reminders-and-email] — The email address is the parent's sign-in email; U3's Q1 made that the one address on record, so no question is asked about it.
+- 2026-11-14T17:20:00Z [unit u5-reminders-and-email] — Notice titles and links come from a registry of per-item facts functions that each unit adds; C8 passes no title, and a shared title function would have to be edited by every later unit.
+
 ## Deviations
 <!-- example: 2026-05-29T10:14:32Z — skipped the optional caching layer the stage prose suggested; the dataset is small enough that it adds risk -->
 - 2026-11-09T07:11:20Z [unit u1-community-foundation] — Left isCoordinator off WorkingGroupMembership although components.md lists it; the unrevoked group-admin grant is the single record, because ADR-010 keeps grants in Identity and a second copy could disagree.

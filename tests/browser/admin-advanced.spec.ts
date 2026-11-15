@@ -20,13 +20,14 @@ test("advanced navigation observes strict administrator role boundaries", async 
   await expect(page.getByTestId("admin-governance-section")).toBeVisible();
 });
 
-test("the reminder page and the privacy page show their explicit empty states", async ({
+test("the delivery failure page and the privacy page show their explicit empty states", async ({
   page,
 }) => {
   await signInAs(page, world().account("super-admin"));
   await page.goto("/admin/emlekeztetok");
   await expect(page.getByTestId("admin-reminder-page")).toBeVisible();
-  await expect(page.getByText("Nincs a szűrésnek megfelelő feladat.")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Kézbesítési hibák", level: 1 })).toBeVisible();
+  await expect(page.getByTestId("admin-reminder-empty")).toBeVisible();
   // Technical correlation text never shows outside the closed developer section.
   await expect(page.locator("main")).not.toContainText(/corr-/);
   await page.goto("/admin/adatvedelem");

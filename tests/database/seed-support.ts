@@ -40,12 +40,19 @@ export function realSeedDeps(overrides: Partial<SeedDeps> = {}): {
  * timestamp columns, which differ from run to run, plus the id and address of the schema's own sign-in users. Two seeds
  * of the same schema must give equal dumps (NFR3.18).
  */
-export async function dumpSchema(db: pg.Client, schema: string): Promise<Record<string, unknown>> {
+/** `ignore` names tables left out of the dump (for example the run records a reset legitimately adds before it empties). */
+export async function dumpSchema(
+  db: pg.Client,
+  schema: string,
+  ignore: readonly string[] = [],
+): Promise<Record<string, unknown>> {
   const tables = (
     await db.query("select tablename from pg_tables where schemaname = $1 order by tablename", [
       schema,
     ])
-  ).rows.map((row) => String(row.tablename));
+  ).rows
+    .map((row) => String(row.tablename))
+    .filter((table) => !ignore.includes(table));
   const dump: Record<string, unknown> = {};
   for (const table of tables) {
     const result = await db.query(

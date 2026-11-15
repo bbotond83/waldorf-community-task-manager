@@ -9,7 +9,7 @@ description: >
   Leads the Reverse Engineering code scan and Code Generation, and serves as a dispatched
   collaborator in the Practices Discovery hub-and-spoke and User Stories mob ensembles.
 disallowedTools: Task
-model: inherit
+model: claude-sonnet-5-5
 effort: medium
 ---
 <!-- aidlc-delegated-knowledge-preflight -->

@@ -38,7 +38,13 @@ const NOTIFICATION_TABLES = [
   "notifications",
   "reminder_jobs",
   "reminder_recipients",
-  "reminder_attempts",
+  "notice_kinds",
+  "notice_targets",
+  "timed_check_registry",
+  "email_deliveries",
+  "email_attempts",
+  "timed_runs",
+  "timed_check_runs",
 ] as const;
 
 /**
@@ -95,7 +101,7 @@ for (const schema of NOTIFICATION_SCHEMAS) {
       );
     });
 
-    it("accepts only the seven kinds and the two target types, and ties a reminder kind to a job", async () => {
+    it("accepts only registered kinds and target types, and ties a reminder kind to a job", async () => {
       const insert = (kind: string, targetType: string, job: string | null) =>
         code(
           `insert into notifications (organization_id, parent_id, kind, target_type, target_ref, task_id, task_starts_at, reminder_job_id, dedupe_key)
@@ -121,11 +127,15 @@ for (const schema of NOTIFICATION_SCHEMAS) {
         "23514",
         "an event notice has no job",
       );
-      assert.equal(await insert("shout", "task", null), "23514");
-      assert.equal(await insert("sign_up_confirmed", "family", null), "23514");
+      assert.equal(await insert("shout", "task", null), "23503", "an unregistered kind");
+      assert.equal(
+        await insert("sign_up_confirmed", "family", null),
+        "23514",
+        "an unregistered target type also breaks the task shape",
+      );
     });
 
-    it("keeps a notification, a recipient and an attempt in the organization of their job (composite keys)", async () => {
+    it("keeps a notification and a recipient in the organization of their job (composite keys)", async () => {
       const job = await insertJob(db, { task: TASK_A, status: "sent" });
       assert.equal(
         await code(
@@ -144,13 +154,6 @@ for (const schema of NOTIFICATION_SCHEMAS) {
       );
       assert.equal(
         await code(
-          "insert into reminder_attempts (organization_id, reminder_job_id, attempt_number, outcome) values ($1, $2, 1, 'simulated_sent')",
-          [OTHER_ORGANIZATION, job],
-        ),
-        "23503",
-      );
-      assert.equal(
-        await code(
           "insert into reminder_recipients (organization_id, reminder_job_id, family_id) values ($1, $2, $3)",
           [ORGANIZATION, job, FAMILY_1],
         ),
@@ -158,7 +161,7 @@ for (const schema of NOTIFICATION_SCHEMAS) {
       );
     });
 
-    it("allows one live job per task and threshold, and a new one once the old one is stale or cancelled (BR40.4)", async () => {
+    it("allows one live job per task and threshold, and a new one once the old one is stale, cancelled or skipped (BR40.4)", async () => {
       const first = await insertJob(db, { task: TASK_A, threshold: "24h" });
       await assert.rejects(insertJob(db, { task: TASK_A, threshold: "24h", status: "sent" }), {
         code: "23505",
@@ -173,6 +176,11 @@ for (const schema of NOTIFICATION_SCHEMAS) {
         [TASK_A],
       );
       await insertJob(db, { task: TASK_A, threshold: "24h" });
+      await db.query(
+        "update reminder_jobs set status = 'skipped' where task_id = $1 and threshold = '24h' and status = 'queued'",
+        [TASK_A],
+      );
+      await insertJob(db, { task: TASK_A, threshold: "24h" });
       assert.equal(
         (
           await db.query(
@@ -180,57 +188,57 @@ for (const schema of NOTIFICATION_SCHEMAS) {
             [TASK_A],
           )
         ).rows[0].n,
-        3,
-        "stale and cancelled jobs stay as history",
+        4,
+        "stale, cancelled and skipped jobs stay as history",
       );
     });
 
-    it("limits a job's status, threshold and attempt count, and numbers the attempts one to three, once each (BR40.6)", async () => {
+    it("limits a job's status and threshold, and gives it a due date and no simulated state (BR53.2)", async () => {
       const bad = (column: string, value: string) =>
         code(
-          `insert into reminder_jobs (organization_id, task_id, threshold, task_starts_at, scheduled_for, correlation_id, ${column})
-           values ($1, $2, '24h', now(), now(), 'corr-abcdef', $3)`,
+          `insert into reminder_jobs (organization_id, task_id, threshold, task_starts_at, due_on, correlation_id, ${column})
+           values ($1, $2, '24h', now(), current_date, 'corr-abcdef', $3)`,
           [ORGANIZATION, uuid(9200 + Math.floor(Math.random() * 1000)), value],
         );
       assert.equal(await bad("status", "paused"), "23514");
-      assert.equal(await bad("attempt", "4"), "23514");
-      assert.equal(await bad("attempt", "-1"), "23514");
+      for (const simulated of ["retryable", "retrying", "terminal"]) {
+        assert.equal(await bad("status", simulated), "23514", `${simulated} no longer exists`);
+      }
+      assert.equal(await bad("status", "skipped"), undefined, "skipped is a job state");
       assert.equal(
         await code(
-          "insert into reminder_jobs (organization_id, task_id, threshold, task_starts_at, scheduled_for, correlation_id) values ($1, $2, '48h', now(), now(), 'corr-abcdef')",
+          "insert into reminder_jobs (organization_id, task_id, threshold, task_starts_at, due_on, correlation_id) values ($1, $2, '48h', now(), current_date, 'corr-abcdef')",
           [ORGANIZATION, TASK_A],
         ),
         "23514",
       );
       assert.equal(
         await code(
-          "insert into reminder_jobs (organization_id, task_id, threshold, task_starts_at, scheduled_for, correlation_id) values ($1, $2, '24h', now(), now(), 'Has A Space')",
+          "insert into reminder_jobs (organization_id, task_id, threshold, task_starts_at, due_on, correlation_id) values ($1, $2, '24h', now(), current_date, 'Has A Space')",
           [ORGANIZATION, TASK_A],
         ),
         "23514",
         "the correlation id is a short lower-case token",
       );
-      const job = await insertJob(db, { task: TASK_A });
-      const attempt = (number: number, outcome = "simulated_retry") =>
-        code(
-          "insert into reminder_attempts (organization_id, reminder_job_id, attempt_number, outcome) values ($1, $2, $3, $4)",
-          [ORGANIZATION, job, number, outcome],
-        );
-      assert.equal(await attempt(1), undefined);
-      assert.equal(await attempt(1), "23505", "an attempt number is used once");
-      assert.equal(await attempt(2), undefined);
-      assert.equal(await attempt(3, "simulated_failed"), undefined);
-      assert.equal(await attempt(4), "23514", "at most three attempts per job");
-      assert.equal(await attempt(0), "23514");
-      const other = await insertJob(db, { task: TASK_B });
       assert.equal(
         await code(
-          "insert into reminder_attempts (organization_id, reminder_job_id, attempt_number, outcome) values ($1, $2, 1, 'delivered')",
-          [ORGANIZATION, other],
+          "insert into reminder_jobs (organization_id, task_id, threshold, task_starts_at, correlation_id) values ($1, $2, '24h', now(), 'corr-abcdef')",
+          [ORGANIZATION, TASK_A],
         ),
-        "23514",
-        "only the three simulated outcomes exist",
+        "23502",
+        "a job always has a due date",
       );
+      const columns = (
+        await db.query(
+          "select column_name from information_schema.columns where table_schema = current_schema() and table_name = 'reminder_jobs'",
+        )
+      ).rows.map((row) => String(row.column_name));
+      assert.ok(columns.includes("due_on"));
+      assert.ok(!columns.includes("scheduled_for") && !columns.includes("attempt"));
+      const simulatedTable = await db.query(
+        "select 1 from pg_tables where schemaname = current_schema() and tablename = 'reminder_attempts'",
+      );
+      assert.equal(simulatedTable.rowCount, 0, "the simulated attempt table is gone");
     });
 
     it("keeps one recipient row per job and family, and raises the job version on every accepted update", async () => {
@@ -255,7 +263,7 @@ for (const schema of NOTIFICATION_SCHEMAS) {
       );
       const before = (await db.query("select version from reminder_jobs where id = $1", [job]))
         .rows[0].version as number;
-      await db.query("update reminder_jobs set status = 'sent', attempt = 1 where id = $1", [job]);
+      await db.query("update reminder_jobs set status = 'sent' where id = $1", [job]);
       const after = (await db.query("select version from reminder_jobs where id = $1", [job]))
         .rows[0].version as number;
       assert.equal(after, before + 1);
@@ -281,13 +289,21 @@ for (const schema of NOTIFICATION_SCHEMAS) {
             .indexdef.includes("stale"),
         "the live job is unique per task and threshold, stale and cancelled excluded",
       );
-      assert.ok(has("reminder_jobs", "(status, scheduled_for)"), "due jobs");
+      assert.ok(has("reminder_jobs", "(status, due_on)"), "due jobs");
+      assert.ok(has("email_deliveries", "(status, next_attempt_at)"), "the claim");
+      assert.ok(has("email_deliveries", "(claimed_at)"), "the expiry sweep");
+      assert.ok(
+        has("email_deliveries", "(kind, target_type, target_id, status)"),
+        "the failure groups",
+      );
+      assert.ok(has("email_attempts", "(delivery_id, round, attempt_number)"), "tries by delivery");
+      assert.ok(has("timed_check_runs", "(run_id, check_name)"), "check records by run");
+      assert.ok(has("timed_check_runs", "(started_at)"), "check records by time");
       assert.ok(
         has("reminder_recipients", "(reminder_job_id, family_id)"),
         "recipients by job and family",
       );
       assert.ok(has("reminder_recipients", "(family_id, status)"), "recipients by family");
-      assert.ok(has("reminder_attempts", "(reminder_job_id, attempt_number)"), "attempts by job");
     });
 
     /** Rows each viewer sees of the seeded notices: only the parent whose notice it is sees any (NFR1.43). */
@@ -399,7 +415,7 @@ for (const schema of NOTIFICATION_SCHEMAS) {
         "insert into reminder_recipients (organization_id, reminder_job_id, family_id) values ($1, $2, $3)",
         [ORGANIZATION, job, FAMILY_1],
       );
-      for (const table of ["reminder_jobs", "reminder_recipients", "reminder_attempts"]) {
+      for (const table of NOTIFICATION_TABLES.filter((name) => name !== "notifications")) {
         for (const viewer of [
           "parent",
           "teacher",
@@ -427,7 +443,7 @@ for (const schema of NOTIFICATION_SCHEMAS) {
           for (const sql of [
             `select count(*) from ${table}`,
             `delete from ${table}`,
-            `update ${table} set id = id`,
+            `insert into ${table} default values`,
           ]) {
             const failure = await failureOf(() =>
               asActor(db, schema, { role }, () => db.query(sql)),
@@ -446,7 +462,7 @@ for (const schema of NOTIFICATION_SCHEMAS) {
           [[...NOTIFICATION_TABLES]],
         )
       ).rows;
-      assert.equal(rights.length, 4);
+      assert.equal(rights.length, NOTIFICATION_TABLES.length);
       for (const row of rights) {
         assert.deepEqual(
           [row.service, row.anon, row.writes],

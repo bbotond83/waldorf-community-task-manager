@@ -41,7 +41,7 @@ function database(world: World = {}) {
         if (sql.startsWith("select id::text as id from organizations")) {
           return (world.organizations ?? []).map((id) => ({ id }));
         }
-        if (/^select reminder_run_due_system\(/.test(sql)) {
+        if (/^select timed_checks_run_system\(/.test(sql)) {
           return [{ result: { state: world.functionState ?? "success" } }];
         }
         if (sql.startsWith("select tablename from pg_tables")) {
@@ -118,7 +118,7 @@ describe("db:seed command", () => {
     assert.equal(await seedMain([], run.deps), 0);
     assert.match(
       run.lines[0]!,
-      /^SEED ok schema=public set=small groups=6 families=6 parents=12 children=8 accounts=10 events=3 tasks=8 assignments=8 accounts_created=10$/,
+      /^SEED ok schema=public set=small groups=6 families=6 parents=12 children=8 accounts=10 events=3 tasks=8 assignments=8 notices=2 accounts_created=10$/,
     );
     assert.match(run.lines[1]!, /^TIMING seed\(public, small\) \d+\.\d s \(target 60\.0 s: met\)$/);
     assert.equal(run.lines.length, 2);
@@ -301,20 +301,13 @@ describe("db:reset command", () => {
     assert.equal(run.connections(), 0);
   });
 
-  it("runs the tick function for every organization first, then empties the schema in one transaction", async () => {
+  it("runs the daily checks once first, then empties the schema in one transaction", async () => {
     const orgs = ["aaaaaaaa-0000-4000-8000-000000000001", "aaaaaaaa-0000-4000-8000-000000000002"];
     const run = setup({ organizations: orgs });
     assert.equal(await resetMain(["--schema", "worker_1"], run.deps), 0);
     const statements = sqlOf(run.db.log);
-    const calls = statements.filter((sql) => /^select reminder_run_due_system\(/.test(sql));
-    assert.deepEqual(calls, [
-      "select reminder_run_due_system($1::uuid) as result",
-      "select reminder_run_due_system($1::uuid) as result",
-    ]);
-    const functionValues = run.db.log
-      .filter((entry) => entry.sql.includes("_system("))
-      .map((entry) => entry.values![0]);
-    assert.deepEqual(functionValues, [orgs[0], orgs[1]]);
+    const calls = statements.filter((sql) => /^select timed_checks_run_system\(/.test(sql));
+    assert.deepEqual(calls, ["select timed_checks_run_system('daily') as result"]);
     const begin = statements.indexOf("begin");
     assert.ok(
       begin > statements.lastIndexOf(calls.at(-1)!),
@@ -388,7 +381,7 @@ describe("db:reset command", () => {
     assert.equal(await resetMain(["--yes"], run.deps), 1);
     assert.match(
       run.lines[0]!,
-      /^RESET FAILED step=system-functions: reminder_run_due_system did not succeed \(denied\); nothing was emptied\. event=reset_failed$/,
+      /^RESET FAILED step=system-functions: timed_checks_run_system did not succeed \(denied\); nothing was emptied\. event=reset_failed$/,
     );
     assert.ok(!sqlOf(run.db.log).includes("begin"));
     assert.ok(!sqlOf(run.db.log).some((sql) => sql.startsWith("truncate")));

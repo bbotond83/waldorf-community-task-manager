@@ -21,7 +21,7 @@ export const RESET_HELP = `Usage: npm run db:reset [-- --schema <name>] [--yes]
 
 Empties one schema of the local stack: every table, including the audit log, and removes the sign-in users whose address
 starts with "<schema>." (the same prefix "db:worker <schema> --reset" removes; no other schema's accounts are touched).
-Before emptying, it runs the reminder-tick system function for every organization still in the schema. The stack keeps
+Before emptying, it runs the daily timed checks once when the schema still holds an organization. The stack keeps
 running. It refuses any database that is not the local stack.
 
   --schema <name>  public (default), worker_1, worker_2, worker_3 or worker_4
@@ -31,32 +31,28 @@ running. It refuses any database that is not the local stack.
 
 export interface ResetResult {
   schema: string;
-  /** How many organizations the tick function was run for (before the tables were emptied). */
+  /** How many organizations the schema held (the daily checks ran once for them, before the tables were emptied). */
   organizations: number;
   durationMs: number;
 }
 
 const quote = (identifier: string) => `"${identifier.replace(/"/g, '""')}"`;
 
-/** One system function answers a jsonb envelope; anything but a success stops the reset before anything is emptied. */
-async function runSystemFunction(
-  client: SqlClient,
-  name: string,
-  organization: string,
-): Promise<void> {
-  const result = await client.query(`select ${name}($1::uuid) as result`, [organization]);
+/** The daily run answers a jsonb envelope; anything but a success stops the reset before anything is emptied. */
+async function runDailyChecks(client: SqlClient): Promise<void> {
+  const result = await client.query("select timed_checks_run_system('daily') as result");
   const state = (result.rows[0]?.result as { state?: string } | undefined)?.state;
   if (state !== "success") {
     throw new ToolingError(
       "system-functions",
-      `${name} did not succeed (${state ?? "no answer"}); nothing was emptied.`,
+      `timed_checks_run_system did not succeed (${state ?? "no answer"}); nothing was emptied.`,
     );
   }
 }
 
 /**
- * Resets one schema (NFR6.28). The reminder-tick system function runs first, for every organization present, because
- * after the tables are empty there is none left to run it for; then the tables and the schema's sign-in users are emptied
+ * Resets one schema (NFR6.28). The daily timed checks run first, once, when an organization is present, so reminders
+ * and housekeeping that were due are decided before the tables are emptied; then the tables and the schema's sign-in users are emptied
  * in one transaction, so a failure leaves the schema as it was.
  */
 export async function resetSchema(
@@ -72,9 +68,7 @@ export async function resetSchema(
     const organizations = (
       await client.query("select id::text as id from organizations order by id")
     ).rows.map((row) => String(row.id));
-    for (const organization of organizations) {
-      await runSystemFunction(client, "reminder_run_due_system", organization);
-    }
+    if (organizations.length > 0) await runDailyChecks(client);
     await client.query("begin");
     try {
       await resetWorkerData(client, schema);

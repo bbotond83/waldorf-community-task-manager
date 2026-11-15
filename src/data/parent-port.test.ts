@@ -75,7 +75,6 @@ test("the family comes from the database: the caller's actor and family are neve
   assert.doesNotMatch(sent, /someone-else|another-family/);
   assert.deepEqual(fake.rpcCalls, [
     { name: "duty_list", args: {} },
-    { name: "reminder_run_due", args: {} },
     { name: "notification_list", args: {} },
   ]);
 });

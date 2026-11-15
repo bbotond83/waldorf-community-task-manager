@@ -64,7 +64,7 @@ describe("navigation and default pages follow the access rules", () => {
     }
   });
 
-  it("keeps records, reminders, privacy and settings out of the group admin menu (BR3.9)", () => {
+  it("keeps records, delivery failures, privacy and settings out of the group admin menu (BR3.9)", () => {
     const hrefs = roleProfile("group-admin").navigation.map((item) => item.href);
     for (const forbidden of [
       "/admin/nyilvantartasok",
@@ -107,7 +107,7 @@ describe("navigation and default pages follow the access rules", () => {
       "Tanév",
       "Beosztás",
       "Szülők",
-      "Emlékeztetők",
+      "Kézbesítési hibák",
       "Adatvédelem",
       "Beállítások",
     ]);
