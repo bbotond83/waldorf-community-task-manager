@@ -8,7 +8,7 @@ type Call = { name: string; args: Record<string, unknown> };
 
 const ENVIRONMENT = {
   SUPABASE_URL: "http://127.0.0.1:54321",
-  SUPABASE_SERVICE_ROLE_KEY: "service-key-for-tests-only",
+  SUPABASE_SERVICE_ROLE_KEY: "fake-service-key",
   APP_PUBLIC_URL: "http://127.0.0.1:3000",
   SMTP_HOST: "127.0.0.1",
   SMTP_PORT: "54325",
