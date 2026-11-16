@@ -1987,6 +1987,241 @@ nav a:hover {
   margin: 0;
 }
 
+/* The whole card is the target of its one link, so a finger or a click anywhere on it opens the group. */
+.workgroup-card {
+  position: relative;
+}
+
+.workgroup-card-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.workgroup-card-link::after {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius);
+  content: "";
+}
+
+.workgroup-card-link:hover,
+.workgroup-card-link:focus-visible {
+  text-decoration: underline;
+}
+
+.workgroup-card:focus-within {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/*
+ * One working group's page (U4), the same layout for the parent, teacher and admin areas. A cream panel for the
+ * group, a notice when nobody coordinates it, then the members as rows that become a stack on a phone.
+ * Every control is at least 44px; a role is never shown by colour alone (the word "Koordinátor" is in the badge).
+ */
+.parent-group-page,
+.teacher-group-page,
+.admin-group-page {
+  display: grid;
+  gap: 1.25rem;
+  padding-block: clamp(1.5rem, 4vw, 3rem);
+}
+
+.parent-group-back-link,
+.teacher-group-back-link,
+.admin-group-back-link {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  min-height: 44px;
+  padding-inline: 0.35rem;
+}
+
+.parent-group-header,
+.teacher-group-header,
+.admin-group-header {
+  display: grid;
+  gap: 0.5rem;
+  padding: 1.25rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.parent-group-header h1,
+.teacher-group-header h1,
+.admin-group-header h1,
+.parent-group-header p,
+.teacher-group-header p,
+.admin-group-header p {
+  margin: 0;
+}
+
+.parent-group-notice,
+.teacher-group-notice,
+.admin-group-notice,
+.parent-group-warning,
+.parent-group-state,
+.teacher-group-state,
+.admin-group-state {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border-left: 0.35rem solid var(--color-accent-ochre);
+  border-radius: 0.5rem;
+  background: var(--color-info-bg);
+  font-weight: 600;
+}
+
+.parent-group-warning,
+.parent-group-state,
+.teacher-group-state,
+.admin-group-state {
+  border-left-color: var(--color-primary);
+  background: var(--color-danger-bg);
+}
+
+.parent-group-state h2,
+.teacher-group-state h2,
+.admin-group-state h2 {
+  margin: 0;
+  font-size: var(--text-headline-sm);
+}
+
+.parent-group-membership {
+  display: grid;
+  gap: 0.75rem;
+  justify-items: start;
+}
+
+.parent-group-membership .parent-form {
+  margin-block: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.parent-group-question {
+  margin: 0;
+  font-weight: 700;
+}
+
+.parent-group-confirm {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.parent-group-members,
+.teacher-group-members,
+.admin-group-members {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.parent-group-members h2,
+.teacher-group-members h2,
+.admin-group-members h2,
+.parent-group-hint,
+.teacher-group-hint,
+.admin-group-hint,
+.parent-group-empty,
+.teacher-group-empty,
+.admin-group-empty {
+  margin: 0;
+}
+
+.parent-group-member-list,
+.teacher-group-member-list,
+.admin-group-member-list {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.parent-group-member,
+.teacher-group-member,
+.admin-group-member {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.parent-group-member-main,
+.teacher-group-member-main,
+.admin-group-member-main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.75rem;
+  min-width: 0;
+}
+
+.parent-group-member-name,
+.teacher-group-member-name,
+.admin-group-member-name {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.parent-group-badge,
+.teacher-group-badge,
+.admin-group-badge {
+  padding: 0.15rem 0.6rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-pill);
+  background: var(--color-read-bg);
+  color: var(--color-read-text);
+  font-size: var(--text-eyebrow);
+  font-weight: 700;
+}
+
+.parent-group-badge-coordinator,
+.teacher-group-badge-coordinator,
+.admin-group-badge-coordinator {
+  border-color: var(--color-primary-dark);
+  background: var(--color-primary-dark);
+  color: var(--color-surface);
+}
+
+.parent-group-member-contact,
+.teacher-group-member-contact,
+.admin-group-member-contact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--color-muted);
+  overflow-wrap: anywhere;
+}
+
+/* The row is already a card, so its coordinator form adds no second border or panel inside it. */
+.admin-group-member .admin-form {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.admin-group-member .admin-form button {
+  white-space: normal;
+}
+
 .site-header-switch {
   white-space: nowrap;
 }

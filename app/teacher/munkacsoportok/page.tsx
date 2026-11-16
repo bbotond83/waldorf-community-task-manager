@@ -10,5 +10,5 @@ export default async function TeacherWorkingGroupsPage() {
     session.state === "success" && facade
       ? await facade.list(session.data.applicationSession, session.data.scope)
       : terminalFailure();
-  return <WorkingGroupList result={result} />;
+  return <WorkingGroupList result={result} basePath="/teacher/munkacsoportok" />;
 }

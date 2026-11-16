@@ -115,8 +115,10 @@ describe("honest executable denominator", () => {
     // the Hungarian wording module: 212 + 11. The review fixes add the super admin's duty card page: 223 + 1. U3 adds the account changes of the sign-in
     // module (src/identity/account-changes.ts) and the directory adapter (src/data/directory.ts): 224 + 2. The screens then add seventeen: the facade, the search function, the search component and the
     // directory page (4), the three directory pages (3), Fiókom (page, actions, field component, state mapper: 4), the
-    // email confirmation page (page, action, form: 3), and the invitation list, the parent actions and the removal page (3): 226 + 17. U5 adds the scheduled command (scripts/timed-run.ts): 243 + 1; the screen then adds its wording module (src/application/delivery-labels.ts): 244 + 1.
-    expect(inventory.length).toBe(245);
+    // email confirmation page (page, action, form: 3), and the invitation list, the parent actions and the removal page (3): 226 + 17. U5 adds the scheduled command (scripts/timed-run.ts): 243 + 1; the screen then adds its wording module (src/application/delivery-labels.ts): 244 + 1. U4 adds the three group pages, the shared
+    // group page (src/runtime/WorkingGroupDetail.tsx), the parent's join and leave panel, the two action files (parent and admin)
+    // and the result mapper they share (app/_lib/working-group-result.ts): 245 + 8.
+    expect(inventory.length).toBe(253);
     for (const path of [
       "src/runtime/AppNav.tsx",
       "src/runtime/StatusBadge.tsx",

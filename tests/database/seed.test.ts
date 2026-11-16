@@ -81,6 +81,40 @@ describe("seed on the real stack", () => {
     assert.equal((await schemaUsers(db, A)).length, counts.accounts);
   });
 
+  it("gives every working group members and exactly one coordinator who is a member of it (BR41.8), in both sets", async () => {
+    for (const large of [false, true]) {
+      await resetWorkerData(db, A);
+      const { deps, lines } = realSeedDeps();
+      assert.equal(
+        await seedMain(["--schema", A, ...(large ? ["--large"] : [])], deps),
+        0,
+        lines.join("\n"),
+      );
+      const perGroup = (
+        await db.query(
+          `select g.id::text,
+                  (select count(*)::int from "${A}".group_memberships m where m.group_id = g.id and m.status = 'active') as members,
+                  (select count(*)::int from "${A}".app_role_grants r
+                    where r.scope_id = g.id and r.role = 'group_admin' and r.revoked_at is null) as coordinators
+             from "${A}".groups g`,
+        )
+      ).rows;
+      assert.equal(perGroup.length, 6);
+      for (const row of perGroup) {
+        assert.ok(row.members >= 1, `large=${large}: a group has members`);
+        assert.equal(row.coordinators, 1, `large=${large}: a group has one coordinator`);
+      }
+      const without = await db.query(
+        `select r.id from "${A}".app_role_grants r
+          where r.role = 'group_admin' and r.revoked_at is null
+            and not exists (select 1 from "${A}".parents p
+                              join "${A}".group_memberships m on m.parent_id = p.id and m.group_id = r.scope_id and m.status = 'active'
+                             where p.account_id = r.subject_id)`,
+      );
+      assert.deepEqual(without.rows, [], `large=${large}: every coordinator is a member`);
+    }
+  });
+
   it("writes the 30-family set from the same rules", async () => {
     const { deps, lines } = realSeedDeps();
     assert.equal(await seedMain(["--schema", A, "--large"], deps), 0, lines.join("\n"));

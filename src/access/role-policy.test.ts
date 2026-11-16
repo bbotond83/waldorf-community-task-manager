@@ -323,6 +323,68 @@ test("invitations and family and parent records are a super admin's alone (BR35.
     }
   }
 });
+test("joining and leaving a working group is a parent's own act: no other role holds it, a super admin included (BR40)", () => {
+  for (const action of ["create", "update"] as const) {
+    assert.equal(
+      grantAllows(grant("parent", family), {
+        action,
+        resource: { kind: "working_group_membership", scope: family },
+      }),
+      true,
+      `parent ${action}`,
+    );
+    for (const [role, scope] of [
+      ["group_admin", group],
+      ["kindergarten_teacher", org],
+      ["super_admin", org],
+    ] as const) {
+      assert.equal(
+        grantAllows(grant(role, scope), {
+          action,
+          resource: { kind: "working_group_membership", scope },
+        }),
+        false,
+        `${role} ${action}`,
+      );
+    }
+  }
+  // A parent holds no other action on a membership.
+  for (const action of ["read", "delete", "manage"] as const) {
+    assert.equal(
+      grantAllows(grant("parent", family), {
+        action,
+        resource: { kind: "working_group_membership", scope: family },
+      }),
+      false,
+      `parent ${action}`,
+    );
+  }
+});
+test("appointing and revoking a coordinator is a super admin's alone (BR41.1)", () => {
+  assert.equal(
+    grantAllows(grant("super_admin", org), {
+      action: "manage",
+      resource: { kind: "working_group_coordinator", scope: org },
+    }),
+    true,
+  );
+  for (const [role, scope] of [
+    ["group_admin", group],
+    ["kindergarten_teacher", org],
+    ["parent", family],
+  ] as const) {
+    for (const action of ["read", "create", "update", "delete", "manage"] as const) {
+      assert.equal(
+        grantAllows(grant(role, scope), {
+          action,
+          resource: { kind: "working_group_coordinator", scope },
+        }),
+        false,
+        `${role} ${action}`,
+      );
+    }
+  }
+});
 test("delivery failures (resource reminder) are a super admin's alone, for the list and for Try again", () => {
   for (const action of ["read", "update"] as const) {
     assert.equal(

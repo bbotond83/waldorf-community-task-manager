@@ -10,5 +10,5 @@ export default async function ParentWorkingGroupsPage() {
     session.state === "success" && facade
       ? await facade.list(session.data.applicationSession, session.data.familyScope)
       : terminalFailure();
-  return <WorkingGroupList result={result} />;
+  return <WorkingGroupList result={result} basePath="/szulo/munkacsoportok" />;
 }

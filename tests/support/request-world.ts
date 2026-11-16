@@ -11,6 +11,9 @@ import {
   WorkingGroupApplicationFacade,
   type DomainOutcome,
   type RotaApplicationPort,
+  type WorkingGroupApplicationPort,
+  type WorkingGroupChangeModel,
+  type WorkingGroupDetailModel,
 } from "../../src/application/index.ts";
 import { createVersionPort } from "../../src/data/index.ts";
 import type { RequestServices } from "../../src/runtime/production/services.ts";
@@ -32,6 +35,81 @@ import {
 const deniedOutcome = async <T>(): Promise<DomainOutcome<T>> => ({ state: "denied" });
 
 export const ROTA_CARD_DUTY_ID = "duty-card-1";
+
+export const GROUP_ID = "cccccccc-0000-4000-8000-000000000001";
+export const OWN_MEMBERSHIP_ID = "dddddddd-0000-4000-8000-000000000001";
+export const OTHER_MEMBERSHIP_ID = "dddddddd-0000-4000-8000-000000000002";
+
+/** An invented group with one coordinator and one plain member; a test replaces `detailOutcome` to change what a page reads. */
+export const GROUP_DETAIL: WorkingGroupDetailModel = {
+  group: {
+    id: GROUP_ID,
+    name: "Játszókert",
+    description: "A játszókert gondozása.",
+    schoolYearId: "year-2026",
+    schoolYearName: "2026/2027",
+  },
+  hasCoordinator: true,
+  callerIsParent: true,
+  ownMembership: null,
+  members: [
+    {
+      membershipId: OTHER_MEMBERSHIP_ID,
+      parentId: "parent-juhar",
+      fullName: "Juhar Dóra",
+      isCoordinator: true,
+      isSelf: false,
+    },
+  ],
+};
+
+/**
+ * The working-group port of a request: the list shows the teacher groups, the group page and the four commands answer
+ * what a test sets and remember what they were asked, so a test checks both the page and the call.
+ */
+export class WorkingGroupPortDouble implements WorkingGroupApplicationPort {
+  detailOutcome: DomainOutcome<WorkingGroupDetailModel> = { state: "success", data: GROUP_DETAIL };
+  commandOutcome: DomainOutcome<WorkingGroupChangeModel> = {
+    state: "success",
+    data: { membershipId: OWN_MEMBERSHIP_ID, version: 2, alreadyMember: false },
+  };
+  readonly calls: { name: string; input: unknown }[] = [];
+
+  async list() {
+    return {
+      state: "success" as const,
+      data: {
+        items: TEACHER_GROUPS.map((group) => ({
+          id: group.scope.id,
+          name: group.label,
+          description: `${group.label} leírása.`,
+          schoolYearId: "year-2026",
+          schoolYearName: "2026/2027",
+        })),
+      },
+    };
+  }
+  async detail(groupId: string) {
+    this.calls.push({ name: "detail", input: groupId });
+    return this.detailOutcome;
+  }
+  async join(input: { idempotencyKey: string; groupId: string }) {
+    this.calls.push({ name: "join", input });
+    return this.commandOutcome;
+  }
+  async leave(input: { idempotencyKey: string; membershipId: string; expectedVersion: number }) {
+    this.calls.push({ name: "leave", input });
+    return this.commandOutcome;
+  }
+  async appoint(input: { idempotencyKey: string; membershipId: string; expectedVersion: number }) {
+    this.calls.push({ name: "appoint", input });
+    return this.commandOutcome;
+  }
+  async revoke(input: { idempotencyKey: string; membershipId: string; expectedVersion: number }) {
+    this.calls.push({ name: "revoke", input });
+    return this.commandOutcome;
+  }
+}
 
 /** A rota port with nothing published: the overview is empty, everything else is refused. */
 const ROTA_PORT_DOUBLE: RotaApplicationPort = {
@@ -156,6 +234,7 @@ export function createRequestWorld() {
   let parentPort = new ParentPortDouble(ACCOUNT_IDS.parent);
   let adminPort = newAdminPort();
   let directoryPort = new DirectoryPortDouble();
+  let workingGroupPort = new WorkingGroupPortDouble();
 
   function newAdminPort(): AdminPortDouble {
     return new AdminPortDouble({
@@ -213,20 +292,7 @@ export function createRequestWorld() {
         pipeline,
         new TeacherPortDouble(teacherSource.repository, teacherScenario),
       ),
-      workingGroups: new WorkingGroupApplicationFacade(pipeline, {
-        list: async () => ({
-          state: "success",
-          data: {
-            items: TEACHER_GROUPS.map((group) => ({
-              id: group.scope.id,
-              name: group.label,
-              description: `${group.label} leírása.`,
-              schoolYearId: "year-2026",
-              schoolYearName: "2026/2027",
-            })),
-          },
-        }),
-      }),
+      workingGroups: new WorkingGroupApplicationFacade(pipeline, workingGroupPort),
       // The rota screens come after the owner's design approval; until then nothing is planned or published.
       rota: new RotaApplicationFacade(pipeline, ROTA_PORT_DOUBLE),
       directory: new DirectoryApplicationFacade(pipeline, directoryPort),
@@ -258,6 +324,7 @@ export function createRequestWorld() {
         admin: adminPort,
         teacher: teacherSource,
         directory: directoryPort,
+        workingGroups: workingGroupPort,
       };
     },
     /** The state of a fresh test: everyone active, nobody signed in, all fixture data as first delivered. */
@@ -271,6 +338,7 @@ export function createRequestWorld() {
       parentPort = new ParentPortDouble(ACCOUNT_IDS.parent);
       adminPort = newAdminPort();
       directoryPort = new DirectoryPortDouble();
+      workingGroupPort = new WorkingGroupPortDouble();
     },
     /** What `productionRequest()` answers. */
     async productionRequest(): Promise<ProductionRequestDouble> {

@@ -82,6 +82,7 @@ export type AuthorizationMatrixRowId =
   | "AUTH-TEACHER-TRACKING"
   | "AUTH-GROUP-ADMIN-CORE"
   | "AUTH-WORKING-GROUPS"
+  | "AUTH-PARENT-GROUP-MEMBERSHIP"
   | "AUTH-ROTA-OVERVIEW"
   | "AUTH-ROTA-DUTY"
   | "AUTH-DIRECTORY"
@@ -172,6 +173,38 @@ export type WorkingGroupItem = Readonly<{
   schoolYearName: string;
 }>;
 export type WorkingGroupListModel = Readonly<{ items: readonly WorkingGroupItem[] }>;
+
+/**
+ * One member row of a group page (BR42.2). The database decides who sees a phone or an e-mail address: a field it
+ * withheld is absent here, so no screen can show it. `version` comes back to a super admin only, who needs it to
+ * appoint or revoke.
+ */
+export type WorkingGroupMember = Readonly<{
+  membershipId: string;
+  parentId: string;
+  fullName: string;
+  isCoordinator: boolean;
+  isSelf: boolean;
+  email?: string;
+  phone?: string;
+  version?: number;
+}>;
+
+/** The group page (BR42): the group, whether anyone coordinates it, the caller's own membership and the members. */
+export type WorkingGroupDetailModel = Readonly<{
+  group: WorkingGroupItem;
+  hasCoordinator: boolean;
+  callerIsParent: boolean;
+  ownMembership: Readonly<{ id: string; version: number }> | null;
+  members: readonly WorkingGroupMember[];
+}>;
+
+/** What a membership command returns: the membership and its new version; `alreadyMember` for a repeated join. */
+export type WorkingGroupChangeModel = Readonly<{
+  membershipId: string | null;
+  version: number | null;
+  alreadyMember: boolean;
+}>;
 
 /** The school year a calendar or plan screen is showing. */
 export type RotaSchoolYear = Readonly<{

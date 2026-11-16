@@ -190,6 +190,7 @@ for (const schema of NOTIFICATION_SCHEMAS) {
       const calls = [
         "select notice_send(array[$1::uuid], 'sign_up_confirmed', 'task', $2::uuid, 'k')",
         "select notice_facts_task($2::uuid, $1::uuid, 'sign_up_confirmed')",
+        "select notice_facts_working_group($2::uuid, $1::uuid, 'coordinator_appointed')",
         "select notice_describe('sign_up_confirmed', 'task', $2::uuid, $1::uuid)",
         "select duty_reminders_due_check(now())",
         "select housekeeping_due_check(now())",
@@ -227,7 +228,8 @@ for (const schema of NOTIFICATION_SCHEMAS) {
           );
         }
       }
-      assert.equal((await rows("select count(*)::int as n from notice_kinds"))[0]!.n, 8);
+      // Eight kinds of U5 and the two coordinator kinds that U4 registered.
+      assert.equal((await rows("select count(*)::int as n from notice_kinds"))[0]!.n, 10);
     });
 
     it("refused: a registry name with a quote or a capital is refused by the name pattern (NFR3.7)", async () => {

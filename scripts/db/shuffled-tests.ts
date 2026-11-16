@@ -48,6 +48,8 @@ export const DATABASE_TEST_FILES = [
   "tests/database/rota-calendar.test.ts",
   "tests/database/rota-plan.test.ts",
   "tests/database/rota-migration.test.ts",
+  "tests/database/working-groups.test.ts",
+  "tests/database/working-groups-races.test.ts",
   "tests/database/notifications-schema.test.ts",
   "tests/database/notifications-functions.test.ts",
   "tests/database/notifications-handoff.test.ts",

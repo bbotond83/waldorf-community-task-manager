@@ -5,7 +5,15 @@ import type {
   WorkingGroupItem,
   WorkingGroupListModel,
 } from "../../src/application/index.ts";
-import { WorkingGroupList } from "../../src/runtime/WorkingGroupList.tsx";
+import { WorkingGroupList as GroupListWithPath } from "../../src/runtime/WorkingGroupList.tsx";
+
+const BASE_PATH = "/szulo/munkacsoportok";
+
+function WorkingGroupList({
+  result,
+}: Readonly<{ result: ApplicationResult<WorkingGroupListModel> }>) {
+  return <GroupListWithPath result={result} basePath={BASE_PATH} />;
+}
 
 const group = (id: string, name: string, schoolYearName = "2026/2027"): WorkingGroupItem => ({
   id,
@@ -37,11 +45,14 @@ describe("the working-group list (W3)", () => {
     expect(screen.getByTestId("workgroup-list").children).toHaveLength(2);
   });
 
-  it("is read-only: no button, link, count, person or badge on a card", () => {
+  it("leads each card to its group page with one link, and adds no button, count, person or badge", () => {
     render(<WorkingGroupList result={success([group("g-1", "Játszókert")])} />);
     const card = screen.getByTestId("workgroup-card-g-1");
     expect(within(card).queryByRole("button")).toBeNull();
-    expect(within(card).queryByRole("link")).toBeNull();
+    const links = within(card).getAllByRole("link");
+    expect(links).toHaveLength(1);
+    expect(links[0]).toHaveAttribute("href", `${BASE_PATH}/g-1`);
+    expect(links[0]).toHaveAccessibleName("Játszókert");
     expect(card.querySelector("svg, img, [data-status-icon]")).toBeNull();
     expect(card.textContent).toBe("JátszókertJátszókert leírása.");
   });

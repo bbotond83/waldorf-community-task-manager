@@ -249,6 +249,21 @@ export const ELEVATED: Record<
   end_admin: INTERNAL,
   working_group_list: "authenticated",
   family_name_list: "authenticated",
+  // Ovis tábla U4 (C8, BR40 to BR44). The detail read and the four commands check their caller themselves; the
+  // directory helpers, the member lists, the removal steps and the notice facts are internal. end_admin gained a
+  // reason argument (a new signature, still internal).
+  working_group_detail: "authenticated",
+  working_group_join: "authenticated",
+  working_group_leave: "authenticated",
+  coordinator_appoint: "authenticated",
+  coordinator_revoke: "authenticated",
+  directory_parent_shares: INTERNAL,
+  directory_parent_email: INTERNAL,
+  group_members: INTERNAL,
+  group_coordinators: INTERNAL,
+  working_groups_removal_preview: INTERNAL,
+  working_groups_removal_apply: INTERNAL,
+  notice_facts_working_group: INTERNAL,
   // Ovis tábla U2 (C3, C4, C5, C18, BR20 to BR27). The calendar, the draft, the adjusting, the publishing and the
   // reads are signed-in commands and lists that check their caller themselves; the school calendar helpers, the
   // shared duty and place functions, the rota guard and the two renamed cores are internal.

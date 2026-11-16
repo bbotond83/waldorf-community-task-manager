@@ -162,6 +162,7 @@ kind: internal
 functions:
   group_members(group_id): returns parent ids of active members
   group_coordinators(group_id): returns parent ids of active coordinators
+names: the two functions are named group_members and group_coordinators (fixed by U4's migration 20261051_working_groups.sql); both return a uuid array ordered by id, nothing for an unknown group, and neither is granted to signed-in users
 uses: C2 grant_admin and end_admin
 screens: read members through U4's own list function, which applies the directory rules (ADR-008)
 ```
@@ -341,6 +342,7 @@ order:
   - U14 locks the family row first, also when removing one parent
   - Apply runs in the C1 lock order, so blocks run as U6, U7, U2, U11, U12, U13, then U10, U9, U5, U4, U3 and last U1
   - The rows changed by U10, U9, U5, U4, U3 and U1 during removal are never locked by another block, so they need no C1 step; within a block, each kind of row is locked by ascending id
+  - U4's block (working_groups_removal_preview and working_groups_removal_apply) must run before U3's directory block, because U3's block clears the parent's account link and the coordinator grants can then no longer be found; U14's design has to call the blocks in this order
 ```
 
 ### C17 One-off load

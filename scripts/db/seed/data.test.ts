@@ -175,7 +175,7 @@ describe("seed data: the 30-family set", () => {
     assert.equal(large.families.length, 30);
     assert.equal(large.groups.length, 6);
     assert.equal(large.accounts.length, 1 + 2 + 1 + 30);
-    assert.equal(large.memberships.length, 30);
+    assert.equal(large.memberships.length, 51);
   });
 
   it("holds the role fixtures of the Unit: an administrator who is a parent, one of two groups, a community teacher (BR2.1)", () => {
@@ -196,6 +196,42 @@ describe("seed data: the 30-family set", () => {
     assert.deepEqual([teacher.scopeType, teacher.scopeId], ["organization", small.organization.id]);
     assert.ok(small.tasks.some((task) => task.groupId === null));
     assert.ok(small.events.some((event) => event.groupId === null));
+  });
+
+  it("gives every working group members and one coordinator who is a member of it (BR41.8), in both sizes", () => {
+    for (const size of ["small", "large"] as const) {
+      const plan = buildSeedPlan("worker_1", size);
+      const parentOfAccount = new Map(
+        plan.parents
+          .filter((parent) => parent.accountId)
+          .map((parent) => [parent.accountId, parent.id]),
+      );
+      const keys = plan.memberships.map((entry) => `${entry.parentId}|${entry.groupId}`);
+      assert.equal(new Set(keys).size, keys.length, "no parent joins a group twice");
+      for (const group of plan.groups) {
+        assert.ok(
+          plan.memberships.some((entry) => entry.groupId === group.id),
+          `${size}: ${group.name} has members`,
+        );
+        const holders = [
+          ...plan.accounts.filter(
+            (entry) => entry.role === "group_admin" && entry.scopeId === group.id,
+          ),
+          ...plan.extraGrants.filter(
+            (grant) => grant.role === "group_admin" && grant.scopeId === group.id,
+          ),
+        ].map((grant) => ("subjectId" in grant ? grant.subjectId : grant.id));
+        assert.equal(holders.length, 1, `${size}: ${group.name} has exactly one coordinator`);
+        const parentId = parentOfAccount.get(holders[0]!);
+        assert.ok(parentId, "the coordinator is a linked parent");
+        assert.ok(
+          plan.memberships.some(
+            (entry) => entry.parentId === parentId && entry.groupId === group.id,
+          ),
+          `${size}: the coordinator of ${group.name} is a member of it`,
+        );
+      }
+    }
   });
 
   it("keeps every rule of the small set: capacity, group reach and unique places", () => {

@@ -486,6 +486,43 @@ export function buildSeedPlan(schema: string, size: SeedSize): SeedPlan {
     }
   }
 
+  // U4 (BR40 to BR44): every working group has members and one coordinator with a linked account. Whoever holds the
+  // group-admin right is also a member of that group (BR41.8). The first parent of each family joins one more
+  // group, so no group is empty; the second administrator coordinates two groups, and the first parents of
+  // families 3, 4 and 5 coordinate groups 4, 5 and 6. The rows are written directly, as the rest of the seed is,
+  // because the seed runs as the schema owner without a signed-in session; the coordinator functions need one.
+  const joined = new Set(memberships.map((entry) => `${entry.parentId}|${entry.groupId}`));
+  const join = (parentKey: string, group: SeedPlan["groups"][number]) => {
+    const parentId = id(parentKey);
+    if (joined.has(`${parentId}|${group.id}`)) return;
+    joined.add(`${parentId}|${group.id}`);
+    memberships.push({
+      id: id(`membership:${parentKey.slice("parent:".length)}:${group.id}`),
+      parentId,
+      groupId: group.id,
+    });
+  };
+  for (let n = 1; n <= shape.families; n++) join(`parent:${n}:1`, groups[(n + 2) % groups.length]!);
+  const coordinators: { parentKey: string; groupIndex: number }[] = [
+    { parentKey: "parent:1:2", groupIndex: 0 },
+    { parentKey: "parent:2:2", groupIndex: 1 },
+    { parentKey: "parent:2:2", groupIndex: 2 },
+  ];
+  for (const [offset, groupIndex] of [3, 4, 5].entries()) {
+    const n = offset + 3;
+    const holder = accounts.find((entry) => entry.tag === `parent-${n}`);
+    if (!holder) continue;
+    coordinators.push({ parentKey: `parent:${n}:1`, groupIndex });
+    extraGrants.push({
+      id: id(`grant:${holder.tag}:coordinator:${groupIndex + 1}`),
+      subjectId: holder.id,
+      role: "group_admin",
+      scopeType: "group",
+      scopeId: groups[groupIndex]!.id,
+    });
+  }
+  for (const entry of coordinators) join(entry.parentKey, groups[entry.groupIndex]!);
+
   const events: SeedPlan["events"] = [];
   const tasks: SeedPlan["tasks"] = [];
   const assignments: SeedPlan["assignments"] = [];
