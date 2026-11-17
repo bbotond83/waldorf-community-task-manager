@@ -1,16 +1,29 @@
 import type {
   DomainOutcome,
+  FamilyStandingItem,
+  FlaggedDutyItem,
   RotaApplicationPort,
   RotaChangeModel,
+  RotaClashWeek,
   RotaDutyCardModel,
   RotaFamilyCount,
+  RotaFlaggedWeek,
+  RotaJob,
   RotaOverviewItem,
   RotaOverviewModel,
   RotaPlanModel,
   RotaPlanWeek,
   RotaSchoolYear,
+  RotaWeekRef,
   SchoolCalendarModel,
   SchoolWeekItem,
+  UnpickedItem,
+  UnpickedListModel,
+  WeekendFreeSlot,
+  WeekendOverviewItem,
+  WeekendOwnPickModel,
+  WeekendSlot,
+  WeekendStateModel,
 } from "../application/index.ts";
 import type { DatabaseClient } from "../runtime/database/client.ts";
 import { malformedResponse } from "./errors.ts";
@@ -62,6 +75,51 @@ function toWeek(row: Row): SchoolWeekItem {
   });
 }
 
+const JOBS = ["indoor_cleaning", "front_garden", "water_carrying", "weekend_animal_care"] as const;
+const PICKING_JOBS = ["indoor_cleaning", "front_garden"] as const;
+const SLOTS = [
+  "saturday_opening",
+  "saturday_closing",
+  "sunday_opening",
+  "sunday_closing",
+  "shelter_cleaning",
+] as const;
+const STANDINGS = ["staying", "leaving", "new"] as const;
+const HOLD_REASONS = ["leaving_after_changeover", "new_before_changeover"] as const;
+const PICK_STATES = ["not_needed", "picked", "missed", "open"] as const;
+
+function optionalJob(row: Row, key: string): RotaJob | undefined {
+  return row[key] == null ? undefined : oneOf(row, key, JOBS);
+}
+
+function optionalSlot(row: Row, key: string): WeekendSlot | undefined {
+  return row[key] == null ? undefined : oneOf(row, key, SLOTS);
+}
+
+function toStanding(row: Row): FamilyStandingItem {
+  return Object.freeze({
+    familyId: text(row, "family_id"),
+    displayName: text(row, "display_name"),
+    standing: oneOf(row, "standing", STANDINGS),
+    version: integer(row, "version"),
+  });
+}
+
+function toFlaggedDuty(row: Row): FlaggedDutyItem {
+  const job = optionalJob(row, "job");
+  const dutyId = optionalText(row, "duty_id");
+  return Object.freeze({
+    source: text(row, "source"),
+    familyId: text(row, "family_id"),
+    familyDisplayName: text(row, "family_display_name"),
+    title: text(row, "title"),
+    ...(job ? { job } : {}),
+    onDate: text(row, "on_date"),
+    reason: oneOf(row, "reason", HOLD_REASONS),
+    ...(dutyId ? { dutyId } : {}),
+  });
+}
+
 function toCalendar(envelope: Envelope): SchoolCalendarModel {
   const year = optionalRow(envelope, "school_year");
   return Object.freeze({
@@ -81,6 +139,8 @@ function toCalendar(envelope: Envelope): SchoolCalendarModel {
       ),
     ),
     hasPlan: flag(envelope, "has_plan"),
+    standings: Object.freeze(asRows(envelope.standings).map(toStanding)),
+    flaggedDuties: Object.freeze(asRows(envelope.flagged_duties).map(toFlaggedDuty)),
   });
 }
 
@@ -93,6 +153,7 @@ function toPlanWeek(row: Row): RotaPlanWeek {
     row.empty_reason == null ? undefined : oneOf(row, "empty_reason", EMPTY_REASONS);
   return Object.freeze({
     id: text(row, "id"),
+    job: oneOf(row, "job", JOBS),
     weekStart: text(row, "week_start"),
     isBreak: flag(row, "is_break"),
     ...(familyId ? { familyId } : {}),
@@ -104,16 +165,68 @@ function toPlanWeek(row: Row): RotaPlanWeek {
 }
 
 function toFamilyCount(row: Row): RotaFamilyCount {
+  const countRow = asRow(row.counts);
+  const counts = Object.freeze({
+    indoor_cleaning: integer(countRow, "indoor_cleaning"),
+    front_garden: integer(countRow, "front_garden"),
+    water_carrying: integer(countRow, "water_carrying"),
+    weekend_animal_care: integer(countRow, "weekend_animal_care"),
+  });
+  if (!Array.isArray(row.above_lowest)) throw malformedResponse();
+  const aboveLowestJobs = Object.freeze(row.above_lowest.map((job) => oneOf({ job }, "job", JOBS)));
   return Object.freeze({
     familyId: text(row, "family_id"),
     displayName: text(row, "display_name"),
-    weeks: integer(row, "weeks"),
-    aboveLowest: flag(row, "above_lowest"),
+    fullYear: flag(row, "full_year"),
+    counts,
+    aboveLowestJobs,
+    // The indoor-cleaning figures the planning screen showed before there were four rotas.
+    weeks: counts.indoor_cleaning,
+    aboveLowest: aboveLowestJobs.includes("indoor_cleaning"),
   });
 }
 
-function weekStarts(value: unknown): readonly string[] {
-  return Object.freeze(asRows(value).map((row) => text(row, "week_start")));
+function weekRefs(value: unknown): readonly RotaWeekRef[] {
+  return Object.freeze(
+    asRows(value).map((row) => {
+      const reason = optionalText(row, "reason");
+      return Object.freeze({
+        weekStart: text(row, "week_start"),
+        job: oneOf(row, "job", JOBS),
+        ...(reason ? { reason } : {}),
+      });
+    }),
+  );
+}
+
+/** Each Monday once, in the order the rows came. */
+function distinctWeekStarts(refs: readonly RotaWeekRef[]): readonly string[] {
+  return Object.freeze([...new Set(refs.map((ref) => ref.weekStart))]);
+}
+
+function toFlaggedWeek(row: Row): RotaFlaggedWeek {
+  return Object.freeze({
+    weekStart: text(row, "week_start"),
+    job: oneOf(row, "job", JOBS),
+    familyId: text(row, "family_id"),
+    familyDisplayName: text(row, "family_display_name"),
+    reason: oneOf(row, "reason", HOLD_REASONS),
+  });
+}
+
+function toClashWeek(row: Row): RotaClashWeek {
+  const jobs = row.jobs === undefined ? undefined : asJobs(row.jobs);
+  return Object.freeze({
+    weekStart: text(row, "week_start"),
+    familyId: text(row, "family_id"),
+    familyDisplayName: text(row, "family_display_name"),
+    ...(jobs ? { jobs } : {}),
+  });
+}
+
+function asJobs(value: unknown): readonly RotaJob[] {
+  if (!Array.isArray(value)) throw malformedResponse();
+  return Object.freeze(value.map((job) => oneOf({ job }, "job", JOBS)));
 }
 
 function toPlan(envelope: Envelope): RotaPlanModel {
@@ -121,6 +234,10 @@ function toPlan(envelope: Envelope): RotaPlanModel {
   const plan = optionalRow(envelope, "plan");
   const weekCount = optionalInteger(envelope, "week_count");
   const blockers = optionalRow(envelope, "blockers");
+  const warnings = optionalRow(envelope, "warnings");
+  const emptyRows = blockers ? weekRefs(blockers.empty_weeks) : Object.freeze([]);
+  const breakRows = blockers ? weekRefs(blockers.break_weeks) : Object.freeze([]);
+  const ineligibleRows = blockers ? weekRefs(blockers.ineligible_weeks) : Object.freeze([]);
   const publishedAt = plan ? optionalText(plan, "published_at") : undefined;
   return Object.freeze({
     ...(year ? { schoolYear: toSchoolYear(year) } : {}),
@@ -143,9 +260,25 @@ function toPlan(envelope: Envelope): RotaPlanModel {
     ),
     changedWeeks: optionalInteger(envelope, "changed_weeks") ?? 0,
     blockers: Object.freeze({
-      emptyWeeks: blockers ? weekStarts(blockers.empty_weeks) : Object.freeze([]),
-      breakWeeks: blockers ? weekStarts(blockers.break_weeks) : Object.freeze([]),
-      ineligibleWeeks: blockers ? weekStarts(blockers.ineligible_weeks) : Object.freeze([]),
+      emptyWeeks: distinctWeekStarts(emptyRows),
+      breakWeeks: distinctWeekStarts(breakRows),
+      ineligibleWeeks: distinctWeekStarts(ineligibleRows),
+      emptyRows,
+      breakRows,
+      ineligibleRows,
+      flaggedWeeks: Object.freeze(
+        blockers?.flagged_weeks === undefined
+          ? []
+          : asRows(blockers.flagged_weeks).map(toFlaggedWeek),
+      ),
+      clashWeeks: Object.freeze(
+        blockers?.clash_weeks === undefined ? [] : asRows(blockers.clash_weeks).map(toClashWeek),
+      ),
+    }),
+    warnings: Object.freeze({
+      twoJobs: Object.freeze(
+        warnings?.two_jobs === undefined ? [] : asRows(warnings.two_jobs).map(toClashWeek),
+      ),
     }),
     canPublish: envelope.can_publish === true,
   });
@@ -157,12 +290,26 @@ function toOverviewItem(row: Row): RotaOverviewItem {
   const familyDisplayName = optionalText(row, "family_display_name");
   const dutyId = optionalText(row, "duty_id");
   return Object.freeze({
-    job: oneOf(row, "job", ["indoor_cleaning"] as const),
+    job: oneOf(row, "job", JOBS),
     weekStart: text(row, "week_start"),
     isBreak: flag(row, "is_break"),
     ...(familyId ? { familyId } : {}),
     ...(familyDisplayName ? { familyDisplayName } : {}),
     // A week with no rota row has no family to compare, so the database's own flag is null there.
+    isOwn: row.is_own === null || row.is_own === undefined ? false : flag(row, "is_own"),
+    ...(dutyId ? { dutyId } : {}),
+  });
+}
+
+function toWeekendItem(row: Row): WeekendOverviewItem {
+  const familyId = optionalText(row, "family_id");
+  const familyDisplayName = optionalText(row, "family_display_name");
+  const dutyId = optionalText(row, "duty_id");
+  return Object.freeze({
+    weekStart: text(row, "week_start"),
+    slot: oneOf(row, "slot", SLOTS),
+    ...(familyId ? { familyId } : {}),
+    ...(familyDisplayName ? { familyDisplayName } : {}),
     isOwn: row.is_own === null || row.is_own === undefined ? false : flag(row, "is_own"),
     ...(dutyId ? { dutyId } : {}),
   });
@@ -176,21 +323,117 @@ function toOverview(envelope: Envelope): RotaOverviewModel {
       ? { schoolYear: Object.freeze({ id: text(year, "id"), name: text(year, "name") }) }
       : {}),
     items: Object.freeze(asRows(envelope.items).map(toOverviewItem)),
+    weekendItems: Object.freeze(asRows(envelope.weekend_items).map(toWeekendItem)),
+  });
+}
+
+function toFreeSlot(row: Row): WeekendFreeSlot {
+  return Object.freeze({
+    slot: oneOf(row, "slot", SLOTS),
+    dutyId: text(row, "duty_id"),
+    placeVersion: integer(row, "place_version"),
+  });
+}
+
+function toWeekendState(row: Row): WeekendStateModel {
+  const weekendFamily = optionalText(row, "weekend_family_display_name");
+  return Object.freeze({
+    weekStart: text(row, "week_start"),
+    picksCloseAt: text(row, "picks_close_at"),
+    changeUntil: text(row, "change_until"),
+    ...(weekendFamily ? { weekendFamilyDisplayName: weekendFamily } : {}),
+    slots: Object.freeze(
+      asRows(row.slots).map((slot) => {
+        const holder = optionalText(slot, "holder_family_display_name");
+        return Object.freeze({
+          slot: oneOf(slot, "slot", SLOTS),
+          dutyId: text(slot, "duty_id"),
+          placeVersion: integer(slot, "place_version"),
+          ...(holder ? { holderFamilyDisplayName: holder } : {}),
+          heldByWeekendFamily: flag(slot, "held_by_weekend_family"),
+          picked: flag(slot, "picked"),
+        });
+      }),
+    ),
+    pickers: Object.freeze(
+      asRows(row.pickers).map((picker) => {
+        const family = optionalText(picker, "family_display_name");
+        const slot = optionalSlot(picker, "slot");
+        return Object.freeze({
+          job: oneOf(picker, "job", PICKING_JOBS),
+          ...(family ? { familyDisplayName: family } : {}),
+          state: oneOf(picker, "state", PICK_STATES),
+          ...(slot ? { slot } : {}),
+        });
+      }),
+    ),
+  });
+}
+
+function toOwnPick(row: Row): WeekendOwnPickModel {
+  const slot = optionalSlot(row, "slot");
+  return Object.freeze({
+    rotaWeekId: text(row, "rota_week_id"),
+    state: oneOf(row, "state", PICK_STATES),
+    ...(slot ? { slot } : {}),
+    canPick: flag(row, "can_pick"),
+    freeSlots: Object.freeze(asRows(row.free_slots).map(toFreeSlot)),
+    picksCloseAt: text(row, "picks_close_at"),
+    changeUntil: text(row, "change_until"),
   });
 }
 
 function toDutyCard(envelope: Envelope): RotaDutyCardModel {
   const item = asRow(envelope.item);
-  if (item.no_fixed_day !== true) throw malformedResponse();
+  const slot = optionalSlot(item, "slot");
+  const day =
+    item.day == null ? undefined : oneOf(item, "day", ["saturday", "sunday", "weekend"] as const);
+  const partOfDay =
+    item.part_of_day == null
+      ? undefined
+      : oneOf(item, "part_of_day", ["morning", "evening", "all_day"] as const);
+  const weekend = item.weekend == null ? undefined : toWeekendState(asRow(item.weekend));
+  const ownPick = item.own_pick == null ? undefined : toOwnPick(asRow(item.own_pick));
   return Object.freeze({
     dutyId: text(item, "duty_id"),
-    job: oneOf(item, "job", ["indoor_cleaning"] as const),
+    job: oneOf(item, "job", JOBS),
+    ...(slot ? { slot } : {}),
     title: text(item, "title"),
     familyDisplayName: text(item, "family_display_name"),
     weekStart: text(item, "week_start"),
     weekEnd: text(item, "week_end"),
-    noFixedDay: true,
+    noFixedDay: flag(item, "no_fixed_day"),
     isBreakWeek: flag(item, "is_break_week"),
+    includesWatering: flag(item, "includes_watering"),
+    bottlesAtWeekEnd: flag(item, "bottles_at_week_end"),
+    ...(day ? { day } : {}),
+    ...(partOfDay ? { partOfDay } : {}),
+    ...(weekend ? { weekend } : {}),
+    ...(ownPick ? { ownPick } : {}),
+  });
+}
+
+function toUnpickedItem(row: Row): UnpickedItem {
+  const closes = optionalText(row, "picks_close_at");
+  const change = optionalText(row, "change_until");
+  return Object.freeze({
+    rotaWeekId: text(row, "rota_week_id"),
+    job: oneOf(row, "job", PICKING_JOBS),
+    weekStart: text(row, "week_start"),
+    familyDisplayName: text(row, "family_display_name"),
+    weekendFamilyDisplayName: text(row, "weekend_family_display_name"),
+    ...(closes ? { picksCloseAt: closes } : {}),
+    ...(change ? { changeUntil: change } : {}),
+    freeSlots: Object.freeze(
+      row.free_slots === undefined ? [] : asRows(row.free_slots).map(toFreeSlot),
+    ),
+  });
+}
+
+function toUnpickedList(envelope: Envelope): UnpickedListModel {
+  return Object.freeze({
+    items: Object.freeze(asRows(envelope.items).map(toUnpickedItem)),
+    missed: Object.freeze(asRows(envelope.missed).map(toUnpickedItem)),
   });
 }
 
@@ -287,6 +530,43 @@ export function createRotaPort(database: DatabaseClient): RotaApplicationPort {
     },
     async dutyCard({ dutyId }) {
       return toOutcome(await gateway.call("rota_duty_card", { p_duty_id: dutyId }), toDutyCard);
+    },
+    setStanding: ({ idempotencyKey, familyId, schoolYearId, standing, expectedVersion }) =>
+      command(
+        "family_standing_set",
+        {
+          p_idempotency_key: idempotencyKey,
+          p_family_id: familyId,
+          p_school_year_id: schoolYearId,
+          p_standing: standing,
+          p_expected_version: expectedVersion,
+        },
+        idempotencyKey,
+      ),
+    pickSlot: ({ idempotencyKey, rotaWeekId, slot, expectedVersion }) =>
+      command(
+        "weekend_pick_set",
+        {
+          p_idempotency_key: idempotencyKey,
+          p_rota_week_id: rotaWeekId,
+          p_slot: slot,
+          p_expected_version: expectedVersion,
+        },
+        idempotencyKey,
+      ),
+    assignSlot: ({ idempotencyKey, rotaWeekId, slot, expectedVersion }) =>
+      command(
+        "weekend_pick_assign",
+        {
+          p_idempotency_key: idempotencyKey,
+          p_rota_week_id: rotaWeekId,
+          p_slot: slot,
+          p_expected_version: expectedVersion,
+        },
+        idempotencyKey,
+      ),
+    async unpickedList() {
+      return toOutcome(await gateway.call("weekend_unpicked_list", {}), toUnpickedList);
     },
   };
 }

@@ -436,3 +436,13 @@ used_by:
 | C8 | Which notice kinds does each unit add? Settled unit by unit in Functional Design | U5 to U13 |
 | C17 | How does the invented workbook stay faithful to the real layout without personal data? | U15 |
 | C1 | How is a fixed-list test case with no meaning for a rule recorded? | U1 |
+
+## Deltas from U6 (full rotas and weekend picks)
+
+- C5: the weekend pick functions may call `place_reassign` for weekend-slot places (BR63.9).
+- C20: an active family with no standing row counts as staying; nothing is returned only for an unknown family or year (BR60.6).
+- C10: the answer also carries a reason.
+- C9: the check `rota_week_reminder` joins the list of checks.
+- C11: `rota_adjust_picks_after_change` also keeps the rota week's family in step with the duty; a weekend family's week is named by its shelter-cleaning place (BR66.2).
+- C8: this unit's open question is settled by its six notice kinds (see the unit's `entities.md`).
+- C16: U14 decides what happens to the standings, slots and picks of a deleted or anonymised family.

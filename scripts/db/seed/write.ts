@@ -266,11 +266,105 @@ export async function writeSeedPlan(client: SqlClient, plan: SeedPlan): Promise<
       ]),
     );
     await writeNotices(client, plan);
+    await writeRota(client, plan);
     await client.query("commit");
   } catch (error) {
     await client.query("rollback").catch(() => undefined);
     throw error;
   }
+}
+
+/**
+ * The standings and the four-rota plan of the year (BR60.1, BR61.1). The draft is computed by the database's own draft
+ * function, so it is the draft a super admin would get. A published set (the large one) goes through the same steps as
+ * publishing: the weekly duties, the five weekend slots and duties of every weekend, then a few picks that move an
+ * opening to the picking family, then the plan is marked published. The statements are the same for both sets; the
+ * published flag and the number of picks are values. A plan that is already published is left as it is.
+ */
+async function writeRota(client: SqlClient, plan: SeedPlan): Promise<void> {
+  const organization = plan.organization.id;
+  const { rotaPlan } = plan;
+  await insertRows(
+    client,
+    "family_year_standings",
+    ["id", "organization_id", "family_id", "school_year_id", "standing"],
+    plan.standings.map((entry) => [
+      entry.id,
+      organization,
+      entry.familyId,
+      plan.schoolYear.id,
+      entry.standing,
+    ]),
+  );
+  await insertRows(
+    client,
+    "rota_plans",
+    ["id", "organization_id", "school_year_id"],
+    [[rotaPlan.id, organization, plan.schoolYear.id]],
+  );
+  await client.query(
+    `insert into rota_weeks (id, organization_id, plan_id, job, week_start, family_id, empty_reason)
+     select md5($2::text || ':' || d.o_job || ':' || d.o_week_start::text)::uuid,
+            $1::uuid, $2::uuid, d.o_job, d.o_week_start, d.o_family_id, d.o_empty_reason
+       from rota_draft_compute($1::uuid, $3::uuid) d
+     on conflict do nothing`,
+    [organization, rotaPlan.id, plan.schoolYear.id],
+  );
+  const toPublish = `exists (select 1 from rota_plans p where p.id = $1::uuid and p.status = 'draft') and $2::boolean`;
+  await client.query(
+    `insert into weekend_slots (organization_id, weekend_week_id, slot)
+     select w.organization_id, w.id, s.slot
+       from rota_weeks w
+      cross join (values ('saturday_opening'), ('saturday_closing'), ('sunday_opening'), ('sunday_closing'),
+                         ('shelter_cleaning')) s(slot)
+      where ${toPublish} and w.plan_id = $1::uuid and w.job = 'weekend_animal_care' and w.family_id is not null
+     on conflict do nothing`,
+    [rotaPlan.id, rotaPlan.published],
+  );
+  await client.query(
+    `select count(duty_create('rota_week', w.id, rota_job_title(w.job), 'rota_' || w.job,
+                              w.week_start::timestamp at time zone 'Europe/Budapest',
+                              ((w.week_start + 6)::timestamp + interval '23 hours 59 minutes 59 seconds')
+                                at time zone 'Europe/Budapest',
+                              null, array[w.family_id], 'rota_publish'))
+       from rota_weeks w
+      where ${toPublish} and w.plan_id = $1::uuid and w.job <> 'weekend_animal_care' and w.family_id is not null`,
+    [rotaPlan.id, rotaPlan.published],
+  );
+  await client.query(
+    `select count(duty_create('weekend_slot', s.id, weekend_slot_title(s.slot), weekend_slot_category(s.slot),
+                              x.starts_at, x.ends_at, null, array[w.family_id], 'rota_publish'))
+       from weekend_slots s
+       join rota_weeks w on w.id = s.weekend_week_id
+      cross join lateral weekend_slot_window(w.week_start, s.slot) x
+      where ${toPublish} and w.plan_id = $1::uuid`,
+    [rotaPlan.id, rotaPlan.published],
+  );
+  await client.query(
+    `with chosen as (
+       select w.id as week_id, w.organization_id, w.family_id as picker, s.id as slot_id, t.id as task_id
+         from rota_weeks w
+         join rota_weeks ww on ww.plan_id = w.plan_id and ww.week_start = w.week_start and ww.job = 'weekend_animal_care'
+         join weekend_slots s on s.weekend_week_id = ww.id and s.slot = 'saturday_opening'
+         join tasks t on t.origin_kind = 'weekend_slot' and t.origin_id = s.id
+        where ${toPublish} and w.plan_id = $1::uuid and w.job = 'indoor_cleaning' and w.family_id is not null
+          and ww.family_id is not null and ww.family_id <> w.family_id and w.week_start > current_date
+          and not exists (select 1 from weekend_picks pk where pk.rota_week_id = w.id)
+        order by w.week_start
+        limit $3::integer),
+     moved as (
+       update assignments a set family_id = c.picker, source = 'weekend_pick'
+         from chosen c where a.task_id = c.task_id and a.status <> 'removed'
+       returning a.task_id)
+     insert into weekend_picks (organization_id, rota_week_id, weekend_slot_id, source)
+     select c.organization_id, c.week_id, c.slot_id, 'family' from chosen c`,
+    [rotaPlan.id, rotaPlan.published, rotaPlan.picks],
+  );
+  await client.query(
+    `update rota_plans set status = 'published', published_at = now(), published_by = $3::uuid
+      where id = $1::uuid and status = 'draft' and $2::boolean`,
+    [rotaPlan.id, rotaPlan.published, rotaPlan.publishedBy],
+  );
 }
 
 /**

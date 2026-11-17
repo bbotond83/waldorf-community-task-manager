@@ -69,10 +69,21 @@ test("Beosztás tervezése: draft, change, discard, publish; parents and teacher
 }) => {
   await signInAs(page, world().account("super-admin"));
   await page.goto("/admin/beosztas");
-  await expect(page.getByTestId("admin-rota-no-plan")).toBeVisible();
+  // The seed already holds a four-rota draft: it shows the tabs of the four rotas, and each rota has its weeks.
+  await expect(page.getByTestId("admin-rota-head")).toContainText("Tervezet");
+  await expect(page.getByTestId("admin-rota-tabs")).toBeVisible();
   await noSidewaysScroll(page);
   await expectNoSeriousViolations(page);
+  for (const job of ["front_garden", "water_carrying", "weekend_animal_care", "indoor_cleaning"]) {
+    await page.getByTestId(`admin-rota-tab-${job}`).click();
+    await expect(page.getByTestId(`admin-rota-tab-${job}`)).toHaveAttribute("aria-current", "page");
+    await expect(page.locator('tr[data-testid^="admin-rota-week-"]').first()).toBeVisible();
+  }
 
+  // Discard the seeded draft and make it again, as an administrator would.
+  await page.getByTestId("admin-rota-discard-form-submit-button").click();
+  await expect(page.getByTestId("admin-rota-no-plan")).toBeVisible();
+  await expectNoSeriousViolations(page);
   await page.getByTestId("admin-rota-draft-form-submit-button").click();
   await expect(page.getByTestId("admin-rota-weeks")).toBeVisible();
   await expect(page.getByTestId("admin-rota-head")).toContainText("Tervezet");
@@ -115,16 +126,17 @@ test("Beosztás tervezése: draft, change, discard, publish; parents and teacher
 test("the published rota: parent overview, own duty card, other families refused, teacher overview", async ({
   page,
 }) => {
-  await signInAs(page, world().account("super-admin"));
-  await page.goto("/admin/beosztas");
-  await page.getByTestId("admin-rota-draft-form-submit-button").click();
-  await page.getByTestId("admin-rota-publish-form-submit-button").click();
-  await expect(page.getByTestId("admin-rota-head")).toContainText("Közzétéve");
+  await publishSeededDraft(page);
 
   await signInAs(page, world().account("parent-1"));
   await page.goto("/szulo/beosztas");
   await expect(page.getByRole("heading", { name: "Beosztás", level: 1 })).toBeFocused();
   await expect(page.locator(".parent-rota-own").first()).toBeAttached();
+  // The four rotas and the weekend duties each have their section.
+  for (const job of ["indoor_cleaning", "front_garden", "water_carrying", "weekend_animal_care"]) {
+    await expect(page.getByTestId(`rota-job-${job}`)).toBeAttached();
+  }
+  await expect(page.getByTestId("rota-weekend")).toBeAttached();
   await noSidewaysScroll(page);
   await expectNoSeriousViolations(page);
   await expect(page.getByText("Csere", { exact: false })).toHaveCount(0);
@@ -134,7 +146,11 @@ test("the published rota: parent overview, own duty card, other families refused
   await page.getByTestId("rota-filter-submit-button").click();
   await expect(page.locator(".parent-rota-week:not(.parent-rota-week-own)")).toHaveCount(0);
 
-  const href = await page.locator('a[href^="/szulo/beosztas/"]').first().getAttribute("href");
+  const href = await page
+    .getByTestId("rota-job-indoor_cleaning")
+    .locator('a[href^="/szulo/beosztas/"]')
+    .first()
+    .getAttribute("href");
   expect(href).toBeTruthy();
   await page.goto(href!);
   await expect(page.getByTestId("rota-card-no-fixed-day")).toContainText("nincs kijelölt napja");
@@ -171,6 +187,77 @@ test("the published rota: parent overview, own duty card, other families refused
   await expect(page.getByTestId("rota-table")).toBeAttached();
   await expect(page.locator('a[href^="/szulo/beosztas/"]')).toHaveCount(0);
   await expectNoSeriousViolations(page);
+});
+
+/** The seed holds a draft of the four rotas; the administrator publishes it, which also seeds the weekend duties. */
+async function publishSeededDraft(page: Page) {
+  await signInAs(page, world().account("super-admin"));
+  await page.goto("/admin/beosztas");
+  await page.getByTestId("admin-rota-publish-form-submit-button").click();
+  await expect(page.getByTestId("admin-rota-head")).toContainText("Közzétéve");
+}
+
+test("Tanév: the super admin sets a family's standing, sees the counts and the changeover note", async ({
+  page,
+}) => {
+  await signInAs(page, world().account("super-admin"));
+  await page.goto("/admin/tanev");
+  await expect(page.getByTestId("admin-standings")).toBeVisible();
+  await expect(page.getByTestId("admin-standings-summary")).toContainText("Összesen: 6 család");
+  await expect(page.getByTestId("admin-standings-note")).toContainText("évváltás napja");
+  await noSidewaysScroll(page);
+  await expectNoSeriousViolations(page);
+
+  const select = page.locator('select[data-testid^="admin-standing-select-"]').first();
+  const before = await select.inputValue();
+  const target = before === "staying" ? "leaving" : "staying";
+  await select.selectOption(target);
+  await page.locator('button[data-testid^="admin-standing-form-"]').first().click();
+  await expect(page.locator('[data-testid$="-state-success"]').first()).toBeVisible();
+  await page.reload();
+  await expect(page.locator('select[data-testid^="admin-standing-select-"]').first()).toHaveValue(
+    target,
+  );
+});
+
+test("a family chooses its weekend slot on its duty card, and the administrator sees who has not chosen", async ({
+  page,
+}) => {
+  await publishSeededDraft(page);
+
+  // Find a week of the parent's family that owes a pick and is still open.
+  await signInAs(page, world().account("parent-1"));
+  await page.goto("/szulo/beosztas");
+  const hrefs = await page
+    .locator(
+      '[data-testid="rota-job-indoor_cleaning"] a[href^="/szulo/beosztas/"], [data-testid="rota-job-front_garden"] a[href^="/szulo/beosztas/"]',
+    )
+    .evaluateAll((links) => [...new Set(links.map((link) => link.getAttribute("href")))]);
+  let picked = false;
+  for (const href of hrefs) {
+    await page.goto(href!);
+    const radios = page.getByTestId("weekend-pick-fieldset").getByRole("radio");
+    if ((await radios.count()) === 0) continue;
+    await radios.first().check();
+    await page.getByTestId("weekend-pick-form-submit-button").click();
+    await expect(page.getByTestId("weekend-pick-form-state-success")).toContainText(
+      "A választás mentve.",
+    );
+    await expectNoSeriousViolations(page);
+    await noSidewaysScroll(page);
+    picked = true;
+    break;
+  }
+  expect(picked, "one of the family's cards offers the weekend picker").toBe(true);
+
+  // The administrator's dashboard carries the unpicked list; a group administrator has none.
+  await signInAs(page, world().account("super-admin"));
+  await page.goto("/admin");
+  await expect(page.getByRole("heading", { name: "Ki nem választott?" })).toBeVisible();
+  await expectNoSeriousViolations(page);
+  await signInAs(page, world().account("group-admin-1"));
+  await page.goto("/admin");
+  await expect(page.getByRole("heading", { name: "Ki nem választott?" })).toHaveCount(0);
 });
 
 test("the calendar and planning screens refuse every role but the super admin", async ({

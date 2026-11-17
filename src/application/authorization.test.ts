@@ -180,6 +180,37 @@ describe("AuthorizationContract", () => {
     }
   });
 
+  it("limits standings and the unpicked list to a super admin, and weekend picking to a parent (U6)", async () => {
+    for (const [role, scope] of [
+      ["parent", familyScope],
+      ["group_admin", groupScope],
+      ["kindergarten_teacher", organizationScope],
+      ["super_admin", organizationScope],
+    ] as const) {
+      const session = makeSession(role, scope);
+      for (const resource of ["family_standing", "weekend_pick", "weekend_unpicked_list"]) {
+        const result = await contractFor(session).authorize(session, {
+          matrixRowId: "AUTH-SUPER-ROTA",
+          action: "manage",
+          resource,
+          scope,
+        });
+        assert.equal(
+          result.state,
+          role === "super_admin" ? "success" : "denied",
+          `${role} ${resource}`,
+        );
+      }
+      const pick = await contractFor(session).authorize(session, {
+        matrixRowId: "AUTH-PARENT-WEEKEND-PICK",
+        action: "update",
+        resource: "weekend_pick",
+        scope,
+      });
+      assert.equal(pick.state, role === "parent" ? "success" : "denied", `${role} pick`);
+    }
+  });
+
   it("gives the rota rows no menu entry until their pages exist, so no role is sent to a missing page", async () => {
     const session = makeSession("super_admin", organizationScope);
     const navigation = await contractFor(session).navigation(session);

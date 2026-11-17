@@ -126,7 +126,20 @@ const REFUSAL_MESSAGES: Readonly<Record<string, string>> = Object.freeze({
   ROTA_FAMILY_INELIGIBLE:
     "Ez a család nem osztható be: nem aktív, vagy nem ehhez a közösséghez tartozik.",
   ROTA_BREAK_WEEK: "Szünetes hétre nem osztható be család. Üresítse ki a hetet.",
-  ROTA_WEEKS_EMPTY: "A közzététel előtt minden tanítási hétnek családot kell adni.",
+  ROTA_WEEKS_EMPTY:
+    "A közzététel előtt minden tanítási hétnek családot kell adni mind a négy beosztásban (szünetes héten a belső takarítás és a vízhordás üres maradhat).",
+  ROTA_SAME_WEEK_CLASH:
+    "Ugyanaz a család ugyanazon a héten nem végezheti a belső takarítást és az előkert gondozását is.",
+  STANDING_INVALID: "Ez az állapot nem választható. Válasszon a Marad, Távozik és Új közül.",
+  DUTY_INELIGIBLE:
+    "Ez a család az adott napon már nem (vagy még nem) vállalhat feladatot, ezért nem osztható be.",
+  WEEKEND_PICK_CLOSED:
+    "A választás ideje lejárt: szombat éjféltől már nem lehet nyitást vagy zárást választani.",
+  WEEKEND_PICK_LOCKED:
+    "A választás péntek délután már nem módosítható. Ha változtatni kell, kérje az adminisztrátor segítségét.",
+  WEEKEND_PICK_NOT_NEEDED: "Ezen a héten nem kell hétvégi nyitást vagy zárást választani.",
+  WEEKEND_SLOT_NOT_PICKABLE: "Ezt a hétvégi feladatot nem lehet választani.",
+  WEEKEND_SLOT_TAKEN: "Ezt a nyitást vagy zárást közben más család választotta. Válasszon másikat.",
   ROTA_DISCARD_OUTDATED:
     "A kézzel módosított hetek száma közben megváltozott. Nézze át a tervezetet, és vesse el újra.",
   BREAK_WEEK_INVALID: "A szünet első napja a tanév egyik tanítási hetének hétfője legyen.",
@@ -151,7 +164,110 @@ export function hasRotaRefusalMessage(code: string | undefined): boolean {
   return code !== undefined && Object.hasOwn(REFUSAL_MESSAGES, code);
 }
 
-/** The fixed Hungarian text of an indoor-cleaning duty card (BR24.3); other jobs bring their own texts later. */
+/** The name of each rota as the screens write it (the same words the database puts on the duty). */
+export const ROTA_JOB_LABELS = Object.freeze({
+  indoor_cleaning: "Belső takarítás",
+  front_garden: "Előkert",
+  water_carrying: "Vízhordás",
+  weekend_animal_care: "Hétvégi állatgondozás",
+} as const);
+
+/** The name of each weekend duty (BR63.1). */
+export const WEEKEND_SLOT_LABELS = Object.freeze({
+  saturday_opening: "Szombat reggeli nyitás",
+  saturday_closing: "Szombat esti zárás",
+  sunday_opening: "Vasárnap reggeli nyitás",
+  sunday_closing: "Vasárnap esti zárás",
+  shelter_cleaning: "Hétvégi takarítás",
+} as const);
+
+/** Why a week of the draft is empty, as the planning screen says it (BR62.3). */
+export const EMPTY_WEEK_REASON_TEXT = Object.freeze({
+  no_family: "Még nincs család kijelölve.",
+  cleared: "A hét ki lett ürítve.",
+  break_week: "Szünetes hét: ennél a beosztásnál üresen maradhat.",
+} as const);
+
+/** Why a family may not hold a duty on a date, as the flagged-duty list says it (BR60.5). */
+export const HOLD_REASON_TEXT = Object.freeze({
+  leaving_after_changeover: "A család az évváltás után távozik.",
+  new_before_changeover: "A család csak az évváltástól csatlakozik.",
+} as const);
+
+/** The standings a super admin can set (BR60.1). */
+export const STANDING_LABELS = Object.freeze({
+  staying: "Marad",
+  leaving: "Távozik",
+  new: "Új",
+} as const);
+
+/** The state of a weekend pick, as the picker and the weekend list say it (BR63.4, BR65.3). */
+export const PICK_STATE_TEXT = Object.freeze({
+  open: "Még nem választott.",
+  picked: "Választott.",
+  missed: "Nem választott időben.",
+  not_needed: "Ezen a héten nem kell választani.",
+} as const);
+
+/** The warning lines of the planning screen (BR62.6, BR62.7) and the calendar. */
+export const ROTA_WARNING_TEXT = Object.freeze({
+  twoJobs: "Ugyanaz a család ezen a héten két beosztásban is szerepel.",
+  breakWeek: "Szünetes héten is van család a belső takarításnál vagy a vízhordásnál.",
+} as const);
+
+/** The fixed Hungarian text of the duty cards of the other three rotas and of the weekend duties (BR65.2). */
+export const DUTY_CARD_TEXT = Object.freeze({
+  front_garden: Object.freeze({
+    jobLabel: "Előkert",
+    instruction: "A család a saját hetében rendben tartja az óvoda előkertjét.",
+    watering: "Március és október között a növények öntözése is a család dolga.",
+  }),
+  water_carrying: Object.freeze({
+    jobLabel: "Vízhordás",
+    instruction: "A család a saját hetében gondoskodik az ivóvízről.",
+    bottlesAtWeekEnd: "A hét végén a palackokat a család visszaviszi a helyükre.",
+  }),
+  weekend_animal_care: Object.freeze({
+    jobLabel: "Hétvégi állatgondozás",
+    instruction:
+      "A család a hétvégén gondozza az óvoda állatait, és ő viszi a hétvégi takarítást is. A szombati és vasárnapi nyitást és zárást a hét belső takarító és előkerti családja választhatja; ami nem kel el, az a hétvégi családnál marad.",
+  }),
+  weekend_slot: Object.freeze({
+    instruction: "Ez a hétvégi feladat a megjelölt napon és napszakban esedékes.",
+    day: Object.freeze({ saturday: "Szombat", sunday: "Vasárnap", weekend: "A hétvége" }),
+    partOfDay: Object.freeze({ morning: "reggel", evening: "este", all_day: "egész nap" }),
+  }),
+} as const);
+
+/** The words of the administrator's unpicked list "Ki nem választott?" (BR63.8) and its assign action (BR63.6). */
+export const ROTA_ASSIGN_TEXT = Object.freeze({
+  title: "Ki nem választott?",
+  intro:
+    "Ezek a hétvégi feladatok még a hétvégi családnál vannak. Szombat éjfélig kijelölheti őket valamelyik családnak.",
+  emptyTitle: "Mindenki választott.",
+  empty: "Most nincs kiosztandó hétvégi feladat.",
+  missedTitle: "Nem választott időben",
+  slotLabel: "Szabad nyitás vagy zárás",
+  submit: "Kijelölés mentése",
+  noFreeSlot: "Nincs szabad nyitás vagy zárás ezen a héten.",
+});
+
+/** The words of the weekend picker on a duty card (BR63.4, BR65.3). */
+export const WEEKEND_PICKER_TEXT = Object.freeze({
+  legend: "Hétvégi nyitás vagy zárás választása",
+  rule: "Péntek délig választhat, és péntek délig módosíthatja is; ami nem kel el, az a hétvégi családnál marad.",
+  submit: "Választás mentése",
+  saved: "A választás mentve.",
+  taken: "Már választották",
+  closed: "A választás ideje lejárt.",
+  weekendFamily: "Hétvégi felelős család",
+  weekendList: "Hétvégi feladatok ezen a héten",
+  whoPicked: "Ki mit választott?",
+  noOne: "Még nincs választva.",
+  keptByWeekendFamily: "A hétvégi család viszi.",
+});
+
+/** The fixed Hungarian text of an indoor-cleaning duty card (BR24.3); the texts of the other jobs are `DUTY_CARD_TEXT`. */
 export const INDOOR_CLEANING_CARD_TEXT = Object.freeze({
   jobLabel: "Benti takarítás",
   instruction: "A család a saját hetében takarítja az óvoda belső tereit.",

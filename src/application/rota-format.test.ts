@@ -2,11 +2,19 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
   budapestToday,
+  DUTY_CARD_TEXT,
+  EMPTY_WEEK_REASON_TEXT,
   formatLongDay,
   formatShortDay,
   formatWeekRange,
   hasRotaRefusalMessage,
+  HOLD_REASON_TEXT,
+  PICK_STATE_TEXT,
+  ROTA_JOB_LABELS,
+  ROTA_WARNING_TEXT,
   rotaRefusalMessage,
+  STANDING_LABELS,
+  WEEKEND_SLOT_LABELS,
   weekdayName,
   weekPhase,
 } from "./rota-format.ts";
@@ -64,6 +72,14 @@ describe("refusal messages", () => {
       "DUTY_ROTA_MANAGED",
       "VERSION_CONFLICT",
       "idempotency_key_reused",
+      "ROTA_SAME_WEEK_CLASH",
+      "STANDING_INVALID",
+      "DUTY_INELIGIBLE",
+      "WEEKEND_PICK_CLOSED",
+      "WEEKEND_PICK_LOCKED",
+      "WEEKEND_PICK_NOT_NEEDED",
+      "WEEKEND_SLOT_NOT_PICKABLE",
+      "WEEKEND_SLOT_TAKEN",
     ]) {
       assert.equal(hasRotaRefusalMessage(code), true, code);
       assert.notEqual(rotaRefusalMessage(code), rotaRefusalMessage("ismeretlen"), code);
@@ -74,5 +90,68 @@ describe("refusal messages", () => {
     assert.equal(rotaRefusalMessage("ismeretlen"), "A művelet most nem hajtható végre.");
     assert.equal(rotaRefusalMessage(undefined), "A művelet most nem hajtható végre.");
     assert.equal(hasRotaRefusalMessage(undefined), false);
+  });
+
+  it("gives every refusal code of the four rotas and the weekend picks its own sentence, and none of them names a person", () => {
+    const codes = [
+      "ROTA_SAME_WEEK_CLASH",
+      "STANDING_INVALID",
+      "DUTY_INELIGIBLE",
+      "WEEKEND_PICK_CLOSED",
+      "WEEKEND_PICK_LOCKED",
+      "WEEKEND_PICK_NOT_NEEDED",
+      "WEEKEND_SLOT_NOT_PICKABLE",
+      "WEEKEND_SLOT_TAKEN",
+    ];
+    const sentences = codes.map((code) => rotaRefusalMessage(code));
+    assert.equal(new Set(sentences).size, codes.length, "each code reads differently");
+    for (const sentence of sentences) assert.match(sentence, /[.]$/, "a full sentence");
+  });
+});
+
+describe("the words of the four rotas", () => {
+  it("names every rota and every weekend duty the way the database does", () => {
+    assert.deepEqual(Object.keys(ROTA_JOB_LABELS), [
+      "indoor_cleaning",
+      "front_garden",
+      "water_carrying",
+      "weekend_animal_care",
+    ]);
+    assert.deepEqual(Object.keys(WEEKEND_SLOT_LABELS), [
+      "saturday_opening",
+      "saturday_closing",
+      "sunday_opening",
+      "sunday_closing",
+      "shelter_cleaning",
+    ]);
+    assert.equal(ROTA_JOB_LABELS.front_garden, "Előkert");
+    assert.equal(WEEKEND_SLOT_LABELS.shelter_cleaning, "Hétvégi takarítás");
+  });
+
+  it("has a sentence for every standing, empty-week reason, hold reason and pick state", () => {
+    assert.deepEqual(Object.values(STANDING_LABELS), ["Marad", "Távozik", "Új"]);
+    assert.deepEqual(Object.keys(EMPTY_WEEK_REASON_TEXT), ["no_family", "cleared", "break_week"]);
+    assert.deepEqual(Object.keys(HOLD_REASON_TEXT), [
+      "leaving_after_changeover",
+      "new_before_changeover",
+    ]);
+    assert.deepEqual(Object.keys(PICK_STATE_TEXT), ["open", "picked", "missed", "not_needed"]);
+    assert.ok(ROTA_WARNING_TEXT.twoJobs.length > 0 && ROTA_WARNING_TEXT.breakWeek.length > 0);
+  });
+
+  it("has a card text for the three other rotas and the weekend duties", () => {
+    assert.ok(DUTY_CARD_TEXT.front_garden.watering.includes("öntözés"));
+    assert.ok(DUTY_CARD_TEXT.water_carrying.bottlesAtWeekEnd.length > 0);
+    assert.ok(DUTY_CARD_TEXT.weekend_animal_care.instruction.includes("hétvég"));
+    assert.deepEqual(Object.keys(DUTY_CARD_TEXT.weekend_slot.day), [
+      "saturday",
+      "sunday",
+      "weekend",
+    ]);
+    assert.deepEqual(Object.keys(DUTY_CARD_TEXT.weekend_slot.partOfDay), [
+      "morning",
+      "evening",
+      "all_day",
+    ]);
   });
 });

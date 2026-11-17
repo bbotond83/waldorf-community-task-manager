@@ -77,8 +77,16 @@ export async function schemaUsers(db: pg.Client, schema: string): Promise<unknow
 }
 
 /** Rows in one table of a schema. */
-export async function rowCount(db: pg.Client, schema: string, table: string): Promise<number> {
-  return (await db.query(`select count(*)::int as n from "${schema}"."${table}"`)).rows[0].n;
+export async function rowCount(
+  db: pg.Client,
+  schema: string,
+  table: string,
+  where = "true",
+  params: unknown[] = [],
+): Promise<number> {
+  return (
+    await db.query(`select count(*)::int as n from "${schema}"."${table}" where ${where}`, params)
+  ).rows[0].n;
 }
 
 /** A real sign-in through the sign-in service, as a person would; returns the access token or undefined. */

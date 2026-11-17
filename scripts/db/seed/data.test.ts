@@ -19,6 +19,8 @@ const allIds = (plan: SeedPlan): string[] => [
   plan.organization.id,
   plan.schoolYear.id,
   ...plan.breakWeeks.map((entry) => entry.id),
+  ...plan.standings.map((entry) => entry.id),
+  plan.rotaPlan.id,
   ...plan.groups.map((entry) => entry.id),
   ...plan.families.map((entry) => entry.id),
   ...plan.memberships.map((entry) => entry.id),
@@ -47,6 +49,8 @@ describe("seed data: the small set", () => {
       tasks: 8,
       assignments: 8,
       notices: 2,
+      standings: 2,
+      plans: 1,
     });
     assert.deepEqual(
       plan.accounts.filter((entry) => entry.role !== "parent").map((entry) => entry.tag),
@@ -295,10 +299,47 @@ describe("seed data: the school calendar", () => {
     }
   });
 
-  it("seeds no rota plan: the owner makes the first draft on the planning screen", () => {
-    const plan = buildSeedPlan("public", "small") as unknown as Record<string, unknown>;
-    assert.equal("rotaPlan" in plan, false);
-    assert.equal("rotaWeeks" in plan, false);
+  it("seeds one four-rota plan: a draft in the small set, published with six picks in the large set (BR61.1)", () => {
+    const small = buildSeedPlan("public", "small");
+    assert.deepEqual(
+      {
+        published: small.rotaPlan.published,
+        by: small.rotaPlan.publishedBy,
+        picks: small.rotaPlan.picks,
+      },
+      { published: false, by: null, picks: 0 },
+    );
+    const large = buildSeedPlan("public", "large");
+    assert.equal(large.rotaPlan.published, true);
+    assert.equal(large.rotaPlan.publishedBy, large.accounts[0]!.id, "the super admin published it");
+    assert.equal(large.rotaPlan.picks, 6);
+    assert.notEqual(small.rotaPlan.id, buildSeedPlan("worker_1", "small").rotaPlan.id);
+  });
+
+  it("lets a run ask for the other state of the rota plan, for the timing of the draft and the publish", () => {
+    const draft = buildSeedPlan("public", "large", "draft");
+    assert.deepEqual(
+      [draft.rotaPlan.published, draft.rotaPlan.publishedBy, draft.rotaPlan.picks],
+      [false, null, 0],
+    );
+    const published = buildSeedPlan("public", "small", "published");
+    assert.equal(published.rotaPlan.published, true);
+    assert.equal(published.rotaPlan.picks, 6);
+    assert.equal(published.rotaPlan.publishedBy, published.accounts[0]!.id);
+  });
+
+  it("seeds one leaving and one new family, the last two, in both sets (BR60.1)", () => {
+    for (const size of ["small", "large"] as const) {
+      const plan = buildSeedPlan("public", size);
+      assert.deepEqual(
+        plan.standings.map((entry) => entry.standing),
+        ["leaving", "new"],
+      );
+      assert.deepEqual(
+        plan.standings.map((entry) => entry.familyId),
+        plan.families.slice(-2).map((family) => family.id),
+      );
+    }
   });
 
   it("gives the same break weeks to every schema, with ids of its own", () => {

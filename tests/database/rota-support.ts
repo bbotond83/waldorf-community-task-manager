@@ -41,15 +41,57 @@ export type PlanView = {
   can_publish: boolean;
 };
 
+/** The whole read of a plan as the four-rota function returns it. */
+export type FullPlanView = Omit<PlanView, "items" | "families"> & {
+  items: (PlanWeek & { job: string })[];
+  families: {
+    family_id: string;
+    full_year: boolean;
+    counts: Record<string, number>;
+    above_lowest: string[];
+  }[];
+  blockers: {
+    empty_weeks: unknown[];
+    break_weeks: unknown[];
+    ineligible_weeks: unknown[];
+    flagged_weeks: unknown[];
+    clash_weeks: unknown[];
+  };
+  warnings: { two_jobs: unknown[] };
+};
+
+export async function readFullPlan(
+  db: pg.Client,
+  schema: string,
+  account: string = SUPER_ADMIN,
+  year: string = YEAR_1,
+): Promise<FullPlanView> {
+  return (await callFunction(db, schema, account, "rota_plan_get($1)", [
+    year,
+  ])) as unknown as FullPlanView;
+}
+
+/**
+ * The indoor-cleaning view of a plan: the rota the U2 tests were written for. Items are the indoor-cleaning weeks,
+ * `weeks` is each family's indoor-cleaning count and `above_lowest` says whether indoor cleaning is uneven.
+ */
 export async function readPlan(
   db: pg.Client,
   schema: string,
   account: string = SUPER_ADMIN,
   year: string = YEAR_1,
 ): Promise<PlanView> {
-  return (await callFunction(db, schema, account, "rota_plan_get($1)", [
-    year,
-  ])) as unknown as PlanView;
+  const full = await readFullPlan(db, schema, account, year);
+  if (!full.items) return full as unknown as PlanView;
+  return {
+    ...full,
+    items: full.items.filter((w) => w.job === "indoor_cleaning"),
+    families: full.families.map((f) => ({
+      family_id: f.family_id,
+      weeks: f.counts.indoor_cleaning ?? 0,
+      above_lowest: f.above_lowest.includes("indoor_cleaning"),
+    })),
+  };
 }
 
 export async function schoolWeekStarts(db: pg.Client, year: string = YEAR_1): Promise<string[]> {

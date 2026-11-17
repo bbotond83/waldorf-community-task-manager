@@ -293,6 +293,39 @@ export const ELEVATED: Record<
   duty_rota_managed_request: INTERNAL,
   swap_withdraw_core: INTERNAL,
   cancellation_request_core: INTERNAL,
+  // Ovis tábla U6 (C10, C11, C12, C16, C20, BR60 to BR64). The standing command, the two weekend pick commands and
+  // the unpicked list are signed-in commands that check their caller themselves; the eligibility checks, the draft
+  // and notice helpers, the timed checks and the change and removal functions for later units are internal.
+  family_standing_set: "authenticated",
+  weekend_pick_set: "authenticated",
+  weekend_pick_assign: "authenticated",
+  weekend_unpicked_list: "authenticated",
+  duty_ineligible_result: INTERNAL,
+  duty_standing_check: INTERNAL,
+  duty_standing_check_task: INTERNAL,
+  families_with_standing: INTERNAL,
+  family_hold_reason: INTERNAL,
+  family_may_hold_duty: INTERNAL,
+  family_standing: INTERNAL,
+  swap_standing_check: INTERNAL,
+  rota_adjust_picks_after_change: INTERNAL,
+  rota_check_change: INTERNAL,
+  rota_draft_compute: INTERNAL,
+  rota_family_for: INTERNAL,
+  rota_flagged_duties: INTERNAL,
+  rota_notice_parents: INTERNAL,
+  rota_notice_super_admins: INTERNAL,
+  rota_planning_removal_apply: INTERNAL,
+  rota_planning_removal_preview: INTERNAL,
+  rota_week_duty: INTERNAL,
+  rota_week_reminder_check: INTERNAL,
+  weekend_pick_alert_send: INTERNAL,
+  weekend_pick_owed: INTERNAL,
+  weekend_pick_step: INTERNAL,
+  weekend_picking_state: INTERNAL,
+  weekend_picks_alert_check: INTERNAL,
+  weekend_picks_due_check: INTERNAL,
+  weekend_shelter_duty: INTERNAL,
   // U5 audit purge (NFR1.68): deletes audit events older than 365 days. Elevated because no application role holds
   // a delete right on the audit table; it checks that the caller is the system, sets the transaction-local purge
   // setting for its own transaction only, and is called by identity_housekeeping (the service-role key).
@@ -343,6 +376,9 @@ const POLICY_TEST_COVERAGE: Record<string, string> = {
   break_weeks: "rota-plan.test.ts (BR27.2 table access)",
   rota_plans: "rota-plan.test.ts (BR27.2 table access)",
   rota_weeks: "rota-plan.test.ts (BR27.2 table access)",
+  family_year_standings: "rota-standing.test.ts (table access)",
+  weekend_slots: "weekend-picks.test.ts (table access)",
+  weekend_picks: "weekend-picks.test.ts (table access)",
 };
 
 /**
@@ -382,6 +418,12 @@ const PROBE_DECISION: Record<string, string> = {
   break_weeks: "none: U2 table, never a detail screen",
   rota_plans: "none: U2 table, read through the plan and overview functions, never a detail screen",
   rota_weeks: "none: U2 table, read through the plan and overview functions, never a detail screen",
+  family_year_standings:
+    "none: U6 table, read through the calendar function, never a detail screen",
+  weekend_slots:
+    "none: U6 table, read through the overview and card functions, never a detail screen",
+  weekend_picks:
+    "none: U6 table, read through the overview and card functions, never a detail screen",
   // U4 tables: a notification, a reminder job and its rows are never a detail screen of the probe.
   notifications: "none: U4 table, never a detail screen",
   reminder_jobs: "none: U4 table, never a detail screen",

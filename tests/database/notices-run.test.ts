@@ -111,6 +111,9 @@ for (const schema of NOTIFICATION_SCHEMAS) {
         [
           ["duty_reminders", "success"],
           ["housekeeping", "success"],
+          // The checks of the rota unit (U6), registered in the same run.
+          ["rota_week_reminder", "success"],
+          ["weekend_picks_reminder", "success"],
         ],
       );
       assert.equal(reminders(answer).created, 2);
@@ -136,6 +139,8 @@ for (const schema of NOTIFICATION_SCHEMAS) {
         [
           { check_name: "duty_reminders", outcome: "success", created: 2 },
           { check_name: "housekeeping", outcome: "success", created: 0 },
+          { check_name: "rota_week_reminder", outcome: "success", created: 0 },
+          { check_name: "weekend_picks_reminder", outcome: "success", created: 0 },
         ],
       );
     });
@@ -183,10 +188,13 @@ for (const schema of NOTIFICATION_SCHEMAS) {
       assert.equal(await count("timed_runs"), 0, "a refused run leaves no record");
     });
 
-    it("friday_noon: runs the checks registered for it, none by default, and still leaves a run record (BR52.2)", async () => {
+    it("friday_noon: runs the checks registered for it (U6's alert only) and still leaves a run record (BR52.2)", async () => {
       const answer = await run("friday_noon");
       assert.equal(answer.state, "success");
-      assert.deepEqual(answer.checks, []);
+      assert.deepEqual(
+        answer.checks.map((check) => [check.check, check.outcome, check.created]),
+        [["weekend_picks_alert", "success", 0]],
+      );
       assert.equal(await count("timed_runs", "run_kind = 'friday_noon'"), 1);
     });
 
@@ -216,6 +224,8 @@ for (const schema of NOTIFICATION_SCHEMAS) {
             ["aa_step4", "success"],
             ["duty_reminders", "success"],
             ["housekeeping", "success"],
+            ["rota_week_reminder", "success"],
+            ["weekend_picks_reminder", "success"],
           ],
         );
         const broken = answer.checks.find((check) => check.check === "broken_step2")!;

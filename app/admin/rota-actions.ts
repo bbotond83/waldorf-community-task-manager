@@ -220,3 +220,79 @@ export async function publishAction(
   if (result.state === "success") refresh();
   return rotaState(result, "A beosztás közzétéve.");
 }
+
+const STANDINGS = ["staying", "leaving", "new"] as const;
+const SLOTS = ["saturday_opening", "saturday_closing", "sunday_opening", "sunday_closing"] as const;
+
+/** Sets a family's standing in a school year (BR60.1). The version is 0 while the family has no standing yet. */
+export async function setStandingAction(
+  _state: AdminActionState,
+  formData: FormData,
+): Promise<AdminActionState> {
+  const familyId = text(formData, "familyId");
+  const schoolYearId = text(formData, "schoolYearId");
+  const standing = text(formData, "standing");
+  const key = text(formData, "idempotencyKey");
+  const expectedVersion = Number(formData.get("expectedVersion"));
+  if (
+    !UUID.test(familyId) ||
+    !UUID.test(schoolYearId) ||
+    !KEY.test(key) ||
+    !Number.isInteger(expectedVersion) ||
+    expectedVersion < 0
+  ) {
+    return invalid("Töltse újra az oldalt, és próbálja újra.");
+  }
+  const chosen = STANDINGS.find((value) => value === standing);
+  if (!chosen) {
+    return {
+      state: "validation",
+      message: "Ellenőrizze a megadott adatokat.",
+      fieldErrors: { standing: "Válasszon a Marad, Távozik és Új közül." },
+    };
+  }
+  const context = await boundary();
+  if (!context) return DENIED;
+  const result = await context.rota.setStanding(
+    context.session.applicationSession,
+    context.session.scope,
+    { idempotencyKey: key, familyId, schoolYearId, standing: chosen, expectedVersion },
+  );
+  if (result.state === "success") refresh();
+  return rotaState(result, "A család helyzete mentve.");
+}
+
+/** A super admin assigns a weekend opening or closing to a family until the weekend starts (BR63.6). */
+export async function assignSlotAction(
+  _state: AdminActionState,
+  formData: FormData,
+): Promise<AdminActionState> {
+  const rotaWeekId = text(formData, "rotaWeekId");
+  // The list sends one value per free slot, `<slot>:<version of its place>` (the version that was on screen).
+  const [slot = "", versionText = ""] = text(formData, "slot").split(":");
+  const key = text(formData, "idempotencyKey");
+  const expectedVersion = Number(versionText);
+  const chosen = SLOTS.find((value) => value === slot);
+  if (!UUID.test(rotaWeekId) || !KEY.test(key)) {
+    return invalid("Töltse újra az oldalt, és próbálja újra.");
+  }
+  if (!chosen || !Number.isInteger(expectedVersion) || expectedVersion < 1) {
+    return {
+      state: "validation",
+      message: "Ellenőrizze a megadott adatokat.",
+      fieldErrors: { slot: "Válasszon egy szabad nyitást vagy zárást." },
+    };
+  }
+  const context = await boundary();
+  if (!context) return DENIED;
+  const result = await context.rota.assignSlot(
+    context.session.applicationSession,
+    context.session.scope,
+    { idempotencyKey: key, rotaWeekId, slot: chosen, expectedVersion },
+  );
+  if (result.state === "success") {
+    refresh();
+    revalidatePath("/admin");
+  }
+  return rotaState(result, "A kijelölés mentve.");
+}

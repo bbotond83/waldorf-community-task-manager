@@ -22,6 +22,9 @@
 - 2026-11-15T13:05:00Z [unit u4-working-groups] — The coordinator notice's once key carries the kind (coordinator_appointed:<grant id>); U5 removes duplicates by once key and parent only, so the grant id alone would drop the revocation notice.
 - 2026-11-15T13:05:00Z [unit u4-working-groups] — A stale leave after an appointment gets VERSION_CONFLICT on purpose; the parent's page did not show the warning that leaving ends the coordinator right.
 
+- 2026-11-16T05:49:19Z — [unit u6-full-rotas-and-weekend-picks] Judge a rota week's changeover eligibility by its Monday; the stories give only a date, and a week that contains the changeover date would otherwise leave its weekend duties and pick with a family that may not hold them. Recorded as an assumption for the owner.
+- 2026-11-16T05:49:19Z — [unit u6-full-rotas-and-weekend-picks] Treat a family with no standing row as staying; contract C20 said "null when the family has no row", but backfilling a row for every family and year would keep two copies of one fact. Listed as a contract delta.
+
 ## Deviations
 <!-- example: 2026-05-29T10:14:32Z — skipped the optional caching layer the stage prose suggested; the dataset is small enough that it adds risk -->
 - 2026-11-09T07:11:20Z [unit u1-community-foundation] — Left isCoordinator off WorkingGroupMembership although components.md lists it; the unrevoked group-admin grant is the single record, because ADR-010 keeps grants in Identity and a second copy could disagree.
@@ -47,7 +50,12 @@
 
 - 2026-11-15T12:01:26Z [unit u4-working-groups] — The general role-change function refuses the group-admin role instead of gaining a membership check (Q3); one way in keeps the grant-needs-membership rule in a single place.
 
+- 2026-11-16T05:49:19Z — [unit u6-full-rotas-and-weekend-picks] Give the weekend family all five weekend places at publishing and let a pick move one, instead of leaving opening and closing places open until picked; "the weekend family does the rest" then needs no step at all, and the overview, done marks and removal read places only. The cost is one contract delta: the pick functions call place_reassign.
+- 2026-11-16T05:49:19Z — [unit u6-full-rotas-and-weekend-picks] Compute flagged duties when read instead of storing a flag; a later change of standing or changeover date then needs no clean-up, and the removal block has nothing to write.
+
 ## Open questions
+
+- 2026-11-16T05:49:19Z — [unit u6-full-rotas-and-weekend-picks] Notices reach only parents with an account, so a super admin with no parent record gets no Friday-noon alert; confirm whether every administrator is also a parent before go-live.
 - 2026-11-10T08:05:00Z [unit u2-first-rota-slice] — The teacher's overview route is only proposed; confirm it in the Stitch design.
 - 2026-11-13T07:07:04Z [unit u3-directory-and-profile] — U14's notes say its design settles removing a family's only parent; U3 now refuses it (owner answer Q5), so U14 should start from that refusal.
 - 2026-11-13T07:16:30Z [unit u3-directory-and-profile] — Settle in NFR Design or the code plan: the extended account-status step must lock the family row before touching the profile (lock order), and the password change must end the sign-in service's sessions that the database's active-session check reads, with a test that an old session is refused.

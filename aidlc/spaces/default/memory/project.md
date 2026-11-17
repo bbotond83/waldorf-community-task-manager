@@ -35,6 +35,8 @@
 
 - ALWAYS check owner-review screenshots for error pages before sending them, because a wrong address in the screenshot script silently shows an error screen instead of the intended screen. (learned 2026-11-14) <!-- cid:261108-ovis-tabla-workflow:code-generation:be1fb7af972058101a51643f40419529287edf164d3f275b419eac82e0476c6a -->
 
+- ALWAYS extend tests/database/identity-catalogue.test.ts (elevated-function list, policy-test list, scope-probe decisions) and src/data/notification-use-cases.test.ts when a new database function or table is added, or they fail on the new objects. (learned 2026-11-17) <!-- cid:261108-ovis-tabla-workflow:code-generation:8c0c296623456e1e5d281cc17df14c664633d7c0a80001079d3d9e9b18a425be -->
+
 ## Deployment
 
 <!-- Project-specific specialisation. -->
@@ -152,3 +154,5 @@ None. (affirmed 2026-10-06)
 - In a verification command, write export PATH=... before the && chain, because a leading PATH=... assignment applies only to the first command and later parts would run on the wrong Node version (learned 2026-10-12) <!-- cid:261012-real-backend-local:code-generation:381cbff5fad47f19462ab785735ce86ee8f3121cb7cdfeeb6e0f063dabf6adbc -->
 - Keep no isCoordinator field on WorkingGroupMembership: the unrevoked group-admin grant is the single record, because ADR-010 keeps grants in Identity and a second copy could disagree. (learned 2026-11-10) <!-- cid:261108-ovis-tabla-workflow:functional-design:7ecc29ad8f42f661eebe4eae86d9135c370af5819bc25cc8e8700b8333904632 -->
 - npm run verify:local needs the local settings loaded first: source .env.database.local and export APP_SESSION_SECRET, APP_PUBLIC_URL and SMTP_FROM, otherwise the build fails with an invalid APP_SESSION_SECRET error. (learned 2026-11-10) <!-- cid:261108-ovis-tabla-workflow:functional-design:b7c24f43b28a3d04c61ba3d31e5f45c81632cbe254e1cc1f2592e2c1a8b783c6 -->
+- Once the Saturday of a weekend has begun, rota changes leave that weekend's picks alone. (learned 2026-11-17) <!-- cid:261108-ovis-tabla-workflow:code-generation:3bb983b7c1fc209681443c9585b24316f108de224c69d356818d5f11ffd76c60 -->
+- NEVER add a row lock in a wrapper function just to check a family's standing, because it broke the timing of the existing lock tests; use a cheap guard that only checks when some family is not staying. (learned 2026-11-17) <!-- cid:261108-ovis-tabla-workflow:code-generation:2b2982ab0a4d97258a90c3103995e390bfeecfc732a8f3fbb9612a0355d4f3b0 -->

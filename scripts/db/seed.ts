@@ -64,7 +64,7 @@ export interface SeedResult {
  */
 export async function seedSchema(
   deps: SeedDeps,
-  options: { schema?: string | true; size: SeedSize },
+  options: { schema?: string | true; size: SeedSize; rotaPlan?: "draft" | "published" },
 ): Promise<SeedResult> {
   const started = deps.now();
   const schema = resolveSeedSchema(options.schema);
@@ -72,7 +72,7 @@ export async function seedSchema(
   const serviceKey = loadServiceKey(deps);
   const client: SqlClient = await connectLocalStack(settings, deps.connect);
   try {
-    const plan = buildSeedPlan(schema, options.size);
+    const plan = buildSeedPlan(schema, options.size, options.rotaPlan);
     const admin = deps.createAdmin({ url: settings.apiUrl, serviceKey });
     const provisioned = await provisionAccounts({ client, admin, accounts: plan.accounts });
     try {

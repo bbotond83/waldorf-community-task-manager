@@ -123,8 +123,12 @@ const ROTA_PORT_DOUBLE: RotaApplicationPort = {
   publish: deniedOutcome,
   overview: async () => ({
     state: "success",
-    data: { overviewState: "nothing_published", items: [] },
+    data: { overviewState: "nothing_published", items: [], weekendItems: [] },
   }),
+  setStanding: deniedOutcome,
+  pickSlot: deniedOutcome,
+  assignSlot: deniedOutcome,
+  unpickedList: deniedOutcome,
   // One card exists, so a page test sees what the policy lets through; every other id is refused.
   dutyCard: async ({ dutyId }) =>
     dutyId === ROTA_CARD_DUTY_ID
@@ -139,6 +143,8 @@ const ROTA_PORT_DOUBLE: RotaApplicationPort = {
             weekEnd: "2026-11-15",
             noFixedDay: true,
             isBreakWeek: false,
+            includesWatering: false,
+            bottlesAtWeekEnd: false,
           },
         }
       : { state: "denied" },

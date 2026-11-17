@@ -35,7 +35,15 @@ function port() {
     return Promise.resolve({ state: "success", data });
   };
   const adapter: RotaApplicationPort = {
-    calendar: () => done("calendar", { schoolYears: [], weeks: [], warnings: [], hasPlan: false }),
+    calendar: () =>
+      done("calendar", {
+        schoolYears: [],
+        weeks: [],
+        warnings: [],
+        hasPlan: false,
+        standings: [],
+        flaggedDuties: [],
+      }),
     addBreakWeek: () => done("addBreakWeek", { id: "w" }),
     removeBreakWeek: () => done("removeBreakWeek", { id: "w" }),
     plan: () =>
@@ -43,14 +51,29 @@ function port() {
         weeks: [],
         families: [],
         changedWeeks: 0,
-        blockers: { emptyWeeks: [], breakWeeks: [], ineligibleWeeks: [] },
+        blockers: {
+          emptyWeeks: [],
+          breakWeeks: [],
+          ineligibleWeeks: [],
+          emptyRows: [],
+          breakRows: [],
+          ineligibleRows: [],
+          flaggedWeeks: [],
+          clashWeeks: [],
+        },
+        warnings: { twoJobs: [] },
         canPublish: false,
       }),
     makeDraft: () => done("makeDraft", { id: "p" }),
     setWeek: () => done("setWeek", { id: "w", version: 2 }),
     discard: () => done("discard", { id: "p" }),
     publish: () => done("publish", { id: "p", version: 2 }),
-    overview: () => done("overview", { overviewState: "nothing_published" as const, items: [] }),
+    overview: () =>
+      done("overview", {
+        overviewState: "nothing_published" as const,
+        items: [],
+        weekendItems: [],
+      }),
     dutyCard: () =>
       done("dutyCard", {
         dutyId: "d",
@@ -59,9 +82,15 @@ function port() {
         familyDisplayName: "Minta család",
         weekStart: "2026-08-31",
         weekEnd: "2026-09-06",
-        noFixedDay: true as const,
+        noFixedDay: true,
         isBreakWeek: false,
+        includesWatering: false,
+        bottlesAtWeekEnd: false,
       }),
+    setStanding: () => done("setStanding", { id: "s", version: 1 }),
+    pickSlot: () => done("pickSlot", { id: "k", version: 2 }),
+    assignSlot: () => done("assignSlot", { id: "k", version: 2 }),
+    unpickedList: () => done("unpickedList", { items: [], missed: [] }),
   };
   const facade = (role: Role) => {
     const versions = new InMemoryAuthorizationVersions({ [`${role}-synthetic`]: 1 });
@@ -230,6 +259,144 @@ describe("RotaApplicationFacade", () => {
       expectedVersion: 1.5,
     });
     assert.equal(badSet.state, "validation");
+    assert.deepEqual(calls, []);
+  });
+
+  it("lets a super admin set a standing, assign a pick and read the unpicked list, and a standing with no row yet has version 0 (U6)", async () => {
+    const { calls, facade } = port();
+    const admin = session("super_admin", organization);
+    const rota = facade("super_admin");
+    const standing = {
+      idempotencyKey: KEY,
+      familyId: "f",
+      schoolYearId: "y",
+      standing: "new" as const,
+    };
+    assert.equal(
+      (await rota.setStanding(admin, organization, { ...standing, expectedVersion: 0 })).state,
+      "success",
+    );
+    assert.equal(
+      (await rota.setStanding(admin, organization, { ...standing, expectedVersion: 3 })).state,
+      "success",
+    );
+    assert.equal(
+      (
+        await rota.assignSlot(admin, organization, {
+          idempotencyKey: KEY,
+          rotaWeekId: "w",
+          slot: "saturday_opening",
+          expectedVersion: 1,
+        })
+      ).state,
+      "success",
+    );
+    assert.equal((await rota.getUnpickedList(admin, organization)).state, "success");
+    assert.deepEqual(calls, ["setStanding", "setStanding", "assignSlot", "unpickedList"]);
+  });
+
+  it("refuses a standing, an assignment and the unpicked list to every role but a super admin (U6)", async () => {
+    for (const [role, scope] of [
+      ["parent", family],
+      ["kindergarten_teacher", organization],
+      ["group_admin", group],
+    ] as const) {
+      const { calls, facade } = port();
+      const rota = facade(role);
+      const who = session(role, scope);
+      const results = [
+        await rota.setStanding(who, scope, {
+          idempotencyKey: KEY,
+          familyId: "f",
+          schoolYearId: "y",
+          standing: "leaving",
+          expectedVersion: 1,
+        }),
+        await rota.assignSlot(who, scope, {
+          idempotencyKey: KEY,
+          rotaWeekId: "w",
+          slot: "sunday_closing",
+          expectedVersion: 1,
+        }),
+        await rota.getUnpickedList(who, scope),
+      ];
+      assert.deepEqual(
+        results.map((result) => result.state),
+        ["denied", "denied", "denied"],
+        role,
+      );
+      assert.deepEqual(calls, [], role);
+    }
+  });
+
+  it("lets a parent, and nobody else, pick a slot for the family (BR63.4)", async () => {
+    for (const [role, scope] of [
+      ["parent", family],
+      ["kindergarten_teacher", organization],
+      ["group_admin", group],
+      ["super_admin", organization],
+    ] as const) {
+      const { calls, facade } = port();
+      const result = await facade(role).pickSlot(session(role, scope), scope, {
+        idempotencyKey: KEY,
+        rotaWeekId: "w",
+        slot: "saturday_opening",
+        expectedVersion: 1,
+      });
+      assert.equal(result.state, role === "parent" ? "success" : "denied", role);
+      assert.deepEqual(calls, role === "parent" ? ["pickSlot"] : [], role);
+    }
+  });
+
+  it("refuses a pick or an assignment with no usable key or version before the port is called (U6)", async () => {
+    const { calls, facade } = port();
+    const admin = session("super_admin", organization);
+    const rota = facade("super_admin");
+    const pick = { rotaWeekId: "w", slot: "saturday_opening" as const };
+    assert.equal(
+      (
+        await rota.assignSlot(admin, organization, {
+          ...pick,
+          idempotencyKey: "x",
+          expectedVersion: 1,
+        })
+      ).state,
+      "validation",
+    );
+    assert.equal(
+      (
+        await rota.assignSlot(admin, organization, {
+          ...pick,
+          idempotencyKey: KEY,
+          expectedVersion: 0,
+        })
+      ).state,
+      "validation",
+    );
+    assert.equal(
+      (
+        await rota.setStanding(admin, organization, {
+          idempotencyKey: "x",
+          familyId: "f",
+          schoolYearId: "y",
+          standing: "staying",
+          expectedVersion: 0,
+        })
+      ).state,
+      "validation",
+    );
+    assert.equal(
+      (
+        await rota.setStanding(admin, organization, {
+          idempotencyKey: KEY,
+          familyId: "f",
+          schoolYearId: "y",
+          standing: "staying",
+          expectedVersion: -1,
+        })
+      ).state,
+      "validation",
+    );
     assert.deepEqual(calls, []);
   });
 

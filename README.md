@@ -127,21 +127,35 @@ code when a check failed or an email could not be sent. Locally, mail goes to th
 `APP_PUBLIC_URL`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_FROM`, optional `DATABASE_SCHEMA`) from the environment or from the
 two `.env` files `db:start` writes. Nothing runs it on a schedule yet: that belongs to the hosting work.
 
-### The school calendar and the cleaning rota
+### The school calendar, the four rotas and the weekend picks
 
-Sign in as the super admin to plan the indoor-cleaning rota for the year. The seed gives the 2026-2027 year a changeover
-date and four invented break weeks, and no plan.
+Sign in as the super admin to plan the four rotas of the year: indoor cleaning, front garden, water carrying and the
+weekend animal care. The seed gives the 2026-2027 year a changeover date and four invented break weeks, one family that
+leaves after the changeover date and one that is new from it, and a **draft** of the four rotas (the large seed holds a
+published plan with six weekend picks instead). The draft is part of the seed: a database made before this version has to
+be reset for it (`npm run db:reset`, then `npm run db:seed`), because the migration only adds `not_drafted` rows to an
+existing plan.
 
-| Screen                    | Address                                | Who                                  | What it does                                                                                                                                 |
-| ------------------------- | -------------------------------------- | ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| Tanév                     | `/admin/tanev`                         | super admin                          | year dates, changeover date, break weeks (add, remove), the list of school weeks                                                             |
-| Beosztás tervezése        | `/admin/beosztas`                      | super admin                          | make a draft, change a week, discard, publish; shows what blocks publishing and each family's count of weeks                                 |
-| Beosztás                  | `/szulo/beosztas`, `/teacher/beosztas` | parent, group administrator, teacher | the published rota: week cards on a phone, a table on a computer, a family filter; "Még nincs közzétett beosztás." until a plan is published |
-| Takarítási feladat (card) | `/szulo/beosztas/[id]`                 | the family that holds the week       | the family, the week, the fixed instruction and the note that there is no fixed day                                                          |
+| Screen             | Address                                | Who                                  | What it does                                                                                                                                                                                      |
+| ------------------ | -------------------------------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Tanév              | `/admin/tanev`                         | super admin                          | year dates, changeover date, break weeks, the list of school weeks, each family's standing (Marad, Távozik, Új) and the duties that standing flags                                                |
+| Beosztás tervezése | `/admin/beosztas`                      | super admin                          | one tab per rota: make a draft, change a week, discard, publish; per-rota counts, what blocks publishing (empty weeks, clashes, flagged families) and the warning for one family in two rotas     |
+| Áttekintés         | `/admin`                               | super admin                          | the list "Ki nem választott?": the weekend picks nobody has made, the free openings and closings, and the assign action                                                                           |
+| Beosztás           | `/szulo/beosztas`, `/teacher/beosztas` | parent, group administrator, teacher | the published rota: one section per rota and the five weekend duties of each week; week cards on a phone, a table on a computer, a family filter; "Még nincs közzétett beosztás." until published |
+| Feladatlap (card)  | `/szulo/beosztas/[id]`                 | the family that holds the week       | the family, the week and the fixed text of the rota; for the week's inside-cleaning and front-garden family the weekend picker, for the week's families the weekend list and who picked what      |
 
-A draft is visible to the super admin only. Publishing creates one duty and one place for each week and a notice for each
-parent. A published plan cannot be changed or discarded in this version; to start over on your computer, reset the local
-database (`npm run db:reset`, then `npm run db:seed`).
+A draft is visible to the super admin only. Publishing creates one duty and one place for each week of the three weekly
+rotas, five weekend duties for each week (all with the weekend family until someone picks) and a notice for each parent.
+The weekend picker is a set of native radio buttons: a family chooses until Friday noon and can change it until then; a
+super admin can assign a free slot until the weekend begins. A published plan cannot be changed or discarded in this
+version; to start over on your computer, reset the local database (`npm run db:reset`, then `npm run db:seed`).
+
+What the timed runs now send: the **daily run** also sends the Wednesday reminder to families that owe a weekend pick, the
+notice to the weekend family when a picker is missing and the weekly rota reminder, and raises the alert for a pick still open
+after Friday noon; the **Friday-noon run** sends the overdue-pick alert to the super admin. `npm run timed:run -- --mode daily`
+(or `friday_noon`) runs a mode once by hand. The pages, the draft and the publish are timed on the 30-family set by
+`ROTA_TIMING=1 npx playwright test --project=chromium tests/browser/rota-timing.spec.ts`.
+Screenshots for the owner's comparison with Stitch: `ROTA_SCREENSHOTS=<folder> npx playwright test --project=chromium tests/browser/rota-screenshots.spec.ts`.
 
 ### The parent directory, "Fiókom" and the family records
 

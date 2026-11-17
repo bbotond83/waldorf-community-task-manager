@@ -5,6 +5,17 @@ import {
 } from "../../app/admin/_lib/action-state.ts";
 import { mapParentResult, PARENT_CONFLICT_MESSAGES } from "../../app/szulo/_lib/action-state.ts";
 import { conflict, invalidated, success } from "../../src/application/index.ts";
+import {
+  EMPTY_WEEK_REASON_TEXT,
+  hasRotaRefusalMessage,
+  HOLD_REASON_TEXT,
+  PICK_STATE_TEXT,
+  ROTA_JOB_LABELS,
+  ROTA_WARNING_TEXT,
+  rotaRefusalMessage,
+  STANDING_LABELS,
+  WEEKEND_SLOT_LABELS,
+} from "../../src/application/rota-format.ts";
 import { statusLabel } from "../../src/application/status-labels.ts";
 import { BUSINESS_CODE_STATES } from "../../src/data/results.ts";
 import { roleProfile } from "../support/role-profiles.ts";
@@ -109,6 +120,51 @@ describe("every conflict code of the database adapters has a message on some scr
       .map(([code]) => code)
       .filter((code) => !covered.has(code));
     expect(missing).toEqual([]);
+  });
+});
+
+const NEW_ROTA_CODES = [
+  "ROTA_SAME_WEEK_CLASH",
+  "STANDING_INVALID",
+  "DUTY_INELIGIBLE",
+  "WEEKEND_PICK_CLOSED",
+  "WEEKEND_PICK_LOCKED",
+  "WEEKEND_PICK_NOT_NEEDED",
+  "WEEKEND_SLOT_NOT_PICKABLE",
+  "WEEKEND_SLOT_TAKEN",
+] as const;
+
+describe("the refusals of the four rotas and the weekend picks (U6)", () => {
+  it.each(NEW_ROTA_CODES)("%s has its own Hungarian sentence", (code) => {
+    expect(hasRotaRefusalMessage(code)).toBe(true);
+    const sentence = rotaRefusalMessage(code);
+    expect(sentence).not.toBe(rotaRefusalMessage("unknown"));
+    expect(sentence).not.toMatch(ENGLISH);
+    expect(sentence).toMatch(/\.$/);
+  });
+
+  it("gives each new refusal a sentence of its own", () => {
+    const sentences = NEW_ROTA_CODES.map((code) => rotaRefusalMessage(code));
+    expect(new Set(sentences).size).toBe(NEW_ROTA_CODES.length);
+  });
+
+  it("names the four rotas, the five weekend duties and the three standings in Hungarian", () => {
+    expect(Object.values(ROTA_JOB_LABELS)).toEqual([
+      "Belső takarítás",
+      "Előkert",
+      "Vízhordás",
+      "Hétvégi állatgondozás",
+    ]);
+    expect(Object.values(WEEKEND_SLOT_LABELS)).toHaveLength(5);
+    expect(Object.values(STANDING_LABELS)).toEqual(["Marad", "Távozik", "Új"]);
+    for (const text of [
+      ...Object.values(EMPTY_WEEK_REASON_TEXT),
+      ...Object.values(HOLD_REASON_TEXT),
+      ...Object.values(PICK_STATE_TEXT),
+      ...Object.values(ROTA_WARNING_TEXT),
+    ]) {
+      expect(text).not.toMatch(ENGLISH);
+    }
   });
 });
 

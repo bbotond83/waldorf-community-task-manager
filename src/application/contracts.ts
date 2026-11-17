@@ -88,6 +88,7 @@ export type AuthorizationMatrixRowId =
   | "AUTH-DIRECTORY"
   | "AUTH-PARENT-ACCOUNT"
   | "AUTH-SUPER-ROTA"
+  | "AUTH-PARENT-WEEKEND-PICK"
   | "AUTH-SUPER-ADMIN"
   | "AUTH-SUPER-GOVERNANCE";
 
@@ -232,11 +233,29 @@ export type SchoolCalendarModel = Readonly<{
   weeks: readonly SchoolWeekItem[];
   warnings: readonly Readonly<{ weekStart: string; familyDisplayName: string }>[];
   hasPlan: boolean;
+  /** Every active family with its standing in the year (BR60.4), and the duties flagged by it (BR60.5). */
+  standings: readonly FamilyStandingItem[];
+  flaggedDuties: readonly FlaggedDutyItem[];
 }>;
 
-/** One week of the plan being adjusted (BR21.2, BR22.1). */
+/** The four rotas of the community (BR61.1). */
+export type RotaJob = "indoor_cleaning" | "front_garden" | "water_carrying" | "weekend_animal_care";
+
+/** The five duties of a weekend (BR63.1): the four openings and closings, and the shelter cleaning. */
+export type WeekendSlot =
+  | "saturday_opening"
+  | "saturday_closing"
+  | "sunday_opening"
+  | "sunday_closing"
+  | "shelter_cleaning";
+
+/** The standing of a family in a school year (BR60.1): staying, leaving after the changeover date, or new from it. */
+export type FamilyStanding = "staying" | "leaving" | "new";
+
+/** One row of the plan being adjusted: one rota, one week (BR21.2, BR22.1, BR62.1). */
 export type RotaPlanWeek = Readonly<{
   id: string;
+  job: RotaJob;
   weekStart: string;
   isBreak: boolean;
   familyId?: string;
@@ -246,11 +265,39 @@ export type RotaPlanWeek = Readonly<{
   version: number;
 }>;
 
+/**
+ * A family's weeks in the plan. `counts` holds the weeks of each rota and `aboveLowestJobs` the rotas in which a
+ * full-year family is more than one week above the lowest count (BR62.2); `weeks` and `aboveLowest` are the indoor
+ * cleaning figures that the planning screen showed before there were four rotas.
+ */
 export type RotaFamilyCount = Readonly<{
   familyId: string;
   displayName: string;
+  fullYear: boolean;
+  counts: Readonly<Record<RotaJob, number>>;
+  aboveLowestJobs: readonly RotaJob[];
   weeks: number;
   aboveLowest: boolean;
+}>;
+
+/** A week row named by its Monday and rota, as the blockers and warnings of the plan list it. */
+export type RotaWeekRef = Readonly<{ weekStart: string; job: RotaJob; reason?: string }>;
+
+/** A family that holds a week it may not hold (BR60.5): the rota week and why. */
+export type RotaFlaggedWeek = Readonly<{
+  weekStart: string;
+  job: RotaJob;
+  familyId: string;
+  familyDisplayName: string;
+  reason: "leaving_after_changeover" | "new_before_changeover";
+}>;
+
+/** The same family on indoor cleaning and front garden in one week (BR62.6), and on two other rotas (a warning). */
+export type RotaClashWeek = Readonly<{
+  weekStart: string;
+  familyId: string;
+  familyDisplayName: string;
+  jobs?: readonly RotaJob[];
 }>;
 
 /** The planning screen (W2 to W5): the draft or published plan, family counts, and what blocks publishing. */
@@ -266,19 +313,40 @@ export type RotaPlanModel = Readonly<{
   weeks: readonly RotaPlanWeek[];
   families: readonly RotaFamilyCount[];
   changedWeeks: number;
+  /**
+   * What blocks publishing. The three week lists hold each Monday once (as before four rotas); the `*Rows` lists
+   * and the flagged and clash lists say which rota and why (BR62.3).
+   */
   blockers: Readonly<{
     emptyWeeks: readonly string[];
     breakWeeks: readonly string[];
     ineligibleWeeks: readonly string[];
+    emptyRows: readonly RotaWeekRef[];
+    breakRows: readonly RotaWeekRef[];
+    ineligibleRows: readonly RotaWeekRef[];
+    flaggedWeeks: readonly RotaFlaggedWeek[];
+    clashWeeks: readonly RotaClashWeek[];
   }>;
+  /** Warnings that do not block: one family on two rotas in one week, other than the clash (BR62.7). */
+  warnings: Readonly<{ twoJobs: readonly RotaClashWeek[] }>;
   canPublish: boolean;
 }>;
 
-/** One week of the overview: only the family id and name, never a contact detail or a sharing choice (NFR1.2). */
+/** One row of the overview: only the family id and name, never a contact detail or a sharing choice (NFR1.2). */
 export type RotaOverviewItem = Readonly<{
-  job: "indoor_cleaning";
+  job: RotaJob;
   weekStart: string;
   isBreak: boolean;
+  familyId?: string;
+  familyDisplayName?: string;
+  isOwn: boolean;
+  dutyId?: string;
+}>;
+
+/** One weekend duty of the overview: who holds the opening, closing or shelter cleaning (BR65.1). */
+export type WeekendOverviewItem = Readonly<{
+  weekStart: string;
+  slot: WeekendSlot;
   familyId?: string;
   familyDisplayName?: string;
   isOwn: boolean;
@@ -289,18 +357,100 @@ export type RotaOverviewModel = Readonly<{
   overviewState: "nothing_published" | "published";
   schoolYear?: Readonly<{ id: string; name: string }>;
   items: readonly RotaOverviewItem[];
+  weekendItems: readonly WeekendOverviewItem[];
 }>;
 
-/** The duty card (W7): the week, the family and the fixed text key; there is no fixed day (BR24.2). */
+/** A free opening or closing of a weekend, with the place version the pick command needs. */
+export type WeekendFreeSlot = Readonly<{ slot: WeekendSlot; dutyId: string; placeVersion: number }>;
+
+/** The state of one weekend as a duty card shows it (BR65.3). */
+export type WeekendStateModel = Readonly<{
+  weekStart: string;
+  picksCloseAt: string;
+  changeUntil: string;
+  weekendFamilyDisplayName?: string;
+  slots: readonly Readonly<{
+    slot: WeekendSlot;
+    dutyId: string;
+    placeVersion: number;
+    holderFamilyDisplayName?: string;
+    heldByWeekendFamily: boolean;
+    picked: boolean;
+  }>[];
+  pickers: readonly Readonly<{
+    job: "indoor_cleaning" | "front_garden";
+    familyDisplayName?: string;
+    state: "not_needed" | "picked" | "missed" | "open";
+    slot?: WeekendSlot;
+  }>[];
+}>;
+
+/** What the picking family itself can do on its duty card (BR63.4). */
+export type WeekendOwnPickModel = Readonly<{
+  rotaWeekId: string;
+  state: "not_needed" | "picked" | "missed" | "open";
+  slot?: WeekendSlot;
+  canPick: boolean;
+  freeSlots: readonly WeekendFreeSlot[];
+  picksCloseAt: string;
+  changeUntil: string;
+}>;
+
+/** The duty card (W7): the week, the family and the fixed text key; a weekly duty has no fixed day (BR24.2). */
 export type RotaDutyCardModel = Readonly<{
   dutyId: string;
-  job: "indoor_cleaning";
+  job: RotaJob;
+  slot?: WeekendSlot;
   title: string;
   familyDisplayName: string;
   weekStart: string;
   weekEnd: string;
-  noFixedDay: true;
+  noFixedDay: boolean;
   isBreakWeek: boolean;
+  includesWatering: boolean;
+  bottlesAtWeekEnd: boolean;
+  day?: "saturday" | "sunday" | "weekend";
+  partOfDay?: "morning" | "evening" | "all_day";
+  weekend?: WeekendStateModel;
+  ownPick?: WeekendOwnPickModel;
+}>;
+
+/** A family's standing in the year shown, with the version the next change needs (BR60.1). */
+export type FamilyStandingItem = Readonly<{
+  familyId: string;
+  displayName: string;
+  standing: FamilyStanding;
+  version: number;
+}>;
+
+/** A duty held by a family that may not hold it (BR60.5), listed for the administrator. */
+export type FlaggedDutyItem = Readonly<{
+  source: string;
+  familyId: string;
+  familyDisplayName: string;
+  title: string;
+  job?: RotaJob;
+  onDate: string;
+  reason: "leaving_after_changeover" | "new_before_changeover";
+  dutyId?: string;
+}>;
+
+/** One owed pick not yet made, with the openings and closings still free (BR63.8). */
+export type UnpickedItem = Readonly<{
+  rotaWeekId: string;
+  job: "indoor_cleaning" | "front_garden";
+  weekStart: string;
+  familyDisplayName: string;
+  weekendFamilyDisplayName: string;
+  picksCloseAt?: string;
+  changeUntil?: string;
+  freeSlots: readonly WeekendFreeSlot[];
+}>;
+
+/** The unpicked list of the dashboard: still open, and missed in time (BR63.8, BR65.4). */
+export type UnpickedListModel = Readonly<{
+  items: readonly UnpickedItem[];
+  missed: readonly UnpickedItem[];
 }>;
 
 /** The result of a command: the changed record's id and its new version. */

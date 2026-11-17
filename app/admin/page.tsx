@@ -1,4 +1,6 @@
+import { resolveRotaFacade } from "../_identity/rota-facade.ts";
 import { AsyncStatePanel } from "./_components/AsyncStatePanel.tsx";
+import { UnpickedList } from "./_components/UnpickedList.tsx";
 import { resolveAdminFacade } from "./_lib/facade.ts";
 import { resolveAdminSession } from "./_lib/session.ts";
 import { terminalFailure } from "../../src/application/results.ts";
@@ -17,13 +19,18 @@ export default async function AdminDashboardPage() {
   const { applicationSession, scope, groupIds } = session.data;
   // Family records are a super admin's (BR3.9): a group administrator has no records panel.
   const showRecords = groupIds.length === 0;
-  const [dashboard, records, tasks] = await Promise.all([
+  const rota = showRecords ? await resolveRotaFacade() : undefined;
+  const [dashboard, records, tasks, unpicked] = await Promise.all([
     facade.getDashboard(applicationSession, scope),
     showRecords
       ? facade.listRecords(applicationSession, scope)
       : Promise.resolve(terminalFailure()),
     facade.listTasks(applicationSession, scope),
-  ]).catch(() => [terminalFailure(), terminalFailure(), terminalFailure()] as const);
+    // The unpicked weekend picks are a super admin's alone (BR63.8); a group administrator has no such panel.
+    rota ? rota.getUnpickedList(applicationSession, scope) : Promise.resolve(undefined),
+  ]).catch(
+    () => [terminalFailure(), terminalFailure(), terminalFailure(), terminalFailure()] as const,
+  );
 
   return (
     <section className="admin-page" data-testid="admin-dashboard-page">
@@ -77,6 +84,7 @@ export default async function AdminDashboardPage() {
           </AsyncStatePanel>
         </DashboardPanel>
       </div>
+      {unpicked && <UnpickedList result={unpicked} />}
     </section>
   );
 }

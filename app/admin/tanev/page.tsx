@@ -1,5 +1,12 @@
 import type { SchoolCalendarModel } from "../../../src/application/index.ts";
-import { formatShortDay, formatWeekRange } from "../../../src/application/rota-format.ts";
+import {
+  formatLongDay,
+  formatShortDay,
+  formatWeekRange,
+  HOLD_REASON_TEXT,
+  STANDING_LABELS,
+} from "../../../src/application/rota-format.ts";
+import { StatusBadge } from "../../../src/runtime/StatusBadge.tsx";
 import { resolveRotaFacade } from "../../_identity/rota-facade.ts";
 import { AdminAccessState } from "../_components/AdminAccessState.tsx";
 import { AdminMutationForm, AdminTextField } from "../_components/AdminMutationForm.tsx";
@@ -8,6 +15,7 @@ import {
   addBreakWeekAction,
   removeBreakWeekAction,
   saveSchoolYearAction,
+  setStandingAction,
 } from "../rota-actions.ts";
 import { YearSwitcher } from "../_components/RotaParts.tsx";
 
@@ -144,9 +152,123 @@ function SchoolYearScreen({ model }: Readonly<{ model: SchoolCalendarModel }>) {
             </section>
             <BreakWeeks model={model} schoolYearId={year.id} />
           </div>
+          <StandingsPanel model={model} schoolYearId={year.id} />
+          <FlaggedDuties model={model} />
           <WeekTable model={model} />
         </>
       )}
+    </section>
+  );
+}
+
+const STANDING_ICON = { staying: "check", leaving: "arrow", new: "arrow" } as const;
+
+/**
+ * The families' standings in the year (BR60.1): who stays, who leaves after the changeover date and who joins from
+ * it. A week is judged by its Monday (BR60.3). One small form per family; a family with no standing yet shows
+ * Marad, which is what the database counts it as.
+ */
+function StandingsPanel({
+  model,
+  schoolYearId,
+}: Readonly<{ model: SchoolCalendarModel; schoolYearId: string }>) {
+  const counts = { staying: 0, leaving: 0, new: 0 };
+  for (const item of model.standings) counts[item.standing] += 1;
+  return (
+    <section className="admin-rota-panel" data-testid="admin-standings">
+      <h2>Családok helyzete</h2>
+      <p className="admin-standings-summary" data-testid="admin-standings-summary">
+        Összesen: {model.standings.length} család · {counts.staying} {STANDING_LABELS.staying},{" "}
+        {counts.leaving} {STANDING_LABELS.leaving}, {counts.new} {STANDING_LABELS.new}
+      </p>
+      {model.standings.length === 0 ? (
+        <p data-testid="admin-standings-empty">Nincs aktív család.</p>
+      ) : (
+        <div className="admin-rota-table-wrapper">
+          <table className="admin-rota-table admin-standings-table">
+            <thead>
+              <tr>
+                <th scope="col">Család</th>
+                <th scope="col">Helyzet</th>
+                <th scope="col">Módosítás</th>
+              </tr>
+            </thead>
+            <tbody>
+              {model.standings.map((item) => (
+                <tr key={item.familyId} data-testid={`admin-standing-${item.familyId}`}>
+                  <th scope="row">{item.displayName}</th>
+                  <td>
+                    <StatusBadge
+                      className={`admin-standing-${item.standing}`}
+                      label={STANDING_LABELS[item.standing]}
+                      symbol={{ icon: STANDING_ICON[item.standing], character: "" }}
+                    />
+                  </td>
+                  <td>
+                    <AdminMutationForm
+                      action={setStandingAction}
+                      submitLabel="Mentés"
+                      testId={`admin-standing-form-${item.familyId}`}
+                    >
+                      <input type="hidden" name="familyId" value={item.familyId} />
+                      <input type="hidden" name="schoolYearId" value={schoolYearId} />
+                      <input type="hidden" name="expectedVersion" value={item.version} />
+                      <input
+                        type="hidden"
+                        name="idempotencyKey"
+                        value={`standing:${item.familyId}:v${item.version}`}
+                      />
+                      <label className="visually-hidden" htmlFor={`standing-${item.familyId}`}>
+                        Helyzet: {item.displayName}
+                      </label>
+                      <select
+                        id={`standing-${item.familyId}`}
+                        name="standing"
+                        defaultValue={item.standing}
+                        data-testid={`admin-standing-select-${item.familyId}`}
+                      >
+                        {(Object.keys(STANDING_LABELS) as (keyof typeof STANDING_LABELS)[]).map(
+                          (value) => (
+                            <option key={value} value={value}>
+                              {STANDING_LABELS[value]}
+                            </option>
+                          ),
+                        )}
+                      </select>
+                    </AdminMutationForm>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+      <p className="admin-rota-note" data-testid="admin-standings-note">
+        {model.schoolYear?.changeoverDate
+          ? `Az évváltás napja: ${formatLongDay(model.schoolYear.changeoverDate)}. `
+          : ""}
+        Az elmenő család az évváltás napjától nem kap új feladatot; az érkező család az évváltás
+        napjától kap. A beosztás a hét hétfői napja szerint veszi figyelembe.
+      </p>
+    </section>
+  );
+}
+
+/** Duties held by a family that may not hold them on that day (BR60.5), listed so the administrator can move them. */
+function FlaggedDuties({ model }: Readonly<{ model: SchoolCalendarModel }>) {
+  if (model.flaggedDuties.length === 0) return null;
+  return (
+    <section className="admin-rota-warning" role="alert" data-testid="admin-flagged-duties">
+      <h2>Átnézendő feladatok</h2>
+      <p>Ezeket a feladatokat olyan család viszi, amely aznap már nem (vagy még nem) vállalhat.</p>
+      <ul>
+        {model.flaggedDuties.map((duty) => (
+          <li key={`${duty.source}:${duty.familyId}:${duty.onDate}`}>
+            {formatLongDay(duty.onDate)}: {duty.title} – {duty.familyDisplayName} (
+            {HOLD_REASON_TEXT[duty.reason]})
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }

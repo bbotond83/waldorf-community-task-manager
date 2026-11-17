@@ -1,6 +1,7 @@
 import { terminalFailure } from "../../../../src/application/results.ts";
 import { RotaDutyCard } from "../../../../src/runtime/RotaOverview.tsx";
 import { resolveRotaFacade } from "../../../_identity/rota-facade.ts";
+import { WeekendPicker } from "../../_components/WeekendPicker.tsx";
 import { resolveParentSession } from "../../_lib/session.ts";
 
 export default async function ParentRotaDutyPage({ params }: { params: Promise<{ id: string }> }) {
@@ -14,5 +15,11 @@ export default async function ParentRotaDutyPage({ params }: { params: Promise<{
     session.state === "success" && facade
       ? await facade.getDutyCard(session.data.applicationSession, session.data.familyScope, id)
       : terminalFailure();
-  return <RotaDutyCard result={result} backHref="/szulo/beosztas" />;
+  return (
+    <RotaDutyCard
+      result={result}
+      backHref="/szulo/beosztas"
+      renderPicker={(card, own) => <WeekendPicker card={card} own={own} />}
+    />
+  );
 }

@@ -10,6 +10,8 @@
 - 2026-11-15T13:40:00Z [unit u4-working-groups] — Asked no questions; requirements.md, the contracts and U4's reviewed design fix every target, and U5 already owns email delivery and failures.
 - 2026-11-15T13:40:00Z [unit u4-working-groups] — Closing the general role-change function for group_admin covers revoking too, with the refusal after the authorization check; the design's second review asked this to be stated, and one way in means both directions.
 
+- 2026-11-16T05:56:00Z — [unit u6-full-rotas-and-weekend-picks] Asked no NFR questions; every target follows from NFR1 to NFR11, the U2 targets for the same pages (2 seconds a page, 5 seconds for draft and publish) and the unit's own rules, so no questions file was written.
+
 ## Deviations
 <!-- example: 2026-05-29T10:14:32Z — skipped the optional caching layer the stage prose suggested; the dataset is small enough that it adds risk -->
 

@@ -38,6 +38,7 @@ const OVERVIEW: RotaOverviewModel = {
     },
     { job: "indoor_cleaning", weekStart: "2026-11-16", isBreak: true, isOwn: false },
   ],
+  weekendItems: [],
 };
 
 const props = {
@@ -74,7 +75,7 @@ describe("RotaOverview", () => {
   it("says nothing is published, and shows no family", () => {
     render(
       <RotaOverview
-        result={success({ overviewState: "nothing_published", items: [] })}
+        result={success({ overviewState: "nothing_published", items: [], weekendItems: [] })}
         {...props}
       />,
     );
@@ -104,6 +105,8 @@ const CARD: RotaDutyCardModel = {
   weekEnd: "2026-11-15",
   noFixedDay: true,
   isBreakWeek: false,
+  includesWatering: false,
+  bottlesAtWeekEnd: false,
 };
 
 describe("RotaDutyCard", () => {

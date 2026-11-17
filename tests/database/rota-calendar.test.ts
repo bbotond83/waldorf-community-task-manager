@@ -274,9 +274,10 @@ for (const schema of DIRECTORY_SCHEMAS) {
       const view = (await call(SUPER_ADMIN, "school_calendar_get($1)", [YEAR_1])) as unknown as {
         warnings: { week_start: string; family_display_name: string }[];
       };
+      // One warning for each of the two rotas that run in a break week's place: indoor cleaning and water carrying.
       assert.deepEqual(
         view.warnings.map((w) => w.week_start),
-        [BREAK_WEEK],
+        [BREAK_WEEK, BREAK_WEEK],
       );
       assert.ok(view.warnings[0]?.family_display_name);
     });

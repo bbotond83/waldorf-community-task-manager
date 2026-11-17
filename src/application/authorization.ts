@@ -128,11 +128,27 @@ export const AUTHORIZATION_MATRIX: readonly MatrixRow[] = Object.freeze([
     fields: [],
   },
   {
-    // The school calendar and the rota plan are a super admin's alone (BR20.2, BR21.1).
+    // The school calendar and the rota plan are a super admin's alone (BR20.2, BR21.1). So are the families'
+    // standings (BR60.1), assigning a weekend pick for a family (BR63.6) and the unpicked list (BR63.8).
     id: "AUTH-SUPER-ROTA",
     roles: ["super_admin"],
     actions: ["read", "create", "update", "delete", "manage"],
-    resources: ["school_calendar", "rota_plan"],
+    resources: [
+      "school_calendar",
+      "rota_plan",
+      "family_standing",
+      "weekend_pick",
+      "weekend_unpicked_list",
+    ],
+    fields: [],
+  },
+  {
+    // A family chooses the weekend opening or closing for its own picking week (BR63.4); the database decides that the
+    // week is the family's. A group admin who is a parent picks as a parent.
+    id: "AUTH-PARENT-WEEKEND-PICK",
+    roles: ["parent"],
+    actions: ["update"],
+    resources: ["weekend_pick"],
     fields: [],
   },
   {

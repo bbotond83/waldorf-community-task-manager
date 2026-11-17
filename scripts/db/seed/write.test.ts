@@ -64,6 +64,8 @@ describe("seed writer", () => {
       "email_attempts",
       "timed_runs",
       "timed_check_runs",
+      "family_year_standings",
+      "rota_plans",
     ]);
   });
 
