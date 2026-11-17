@@ -1,4 +1,5 @@
 import type { ApplicationResult } from "../../../src/application/index.ts";
+import { hasRotaRefusalMessage, rotaRefusalMessage } from "../../../src/application/rota-format.ts";
 
 export type ParentActionState = Readonly<{
   state:
@@ -25,6 +26,11 @@ export function mapParentResult<T>(
     case "success":
       return { state: "success", message: successMessage, code: result.code };
     case "validation":
+      // The rota refusals have a sentence of their own: a family that may not hold the duty on that day (BR60.3),
+      // and the weekend pick refusals (BR63.4).
+      if (hasRotaRefusalMessage(result.code)) {
+        return { state: "validation", message: rotaRefusalMessage(result.code), code: result.code };
+      }
       return {
         state: "validation",
         message: "Ellenőrizze a megadott adatokat.",
@@ -68,7 +74,9 @@ export const PARENT_CONFLICT_MESSAGES: Readonly<Record<string, string>> = Object
 });
 
 function conflictMessage(code: string): string {
-  return Object.hasOwn(PARENT_CONFLICT_MESSAGES, code)
-    ? PARENT_CONFLICT_MESSAGES[code]!
+  if (Object.hasOwn(PARENT_CONFLICT_MESSAGES, code)) return PARENT_CONFLICT_MESSAGES[code]!;
+  // The weekend pick conflicts (a slot taken meanwhile, a pick that closed) have their own sentences.
+  return hasRotaRefusalMessage(code)
+    ? rotaRefusalMessage(code)
     : "A művelet ütközik az aktuális állapottal.";
 }

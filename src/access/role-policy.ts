@@ -133,6 +133,11 @@ function parentCan({ action, resource }: AuthorizationRequest): boolean {
     // serves a group admin who is a parent: the parent grant carries the read, the group admin grant adds nothing.
     case "rota_duty":
       return action === "read";
+    // Choosing the weekend opening or closing for the family's own picking week (BR63.4). The database acts for the
+    // caller's own family and refuses a week that is not that family's. A group admin who is a parent picks through
+    // the parent grant. Assigning a pick for a family is a super admin's alone and needs the manage action.
+    case "weekend_pick":
+      return action === "update";
     case "assignment":
       return action === "read" || action === "create";
     case "contribution":

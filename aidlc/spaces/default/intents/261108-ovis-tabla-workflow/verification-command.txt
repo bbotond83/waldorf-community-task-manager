@@ -1,1 +1,1 @@
-npm run verify:local
+VERIFY_BROWSER_PROJECTS=chromium npm run verify:local

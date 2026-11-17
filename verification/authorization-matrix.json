@@ -387,7 +387,13 @@
       "scope": "organization",
       "route": "/admin/tanev|/admin/beosztas",
       "actions": ["read", "create", "update", "delete", "manage"],
-      "resources": ["school_calendar", "rota_plan"],
+      "resources": [
+        "school_calendar",
+        "rota_plan",
+        "family_standing",
+        "weekend_pick",
+        "weekend_unpicked_list"
+      ],
       "fields": [],
       "effect": "allow"
     },
@@ -397,7 +403,53 @@
       "scope": "non-super-role",
       "route": "/admin/tanev|/admin/beosztas",
       "actions": ["read", "create", "update", "delete", "manage"],
-      "resources": ["school_calendar", "rota_plan"],
+      "resources": [
+        "school_calendar",
+        "rota_plan",
+        "family_standing",
+        "weekend_pick",
+        "weekend_unpicked_list"
+      ],
+      "fields": [],
+      "effect": "deny"
+    },
+    {
+      "id": "AUTH-WEEKEND-PICK-PARENT-ALLOW",
+      "role": "parent",
+      "scope": "linked-family",
+      "route": "/szulo/beosztas/**",
+      "actions": ["update"],
+      "resources": ["weekend_pick"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-WEEKEND-PICK-OTHER-FAMILY-DENY",
+      "role": "parent",
+      "scope": "unrelated-family",
+      "route": "/szulo/beosztas/**",
+      "actions": ["update"],
+      "resources": ["weekend_pick"],
+      "fields": [],
+      "effect": "deny"
+    },
+    {
+      "id": "AUTH-WEEKEND-PICK-GROUP-ADMIN-PARENT-ALLOW",
+      "role": "group_admin",
+      "scope": "linked-family",
+      "route": "/szulo/beosztas/**",
+      "actions": ["update"],
+      "resources": ["weekend_pick"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-WEEKEND-PICK-TEACHER-DENY",
+      "role": "kindergarten_teacher",
+      "scope": "community",
+      "route": "/szulo/beosztas/**",
+      "actions": ["update"],
+      "resources": ["weekend_pick"],
       "fields": [],
       "effect": "deny"
     },

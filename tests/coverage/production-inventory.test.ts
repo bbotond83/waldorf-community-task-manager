@@ -117,8 +117,10 @@ describe("honest executable denominator", () => {
     // directory page (4), the three directory pages (3), Fiókom (page, actions, field component, state mapper: 4), the
     // email confirmation page (page, action, form: 3), and the invitation list, the parent actions and the removal page (3): 226 + 17. U5 adds the scheduled command (scripts/timed-run.ts): 243 + 1; the screen then adds its wording module (src/application/delivery-labels.ts): 244 + 1. U4 adds the three group pages, the shared
     // group page (src/runtime/WorkingGroupDetail.tsx), the parent's join and leave panel, the two action files (parent and admin)
-    // and the result mapper they share (app/_lib/working-group-result.ts): 245 + 8.
-    expect(inventory.length).toBe(253);
+    // and the result mapper they share (app/_lib/working-group-result.ts): 245 + 8. U6 adds the unpicked list of the
+    // admin dashboard (app/admin/_components/UnpickedList.tsx) and the weekend picker of the duty card
+    // (app/szulo/_components/WeekendPicker.tsx): 253 + 2.
+    expect(inventory.length).toBe(255);
     for (const path of [
       "src/runtime/AppNav.tsx",
       "src/runtime/StatusBadge.tsx",

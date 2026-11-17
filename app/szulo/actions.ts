@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { normalizeRequiredText, validation } from "../../src/application/index.ts";
+import { WEEKEND_PICKER_TEXT } from "../../src/application/rota-format.ts";
+import { resolveRotaFacade } from "../_identity/rota-facade.ts";
 import { mapParentResult, type ParentActionState } from "./_lib/action-state.ts";
 import { resolveParentFacade } from "./_lib/facade.ts";
 import { resolveParentSession } from "./_lib/session.ts";
@@ -196,6 +198,54 @@ export async function updateContributionAction(
   });
   if (result.state === "success") revalidatePath(`/szulo/feladatok/${id}`);
   return mapParentResult(result, "A saját hozzájárulási megjegyzés mentve.");
+}
+
+const PICKABLE_SLOTS = [
+  "saturday_opening",
+  "saturday_closing",
+  "sunday_opening",
+  "sunday_closing",
+] as const;
+
+/**
+ * A family chooses the weekend opening or closing for its own picking week (BR63.4). The list sends one radio value
+ * per free slot, `<slot>:<version of its place>`, the version that was on screen. The database checks that the week
+ * is the caller's family's and answers the closed, taken and not-needed cases with their own codes.
+ */
+export async function pickSlotAction(
+  _state: ParentActionState,
+  formData: FormData,
+): Promise<ParentActionState> {
+  const rotaWeekId = stringValue(formData, "rotaWeekId");
+  const [slot = "", versionText = ""] = stringValue(formData, "slot").split(":");
+  const idempotencyKey = stringValue(formData, "idempotencyKey");
+  const expectedVersion = Number(versionText);
+  const chosen = PICKABLE_SLOTS.find((value) => value === slot);
+  if (
+    !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(rotaWeekId) ||
+    !isIdempotencyKey(idempotencyKey)
+  ) {
+    return validationState({ rotaWeekId: "Érvénytelen azonosító." });
+  }
+  if (!chosen || !Number.isInteger(expectedVersion) || expectedVersion < 1) {
+    return validationState({ slot: "Válasszon egy szabad nyitást vagy zárást." });
+  }
+  const session = await resolveParentSession();
+  const rota = await resolveRotaFacade();
+  if (session.state !== "success" || !rota)
+    return { state: "denied", message: "Nincs jogosultság." };
+  const result = await rota.pickSlot(session.data.applicationSession, session.data.familyScope, {
+    idempotencyKey,
+    rotaWeekId,
+    slot: chosen,
+    expectedVersion,
+  });
+  if (result.state === "success") {
+    revalidatePath("/szulo/beosztas");
+    revalidatePath("/szulo/feladatok");
+    revalidatePath("/admin");
+  }
+  return mapParentResult(result, WEEKEND_PICKER_TEXT.saved);
 }
 
 function parseMutationContext(

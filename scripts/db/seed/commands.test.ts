@@ -118,7 +118,7 @@ describe("db:seed command", () => {
     assert.equal(await seedMain([], run.deps), 0);
     assert.match(
       run.lines[0]!,
-      /^SEED ok schema=public set=small groups=6 families=6 parents=12 children=8 accounts=10 events=3 tasks=8 assignments=8 notices=2 accounts_created=10$/,
+      /^SEED ok schema=public set=small groups=6 families=6 parents=12 children=8 accounts=10 events=3 tasks=8 assignments=8 notices=2 standings=2 plans=1 accounts_created=10$/,
     );
     assert.match(run.lines[1]!, /^TIMING seed\(public, small\) \d+\.\d s \(target 60\.0 s: met\)$/);
     assert.equal(run.lines.length, 2);

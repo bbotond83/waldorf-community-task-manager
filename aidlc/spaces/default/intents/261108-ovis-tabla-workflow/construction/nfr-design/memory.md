@@ -7,6 +7,8 @@
 - 2026-11-10T08:25:00Z [unit u2-first-rota-slice] — Asked no questions because the NFR requirements and the approved functional design already fix every pattern; publishing uses set-based inserts rather than one duty-function call per week, which keeps the 5-second target easy.
 - 2026-11-14T07:30:00Z [unit u3-directory-and-profile] — The 30-day clearing of finished email requests counts from decidedAt, or from expiresAt for expired ones, so no job has to mark expiry.
 
+- 2026-11-16T11:02:00Z — [unit u6-full-rotas-and-weekend-picks] Asked no NFR design questions; the unit adds no service, cache or scheduler, and every design follows the patterns U2 and U5 already use (one read function per page, one transaction per command, registry rows for notices and checks).
+
 ## Deviations
 <!-- example: 2026-05-29T10:14:32Z — skipped the optional caching layer the stage prose suggested; the dataset is small enough that it adds risk -->
 - 2026-11-14T07:30:00Z [unit u3-directory-and-profile] — Removing a parent deletes their pending email-change request outright (the new address is a required field, so cancelling would keep it); this refines BR36.3, which only says cancel. The audit row keeps the fact without the address.

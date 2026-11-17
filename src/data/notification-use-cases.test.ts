@@ -96,8 +96,16 @@ const IMPORT_WITHOUT_NOTICES = ["import_commit", "import_recover"];
  * and a place for every filled week, and writes its own one notice per parent inside the same transaction) and the
  * done mark (it changes no one's schedule and sends no notice). Both decide their own behaviour, so neither is a
  * wrapped use case of the hand-off list; `tests/database/rota-plan.test.ts` proves them (BR23.4, BR26.2).
+ * U6 adds the two weekend pick commands: they move a place between families and decide their own notices (a pick
+ * writes none, an assignment by a super admin sends `weekend_pick_assigned`), so they are not wrapped either;
+ * `tests/database/weekend-picks.test.ts` proves them (BR63.4, BR63.6).
  */
-const ROTA_DECIDED_ITSELF = ["rota_plan_publish", "place_mark_done"];
+const ROTA_DECIDED_ITSELF = [
+  "rota_plan_publish",
+  "place_mark_done",
+  "weekend_pick_set",
+  "weekend_pick_assign",
+];
 
 test("the use cases U4 must connect to notifications are exactly the callable functions that change assignments", () => {
   const functions = definitions();

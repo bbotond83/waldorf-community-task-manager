@@ -17,7 +17,10 @@ const world = bindSeededSchema({ seed: false });
 test.beforeAll(async ({}, testInfo) => {
   const schema = world().schema;
   await resetSchema({ ...defaultCommandDeps(), log: () => undefined }, { schema });
-  await seedSchema({ ...defaultSeedDeps(), log: () => undefined }, { schema, size: "large" });
+  await seedSchema(
+    { ...defaultSeedDeps(), log: () => undefined },
+    { schema, size: "large", rotaPlan: "draft" },
+  );
   testInfo.annotations.push({ type: "schema", description: schema });
 });
 
@@ -32,7 +35,10 @@ test("rota pages and a full-year publish on the 30-family set", async ({ page })
   const account = (tag: string) => seedAccount(schema, tag, "large");
   await signInAs(page, account("super-admin"));
 
+  // The large set seeds a draft; discard it so the draft is made (and timed) the way the administrator makes it.
   await page.goto("/admin/beosztas");
+  await page.getByTestId("admin-rota-discard-form-submit-button").click();
+  await page.getByTestId("admin-rota-no-plan").waitFor();
   let started = Date.now();
   await page.getByTestId("admin-rota-draft-form-submit-button").click();
   await page.getByTestId("admin-rota-weeks").waitFor();
@@ -46,6 +52,8 @@ test("rota pages and a full-year publish on the 30-family set", async ({ page })
   for (const [name, path] of [
     ["admin-tanev", "/admin/tanev"],
     ["admin-beosztas", "/admin/beosztas"],
+    ["admin-beosztas-weekend", "/admin/beosztas?beosztas=weekend_animal_care"],
+    ["admin-dashboard", "/admin"],
   ] as const) {
     results[name] = Math.max(
       await timed(page, path),
@@ -59,7 +67,11 @@ test("rota pages and a full-year publish on the 30-family set", async ({ page })
     await timed(page, "/szulo/beosztas"),
     await timed(page, "/szulo/beosztas"),
   );
-  const href = await page.locator('a[href^="/szulo/beosztas/"]').first().getAttribute("href");
+  const href = await page
+    .getByTestId("rota-job-indoor_cleaning")
+    .locator('a[href^="/szulo/beosztas/"]')
+    .first()
+    .getAttribute("href");
   results["duty-card"] = Math.max(
     await timed(page, href!),
     await timed(page, href!),
@@ -68,7 +80,14 @@ test("rota pages and a full-year publish on the 30-family set", async ({ page })
   console.log(`ROTA_TIMING ${JSON.stringify(results)}`);
   expect(publishMs).toBeLessThan(5000);
   expect(draftMs).toBeLessThan(5000);
-  for (const name of ["admin-tanev", "admin-beosztas", "parent-overview", "duty-card"]) {
+  for (const name of [
+    "admin-tanev",
+    "admin-beosztas",
+    "admin-beosztas-weekend",
+    "admin-dashboard",
+    "parent-overview",
+    "duty-card",
+  ]) {
     expect(results[name], name).toBeLessThan(2000);
   }
 });

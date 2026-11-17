@@ -1,12 +1,15 @@
 import type { Scope } from "../access/index.ts";
 import type {
   ApplicationResult,
+  FamilyStanding,
   RotaChangeModel,
   RotaDutyCardModel,
   RotaOverviewModel,
   RotaPlanModel,
   SchoolCalendarModel,
   SessionContext,
+  UnpickedListModel,
+  WeekendSlot,
 } from "./contracts.ts";
 import type { DomainOutcome, FacadePipeline } from "./facade-pipeline.ts";
 import { validateIdempotencyKey, validateMutationContext } from "./validation.ts";
@@ -52,6 +55,29 @@ export interface RotaApplicationPort {
   }): Promise<DomainOutcome<RotaChangeModel>>;
   overview(): Promise<DomainOutcome<RotaOverviewModel>>;
   dutyCard(input: { dutyId: string }): Promise<DomainOutcome<RotaDutyCardModel>>;
+  /** Sets a family's standing in a school year; `expectedVersion` is 0 when the family has none yet (BR60.1). */
+  setStanding(input: {
+    idempotencyKey: string;
+    familyId: string;
+    schoolYearId: string;
+    standing: FamilyStanding;
+    expectedVersion: number;
+  }): Promise<DomainOutcome<RotaChangeModel>>;
+  /** The picking family chooses an opening or closing for the weekend; `expectedVersion` is the slot place's (BR63.4). */
+  pickSlot(input: {
+    idempotencyKey: string;
+    rotaWeekId: string;
+    slot: WeekendSlot;
+    expectedVersion: number;
+  }): Promise<DomainOutcome<RotaChangeModel>>;
+  /** A super admin assigns or changes a family's pick until the weekend starts (BR63.6). */
+  assignSlot(input: {
+    idempotencyKey: string;
+    rotaWeekId: string;
+    slot: WeekendSlot;
+    expectedVersion: number;
+  }): Promise<DomainOutcome<RotaChangeModel>>;
+  unpickedList(): Promise<DomainOutcome<UnpickedListModel>>;
 }
 
 const identity = <T>(value: T): Readonly<T> => value;
@@ -253,6 +279,103 @@ export class RotaApplicationFacade {
       project: identity,
     });
   }
+
+  /** Sets a family's standing in a school year (BR60.1); `expectedVersion` is 0 when it has none yet. A super admin's. */
+  setStanding(
+    session: SessionContext,
+    scope: Scope,
+    input: {
+      idempotencyKey: string;
+      familyId: string;
+      schoolYearId: string;
+      standing: FamilyStanding;
+      expectedVersion: number;
+    },
+  ): Promise<ApplicationResult<RotaChangeModel>> {
+    return this.pipeline.invoke<RotaChangeModel>({
+      session,
+      matrixRowId: "AUTH-SUPER-ROTA",
+      action: "update",
+      resource: "family_standing",
+      scope,
+      idempotencyKey: input.idempotencyKey,
+      validate: () => standingCheck(input),
+      invoke: () => this.domain.setStanding(input),
+      project: identity,
+    });
+  }
+
+  /** A family chooses the opening or closing for its own picking week (BR63.4). The database checks the family. */
+  pickSlot(
+    session: SessionContext,
+    scope: Scope,
+    input: {
+      idempotencyKey: string;
+      rotaWeekId: string;
+      slot: WeekendSlot;
+      expectedVersion: number;
+    },
+  ): Promise<ApplicationResult<RotaChangeModel>> {
+    return this.pipeline.invoke<RotaChangeModel>({
+      session,
+      matrixRowId: "AUTH-PARENT-WEEKEND-PICK",
+      action: "update",
+      resource: "weekend_pick",
+      scope,
+      idempotencyKey: input.idempotencyKey,
+      validate: () => mutationCheck(input),
+      invoke: () => this.domain.pickSlot(input),
+      project: identity,
+    });
+  }
+
+  /** A super admin assigns or changes a family's pick until the weekend starts (BR63.6). */
+  assignSlot(
+    session: SessionContext,
+    scope: Scope,
+    input: {
+      idempotencyKey: string;
+      rotaWeekId: string;
+      slot: WeekendSlot;
+      expectedVersion: number;
+    },
+  ): Promise<ApplicationResult<RotaChangeModel>> {
+    return this.pipeline.invoke<RotaChangeModel>({
+      session,
+      matrixRowId: "AUTH-SUPER-ROTA",
+      action: "manage",
+      resource: "weekend_pick",
+      scope,
+      idempotencyKey: input.idempotencyKey,
+      validate: () => mutationCheck(input),
+      invoke: () => this.domain.assignSlot(input),
+      project: identity,
+    });
+  }
+
+  /** The picks owed and not yet made, and those nobody made in time (BR63.8). A super admin's. */
+  getUnpickedList(
+    session: SessionContext,
+    scope: Scope,
+  ): Promise<ApplicationResult<UnpickedListModel>> {
+    return this.pipeline.invoke<UnpickedListModel>({
+      session,
+      matrixRowId: "AUTH-SUPER-ROTA",
+      action: "read",
+      resource: "weekend_unpicked_list",
+      scope,
+      invoke: () => this.domain.unpickedList(),
+      project: identity,
+    });
+  }
+}
+
+/** A standing command carries a version of 0 or more (0 means the family has no standing row yet). */
+function standingCheck(input: { idempotencyKey: string; expectedVersion: number }) {
+  if (input.expectedVersion === 0) {
+    return validateIdempotencyKey(input.idempotencyKey);
+  }
+  return mutationCheck(input);
 }
 
 function mutationCheck(input: { idempotencyKey: string; expectedVersion: number }) {

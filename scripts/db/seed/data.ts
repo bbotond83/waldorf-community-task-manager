@@ -96,8 +96,15 @@ export interface SeedPlan {
     /** The date a year's rota rows change over to the next year (BR20.3). */
     changeoverDate: string;
   };
-  /** Invented school-break weeks of the year, each the Monday of its week (BR20.1). No rota plan is seeded. */
+  /** Invented school-break weeks of the year, each the Monday of its week (BR20.1). */
   breakWeeks: { id: string; weekStart: string; label: string }[];
+  /** The families that are not staying in the school year: one leaving and one new (BR60.1). */
+  standings: { id: string; familyId: string; standing: "leaving" | "new" }[];
+  /**
+   * The four-rota plan of the year (BR61.1): a draft in the small set, a published plan with `picks` weekend picks in
+   * the large set. `publishedBy` is the super admin account that is recorded as the publisher.
+   */
+  rotaPlan: { id: string; published: boolean; publishedBy: string | null; picks: number };
   groups: { id: string; name: string; description: string }[];
   families: { id: string; name: string }[];
   memberships: { id: string; parentId: string; groupId: string }[];
@@ -349,7 +356,16 @@ const pick = <T>(list: readonly T[], index: number): T => list[index % list.leng
  * Builds the plan of a set for a schema. The plan holds ids, names and offsets only; the writer turns it into rows.
  * The same schema and size always give the same plan.
  */
-export function buildSeedPlan(schema: string, size: SeedSize): SeedPlan {
+/**
+ * The seed plan of a schema. The rota plan is a draft in the small set and published, with some picks, in the large
+ * set; `rotaPlanState` overrides that for a run that needs the other (the rota timing spec times the draft and the
+ * publish on the large set, so it asks for a draft).
+ */
+export function buildSeedPlan(
+  schema: string,
+  size: SeedSize,
+  rotaPlanState: "draft" | "published" = size === "large" ? "published" : "draft",
+): SeedPlan {
   const shape = SEED_SHAPES[size];
   const id = (key: string) => seedId(schema, key);
   const organization = { id: id("organization"), name: "Tesztiskola Waldorf Óvoda" };
@@ -682,12 +698,31 @@ export function buildSeedPlan(schema: string, size: SeedSize): SeedPlan {
     },
   ];
 
+  // The last two families are not staying: the one before the last is leaving, the last is new (BR60.1).
+  const standings: SeedPlan["standings"] = [
+    {
+      id: id("standing:leaving"),
+      familyId: families[families.length - 2]!.id,
+      standing: "leaving",
+    },
+    { id: id("standing:new"), familyId: families[families.length - 1]!.id, standing: "new" },
+  ];
+  const published = rotaPlanState === "published";
+  const rotaPlan: SeedPlan["rotaPlan"] = {
+    id: id("rota-plan"),
+    published,
+    publishedBy: published ? accounts[0]!.id : null,
+    picks: published ? 6 : 0,
+  };
+
   return {
     schema,
     size,
     organization,
     schoolYear,
     breakWeeks,
+    standings,
+    rotaPlan,
     groups,
     families,
     memberships,
@@ -727,5 +762,7 @@ export function describePlan(plan: SeedPlan): Record<string, number> {
     tasks: plan.tasks.length,
     assignments: plan.assignments.length,
     notices: plan.notices.length,
+    standings: plan.standings.length,
+    plans: 1,
   };
 }

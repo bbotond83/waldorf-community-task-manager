@@ -228,8 +228,8 @@ for (const schema of NOTIFICATION_SCHEMAS) {
           );
         }
       }
-      // Eight kinds of U5 and the two coordinator kinds that U4 registered.
-      assert.equal((await rows("select count(*)::int as n from notice_kinds"))[0]!.n, 10);
+      // Eight kinds of U5, the two coordinator kinds that U4 registered and the six of U6.
+      assert.equal((await rows("select count(*)::int as n from notice_kinds"))[0]!.n, 16);
     });
 
     it("refused: a registry name with a quote or a capital is refused by the name pattern (NFR3.7)", async () => {

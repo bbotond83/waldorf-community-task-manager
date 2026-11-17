@@ -300,6 +300,83 @@ describe("seed on the real stack", () => {
     assert.deepEqual(await schemaUsers(db, "public"), []);
   });
 
+  it("BR60.1 BR61.1 the small set holds a four-rota draft and one leaving and one new family, and the large set a published plan with six picks, repeatably", async () => {
+    const jobs = async () =>
+      (
+        await db.query(
+          `select job, count(*)::int as n from "${A}".rota_weeks group by job order by job`,
+        )
+      ).rows.map((row) => [row.job, row.n]);
+    const { deps, lines } = realSeedDeps();
+    assert.equal(await seedMain(["--schema", A], deps), 0, lines.join("\n"));
+    const small = buildSeedPlan(A, "small");
+    assert.deepEqual(
+      (await db.query(`select status from "${A}".rota_plans`)).rows.map((row) => row.status),
+      ["draft"],
+    );
+    const weeks = (await jobs()) as [string, number][];
+    assert.deepEqual(
+      weeks.map(([job]) => job),
+      ["front_garden", "indoor_cleaning", "water_carrying", "weekend_animal_care"],
+    );
+    assert.ok(
+      weeks.every(([, n]) => n === weeks[0]![1]),
+      "every rota has a row for every school week",
+    );
+    assert.equal(
+      await rowCount(db, A, "tasks"),
+      describePlan(small).tasks,
+      "a draft makes no duty",
+    );
+    assert.deepEqual(
+      (
+        await db.query(`select s.standing from "${A}".family_year_standings s order by s.standing`)
+      ).rows.map((row) => row.standing),
+      ["leaving", "new"],
+    );
+    assert.equal(
+      await rowCount(db, A, "rota_weeks", "family_id = $1", [small.standings[1]!.familyId]),
+      0,
+      "the new family holds no week of a year it has not joined",
+    );
+
+    await resetWorkerData(db, A);
+    const large = realSeedDeps();
+    assert.equal(await seedMain(["--schema", A, "--large"], large.deps), 0, large.lines.join("\n"));
+    assert.deepEqual(
+      (await db.query(`select status from "${A}".rota_plans`)).rows.map((row) => row.status),
+      ["published"],
+    );
+    assert.equal(await rowCount(db, A, "weekend_picks"), 6);
+    assert.equal(
+      await rowCount(db, A, "assignments", "source = 'weekend_pick'"),
+      6,
+      "each pick moved one opening to the picking family",
+    );
+    const slots = await rowCount(db, A, "weekend_slots");
+    assert.equal(slots % 5, 0, "five slots for every weekend week");
+    assert.equal(
+      await rowCount(db, A, "tasks", "origin_kind = 'weekend_slot'"),
+      slots,
+      "a duty for every slot",
+    );
+    assert.equal(
+      await rowCount(db, A, "tasks", "origin_kind = 'rota_week'"),
+      await rowCount(db, A, "rota_weeks", "family_id is not null and job <> 'weekend_animal_care'"),
+      "a weekly duty for every filled weekly rota week",
+    );
+    const before = await dumpSchema(db, A, ["tasks", "assignments", "weekend_slots"]);
+    const again = realSeedDeps();
+    assert.equal(await seedMain(["--schema", A, "--large"], again.deps), 0, again.lines.join("\n"));
+    assert.deepEqual(
+      await dumpSchema(db, A, ["tasks", "assignments", "weekend_slots"]),
+      before,
+      "a second seed changes nothing",
+    );
+    assert.equal(await rowCount(db, A, "weekend_picks"), 6);
+    assert.equal(await rowCount(db, A, "weekend_slots"), slots);
+  });
+
   it("returns the counts of what it wrote", async () => {
     const { deps } = realSeedDeps();
     const result = await seedSchema(deps, { schema: A, size: "small" });

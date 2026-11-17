@@ -7,6 +7,7 @@ import {
   BUSINESS_CODE_STATES,
   createAdminPort,
   createParentPort,
+  createRotaPort,
   createTeacherPort,
 } from "../../src/data/index.ts";
 import { createSignInService } from "../../src/identity/service.ts";
@@ -47,9 +48,12 @@ import {
   TASK_3,
   TEACHER_G1,
   uuid,
+  YEAR_1,
 } from "./directory-support.ts";
 import { count, FAMILY_ADMIN_G1 } from "./identity-support.ts";
+import { seedRotaWorld } from "./rota-full-support.ts";
 import { report, stackSettings } from "./stack-support.ts";
+import { publishedWeekend } from "./weekend-picks-support.ts";
 
 const settings = stackSettings();
 const apiUrl = settings.apiUrl.replace(/\/$/, "");
@@ -1386,6 +1390,176 @@ for (const schema of DIRECTORY_SCHEMAS) {
         report(
           `result codes checked on the real stack in ${schema}: ${seen.size} of ${Object.keys(BUSINESS_CODE_STATES).length}`,
         );
+      });
+    });
+
+    describe("the rota port: four rotas, standings and weekend picks (U6)", () => {
+      /** A published week whose indoor-cleaning family is family 1, front garden family 2, weekend family the third. */
+      async function rotaWorld() {
+        await seedRotaWorld(db, schema);
+        return publishedWeekend(db, schema);
+      }
+      const rota = async (who: Who) => createRotaPort((await services(who)).database);
+
+      it("reads the standings, the four-rota plan, the overview, the card and the unpicked list as the signed-in person", async () => {
+        const w = await rotaWorld();
+        const superPort = await rota("super");
+        const calendar = await superPort.calendar({ schoolYearId: YEAR_1 });
+        assert.equal(calendar.state, "success");
+        if (calendar.state === "success") {
+          assert.ok(calendar.data.standings.length >= 3, "every active family is listed");
+          assert.ok(calendar.data.standings.every((item) => item.standing === "staying"));
+        }
+        const overview = await (await rota("parent")).overview();
+        assert.equal(overview.state, "success");
+        if (overview.state === "success") {
+          assert.equal(overview.data.overviewState, "published");
+          const jobs = new Set(overview.data.items.map((item) => item.job));
+          assert.deepEqual([...jobs].sort(), [
+            "front_garden",
+            "indoor_cleaning",
+            "water_carrying",
+            "weekend_animal_care",
+          ]);
+          assert.ok(overview.data.weekendItems.length > 0, "the weekend duties are listed");
+          assert.ok(
+            overview.data.weekendItems.some((item) => item.slot === "shelter_cleaning"),
+            "the shelter cleaning is among them",
+          );
+          const own = overview.data.items.filter((item) => item.isOwn);
+          assert.ok(own.length > 0 && own.every((item) => item.familyId === FAMILY_1));
+        }
+        const indoorDuty = (
+          await sql(
+            "select t.id from tasks t where t.origin_kind = 'rota_week' and t.origin_id = $1",
+            [w.indoor.id],
+          )
+        )[0].id as string;
+        const card = await (await rota("parent")).dutyCard({ dutyId: indoorDuty });
+        assert.equal(card.state, "success");
+        if (card.state === "success") {
+          assert.equal(card.data.job, "indoor_cleaning");
+          assert.equal(card.data.ownPick?.state, "open");
+          assert.equal(card.data.ownPick?.canPick, true);
+          assert.ok((card.data.ownPick?.freeSlots.length ?? 0) > 0);
+          assert.equal(card.data.weekend?.pickers.length, 2);
+        }
+        const unpicked = await superPort.unpickedList();
+        assert.equal(unpicked.state, "success");
+        if (unpicked.state === "success") {
+          assert.ok(
+            unpicked.data.items.some((item) => item.rotaWeekId === w.indoor.id),
+            "the indoor-cleaning family has not picked yet",
+          );
+        }
+        const notAllowed = await (await rota("parent")).unpickedList();
+        assert.deepEqual(notAllowed, { state: "denied" });
+      });
+
+      it("a family picks through the port, a second family is told the slot is taken, and the super admin assigns", async () => {
+        const w = await rotaWorld();
+        const first = await (
+          await rota("parent")
+        ).dutyCard({
+          dutyId: (
+            await sql(
+              "select t.id from tasks t where t.origin_kind = 'rota_week' and t.origin_id = $1",
+              [w.indoor.id],
+            )
+          )[0].id as string,
+        });
+        assert.equal(first.state, "success");
+        if (first.state !== "success") return;
+        const free = must(first.data.ownPick?.freeSlots[0], "a free slot");
+        const picked = await (
+          await rota("parent")
+        ).pickSlot({
+          idempotencyKey: nextKey("pk"),
+          rotaWeekId: w.indoor.id,
+          slot: free.slot,
+          expectedVersion: free.placeVersion,
+        });
+        assert.equal(picked.state, "success", JSON.stringify(picked));
+        const taken = await (
+          await rota("parentOther")
+        ).pickSlot({
+          idempotencyKey: nextKey("pk"),
+          rotaWeekId: w.front.id,
+          slot: free.slot,
+          expectedVersion: free.placeVersion,
+        });
+        refused(taken as Outcome, "conflict", "WEEKEND_SLOT_TAKEN");
+        const other = must(
+          (
+            await sql(
+              "select s.slot, a.version from weekend_slots s join tasks t on t.origin_kind = 'weekend_slot' and t.origin_id = s.id join assignments a on a.task_id = t.id and a.status <> 'removed' where s.weekend_week_id = $1 and s.slot = 'sunday_closing'",
+              [w.weekend.id],
+            )
+          )[0],
+          "the closing slot",
+        );
+        const assigned = await (
+          await rota("super")
+        ).assignSlot({
+          idempotencyKey: nextKey("as"),
+          rotaWeekId: w.front.id,
+          slot: "sunday_closing",
+          expectedVersion: other.version as number,
+        });
+        assert.equal(assigned.state, "success", JSON.stringify(assigned));
+        assert.equal(
+          (await sql("select count(*)::int as n from weekend_picks"))[0].n,
+          2,
+          "both picks are stored",
+        );
+        const notAdmin = await (
+          await rota("parent")
+        ).assignSlot({
+          idempotencyKey: nextKey("as"),
+          rotaWeekId: w.indoor.id,
+          slot: "sunday_closing",
+          expectedVersion: 1,
+        });
+        assert.equal(notAdmin.state, "denied", "a parent cannot assign");
+      });
+
+      it("a super admin sets a standing and a stale version is a conflict", async () => {
+        await rotaWorld();
+        const port = await rota("super");
+        const done = await port.setStanding({
+          idempotencyKey: nextKey("st"),
+          familyId: FAMILY_NO_GROUP,
+          schoolYearId: YEAR_1,
+          standing: "leaving",
+          expectedVersion: 0,
+        });
+        assert.equal(done.state, "success", JSON.stringify(done));
+        const stale = await port.setStanding({
+          idempotencyKey: nextKey("st"),
+          familyId: FAMILY_NO_GROUP,
+          schoolYearId: YEAR_1,
+          standing: "new",
+          expectedVersion: 0,
+        });
+        assert.equal(stale.state, "conflict");
+        const calendar = await port.calendar({ schoolYearId: YEAR_1 });
+        assert.equal(calendar.state, "success");
+        if (calendar.state === "success") {
+          assert.equal(
+            calendar.data.standings.find((item) => item.familyId === FAMILY_NO_GROUP)?.standing,
+            "leaving",
+          );
+        }
+        const asParent = await (
+          await rota("parent")
+        ).setStanding({
+          idempotencyKey: nextKey("st"),
+          familyId: FAMILY_1,
+          schoolYearId: YEAR_1,
+          standing: "leaving",
+          expectedVersion: 0,
+        });
+        assert.equal(asParent.state, "denied");
       });
     });
   });

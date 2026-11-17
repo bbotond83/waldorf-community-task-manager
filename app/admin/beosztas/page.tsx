@@ -1,5 +1,17 @@
-import type { RotaPlanModel, RotaPlanWeek } from "../../../src/application/index.ts";
-import { formatLongDay, formatWeekRange } from "../../../src/application/rota-format.ts";
+import type {
+  RotaJob,
+  RotaPlanModel,
+  RotaPlanWeek,
+  RotaWeekRef,
+} from "../../../src/application/index.ts";
+import {
+  formatLongDay,
+  formatWeekRange,
+  HOLD_REASON_TEXT,
+  ROTA_JOB_LABELS,
+  ROTA_WARNING_TEXT,
+  rotaRefusalMessage,
+} from "../../../src/application/rota-format.ts";
 import { StatusBadge } from "../../../src/runtime/StatusBadge.tsx";
 import { resolveRotaFacade } from "../../_identity/rota-facade.ts";
 import { AdminAccessState } from "../_components/AdminAccessState.tsx";
@@ -16,9 +28,9 @@ import {
 export default async function RotaPlanningPage({
   searchParams,
 }: {
-  searchParams: Promise<{ tanev?: string }>;
+  searchParams: Promise<{ tanev?: string; beosztas?: string }>;
 }) {
-  const [session, rota, { tanev }] = await Promise.all([
+  const [session, rota, { tanev, beosztas }] = await Promise.all([
     resolveAdminSession(),
     resolveRotaFacade(),
     searchParams,
@@ -46,13 +58,21 @@ export default async function RotaPlanningPage({
     );
   }
   const years = calendar.state === "success" ? calendar.data.schoolYears : [];
-  return <PlanningScreen model={result.data} years={years} />;
+  const job = JOBS.find((candidate) => candidate === beosztas) ?? "indoor_cleaning";
+  return <PlanningScreen model={result.data} years={years} job={job} />;
 }
+
+const JOBS = Object.keys(ROTA_JOB_LABELS) as RotaJob[];
 
 function PlanningScreen({
   model,
   years,
-}: Readonly<{ model: RotaPlanModel; years: readonly Readonly<{ id: string; name: string }>[] }>) {
+  job,
+}: Readonly<{
+  model: RotaPlanModel;
+  years: readonly Readonly<{ id: string; name: string }>[];
+  job: RotaJob;
+}>) {
   const { schoolYear: year, plan } = model;
   return (
     <section className="admin-page admin-rota-page" data-testid="admin-rota-page">
@@ -62,8 +82,9 @@ function PlanningScreen({
           Beosztás tervezése
         </h1>
         <p>
-          Benti takarítás: egy család jut egy tanítási hétre. A szülők a tervezetet nem látják, csak
-          a közzétett beosztást.
+          Négy beosztás van: belső takarítás, előkert, vízhordás és hétvégi állatgondozás. Minden
+          tanítási hétre egy-egy család jut. A szülők a tervezetet nem látják, csak a közzétett
+          beosztást.
         </p>
       </header>
       {!year && (
@@ -77,9 +98,11 @@ function PlanningScreen({
         <>
           <PlanHeader model={model} />
           {plan.status === "draft" && <Blockers model={model} />}
+          <Warnings model={model} />
+          <JobTabs selected={job} yearId={year!.id} />
           <div className="admin-rota-grid admin-rota-grid-wide">
-            <WeekPlan model={model} />
-            <FamilyCounts model={model} />
+            <WeekPlan model={model} job={job} />
+            <FamilyCounts model={model} job={job} />
           </div>
         </>
       )}
@@ -167,25 +190,41 @@ function PlanHeader({ model }: Readonly<{ model: RotaPlanModel }>) {
   );
 }
 
+/** What stops a publish (BR62.3), each line naming the rota and the week. */
 function Blockers({ model }: Readonly<{ model: RotaPlanModel }>) {
-  const { emptyWeeks, breakWeeks, ineligibleWeeks } = model.blockers;
+  const { emptyRows, breakRows, ineligibleRows, flaggedWeeks, clashWeeks } = model.blockers;
   if (model.canPublish) return null;
+  const rows = (list: readonly RotaWeekRef[]) =>
+    list.map((row) => `${ROTA_JOB_LABELS[row.job]}: ${formatWeekRange(row.weekStart)}`);
   const groups: [string, string, readonly string[]][] = [
-    ["empty", "Üres hetek: családot kell adni, mielőtt közzéteszi.", emptyWeeks],
-    ["break", "Szünetes hétre család van beosztva: üresítse ki.", breakWeeks],
-    ["ineligible", "A család már nem aktív: adjon másik családot.", ineligibleWeeks],
+    ["empty", "Üres hetek: családot kell adni, mielőtt közzéteszi.", rows(emptyRows)],
+    ["break", "Szünetes hétre család van beosztva: üresítse ki.", rows(breakRows)],
+    ["ineligible", "A család már nem aktív: adjon másik családot.", rows(ineligibleRows)],
+    [
+      "flagged",
+      "Olyan család szerepel a héten, amely aznap már nem (vagy még nem) vállalhat feladatot: adjon másik családot.",
+      flaggedWeeks.map(
+        (week) =>
+          `${ROTA_JOB_LABELS[week.job]}: ${formatWeekRange(week.weekStart)} – ${week.familyDisplayName} (${HOLD_REASON_TEXT[week.reason]})`,
+      ),
+    ],
+    [
+      "clash",
+      rotaRefusalMessage("ROTA_SAME_WEEK_CLASH"),
+      clashWeeks.map((week) => `${formatWeekRange(week.weekStart)} – ${week.familyDisplayName}`),
+    ],
   ];
   return (
     <section className="admin-rota-warning" role="alert" data-testid="admin-rota-blockers">
       <h2>A beosztás még nem tehető közzé</h2>
       {groups
-        .filter(([, , weeks]) => weeks.length > 0)
-        .map(([key, text, weeks]) => (
+        .filter(([, , lines]) => lines.length > 0)
+        .map(([key, text, lines]) => (
           <div key={key} data-testid={`admin-rota-blockers-${key}`}>
             <p>{text}</p>
             <ul>
-              {weeks.map((week) => (
-                <li key={week}>{formatWeekRange(week)}</li>
+              {lines.map((line) => (
+                <li key={line}>{line}</li>
               ))}
             </ul>
           </div>
@@ -194,12 +233,58 @@ function Blockers({ model }: Readonly<{ model: RotaPlanModel }>) {
   );
 }
 
-function WeekPlan({ model }: Readonly<{ model: RotaPlanModel }>) {
+/** Warnings that do not stop a publish: one family in two rotas of the same week (BR62.7). */
+function Warnings({ model }: Readonly<{ model: RotaPlanModel }>) {
+  const { twoJobs } = model.warnings;
+  if (twoJobs.length === 0) return null;
+  return (
+    <section className="admin-rota-notice" role="status" data-testid="admin-rota-warnings">
+      <h2>Figyelem</h2>
+      <p>{ROTA_WARNING_TEXT.twoJobs} A közzétételt ez nem akadályozza.</p>
+      <ul>
+        {twoJobs.map((week) => (
+          <li key={`${week.weekStart}:${week.familyId}`}>
+            {formatWeekRange(week.weekStart)} – {week.familyDisplayName}
+            {week.jobs ? ` (${week.jobs.map((job) => ROTA_JOB_LABELS[job]).join(", ")})` : ""}
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+/** One rota at a time: the tabs are links, so the page works without a script and keeps its address. */
+function JobTabs({ selected, yearId }: Readonly<{ selected: RotaJob; yearId: string }>) {
+  return (
+    <nav className="admin-rota-tabs" aria-label="Beosztások" data-testid="admin-rota-tabs">
+      {JOBS.map((job) => (
+        <a
+          key={job}
+          className="admin-rota-tab"
+          href={`/admin/beosztas?tanev=${yearId}&beosztas=${job}`}
+          aria-current={job === selected ? "page" : undefined}
+          data-testid={`admin-rota-tab-${job}`}
+        >
+          {ROTA_JOB_LABELS[job]}
+        </a>
+      ))}
+    </nav>
+  );
+}
+
+function WeekPlan({ model, job }: Readonly<{ model: RotaPlanModel; job: RotaJob }>) {
   const plan = model.plan!;
   const draft = plan.status === "draft";
+  const weeks = model.weeks.filter((week) => week.job === job);
   return (
     <section className="admin-rota-panel" data-testid="admin-rota-weeks">
-      <h2>Iskolai hetek beosztása</h2>
+      <h2>{ROTA_JOB_LABELS[job]} – iskolai hetek beosztása</h2>
+      {job === "weekend_animal_care" && (
+        <p className="form-hint" data-testid="admin-rota-weekend-note">
+          A hétvégi család viszi mind az öt hétvégi feladatot, amíg a hét belső takarító vagy
+          előkerti családja nem választ belőlük.
+        </p>
+      )}
       <div className="admin-rota-table-wrapper">
         <table className="admin-rota-table">
           <thead>
@@ -210,7 +295,7 @@ function WeekPlan({ model }: Readonly<{ model: RotaPlanModel }>) {
             </tr>
           </thead>
           <tbody>
-            {model.weeks.map((week, index) => (
+            {weeks.map((week, index) => (
               <WeekRow key={week.id} week={week} index={index} model={model} draft={draft} />
             ))}
           </tbody>
@@ -281,7 +366,7 @@ function WeekRow({
                 <option value="">Üres</option>
                 {model.families.map((family) => (
                   <option key={family.familyId} value={family.familyId}>
-                    {family.displayName} ({family.weeks} hét)
+                    {family.displayName} ({family.counts[week.job]} hét)
                   </option>
                 ))}
               </select>
@@ -293,10 +378,11 @@ function WeekRow({
   );
 }
 
-function FamilyCounts({ model }: Readonly<{ model: RotaPlanModel }>) {
+function FamilyCounts({ model, job }: Readonly<{ model: RotaPlanModel; job: RotaJob }>) {
   return (
     <section className="admin-rota-panel" data-testid="admin-rota-families">
       <h2>Hetek családonként</h2>
+      <p className="form-hint">{ROTA_JOB_LABELS[job]}</p>
       {model.families.length === 0 ? (
         <p>Nincs aktív család.</p>
       ) : (
@@ -304,8 +390,8 @@ function FamilyCounts({ model }: Readonly<{ model: RotaPlanModel }>) {
           {model.families.map((family) => (
             <li key={family.familyId} data-testid={`admin-rota-count-${family.familyId}`}>
               <span>{family.displayName}</span>
-              <strong>{family.weeks} hét</strong>
-              {family.aboveLowest && (
+              <strong>{family.counts[job]} hét</strong>
+              {family.aboveLowestJobs.includes(job) && (
                 <StatusBadge
                   className="admin-rota-uneven"
                   label="Több hét a többinél"

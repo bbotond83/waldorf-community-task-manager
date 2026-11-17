@@ -175,6 +175,66 @@ test("the school calendar and the rota plan belong to a super admin alone (BR20.
   }
 });
 
+test("standings, assigned picks and the unpicked list belong to a super admin alone (BR60.1, BR63.6, BR63.8)", () => {
+  for (const kind of ["family_standing", "weekend_unpicked_list"]) {
+    for (const action of ["read", "update", "manage"] as const)
+      assert.equal(
+        grantAllows(grant("super_admin", org), { action, resource: { kind, scope: org } }),
+        true,
+        `${kind} ${action}`,
+      );
+    for (const [role, scope] of [
+      ["parent", family],
+      ["group_admin", group],
+      ["kindergarten_teacher", org],
+    ] as const)
+      for (const action of ["read", "update", "manage"] as const)
+        assert.equal(
+          grantAllows(grant(role, scope), { action, resource: { kind, scope } }),
+          false,
+          `${role} ${kind} ${action}`,
+        );
+  }
+});
+
+test("a parent picks a weekend slot for the own family, and no other action on picks is the parent's (BR63.4)", () => {
+  assert.equal(
+    grantAllows(grant("parent", family), {
+      action: "update",
+      resource: { kind: "weekend_pick", scope: family },
+    }),
+    true,
+  );
+  assert.equal(
+    grantAllows(grant("parent", family), {
+      action: "update",
+      resource: { kind: "weekend_pick", scope: { ...family, id: "other" } },
+    }),
+    false,
+  );
+  for (const action of ["read", "create", "delete", "manage"] as const)
+    assert.equal(
+      grantAllows(grant("parent", family), {
+        action,
+        resource: { kind: "weekend_pick", scope: family },
+      }),
+      false,
+      action,
+    );
+  for (const [role, scope] of [
+    ["group_admin", group],
+    ["kindergarten_teacher", org],
+  ] as const)
+    assert.equal(
+      grantAllows(grant(role, scope), {
+        action: "update",
+        resource: { kind: "weekend_pick", scope },
+      }),
+      false,
+      role,
+    );
+});
+
 test("a duty card is read by a parent of the family and by a super admin, never changed (BR24.2)", () => {
   assert.equal(
     grantAllows(grant("parent", family), {

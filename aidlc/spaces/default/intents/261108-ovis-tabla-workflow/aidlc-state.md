@@ -44,7 +44,7 @@
 - **Construction Iteration**: unit-major
 - **Construction Execution**: serial
 
-- **Construction Verification Command**: npm run verify:local
+- **Construction Verification Command**: VERIFY_BROWSER_PROJECTS=chromium npm run verify:local
 
 - **Unit Ownership**: solo
 
@@ -170,6 +170,24 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+- **Parked**: 2026-11-17T10:04:39Z
+
+- **Parked At Stage**: functional-design
+
+- **Parked By**: person
+
 ## Phase Progress
 <!-- Status values: Pending, Active, Verified, Skipped -->
 
@@ -230,7 +248,7 @@
 - **Current Stage**: functional-design
 - **Next Stage**: nfr-requirements
 - **Status**: Running
-- **Last Updated**: 2026-11-15T19:31:10Z
+- **Last Updated**: 2026-11-17T10:04:39Z
 
 - **Construction Autonomy Mode**: gated
 

@@ -100,6 +100,24 @@ for (const schema of DIRECTORY_SCHEMAS) {
           [family],
         )
       ).rows.map((row) => String(row.d));
+    /** The family holding the front garden in each week (week start as text), for picking weeks free of the clash. */
+    const frontGardenFamilies = async () =>
+      new Map(
+        (
+          await db.query(
+            "select to_char(week_start, 'YYYY-MM-DD') as d, family_id from rota_weeks where job = 'front_garden'",
+          )
+        ).rows.map((row) => [String(row.d), row.family_id as string | null] as const),
+      );
+    const indoorWeeksOf = async (family: string) =>
+      Number(
+        (
+          await db.query(
+            "select count(*)::int as n from rota_weeks where job = 'indoor_cleaning' and family_id = $1",
+            [family],
+          )
+        ).rows[0].n,
+      );
     const published = async () => {
       const draft = await makeDraft(db, schema);
       const done = await publish(db, schema, draft);
@@ -109,7 +127,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
     const dutyOf = async (family: string) =>
       (
         await db.query(
-          "select t.id as task_id, a.id as place_id, a.version as place_version, t.version as task_version from tasks t join assignments a on a.task_id = t.id where t.origin_kind = 'rota_week' and a.family_id = $1 order by t.starts_at limit 1",
+          "select t.id as task_id, a.id as place_id, a.version as place_version, t.version as task_version from tasks t join assignments a on a.task_id = t.id where t.origin_kind = 'rota_week' and t.category = 'rota_indoor_cleaning' and a.family_id = $1 order by t.starts_at limit 1",
           [family],
         )
       ).rows[0] as {
@@ -189,11 +207,13 @@ for (const schema of DIRECTORY_SCHEMAS) {
       );
       await makeDraft(db, schema);
       const weeks = await schoolWeekStarts(db);
-      assert.equal(await count(db, "rota_weeks"), weeks.length);
+      // Four rows for every school week, one for each rota (BR61.1).
+      assert.equal(await count(db, "rota_weeks"), weeks.length * 4);
       const brk = await db.query(
-        "select family_id, empty_reason from rota_weeks where week_start = '2026-12-21'",
+        "select job, family_id, empty_reason from rota_weeks where week_start = '2026-12-21' and job in ('indoor_cleaning', 'water_carrying')",
       );
-      assert.deepEqual([brk.rows[0].family_id, brk.rows[0].empty_reason], [null, null]);
+      assert.equal(brk.rows.length, 2);
+      for (const row of brk.rows) assert.deepEqual([row.family_id, row.empty_reason], [null, null]);
     });
 
     it("BR21.3 active families only", async () => {
@@ -425,20 +445,28 @@ for (const schema of DIRECTORY_SCHEMAS) {
     it("BR22.3 warning, change kept", async () => {
       await makeDraft(db, schema);
       const view = await readPlan(db, schema);
-      const others = view.items.filter((w) => w.family_id !== FAMILY_1).slice(0, 4);
+      const garden = await frontGardenFamilies();
+      // Only weeks in which the family does not hold the front garden: the two may not be in one week (BR62.1).
+      const others = view.items
+        .filter((w) => w.family_id !== FAMILY_1 && garden.get(w.week_start) !== FAMILY_1)
+        .slice(0, 4);
+      assert.equal(others.length, 4);
       for (const week of others) {
         const set = await setWeek(SUPER_ADMIN, week.id, FAMILY_1, week.version);
-        assert.equal(set.state, "success");
+        assert.equal(set.state, "success", JSON.stringify(set));
       }
       const after = await readPlan(db, schema);
       const row = after.families.find((f) => f.family_id === FAMILY_1);
       assert.equal(row?.above_lowest, true);
-      assert.equal((await weeksOf(FAMILY_1)).length, row?.weeks);
+      assert.equal(await indoorWeeksOf(FAMILY_1), row?.weeks);
     });
 
     it("BR22.4 sequential result", async () => {
       await makeDraft(db, schema);
-      const week = (await readPlan(db, schema)).items[7];
+      const garden = await frontGardenFamilies();
+      const week = (await readPlan(db, schema)).items.find(
+        (w) => ![FAMILY_1, FAMILY_2].includes(garden.get(w.week_start) ?? ""),
+      );
       assert.ok(week);
       const one = await setWeek(SUPER_ADMIN, week.id, FAMILY_1, week.version);
       const two = await setWeek(SUPER_ADMIN, week.id, FAMILY_2, week.version + 1);
@@ -623,13 +651,19 @@ for (const schema of DIRECTORY_SCHEMAS) {
     it("BR23.2 one duty and one place per week", async () => {
       await published();
       const weeks = await schoolWeekStarts(db);
-      assert.equal(await count(db, "tasks", ROTA_DUTY), weeks.length);
+      // Three weekly rotas have a duty per week; the fourth is the five weekend duties (BR62.4).
+      assert.equal(await count(db, "tasks", ROTA_DUTY), weeks.length * 3);
       assert.equal(
-        await count(db, "assignments", "source = 'rota_publish' and status = 'active'"),
-        weeks.length,
+        await count(
+          db,
+          "assignments",
+          "source = 'rota_publish' and status = 'active' and task_id in (select id from tasks where origin_kind = 'rota_week')",
+        ),
+        weeks.length * 3,
       );
+      assert.equal(await count(db, "tasks", "origin_kind = 'weekend_slot'"), weeks.length * 5);
       const duty = await db.query(
-        "select title, category, capacity, group_id, status, to_char(starts_at at time zone 'Europe/Budapest', 'YYYY-MM-DD HH24:MI:SS') as s, to_char(ends_at at time zone 'Europe/Budapest', 'YYYY-MM-DD HH24:MI:SS') as e from tasks where origin_kind = 'rota_week' order by starts_at limit 1",
+        "select title, category, capacity, group_id, status, to_char(starts_at at time zone 'Europe/Budapest', 'YYYY-MM-DD HH24:MI:SS') as s, to_char(ends_at at time zone 'Europe/Budapest', 'YYYY-MM-DD HH24:MI:SS') as e from tasks where origin_kind = 'rota_week' and category = 'rota_indoor_cleaning' order by starts_at limit 1",
       );
       assert.deepEqual(duty.rows[0], {
         title: "Belső takarítás",
@@ -671,7 +705,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
         key,
       );
       assert.equal(again.code, "ROTA_PLAN_PUBLISHED");
-      assert.equal(await count(db, "tasks", ROTA_DUTY), (await schoolWeekStarts(db)).length);
+      assert.equal(await count(db, "tasks", ROTA_DUTY), (await schoolWeekStarts(db)).length * 3);
     });
 
     it("BR23.2 two publishes", async () => {
@@ -685,7 +719,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
         ]),
       ]);
       assert.deepEqual([a.state, b.state].sort(), ["conflict", "success"]);
-      assert.equal(await count(db, "tasks", ROTA_DUTY), (await schoolWeekStarts(db)).length);
+      assert.equal(await count(db, "tasks", ROTA_DUTY), (await schoolWeekStarts(db)).length * 3);
     });
 
     it("BR23.3 first publish", async () => {
@@ -734,7 +768,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
     const expectedParents = async () =>
       (
         await db.query(
-          "select count(*)::int as n from parents p join families f on f.id = p.family_id where p.account_id is not null and p.status = 'active' and f.status = 'active' and p.family_id in (select family_id from rota_weeks where family_id is not null)",
+          "select count(*)::int as n from parents p join accounts a on a.id = p.account_id join families f on f.id = p.family_id where p.status = 'active' and a.status = 'active' and f.status = 'active' and p.family_id in (select family_id from rota_weeks where family_id is not null)",
         )
       ).rows[0].n as number;
 
@@ -880,12 +914,18 @@ for (const schema of DIRECTORY_SCHEMAS) {
         };
         assert.equal(view.state, "success");
         assert.equal(view.overview_state, "published");
-        assert.equal(view.items.length, weeks.length);
+        // Four rows for every school week, one for each rota.
+        assert.equal(view.items.length, weeks.length * 4);
         // The exact field list (NFR1.2): no child name, contact detail or sharing choice.
         assert.deepEqual(Object.keys(view.items[0] ?? {}).sort(), OVERVIEW_FIELDS);
         const own = view.items.filter((item) => item.is_own === true);
         assert.equal(own.length, account === PARENT_F1 ? (await weeksOf(FAMILY_1)).length : 0);
-        assert.equal(view.items.filter((item) => item.duty_id !== null).length, own.length);
+        // A weekend week has no weekly duty; its five duties are listed with the weekend items.
+        const weekendRows = own.filter((item) => item.job === "weekend_animal_care").length;
+        assert.equal(
+          view.items.filter((item) => item.duty_id !== null).length,
+          own.length - weekendRows,
+        );
       }
     });
 
@@ -943,14 +983,21 @@ for (const schema of DIRECTORY_SCHEMAS) {
         item: Record<string, unknown>;
       };
       assert.deepEqual(Object.keys(card.item).sort(), [
+        "bottles_at_week_end",
+        "day",
         "duty_id",
         "family_display_name",
+        "includes_watering",
         "is_break_week",
         "job",
         "no_fixed_day",
+        "own_pick",
+        "part_of_day",
+        "slot",
         "title",
         "week_end",
         "week_start",
+        "weekend",
       ]);
       assert.equal(card.item.job, "indoor_cleaning");
       assert.equal(card.item.no_fixed_day, true);

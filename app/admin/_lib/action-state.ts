@@ -1,4 +1,5 @@
 import type { ApplicationResult } from "../../../src/application/index.ts";
+import { rotaRefusalMessage } from "../../../src/application/rota-format.ts";
 import { DIRECTORY_REFUSAL_MESSAGES } from "../../../src/data/copy.ts";
 import type { AdminActionState } from "../actions.ts";
 
@@ -27,6 +28,10 @@ function mapByState<T>(result: ApplicationResult<T>, successMessage: string): Ad
     case "recovery":
       return { state: "success", message: successMessage, code: result.code };
     case "validation":
+      // A family that may not hold a duty on that day (BR60.3): one sentence, no field to point at.
+      if (result.code === "DUTY_INELIGIBLE") {
+        return { state: "validation", message: rotaRefusalMessage(result.code), code: result.code };
+      }
       return {
         state: "validation",
         message: "Ellenőrizze a megadott adatokat.",
