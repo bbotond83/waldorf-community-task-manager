@@ -95,6 +95,23 @@ export const AUTHORIZATION_MATRIX: readonly MatrixRow[] = Object.freeze([
     fields: [],
   },
   {
+    // Every signed-in role reads the library pages, a teacher too (BR130.1); the database decides which parts.
+    id: "AUTH-LIBRARY",
+    roles: ["parent", "group_admin", "kindergarten_teacher", "super_admin"],
+    actions: ["read"],
+    resources: ["library"],
+    fields: [],
+  },
+  {
+    // Books are added, changed, borrowed and returned by parents and super admins; a teacher writes nothing (FR1.6).
+    // A group admin who is a parent acts through the parent grant. The database repeats every check.
+    id: "AUTH-LIBRARY-COMMANDS",
+    roles: ["parent", "super_admin"],
+    actions: ["create", "update", "delete"],
+    resources: ["library_book"],
+    fields: [],
+  },
+  {
     id: "AUTH-WORKING-GROUPS",
     roles: ["parent", "group_admin", "kindergarten_teacher", "super_admin"],
     actions: ["read"],

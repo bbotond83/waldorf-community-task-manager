@@ -1,0 +1,229 @@
+{
+  "stage": "code-generation",
+  "unit": "u13-lending-library",
+  "version": 1,
+  "writes": [
+    {
+      "path": "app/_library/LibraryForms.tsx"
+    },
+    {
+      "path": "app/_library/LibraryScreens.tsx"
+    },
+    {
+      "path": "app/_library/actions.ts"
+    },
+    {
+      "path": "app/_library/actor.ts"
+    },
+    {
+      "path": "app/_library/facade.ts"
+    },
+    {
+      "path": "app/_library/library-id.ts"
+    },
+    {
+      "path": "app/_library/library-result.ts"
+    },
+    {
+      "path": "app/admin/konyvtar/[id]/page.tsx"
+    },
+    {
+      "path": "app/admin/konyvtar/[id]/szerkesztes/page.tsx"
+    },
+    {
+      "path": "app/admin/konyvtar/page.tsx"
+    },
+    {
+      "path": "app/admin/konyvtar/uj/page.tsx"
+    },
+    {
+      "path": "app/globals.css"
+    },
+    {
+      "path": "app/szulo/konyvtar/[id]/page.tsx"
+    },
+    {
+      "path": "app/szulo/konyvtar/[id]/szerkesztes/page.tsx"
+    },
+    {
+      "path": "app/szulo/konyvtar/page.tsx"
+    },
+    {
+      "path": "app/szulo/konyvtar/uj/page.tsx"
+    },
+    {
+      "path": "app/teacher/konyvtar/[id]/page.tsx"
+    },
+    {
+      "path": "app/teacher/konyvtar/page.tsx"
+    },
+    {
+      "path": "package.json"
+    },
+    {
+      "path": "scripts/db/seed/commands.test.ts"
+    },
+    {
+      "path": "scripts/db/seed/data.test.ts"
+    },
+    {
+      "path": "scripts/db/seed/data.ts"
+    },
+    {
+      "path": "scripts/db/seed/write.test.ts"
+    },
+    {
+      "path": "scripts/db/seed/write.ts"
+    },
+    {
+      "path": "scripts/db/shuffled-tests.ts"
+    },
+    {
+      "path": "src/access/role-policy.ts"
+    },
+    {
+      "path": "src/application/authorization.ts"
+    },
+    {
+      "path": "src/application/contracts.ts"
+    },
+    {
+      "path": "src/application/index.ts"
+    },
+    {
+      "path": "src/application/library-facade.test.ts"
+    },
+    {
+      "path": "src/application/library-facade.ts"
+    },
+    {
+      "path": "src/application/library-format.test.ts"
+    },
+    {
+      "path": "src/application/library-format.ts"
+    },
+    {
+      "path": "src/data/copy.ts"
+    },
+    {
+      "path": "src/data/index.ts"
+    },
+    {
+      "path": "src/data/library.test.ts"
+    },
+    {
+      "path": "src/data/library.ts"
+    },
+    {
+      "path": "src/data/results.ts"
+    },
+    {
+      "path": "src/runtime/navigation.ts"
+    },
+    {
+      "path": "src/runtime/production/access.test.ts"
+    },
+    {
+      "path": "src/runtime/production/services.ts"
+    },
+    {
+      "path": "supabase/migrations/20261058_lending_library.sql"
+    },
+    {
+      "path": "tests/browser/functional-fixes.spec.ts"
+    },
+    {
+      "path": "tests/browser/library-screenshots.spec.ts"
+    },
+    {
+      "path": "tests/browser/library-timing.spec.ts"
+    },
+    {
+      "path": "tests/browser/library.spec.ts"
+    },
+    {
+      "path": "tests/browser/navigation-polish.spec.ts"
+    },
+    {
+      "path": "tests/browser/runtime-foundation.spec.ts"
+    },
+    {
+      "path": "tests/browser/teacher-web.spec.ts"
+    },
+    {
+      "path": "tests/browser/visual-overhaul.spec.ts"
+    },
+    {
+      "path": "tests/coverage/production-inventory.test.ts"
+    },
+    {
+      "path": "tests/database/identity-catalogue.test.ts"
+    },
+    {
+      "path": "tests/database/library-adapter.test.ts"
+    },
+    {
+      "path": "tests/database/library-books.test.ts"
+    },
+    {
+      "path": "tests/database/library-core.test.ts"
+    },
+    {
+      "path": "tests/database/library-for-later-units.test.ts"
+    },
+    {
+      "path": "tests/database/library-loans.test.ts"
+    },
+    {
+      "path": "tests/database/library-races.test.ts"
+    },
+    {
+      "path": "tests/database/library-support.ts"
+    },
+    {
+      "path": "tests/database/library-timing.test.ts"
+    },
+    {
+      "path": "tests/database/notices-failures.test.ts"
+    },
+    {
+      "path": "tests/database/notices-run.test.ts"
+    },
+    {
+      "path": "tests/database/notices-send.test.ts"
+    },
+    {
+      "path": "tests/database/notifications-timing.test.ts"
+    },
+    {
+      "path": "tests/database/seed.test.ts"
+    },
+    {
+      "path": "tests/integration/app-nav.test.tsx"
+    },
+    {
+      "path": "tests/integration/copy.test.ts"
+    },
+    {
+      "path": "tests/integration/library-actions.test.ts"
+    },
+    {
+      "path": "tests/integration/library-screens.test.tsx"
+    },
+    {
+      "path": "tests/integration/runtime-shell.test.tsx"
+    },
+    {
+      "path": "tests/support/request-world.ts"
+    },
+    {
+      "path": "tests/unit/navigation-access.test.ts"
+    },
+    {
+      "path": "tests/unit/runtime-boundaries.test.ts"
+    },
+    {
+      "path": "verification/authorization-matrix.json"
+    }
+  ]
+}

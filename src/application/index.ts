@@ -42,5 +42,7 @@ export { WorkingGroupApplicationFacade } from "./working-group-facade.ts";
 export type { WorkingGroupApplicationPort } from "./working-group-facade.ts";
 export { EventApplicationFacade } from "./event-facade.ts";
 export type { EventApplicationPort } from "./event-facade.ts";
+export { LibraryApplicationFacade } from "./library-facade.ts";
+export type { LibraryApplicationPort } from "./library-facade.ts";
 export { DirectoryApplicationFacade } from "./directory-facade.ts";
 export type { DirectoryApplicationPort } from "./directory-facade.ts";

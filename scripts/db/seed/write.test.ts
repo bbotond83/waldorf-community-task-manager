@@ -63,6 +63,9 @@ describe("seed writer", () => {
       "assignments",
       "event_signups",
       "food_offers",
+      "books",
+      "loans",
+      "return_watches",
       "notifications",
       "email_deliveries",
       "email_attempts",
@@ -128,6 +131,9 @@ describe("seed writer", () => {
     assert.equal(new Set(ages).size, ages.length);
     assert.equal(rowsOf("event_signups"), plan.eventSignups.length);
     assert.equal(rowsOf("food_offers"), plan.foodOffers.length);
+    assert.equal(rowsOf("books"), plan.books.length);
+    assert.equal(rowsOf("loans"), plan.loans.length);
+    assert.equal(rowsOf("return_watches"), plan.watches.length);
     assert.equal(rowsOf("tasks"), counts.tasks);
     assert.equal(rowsOf("assignments"), counts.assignments);
     const familyInsert = calls.find((call) => call.sql.startsWith('insert into "families"'))!;
@@ -171,7 +177,9 @@ describe("seed writer", () => {
     const large = recorder();
     await writeSeedPlan(small.client, plan);
     await writeSeedPlan(large.client, buildSeedPlan("worker_2", "large"));
-    assert.deepEqual(tables(small.calls), tables(large.calls));
+    // A table of more than 200 rows is written in several statements (the 300 books), so repeats in a row count once.
+    const once = (names: string[]) => names.filter((name, index) => name !== names[index - 1]);
+    assert.deepEqual(once(tables(small.calls)), once(tables(large.calls)));
     const familyRows = (calls: { sql: string }[]) =>
       calls.find((call) => call.sql.startsWith('insert into "families"'))!.sql.match(/\(\$/g)!
         .length;

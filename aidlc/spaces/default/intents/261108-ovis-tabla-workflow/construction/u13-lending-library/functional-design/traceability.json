@@ -1,0 +1,45 @@
+{
+  "stage": "functional-design",
+  "unit": "u13-lending-library",
+  "upstream_ids": [
+    "AC16.1.1",
+    "AC16.1.2",
+    "AC16.2.1",
+    "AC16.2.2",
+    "AC16.2.3",
+    "AC16.2.4",
+    "AC16.3.1",
+    "AC16.3.2",
+    "AC17.1.1",
+    "AC17.1.2",
+    "AC17.1.3",
+    "AC17.1.4",
+    "AC17.1.5",
+    "AC17.1.6"
+  ],
+  "coverage": [
+    { "id": "AC16.1.1", "status": "OK", "target": "BR130.1, BR131.1, BR131.2" },
+    { "id": "AC16.1.2", "status": "OK", "target": "BR130.2" },
+    { "id": "AC16.2.1", "status": "OK", "target": "BR133.1, BR133.3" },
+    { "id": "AC16.2.2", "status": "OK", "target": "BR134.1" },
+    { "id": "AC16.2.3", "status": "OK", "target": "BR134.1, BR134.2" },
+    { "id": "AC16.2.4", "status": "OK", "target": "BR133.2" },
+    { "id": "AC16.3.1", "status": "OK", "target": "BR135.1, BR135.2" },
+    { "id": "AC16.3.2", "status": "OK", "target": "BR136.1, BR136.2" },
+    { "id": "AC17.1.1", "status": "OK", "target": "BR135.2, BR136.1, BR137.1 (the notice kinds and recipients for a book; the in-app notice, the email and the local test mailbox are delivered by u5-reminders-and-email)" },
+    { "id": "AC17.1.2", "status": "N/A", "target": "delivered by u5-reminders-and-email" },
+    { "id": "AC17.1.3", "status": "OK", "target": "BR135.2, BR136.1, BR136.2 (once keys for book notices; the mechanism is delivered by u5-reminders-and-email)" },
+    { "id": "AC17.1.4", "status": "OK", "target": "BR137.1" },
+    { "id": "AC17.1.5", "status": "N/A", "target": "delivered by u5-reminders-and-email" },
+    { "id": "AC17.1.6", "status": "OK", "target": "BR137.1" }
+  ],
+  "reverse": [
+    { "id": "BR132.1", "status": "N/A", "target": "owner answer Q2 and Q1; changing a book and its owner" },
+    { "id": "BR132.2", "status": "N/A", "target": "owner answer Q2; removing a book while nobody holds it" },
+    { "id": "BR134.2", "status": "N/A", "target": "owner answer Q3; a super admin records the return of a book with no owner who has rights" },
+    { "id": "BR138.1", "status": "N/A", "target": "NFR3, NFR5 and contract C1; locks, idempotency and versions" },
+    { "id": "BR139.1", "status": "N/A", "target": "contract C16; removing a person" },
+    { "id": "BR139.2", "status": "N/A", "target": "NFR4 and contract C1; audit without names" },
+    { "id": "BR140.1", "status": "N/A", "target": "FR18.1 and contract C17; the one-off load of the books" }
+  ]
+}

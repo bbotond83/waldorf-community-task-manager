@@ -171,6 +171,29 @@ export interface SeedPlan {
     hasEgg: boolean;
     hasGarlic: boolean;
   }[];
+  /** Invented library books (U13): a parent's own book, or one with a typed owner name and a source key. */
+  books: {
+    id: string;
+    title: string;
+    authors: string;
+    description: string | null;
+    ownerParentId: string | null;
+    ownerName: string | null;
+    sourceKey: string | null;
+  }[];
+  /** Invented loans: closed history, open loans and one late open loan; dates are days before or after today. */
+  loans: {
+    id: string;
+    bookId: string;
+    borrowerParentId: string;
+    borrowerFamilyId: string;
+    borrowedDaysAgo: number;
+    /** Days from today (negative: already passed); null when the borrower named no date. */
+    untilInDays: number | null;
+    returnedDaysAgo: number | null;
+  }[];
+  /** Invented return watches on borrowed books. */
+  watches: { id: string; bookId: string; parentId: string }[];
   tasks: {
     id: string;
     groupId: string | null;
@@ -754,6 +777,74 @@ export function buildSeedPlan(
     },
   );
 
+  // The community library (U13): books of the families, closed and open loans, and watches on borrowed books. The
+  // large set has 300 books, one of them (book 7) with the most watches, for the timing checks.
+  const books: SeedPlan["books"] = [];
+  const loans: SeedPlan["loans"] = [];
+  const watches: SeedPlan["watches"] = [];
+  const BOOK_TITLES = [
+    "A kis herceg",
+    "Pál utcai fiúk",
+    "Mese a hóemberről",
+    "A gyermek korai évei",
+    "Kerti munkák ritmusa",
+    "Rajzok és mesék",
+    "Az évszakok asztala",
+    "Gyapjúmesék",
+  ] as const;
+  const BOOK_AUTHORS = ["Saint-Exupéry", "Molnár Ferenc", "Ismeretlen", "Teszt Szerző"] as const;
+  const bookCount = size === "large" ? 300 : 6;
+  const parentOfFamily = (number: number) => id(`parent:${number}:1`);
+  const familyCount = families.length;
+  const watchesOf = (bookIndex: number) =>
+    bookIndex === 7 && size === "large" ? 20 : 1 + (bookIndex % 3);
+  for (let k = 1; k <= bookCount; k += 1) {
+    const bookId = id(`book:${k}`);
+    const ownerNumber = ((k - 1) % familyCount) + 1;
+    const typed = size === "large" ? k % 25 === 0 : k === 5;
+    const round = Math.ceil(k / BOOK_TITLES.length);
+    books.push({
+      id: bookId,
+      title: `${pick(BOOK_TITLES, k - 1)}${round > 1 ? ` ${round}` : ""}`,
+      authors: pick(BOOK_AUTHORS, k - 1),
+      description: k % 2 === 1 ? "Rövid leírás a könyvről." : null,
+      ownerParentId: typed ? null : parentOfFamily(ownerNumber),
+      ownerName: typed ? "Régi Gazda" : null,
+      sourceKey: typed ? `seed-book:${k}` : null,
+    });
+    const nextNumber = (ownerNumber % familyCount) + 1;
+    if (k % 3 === 0) {
+      loans.push({
+        id: id(`loan:${k}:1`),
+        bookId,
+        borrowerParentId: parentOfFamily(nextNumber),
+        borrowerFamilyId: families[nextNumber - 1]!.id,
+        borrowedDaysAgo: 40,
+        untilInDays: -32,
+        returnedDaysAgo: 30,
+      });
+    }
+    const late = k % 5 === 3;
+    if (k % 5 === 2 || late) {
+      const borrowerNumber = late ? (ownerNumber === 1 ? 2 : 1) : nextNumber;
+      loans.push({
+        id: id(`loan:${k}:2`),
+        bookId,
+        borrowerParentId: parentOfFamily(borrowerNumber),
+        borrowerFamilyId: families[borrowerNumber - 1]!.id,
+        borrowedDaysAgo: 10,
+        untilInDays: late ? -3 : 14,
+        returnedDaysAgo: null,
+      });
+      let added = 0;
+      for (let n = 1; n <= familyCount && added < watchesOf(k); n += 1) {
+        if (n === ownerNumber || n === borrowerNumber) continue;
+        watches.push({ id: id(`watch:${k}:${n}`), bookId, parentId: parentOfFamily(n) });
+        added += 1;
+      }
+    }
+  }
+
   const DELIVERY_STATES = ["queued", "sent", "failed"] as const;
   const notices: SeedPlan["notices"] = assignments
     .filter(
@@ -829,6 +920,9 @@ export function buildSeedPlan(
     eventRoles,
     eventSignups,
     foodOffers,
+    books,
+    loans,
+    watches,
     tasks,
     assignments,
     notices,
@@ -857,6 +951,9 @@ export function describePlan(plan: SeedPlan): Record<string, number> {
     children: plan.children.length,
     accounts: plan.accounts.length,
     events: plan.events.length,
+    books: plan.books.length,
+    loans: plan.loans.length,
+    watches: plan.watches.length,
     tasks: plan.tasks.length,
     assignments: plan.assignments.length,
     notices: plan.notices.length,

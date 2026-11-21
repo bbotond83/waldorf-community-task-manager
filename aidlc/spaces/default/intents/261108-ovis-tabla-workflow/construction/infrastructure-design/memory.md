@@ -4,6 +4,8 @@
 ## Interpretations
 <!-- example: 2026-05-29T10:14:32Z — chose REST over GraphQL; the consuming team only needs CRUD, revisit if subscriptions land -->
 
+- 2026-11-21T09:40:00Z [unit u13-lending-library] — Asked no questions; nothing is hosted and the NFR design adds no service, so the design only records that the unit adds database objects, registry rows and seed data to the existing local set-up.
+
 ## Deviations
 <!-- example: 2026-05-29T10:14:32Z — skipped the optional caching layer the stage prose suggested; the dataset is small enough that it adds risk -->
 

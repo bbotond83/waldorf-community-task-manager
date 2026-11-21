@@ -73,6 +73,9 @@ describe("seed on the real stack", () => {
     assert.equal(await rowCount(db, A, "events"), counts.events);
     assert.equal(await rowCount(db, A, "tasks"), counts.tasks);
     assert.equal(await rowCount(db, A, "assignments"), counts.assignments);
+    assert.equal(await rowCount(db, A, "books"), counts.books);
+    assert.equal(await rowCount(db, A, "loans"), counts.loans);
+    assert.equal(await rowCount(db, A, "return_watches"), counts.watches);
     const families = (await db.query(`select id::text from "${A}".families order by id`)).rows.map(
       (row) => row.id,
     );

@@ -3,6 +3,7 @@ import {
   AuthorizationContract,
   DirectoryApplicationFacade,
   EventApplicationFacade,
+  LibraryApplicationFacade,
   FacadePipeline,
   IdempotencyCoordinator,
   InMemoryIdempotencyStore,
@@ -12,6 +13,7 @@ import {
   WorkingGroupApplicationFacade,
   type DomainOutcome,
   type EventApplicationPort,
+  type LibraryApplicationPort,
   type RotaApplicationPort,
   type WorkingGroupApplicationPort,
   type WorkingGroupChangeModel,
@@ -130,6 +132,20 @@ const EVENT_PORT_DOUBLE: EventApplicationPort = {
   addOffer: deniedOutcome,
   changeOffer: deniedOutcome,
   withdrawOffer: deniedOutcome,
+};
+
+/** A library port with no books: every read and command is refused, as the screens are not built yet. */
+const LIBRARY_PORT_DOUBLE: LibraryApplicationPort = {
+  list: deniedOutcome,
+  detail: deniedOutcome,
+  addBook: deniedOutcome,
+  changeBook: deniedOutcome,
+  removeBook: deniedOutcome,
+  borrow: deniedOutcome,
+  setUntil: deniedOutcome,
+  returnBook: deniedOutcome,
+  watch: deniedOutcome,
+  unwatch: deniedOutcome,
 };
 
 /** A rota port with nothing published: the overview is empty, everything else is refused. */
@@ -325,6 +341,7 @@ export function createRequestWorld() {
       directory: new DirectoryApplicationFacade(pipeline, directoryPort),
       // The event screens come after the owner's design approval; until then every event read is empty.
       events: new EventApplicationFacade(pipeline, EVENT_PORT_DOUBLE),
+      library: new LibraryApplicationFacade(pipeline, LIBRARY_PORT_DOUBLE),
     });
   }
 

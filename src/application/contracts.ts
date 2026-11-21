@@ -85,6 +85,8 @@ export type AuthorizationMatrixRowId =
   | "AUTH-PARENT-GROUP-MEMBERSHIP"
   | "AUTH-EVENTS"
   | "AUTH-PARENT-EVENT-SIGNUP"
+  | "AUTH-LIBRARY"
+  | "AUTH-LIBRARY-COMMANDS"
   | "AUTH-ROTA-OVERVIEW"
   | "AUTH-ROTA-DUTY"
   | "AUTH-DIRECTORY"
@@ -321,6 +323,69 @@ export type TypedRoleItem = Readonly<{
   startsAt: string;
 }>;
 export type TypedRoleListModel = Readonly<{ items: readonly TypedRoleItem[] }>;
+
+/** Who owns a book: a parent, a name typed in by the one-off load, or nobody any more (BR131.2, BR139.1). */
+export type LibraryOwner = Readonly<{
+  kind: "parent" | "typed" | "former";
+  /** The owner's name, a typed name, or "korábbi tag"; never a contact detail. */
+  displayName: string;
+}>;
+
+/** One book of the list (BR130.1): where it is now, and whether it is the caller's own or held by the caller. */
+export type LibraryBookItem = Readonly<{
+  id: string;
+  title: string;
+  authors: string;
+  description?: string;
+  version: number;
+  owner: LibraryOwner;
+  state: "available" | "borrowed";
+  holderDisplayName?: string;
+  until?: string;
+  isOwn: boolean;
+  borrowedByMe: boolean;
+}>;
+
+export type LibraryListModel = Readonly<{
+  items: readonly LibraryBookItem[];
+  /** Whether the caller may add a book: a parent or a super admin. */
+  canAdd: boolean;
+}>;
+
+export type LibraryLoanModel = Readonly<{
+  id: string;
+  version: number;
+  borrowedAt: string;
+  until?: string;
+  holderDisplayName: string;
+  isMine: boolean;
+}>;
+
+/** One book page in a single document (NFR9.4): the book, its open loan and what the caller may do. */
+export type LibraryBookDetailModel = Readonly<{
+  book: Readonly<{
+    id: string;
+    title: string;
+    authors: string;
+    description?: string;
+    version: number;
+    owner: LibraryOwner;
+    state: "available" | "borrowed";
+  }>;
+  loan?: LibraryLoanModel;
+  caller: Readonly<{
+    canEdit: boolean;
+    canRemove: boolean;
+    canBorrow: boolean;
+    canReturn: boolean;
+    canSetUntil: boolean;
+    canWatch: boolean;
+    isWatching: boolean;
+  }>;
+}>;
+
+/** What a library command returns: the row's id and its new version (none for a removal or a watch). */
+export type LibraryChangeModel = Readonly<{ id: string | null; version: number | null }>;
 
 /** The school year a calendar or plan screen is showing. */
 export type RotaSchoolYear = Readonly<{

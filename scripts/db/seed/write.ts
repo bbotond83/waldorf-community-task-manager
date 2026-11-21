@@ -330,6 +330,7 @@ export async function writeSeedPlan(client: SqlClient, plan: SeedPlan): Promise<
         row.hasGarlic,
       ]),
     );
+    await writeLibrary(client, plan);
     await writeNotices(client, plan);
     await writeRota(client, plan);
     await client.query("commit");
@@ -337,6 +338,77 @@ export async function writeSeedPlan(client: SqlClient, plan: SeedPlan): Promise<
     await client.query("rollback").catch(() => undefined);
     throw error;
   }
+}
+
+/** The invented library: books, their loans (closed and open) and the watches on borrowed books (U13). */
+async function writeLibrary(client: SqlClient, plan: SeedPlan): Promise<void> {
+  const organization = plan.organization.id;
+  await insertRows(
+    client,
+    "books",
+    [
+      "id",
+      "organization_id",
+      "title",
+      "authors",
+      "description",
+      "owner_parent_id",
+      "owner_name",
+      "source_key",
+    ],
+    plan.books.map((book) => [
+      book.id,
+      organization,
+      book.title,
+      book.authors,
+      book.description,
+      book.ownerParentId,
+      book.ownerName,
+      book.sourceKey,
+    ]),
+  );
+  await insertRows(
+    client,
+    "loans",
+    [
+      "id",
+      "organization_id",
+      "book_id",
+      "borrower_parent_id",
+      "borrower_family_id",
+      {
+        name: "borrowed_at",
+        sql: (placeholder) =>
+          `date_trunc('day', now()) - make_interval(days => ${placeholder}::integer) + interval '10 hours'`,
+      },
+      {
+        name: "until",
+        sql: (placeholder) =>
+          `case when ${placeholder}::integer is null then null else (current_date + ${placeholder}::integer) end`,
+      },
+      {
+        name: "returned_at",
+        sql: (placeholder) =>
+          `case when ${placeholder}::integer is null then null else date_trunc('day', now()) - make_interval(days => ${placeholder}::integer) + interval '12 hours' end`,
+      },
+    ],
+    plan.loans.map((loan) => [
+      loan.id,
+      organization,
+      loan.bookId,
+      loan.borrowerParentId,
+      loan.borrowerFamilyId,
+      loan.borrowedDaysAgo,
+      loan.untilInDays,
+      loan.returnedDaysAgo,
+    ]),
+  );
+  await insertRows(
+    client,
+    "return_watches",
+    ["id", "organization_id", "book_id", "parent_id"],
+    plan.watches.map((watch) => [watch.id, organization, watch.bookId, watch.parentId]),
+  );
 }
 
 /**
