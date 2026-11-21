@@ -161,6 +161,49 @@ export function eventMessage(answer: {
   return DIRECTORY_REFUSAL_FALLBACK;
 }
 
+/**
+ * What a person reads for each refusal of the library commands (U13). A refused field names its reason, which the
+ * adapter turns into the field codes below; the other codes come as the answer's code. An access refusal (a missing,
+ * removed or other-community book) reads as the unavailable book, so a person cannot tell which it was.
+ */
+const LIBRARY_CODE_MESSAGES: Readonly<Record<string, string>> = Object.freeze({
+  BOOK_NOT_AVAILABLE: "Közben valaki kölcsönvette ezt a könyvet.",
+  BOOK_NOT_ON_LOAN: "A könyv már nincs kölcsönadva.",
+  BOOK_ON_LOAN: "Kölcsönadott könyv nem törölhető.",
+  BOOK_AVAILABLE: "A könyv elérhető, ezért nincs mire értesítést kérni.",
+  BOOK_REMOVED: "Ezt a könyvet már törölték.",
+  BOOK_UNAVAILABLE: "Ez a könyv nem érhető el.",
+  ALREADY_WATCHING: "Már kértél értesítést.",
+  VERSION_CONFLICT: "Közben valaki módosította, töltsd újra.",
+  authorization_denied: "Ezt a műveletet nem végezheted el.",
+});
+
+const LIBRARY_REASON_MESSAGES: Readonly<Record<string, string>> = Object.freeze({
+  "VAL-OWN-BOOK": "A saját könyvedet nem veheted kölcsön.",
+  "VAL-BEFORE-TODAY": "A visszahozás napja nem lehet a mai napnál korábbi.",
+  "VAL-TOO-FAR": "A visszahozás napja legfeljebb egy évre lehet.",
+  "VAL-HOLDER-OR-OWNER": "Ezt a személyt most nem lehet kijelölni.",
+  "VAL-PERSON-INVALID": "Ez a személy nem lehet a könyv tulajdonosa.",
+  "VAL-INVALID": "Az egyik megadott adat nem megfelelő.",
+});
+
+export function libraryMessage(answer: {
+  state: string;
+  code?: string | undefined;
+  fieldErrors?: Readonly<Record<string, string>> | undefined;
+}): string {
+  if (answer.state === "denied" && answer.code === undefined) {
+    return LIBRARY_CODE_MESSAGES.BOOK_UNAVAILABLE!;
+  }
+  const byCode = answer.code && LIBRARY_CODE_MESSAGES[answer.code];
+  if (byCode) return byCode;
+  for (const reason of Object.values(answer.fieldErrors ?? {})) {
+    const known = LIBRARY_REASON_MESSAGES[reason];
+    if (known) return known;
+  }
+  return DIRECTORY_REFUSAL_FALLBACK;
+}
+
 export function directoryRefusalMessage(code: string | undefined): string {
   return (code && DIRECTORY_REFUSAL_MESSAGES[code]) || DIRECTORY_REFUSAL_FALLBACK;
 }

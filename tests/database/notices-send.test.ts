@@ -228,8 +228,8 @@ for (const schema of NOTIFICATION_SCHEMAS) {
           );
         }
       }
-      // Eight kinds of U5, the two coordinator kinds that U4 registered, the six of U6 and the three event kinds of U10.
-      assert.equal((await rows("select count(*)::int as n from notice_kinds"))[0]!.n, 19);
+      // Eight kinds of U5, the two coordinator kinds that U4 registered, the six of U6 the three event kinds of U10 and the two library kinds of U13.
+      assert.equal((await rows("select count(*)::int as n from notice_kinds"))[0]!.n, 21);
     });
 
     it("refused: a registry name with a quote or a capital is refused by the name pattern (NFR3.7)", async () => {

@@ -1,0 +1,332 @@
+{
+  "stage": "code-generation",
+  "unit": "u13-lending-library",
+  "upstream_ids": [
+    "BR133.3",
+    "NFR10.1",
+    "BR135.2",
+    "BR131.1",
+    "BR133.1",
+    "BR135.1",
+    "AC16.1.1",
+    "AC16.1.2",
+    "BR130",
+    "BR131",
+    "NFR1",
+    "NFR3.4",
+    "NFR7.3",
+    "NFR7.5",
+    "NFR9.4",
+    "BR132",
+    "BR139.2",
+    "NFR3.2",
+    "NFR4.1",
+    "AC16.2.1",
+    "AC16.2.4",
+    "AC16.3.1",
+    "BR133",
+    "BR135",
+    "BR137",
+    "BR138",
+    "NFR3.3",
+    "NFR3.5",
+    "NFR5",
+    "NFR7.1",
+    "NFR7.2",
+    "AC16.3.2",
+    "AC17.1.1",
+    "AC17.1.6",
+    "BR136",
+    "BR139",
+    "BR140",
+    "NFR6.4",
+    "NFR7.4",
+    "NFR7.6",
+    "NFR11",
+    "NFR3.9",
+    "NFR6.3",
+    "NFR9.1",
+    "NFR9.3",
+    "NFR4.8",
+    "NFR4.9",
+    "NFR8",
+    "NFR1.2",
+    "NFR1.4",
+    "BR131.2",
+    "BR132.1",
+    "BR132.2",
+    "NFR9.2"
+  ],
+  "coverage": [
+    {
+      "id": "BR133.3",
+      "status": "OK",
+      "target": "tests/database/library-core.test.ts"
+    },
+    {
+      "id": "NFR10.1",
+      "status": "OK",
+      "target": "tests/database/library-timing.test.ts"
+    },
+    {
+      "id": "BR135.2",
+      "status": "OK",
+      "target": "tests/database/library-loans.test.ts"
+    },
+    {
+      "id": "BR131.1",
+      "status": "OK",
+      "target": "tests/database/library-books.test.ts"
+    },
+    {
+      "id": "BR133.1",
+      "status": "OK",
+      "target": "tests/database/library-core.test.ts"
+    },
+    {
+      "id": "BR135.1",
+      "status": "OK",
+      "target": "tests/database/library-loans.test.ts"
+    },
+    {
+      "id": "AC16.1.1",
+      "status": "OK",
+      "target": "tests/browser/library.spec.ts"
+    },
+    {
+      "id": "AC16.1.2",
+      "status": "OK",
+      "target": "tests/browser/library.spec.ts"
+    },
+    {
+      "id": "BR130",
+      "status": "OK",
+      "target": "tests/database/library-books.test.ts"
+    },
+    {
+      "id": "BR131",
+      "status": "OK",
+      "target": "tests/database/library-books.test.ts"
+    },
+    {
+      "id": "NFR1",
+      "status": "OK",
+      "target": "tests/database/library-timing.test.ts"
+    },
+    {
+      "id": "NFR3.4",
+      "status": "OK",
+      "target": "tests/database/library-timing.test.ts"
+    },
+    {
+      "id": "NFR7.3",
+      "status": "OK",
+      "target": "tests/browser/library.spec.ts"
+    },
+    {
+      "id": "NFR7.5",
+      "status": "OK",
+      "target": "tests/browser/library.spec.ts"
+    },
+    {
+      "id": "NFR9.4",
+      "status": "OK",
+      "target": "tests/browser/library.spec.ts"
+    },
+    {
+      "id": "BR132",
+      "status": "OK",
+      "target": "tests/database/library-core.test.ts"
+    },
+    {
+      "id": "BR139.2",
+      "status": "OK",
+      "target": "tests/database/library-for-later-units.test.ts"
+    },
+    {
+      "id": "NFR3.2",
+      "status": "OK",
+      "target": "tests/database/library-timing.test.ts"
+    },
+    {
+      "id": "NFR4.1",
+      "status": "OK",
+      "target": "tests/database/library-races.test.ts"
+    },
+    {
+      "id": "AC16.2.1",
+      "status": "OK",
+      "target": "tests/browser/library.spec.ts"
+    },
+    {
+      "id": "AC16.2.4",
+      "status": "OK",
+      "target": "tests/browser/library.spec.ts"
+    },
+    {
+      "id": "AC16.3.1",
+      "status": "OK",
+      "target": "tests/browser/library.spec.ts"
+    },
+    {
+      "id": "BR133",
+      "status": "OK",
+      "target": "tests/database/library-core.test.ts"
+    },
+    {
+      "id": "BR135",
+      "status": "OK",
+      "target": "tests/database/library-loans.test.ts"
+    },
+    {
+      "id": "BR137",
+      "status": "OK",
+      "target": "tests/database/library-loans.test.ts"
+    },
+    {
+      "id": "BR138",
+      "status": "OK",
+      "target": "tests/database/library-for-later-units.test.ts"
+    },
+    {
+      "id": "NFR3.3",
+      "status": "OK",
+      "target": "tests/database/library-timing.test.ts"
+    },
+    {
+      "id": "NFR3.5",
+      "status": "OK",
+      "target": "tests/database/library-timing.test.ts"
+    },
+    {
+      "id": "NFR5",
+      "status": "OK",
+      "target": "tests/browser/library.spec.ts"
+    },
+    {
+      "id": "NFR7.1",
+      "status": "OK",
+      "target": "tests/browser/library.spec.ts"
+    },
+    {
+      "id": "NFR7.2",
+      "status": "OK",
+      "target": "tests/browser/library.spec.ts"
+    },
+    {
+      "id": "AC16.3.2",
+      "status": "OK",
+      "target": "tests/browser/library.spec.ts"
+    },
+    {
+      "id": "AC17.1.1",
+      "status": "OK",
+      "target": "tests/browser/library.spec.ts"
+    },
+    {
+      "id": "AC17.1.6",
+      "status": "OK",
+      "target": "tests/browser/library.spec.ts"
+    },
+    {
+      "id": "BR136",
+      "status": "OK",
+      "target": "tests/database/library-loans.test.ts"
+    },
+    {
+      "id": "BR139",
+      "status": "OK",
+      "target": "tests/database/library-for-later-units.test.ts"
+    },
+    {
+      "id": "BR140",
+      "status": "OK",
+      "target": "tests/database/library-for-later-units.test.ts"
+    },
+    {
+      "id": "NFR6.4",
+      "status": "OK",
+      "target": "tests/database/library-races.test.ts"
+    },
+    {
+      "id": "NFR7.4",
+      "status": "OK",
+      "target": "tests/browser/library.spec.ts"
+    },
+    {
+      "id": "NFR7.6",
+      "status": "OK",
+      "target": "tests/browser/library.spec.ts"
+    },
+    {
+      "id": "NFR11",
+      "status": "OK",
+      "target": "tests/database/library-timing.test.ts"
+    },
+    {
+      "id": "NFR3.9",
+      "status": "OK",
+      "target": "tests/database/library-timing.test.ts"
+    },
+    {
+      "id": "NFR6.3",
+      "status": "OK",
+      "target": "tests/database/library-races.test.ts"
+    },
+    {
+      "id": "NFR9.1",
+      "status": "OK",
+      "target": "tests/browser/library.spec.ts"
+    },
+    {
+      "id": "NFR9.3",
+      "status": "OK",
+      "target": "tests/browser/library.spec.ts"
+    },
+    {
+      "id": "NFR4.8",
+      "status": "OK",
+      "target": "tests/database/library-races.test.ts"
+    },
+    {
+      "id": "NFR4.9",
+      "status": "OK",
+      "target": "tests/database/library-races.test.ts"
+    },
+    {
+      "id": "NFR8",
+      "status": "OK",
+      "target": "tests/browser/library.spec.ts"
+    },
+    {
+      "id": "NFR1.2",
+      "status": "OK",
+      "target": "tests/database/library-timing.test.ts"
+    },
+    {
+      "id": "NFR1.4",
+      "status": "OK",
+      "target": "tests/database/library-timing.test.ts"
+    },
+    {
+      "id": "BR131.2",
+      "status": "OK",
+      "target": "tests/database/library-books.test.ts"
+    },
+    {
+      "id": "BR132.1",
+      "status": "OK",
+      "target": "tests/database/library-core.test.ts"
+    },
+    {
+      "id": "BR132.2",
+      "status": "OK",
+      "target": "tests/database/library-core.test.ts"
+    },
+    {
+      "id": "NFR9.2",
+      "status": "OK",
+      "target": "tests/browser/library.spec.ts"
+    }
+  ]
+}

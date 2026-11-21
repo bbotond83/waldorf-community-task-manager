@@ -106,6 +106,8 @@ export function grantAllows(
   if (request.resource.kind === "working_group") return request.action === "read";
   // Every signed-in role reads the event pages (BR104.1).
   if (request.resource.kind === "event") return request.action === "read";
+  // Every signed-in role reads the library pages, a teacher too (BR130.1).
+  if (request.resource.kind === "library") return request.action === "read";
   // Every signed-in role reads the published rota (BR24.1).
   if (request.resource.kind === "rota") return request.action === "read";
   // Every signed-in role opens the parent directory; which fields come back is decided in the database (BR30).
@@ -148,6 +150,11 @@ function parentCan({ action, resource }: AuthorizationRequest): boolean {
     // Signing up for an event and offering food, changing and withdrawing them (BR108.1, BR113.1).
     case "event_signup":
     case "food_offer":
+      return action === "create" || action === "update" || action === "delete";
+    // Adding, changing, removing, borrowing and returning a book, and asking to be told when it is back (BR131 to BR135).
+    // The database acts for the caller's own parent and decides who owns or holds the book; a super admin acts
+    // through the default grant, a group admin who is a parent through the parent grant.
+    case "library_book":
       return action === "create" || action === "update" || action === "delete";
     // A duty card of the family's own rota duty; the database checks that the family holds it (BR24.2). This also
     // serves a group admin who is a parent: the parent grant carries the read, the group admin grant adds nothing.

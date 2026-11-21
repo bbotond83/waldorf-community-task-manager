@@ -24,3 +24,4 @@
 
 ## Open questions
 <!-- example: 2026-05-29T10:14:32Z — confirm the retention window with compliance before the next stage hardens the schema -->
+- 2026-11-21T09:30:00Z [unit u13-lending-library] — Asked no questions; the NFR requirements, the unit's reviewed rules and the contracts fix every target. The NFR requirements review's minor points are settled here: search folds accents with a small helper instead of an extension, the large seed gains 300 books, timings are medians of 5 runs, a refusal by the notice function rolls the return back while a failed email never does, the audit rollback is tested with a temporary failing trigger, the load returns codes only and writes no audit entry, and `library-` is a new area prefix.

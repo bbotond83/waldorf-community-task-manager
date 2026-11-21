@@ -182,6 +182,7 @@ describe("the other new words of the screens", () => {
       ["parent-swaps", "Cserék", "/szulo/cserek"],
       ["parent-working-groups", "Munkacsoportok", "/szulo/munkacsoportok"],
       ["parent-events", "Események", "/szulo/esemenyek"],
+      ["parent-library", "Könyvtár", "/szulo/konyvtar"],
       ["parent-directory", "Szülők", "/szulo/szulok"],
       ["parent-account", "Fiókom", "/szulo/fiokom"],
     ]);

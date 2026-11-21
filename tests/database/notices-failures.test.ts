@@ -409,7 +409,14 @@ for (const schema of NOTIFICATION_SCHEMAS) {
            ($1, $2, '2026-12-07', $3), ($1, $2, '2026-12-14', $4)`,
         [ORGANIZATION, PLAN, FAMILY_1, FAMILY_2],
       );
+      const BOOK = "99999999-0000-4000-8000-000000000003";
+      await db.query(
+        `insert into books (id, organization_id, title, authors, owner_name, source_key)
+         values ($1, $2, 'Mese a leak tesztből', 'Kitalált Szerző', 'Kitalált Gazda', 'leak-test')`,
+        [BOOK, ORGANIZATION],
+      );
       const targets: Record<string, string> = {
+        book: BOOK,
         task: TASK_1,
         change_request: REQUEST_1,
         rota_plan: PLAN,

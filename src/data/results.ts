@@ -58,6 +58,14 @@ const REASON_CODES: Readonly<Record<string, string>> = Object.freeze({
   too_many: "VAL-TOO-MANY",
   outside_event: "VAL-OUTSIDE-EVENT",
   person_invalid: "VAL-PERSON-INVALID",
+  // The library commands (U13): a borrow of one's own book, a date outside today and a year ahead, a new owner who
+  // already holds the book or a person who cannot own one.
+  own_book: "VAL-OWN-BOOK",
+  before_today: "VAL-BEFORE-TODAY",
+  too_far: "VAL-TOO-FAR",
+  holder_or_owner: "VAL-HOLDER-OR-OWNER",
+  not_a_parent: "VAL-PERSON-INVALID",
+  unknown: "VAL-PERSON-INVALID",
 });
 
 const FIELD_CODES: Readonly<Record<string, string>> = Object.freeze({

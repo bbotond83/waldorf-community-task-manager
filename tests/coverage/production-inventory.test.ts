@@ -122,8 +122,12 @@ describe("honest executable denominator", () => {
     // (app/szulo/_components/WeekendPicker.tsx): 253 + 2. U10's event screens then add nineteen: the shared event code
     // (app/_events: person, facade resolver, address check, form fields, result mapper, actions, forms and screens: 8),
     // the wording and scope helpers (src/application/event-format.ts) and the ten pages under esemenyek in the parent,
-    // teacher and admin areas (4 + 2 + 4): 257 + 19.
-    expect(inventory.length).toBe(276);
+    // teacher and admin areas (4 + 2 + 4): 257 + 19. U13's library then adds sixteen: the facade, its wording of dates
+    // (src/application/library-facade.ts, library-format.ts) and the data adapter (src/data/library.ts: 3), the shared library code
+    // (app/_library: person, facade resolver, address check, result mapper, actions, forms and screens: 7) and the six
+    // pages under konyvtar in the parent and teacher areas (4 + 2): 276 + 16. The admin area's four library pages
+    // (a super admin without a parent record of their own opens the library there): 292 + 4.
+    expect(inventory.length).toBe(296);
     for (const path of [
       "src/runtime/AppNav.tsx",
       "src/runtime/StatusBadge.tsx",
