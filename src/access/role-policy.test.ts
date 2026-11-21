@@ -420,6 +420,51 @@ test("joining and leaving a working group is a parent's own act: no other role h
     );
   }
 });
+test("every role reads the event pages, signing up and offering food are a parent's own acts, managing needs a group admin or super admin (BR104.1, BR108.1, BR113.1)", () => {
+  const holders = [
+    ["parent", family],
+    ["group_admin", group],
+    ["kindergarten_teacher", org],
+    ["super_admin", org],
+  ] as const;
+  for (const [role, scope] of holders) {
+    assert.equal(
+      grantAllows(grant(role, scope), { action: "read", resource: { kind: "event", scope } }),
+      true,
+      `${role} reads`,
+    );
+    assert.equal(
+      grantAllows(grant(role, scope), { action: "update", resource: { kind: "event", scope } }),
+      false,
+      `${role} does not change an event page itself`,
+    );
+    assert.equal(
+      grantAllows(grant(role, scope), {
+        action: "manage",
+        resource: { kind: "event_manage", scope },
+      }),
+      role === "group_admin" || role === "super_admin",
+      `${role} manage`,
+    );
+    for (const kind of ["event_signup", "food_offer"]) {
+      for (const action of ["create", "update", "delete"] as const) {
+        assert.equal(
+          grantAllows(grant(role, scope), { action, resource: { kind, scope } }),
+          role === "parent",
+          `${role} ${action} ${kind}`,
+        );
+      }
+    }
+  }
+  assert.equal(
+    grantAllows(grant("parent", family), {
+      action: "read",
+      resource: { kind: "event_signup", scope: family },
+    }),
+    false,
+    "a parent reads sign-ups through the event page, not as a resource of their own",
+  );
+});
 test("appointing and revoking a coordinator is a super admin's alone (BR41.1)", () => {
   assert.equal(
     grantAllows(grant("super_admin", org), {

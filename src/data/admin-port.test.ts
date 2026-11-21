@@ -576,7 +576,6 @@ const EVENT = {
   group_id: id(3),
   title: "Őszi ünnep",
   location: "Tornaterem",
-  coordinator_name: "Kovács Mária",
   starts_at: "2026-11-02T10:00:00+00:00",
   ends_at: "2026-11-02T13:00:00+00:00",
   status: "planned",
@@ -643,12 +642,14 @@ test("events and tasks are listed together, soonest first, with the screens' sta
   });
 });
 
-test("listed events and tasks carry the kind and the fields their forms edit, with the three event notes", async () => {
+test("listed events and tasks carry the kind and the fields their forms edit, with the event settings and tale", async () => {
   const noted = {
     ...EVENT,
-    allergen_note: "Dió nélkül",
-    supply_note: null,
-    food_note: "Sütemény",
+    is_summer: true,
+    food_signup_on: true,
+    signup_deadline: "2026-10-30T18:00:00+00:00",
+    notice_lead_days: 3,
+    tale: "Egyszer volt, hol nem volt",
   };
   const { run } = admin({ table: tables({ events: [noted], tasks: [TASK] }) });
   const outcome = await run("tasks.list", {});
@@ -661,9 +662,11 @@ test("listed events and tasks carry the kind and the fields their forms edit, wi
     startsAt: "2026-11-02T10:00:00+00:00",
     endsAt: "2026-11-02T13:00:00+00:00",
     location: "Tornaterem",
-    coordinatorName: "Kovács Mária",
-    allergenNote: "Dió nélkül",
-    foodNote: "Sütemény",
+    isSummer: true,
+    foodSignupOn: true,
+    signupDeadline: "2026-10-30T18:00:00+00:00",
+    noticeLeadDays: 3,
+    tale: "Egyszer volt, hol nem volt",
   });
   assert.equal(task?.kind, "task");
   assert.deepEqual(task?.details, {
@@ -701,13 +704,44 @@ test("a title-only change of an event fills the other fields from the stored eve
         group_id: id(3),
         title: "Őszi ünnep 2",
         location: "Tornaterem",
-        coordinator_name: "Kovács Mária",
         starts_at: EVENT.starts_at,
         ends_at: EVENT.ends_at,
         status: "planned",
       },
     },
   });
+});
+
+test("an event change sends its settings, and an empty notice lead clears the stored one", async () => {
+  const { fake, run } = admin({
+    rpc: () => envelope("success", null, { version: 3 }, id(20)),
+    table: tables({ events: [EVENT], tasks: [TASK] }),
+  });
+  await run(
+    "tasks.save",
+    {
+      id: id(20),
+      expectedVersion: 2,
+      kind: "event",
+      title: "Őszi ünnep",
+      isSummer: true,
+      foodSignupOn: true,
+      signupDeadline: "2026-12-01",
+      noticeLeadDays: "",
+    },
+    KEY,
+  );
+  const sent = fake.rpcCalls[0]?.args.p_event as Row;
+  assert.equal(sent.is_summer, true);
+  assert.equal(sent.food_signup_on, true);
+  assert.equal(sent.signup_deadline, "2026-12-01");
+  assert.equal(sent.notice_lead_days, "");
+  await run(
+    "tasks.save",
+    { id: id(20), expectedVersion: 2, kind: "event", title: "Őszi ünnep", noticeLeadDays: 7 },
+    KEY,
+  );
+  assert.equal((fake.rpcCalls[1]?.args.p_event as Row).notice_lead_days, 7);
 });
 
 test("a task is changed or created with every field it needs", async () => {
@@ -764,34 +798,30 @@ test("a task or event that does not exist is denied, and a new one needs a kind"
   });
 });
 
-test("the notes of an event are saved with its version and an empty text clears a note", async () => {
-  const { fake, run } = admin({ rpc: () => envelope("success", null, { version: 3 }, id(20)) });
-  const outcome = await run(
-    "notes.save",
+test("an event's settings are passed on when given and left out when not", async () => {
+  const { fake, run } = admin({
+    rpc: () => envelope("success", null, { version: 3 }, id(20)),
+    table: tables({ events: [EVENT], tasks: [TASK] }),
+  });
+  await run(
+    "tasks.save",
     {
       id: id(20),
       expectedVersion: 2,
-      allergenNote: "mogyoró",
-      supplyNote: "",
-      foodNote: "sütemény",
+      kind: "event",
+      isSummer: true,
+      foodSignupOn: false,
+      signupDeadline: "2026-10-30T18:00:00+00:00",
+      noticeLeadDays: 2,
     },
     KEY,
   );
-  assert.deepEqual(outcome, {
-    state: "success",
-    data: { id: id(20), title: "", state: "notes-saved", version: 3 },
-  });
-  assert.deepEqual(fake.rpcCalls[0]?.args, {
-    p_idempotency_key: KEY,
-    p_event_id: id(20),
-    p_expected_version: 2,
-    p_allergen_note: "mogyoró",
-    p_supply_note: "",
-    p_food_note: "sütemény",
-  });
-  assert.deepEqual(await run("notes.save", { id: "x", expectedVersion: 1 }, KEY), {
-    state: "denied",
-  });
+  const body = (fake.rpcCalls[0]?.args as { p_event: Record<string, unknown> }).p_event;
+  assert.equal(body.is_summer, true);
+  assert.equal(body.food_signup_on, false);
+  assert.equal(body.signup_deadline, "2026-10-30T18:00:00+00:00");
+  assert.equal(body.notice_lead_days, 2);
+  assert.ok(!("coordinator_name" in body));
 });
 
 test("giving a place needs a chosen family and returns the task's new version", async () => {

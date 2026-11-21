@@ -3287,3 +3287,331 @@ nav a:hover {
     display: grid;
   }
 }
+
+/*
+ * Events (U10): the list, the event page and the event form. One level of panels: a card on the list, a panel per
+ * section on the page, and the forms inside a section lose their own frame so no card sits inside a card. The Stitch
+ * designs were followed for the order and wording; the bottom navigation bar and the invented fields were left out.
+ */
+.parent-event-header h1 {
+  font-size: var(--text-headline-lg);
+  line-height: 1.15;
+}
+
+.parent-event-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 0.5rem;
+}
+
+.parent-event-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.75rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-pill);
+  padding: 0.1rem 0.7rem;
+  color: var(--color-primary-dark);
+  background: var(--color-info-bg);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.parent-event-toggle {
+  display: flex;
+  align-items: center;
+  margin-block: 1rem;
+}
+
+.parent-event-toggle label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 44px;
+  font-weight: 600;
+}
+
+.parent-event-toggle input[type="checkbox"],
+.parent-event-check input[type="checkbox"] {
+  width: 1.5rem;
+  height: 1.5rem;
+  min-height: 0;
+  accent-color: var(--color-primary);
+}
+
+.parent-event-list {
+  display: grid;
+  gap: 1rem;
+  margin: 0 0 1.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.parent-event-card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  background: var(--color-surface);
+  box-shadow: var(--shadow);
+  overflow-wrap: break-word;
+}
+
+.parent-event-card-cancelled {
+  border-left: 0.35rem solid var(--color-primary);
+}
+
+.parent-event-title {
+  margin: 0 0 0.5rem;
+  color: var(--color-primary-dark);
+  font-size: 1.35rem;
+  line-height: 1.2;
+}
+
+.parent-event-title a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+.parent-event-when,
+.parent-event-where {
+  margin: 0 0 0.25rem;
+}
+
+.parent-event-where,
+.parent-event-muted {
+  color: var(--color-muted);
+}
+
+.parent-event-struck {
+  text-decoration: line-through;
+}
+
+.parent-event-empty {
+  margin-block: 1rem;
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  color: var(--color-muted);
+  font-weight: 600;
+}
+
+.parent-event-subtitle {
+  margin: 1.5rem 0 1rem;
+  font-size: var(--text-headline-md);
+}
+
+.parent-event-section {
+  margin-block: 1.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  background: var(--color-surface);
+  box-shadow: var(--shadow);
+}
+
+.parent-event-section h2 {
+  margin: 0 0 0.75rem;
+  font-size: var(--text-headline-sm);
+}
+
+.parent-event-section h3 {
+  margin: 1rem 0 0.4rem;
+  color: var(--color-primary-dark);
+  font-size: 1.05rem;
+}
+
+.parent-event-section .parent-form {
+  margin: 0.75rem 0 0;
+  border: 0;
+  padding: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.parent-event-roles {
+  display: grid;
+  margin: 0;
+}
+
+.parent-event-roles > div {
+  padding-block: 0.6rem;
+}
+
+.parent-event-roles > div + div {
+  border-top: 1px solid var(--color-border);
+}
+
+.parent-event-roles dt {
+  color: var(--color-muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.parent-event-roles dd {
+  margin: 0.15rem 0 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.parent-event-tale {
+  margin-block: 1.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 0.25rem 1.25rem;
+  background: var(--color-surface);
+}
+
+.parent-event-tale summary {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  font-family: var(--font-heading);
+  font-size: var(--text-headline-sm);
+  font-weight: 600;
+}
+
+.parent-event-tale p {
+  margin: 0 0 1rem;
+  white-space: pre-line;
+}
+
+.parent-event-deadline {
+  margin: 0 0 0.75rem;
+  color: var(--color-accent-ochre);
+  font-weight: 700;
+}
+
+.parent-event-own-signup {
+  margin-block: 0.75rem;
+  border-left: 0.35rem solid var(--color-success);
+  padding: 0.75rem 1rem;
+  background: var(--color-success-bg);
+}
+
+.parent-event-own-signup p {
+  margin: 0.4rem 0 0;
+}
+
+.parent-event-signup-list,
+.parent-event-food-group ul {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.parent-event-signup-list li,
+.parent-event-food-group li {
+  padding-block: 0.6rem;
+}
+
+.parent-event-signup-list li + li,
+.parent-event-food-group li + li {
+  border-top: 1px solid var(--color-border);
+}
+
+.parent-event-signup-list p {
+  margin: 0.2rem 0 0;
+}
+
+.parent-event-check {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 44px;
+  font-weight: 600;
+}
+
+.parent-event-ingredients {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.5rem;
+  margin: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+}
+
+.parent-event-ingredients legend {
+  padding-inline: 0.4rem;
+  font-weight: 600;
+}
+
+.parent-event-form-row {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+}
+
+.parent-event-role-edit {
+  display: grid;
+  gap: 0.5rem;
+  border-top: 1px solid var(--color-border);
+  padding-block: 0.75rem;
+}
+
+.parent-event-question {
+  margin: 0.75rem 0 0;
+  font-weight: 600;
+}
+
+.parent-event-secondary-button {
+  min-height: 44px;
+  border: 0;
+  box-shadow: inset 0 0 0 1px var(--color-primary);
+  color: var(--color-primary-dark);
+  background: transparent;
+}
+
+.parent-event-secondary-button:hover {
+  color: var(--color-primary-dark);
+  background: var(--color-info-bg);
+}
+
+.parent-group-events {
+  margin-block: 1.5rem;
+}
+
+.parent-group-events h2 {
+  margin: 0 0 0.75rem;
+}
+
+.parent-event-page select {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 0.5rem;
+  padding: 0.65rem 0.75rem;
+  font: inherit;
+}
+
+.parent-event-page .parent-form button,
+.parent-event-page .parent-page-actions a {
+  min-height: 44px;
+}
+
+.parent-event-count {
+  margin: 0.25rem 0 0;
+  color: var(--color-muted);
+  font-weight: 600;
+}
+
+.parent-event-signed-up {
+  border-radius: var(--radius-pill);
+  padding: 0.1rem 0.7rem;
+  color: var(--color-success);
+  background: var(--color-success-bg);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.parent-event-change summary {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--color-primary-dark);
+  font-weight: 600;
+}

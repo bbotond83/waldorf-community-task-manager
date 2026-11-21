@@ -226,3 +226,45 @@ test("a refusal or a replay of a wrapped use case writes nothing: the hook runs 
     assert.match(body, /is distinct from 'replayed'/, `${name} skips a replay`);
   }
 });
+
+/**
+ * U10 (events, sign-ups with a note, food offers, roles) adds callable functions, but none changes a place: a sign-up is
+ * not a duty (BR112.1). They decide their own notices (event_save sends the three event notices itself), so none is a
+ * wrapped use case of the hand-off list. The removal pair of C16 writes the event tables only.
+ */
+test("the U10 functions change no assignment and are not part of the hand-off list", () => {
+  const functions = definitions();
+  const changing = writers(functions);
+  const u10 = [
+    "event_notices_save",
+    "event_tale_save",
+    "event_role_save",
+    "event_role_remove",
+    "event_role_clear_name",
+    "event_signup_add",
+    "event_signup_change",
+    "event_signup_withdraw",
+    "food_offer_add",
+    "food_offer_change",
+    "food_offer_withdraw",
+    "event_list",
+    "event_list_for_group",
+    "event_get",
+    "event_typed_roles_list",
+    "event_is_summer",
+    "event_deadline",
+    "event_organisers",
+    "events_removal_preview",
+    "events_removal_apply",
+    "notice_facts_event",
+  ];
+  for (const name of u10) {
+    assert.ok(functions.has(name), `${name} is defined by the migrations`);
+    assert.equal(changing.has(name), false, `${name} writes no assignment`);
+    assert.equal(
+      NOTIFICATION_USE_CASES.some((useCase) => useCase.replaceAll(".", "_") === name),
+      false,
+      `${name} is not a wrapped use case`,
+    );
+  }
+});

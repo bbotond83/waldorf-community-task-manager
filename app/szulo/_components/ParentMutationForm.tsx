@@ -33,6 +33,7 @@ export type ParentAction = (
 export function ParentMutationForm({
   action,
   submitLabel,
+  submitAriaLabel,
   testId,
   children,
   afterSuccess,
@@ -41,6 +42,8 @@ export function ParentMutationForm({
 }: Readonly<{
   action: ParentAction;
   submitLabel: string;
+  /** A longer accessible name for the button, when the visible label alone does not say what it acts on. */
+  submitAriaLabel?: string;
   testId: string;
   children?: ReactNode;
   afterSuccess?: ReactNode;
@@ -106,7 +109,12 @@ export function ParentMutationForm({
           value={state.state === "validation" ? (state.fieldErrors ?? {}) : {}}
         >
           {children}
-          <button type="submit" disabled={isPending} data-testid={`${testId}-submit-button`}>
+          <button
+            type="submit"
+            disabled={isPending}
+            aria-label={isPending ? undefined : submitAriaLabel}
+            data-testid={`${testId}-submit-button`}
+          >
             {isPending ? "Feldolgozás folyamatban" : submitLabel}
           </button>
         </ParentFieldErrorsContext>

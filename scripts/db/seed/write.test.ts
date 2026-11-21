@@ -57,8 +57,12 @@ describe("seed writer", () => {
       "app_role_grants",
       "app_authorization_versions",
       "events",
+      "event_notices",
+      "event_roles",
       "tasks",
       "assignments",
+      "event_signups",
+      "food_offers",
       "notifications",
       "email_deliveries",
       "email_attempts",
@@ -106,6 +110,24 @@ describe("seed writer", () => {
     assert.equal(rowsOf("accounts"), counts.accounts);
     assert.equal(rowsOf("app_role_grants"), counts.accounts + plan.extraGrants.length);
     assert.equal(rowsOf("events"), counts.events);
+    assert.equal(rowsOf("event_notices"), plan.eventNotices.length);
+    assert.equal(rowsOf("event_roles"), plan.eventRoles.length);
+    // Each event role gets its own age, so the oldest (the teacher schedule's name) never depends on the random ids.
+    const roleInsert = calls.find((call) => call.sql.startsWith('insert into "event_roles"'))!;
+    assert.match(roleInsert.sql, /"created_at"/);
+    const ages = roleInsert.values
+      .filter(
+        (value): value is string => typeof value === "string" && /^\d{4}-\d\d-\d\dT/.test(value),
+      )
+      .map((value) => Date.parse(value));
+    assert.equal(ages.length, plan.eventRoles.length);
+    assert.deepEqual(
+      ages,
+      [...ages].sort((a, b) => a - b),
+    );
+    assert.equal(new Set(ages).size, ages.length);
+    assert.equal(rowsOf("event_signups"), plan.eventSignups.length);
+    assert.equal(rowsOf("food_offers"), plan.foodOffers.length);
     assert.equal(rowsOf("tasks"), counts.tasks);
     assert.equal(rowsOf("assignments"), counts.assignments);
     const familyInsert = calls.find((call) => call.sql.startsWith('insert into "families"'))!;

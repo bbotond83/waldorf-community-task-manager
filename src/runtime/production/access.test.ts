@@ -66,6 +66,7 @@ test("a parent's family comes from the linked Parent and the matching family gra
       "/szulo/beosztas",
       "/szulo/cserek",
       "/szulo/munkacsoportok",
+      "/szulo/esemenyek",
       "/szulo/szulok",
       "/szulo/fiokom",
     ],
@@ -171,7 +172,7 @@ test("a teacher holds the community, and others are denied to the home of their 
     assert.equal(access.data.profile.label, "Óvónő");
     assert.deepEqual(
       access.data.profile.navigation.map((item) => item.label),
-      ["Beosztás", "Takarítás", "Munkacsoportok", "Szülők"],
+      ["Beosztás", "Takarítás", "Munkacsoportok", "Események", "Szülők"],
     );
     assert.equal(access.data.applicationSession.roles[0], "kindergarten_teacher");
   }

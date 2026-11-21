@@ -63,21 +63,12 @@ for (const schema of DIRECTORY_SCHEMAS) {
       ]);
     const taskSave = (account: string, payload: unknown, key = nextKey("tk")): Promise<Result> =>
       callFunction(db, schema, account, "task_save($1, $2::jsonb)", [key, JSON.stringify(payload)]);
-    const notes = (
-      account: string,
-      eventId: string,
-      version: number | null,
-      allergen: string | null,
-      supply: string | null = null,
-      food: string | null = null,
-    ) =>
-      callFunction(db, schema, account, "event_save_notes($1, $2, $3, $4, $5, $6)", [
+    const notes = (account: string, eventId: string, version: number | null, lines: string[]) =>
+      callFunction(db, schema, account, "event_notices_save($1, $2, $3, $4::jsonb)", [
         nextKey("nt"),
         eventId,
         version,
-        allergen,
-        supply,
-        food,
+        JSON.stringify(lines),
       ]);
     const contribution = (
       account: string,
@@ -92,7 +83,6 @@ for (const schema of DIRECTORY_SCHEMAS) {
       group_id: GROUP_1,
       title: "Téli ünnep",
       location: "Terem",
-      coordinator_name: "Nagy Éva",
       starts_at: START,
       ends_at: END,
     };
@@ -107,14 +97,12 @@ for (const schema of DIRECTORY_SCHEMAS) {
     it("creates and changes an event for an admin who reaches its group, and refuses everyone else (BR31.1)", async () => {
       const created = await eventSave(ADMIN_G1, newEvent);
       assert.deepEqual([created.state, created.version], ["success", 1]);
-      const row = await one(
-        "select title, location, coordinator_name, status from events where id = $1",
-        [created.reference],
-      );
+      const row = await one("select title, location, status from events where id = $1", [
+        created.reference,
+      ]);
       assert.deepEqual(row, {
         title: "Téli ünnep",
         location: "Terem",
-        coordinator_name: "Nagy Éva",
         status: "planned",
       });
       const changed = await eventSave(ADMIN_G1, {
@@ -146,7 +134,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
         ["title", { ...newEvent, title: " " }],
         ["title", { ...newEvent, title: "x".repeat(201) }],
         ["location", { ...newEvent, location: "x".repeat(201) }],
-        ["coordinator_name", { ...newEvent, coordinator_name: "x".repeat(201) }],
+        ["notice_lead_days", { ...newEvent, notice_lead_days: 61 }],
         ["starts_at", { ...newEvent, starts_at: "nem dátum" }],
         ["ends_at", { ...newEvent, ends_at: "2031-05-01T09:00:00Z" }],
         ["status", { ...newEvent, status: "postponed" }],
@@ -222,32 +210,31 @@ for (const schema of DIRECTORY_SCHEMAS) {
       assert.deepEqual([moved.field, moved.reason], ["group_id", "locked"]);
     });
 
-    it("saves the three event notes with the event's version, clears empty ones and limits their length (BR31.8)", async () => {
-      const saved = await notes(ADMIN_G1, EVENT_1, 1, "  tej, tojás ", "evőeszköz", "");
+    it("saves the event's notice lines with the event's version, replaces the old list and limits it (BR103)", async () => {
+      const saved = await notes(ADMIN_G1, EVENT_1, 1, ["  tej, tojás ", "evőeszköz"]);
       assert.deepEqual([saved.state, saved.version], ["success", 2]);
       assert.deepEqual(
-        await one("select allergen_note, supply_note, food_note from events where id = $1", [
-          EVENT_1,
-        ]),
-        {
-          allergen_note: "tej, tojás",
-          supply_note: "evőeszköz",
-          food_note: null,
-        },
+        (
+          await db.query(
+            "select position, text from event_notices where event_id = $1 order by position",
+            [EVENT_1],
+          )
+        ).rows,
+        [
+          { position: 1, text: "tej, tojás" },
+          { position: 2, text: "evőeszköz" },
+        ],
       );
-      const stale = await notes(ADMIN_G1, EVENT_1, 1, "régi");
+      const stale = await notes(ADMIN_G1, EVENT_1, 1, ["régi"]);
       assert.deepEqual([stale.state, stale.code], ["conflict", "VERSION_CONFLICT"]);
-      const long = await notes(ADMIN_G1, EVENT_1, 2, "x".repeat(301));
-      assert.deepEqual([long.state, long.field], ["validation", "allergen_note"]);
-      assert.equal((await notes(ADMIN_G1, EVENT_1, null, "x")).field, "expected_version");
+      const long = await notes(ADMIN_G1, EVENT_1, 2, ["x".repeat(301)]);
+      assert.deepEqual([long.state, long.field], ["validation", "notices"]);
+      assert.equal((await notes(ADMIN_G1, EVENT_1, null, ["x"])).field, "expected_version");
       for (const account of [ADMIN_G2, PARENT_F1, TEACHER_G1, OUTSIDER]) {
-        assert.equal((await notes(account, EVENT_1, 2, "tilos")).state, "denied", account);
+        assert.equal((await notes(account, EVENT_1, 2, ["tilos"])).state, "denied", account);
       }
-      assert.equal((await notes(OTHER_ADMIN, EVENT_1, 2, "idegen")).field, "event_id");
-      assert.equal(
-        (await one("select allergen_note from events where id = $1", [EVENT_1])).allergen_note,
-        "tej, tojás",
-      );
+      assert.equal((await notes(OTHER_ADMIN, EVENT_1, 2, ["idegen"])).field, "event_id");
+      assert.equal(await count(db, "event_notices", `event_id = '${EVENT_1}'`), 2);
     });
 
     it("creates a task with or without an event, takes the place from the event and defaults the rest", async () => {
@@ -557,7 +544,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
         for (const sql of [
           "event_save('k', '{}'::jsonb)",
           "task_save('k', '{}'::jsonb)",
-          "event_save_notes('k', null, null, null, null, null)",
+          "event_notices_save('k', null, null, null)",
           "contribution_save('k', null, null)",
         ]) {
           const failure = await failureOf(() =>

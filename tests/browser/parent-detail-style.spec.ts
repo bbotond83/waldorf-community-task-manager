@@ -293,7 +293,7 @@ for (const width of [320, 1280]) {
       expect(look.height).toBeGreaterThanOrEqual(44);
       expect(look.right).toBeLessThanOrEqual(width);
     }
-    const note = page.getByTestId("permitted-allergen-note");
+    const note = page.getByTestId("event-notices");
     const noteLook = await note.evaluate((element) => {
       const computed = getComputedStyle(element);
       return {

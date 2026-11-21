@@ -205,12 +205,9 @@ export async function writeSeedPlan(client: SqlClient, plan: SeedPlan): Promise<
         "group_id",
         "title",
         "location",
-        "coordinator_name",
         atHours("starts_at"),
         atHours("ends_at"),
-        "allergen_note",
-        "supply_note",
-        "food_note",
+        "food_signup_on",
       ],
       plan.events.map((event) => [
         event.id,
@@ -218,12 +215,41 @@ export async function writeSeedPlan(client: SqlClient, plan: SeedPlan): Promise<
         event.groupId,
         event.title,
         event.location,
-        event.coordinator,
         event.startsAtHours,
         event.endsAtHours,
-        event.allergenNote,
-        event.supplyNote,
-        event.foodNote,
+        event.foodSignupOn,
+      ]),
+    );
+    await insertRows(
+      client,
+      "event_notices",
+      ["id", "organization_id", "event_id", "position", "text"],
+      plan.eventNotices.map((row) => [row.id, organization, row.eventId, row.position, row.text]),
+    );
+    await insertRows(
+      client,
+      "event_roles",
+      [
+        "id",
+        "organization_id",
+        "event_id",
+        "name",
+        "parent_id",
+        "person_name",
+        "is_organiser",
+        "created_at",
+      ],
+      // A role's age decides which one the teacher schedule shows (the oldest). The rows go in together, so each gets
+      // its own second: the first role of an event is then the oldest in every schema, whatever its random id.
+      plan.eventRoles.map((row, index) => [
+        row.id,
+        organization,
+        row.eventId,
+        row.name,
+        row.parentId,
+        row.personName,
+        row.isOrganiser,
+        new Date(Date.now() - (plan.eventRoles.length - index) * 1000).toISOString(),
       ]),
     );
     await insertRows(
@@ -263,6 +289,45 @@ export async function writeSeedPlan(client: SqlClient, plan: SeedPlan): Promise<
         assignment.familyId,
         assignment.parentId,
         assignment.source,
+      ]),
+    );
+    await insertRows(
+      client,
+      "event_signups",
+      ["id", "organization_id", "event_id", "parent_id", "family_id", "note"],
+      plan.eventSignups.map((row) => [
+        row.id,
+        organization,
+        row.eventId,
+        row.parentId,
+        row.familyId,
+        row.note,
+      ]),
+    );
+    await insertRows(
+      client,
+      "food_offers",
+      [
+        "id",
+        "organization_id",
+        "event_id",
+        "parent_id",
+        "category",
+        "text",
+        "has_milk",
+        "has_egg",
+        "has_garlic",
+      ],
+      plan.foodOffers.map((row) => [
+        row.id,
+        organization,
+        row.eventId,
+        row.parentId,
+        row.category,
+        row.text,
+        row.hasMilk,
+        row.hasEgg,
+        row.hasGarlic,
       ]),
     );
     await writeNotices(client, plan);

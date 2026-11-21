@@ -100,10 +100,10 @@ test("the sign-in screen stays usable and stable when images fail to load (R-05)
 // The reported defect: after sign-in the browser stayed on the sign-in page with no menu. Each seeded role
 // must land on the home page of its role, with the menu that role is allowed to see.
 const ROLE_LANDINGS = [
-  { tag: "super-admin", path: /\/admin$/, menuItems: 12 },
-  { tag: "group-admin-1", path: /\/admin$/, menuItems: 7 },
-  { tag: "parent-1", path: /\/szulo\/ertesitesek$/, menuItems: 7 },
-  { tag: "teacher-1", path: /\/teacher\/schedule$/, menuItems: 4 },
+  { tag: "super-admin", path: /\/admin$/, menuItems: 13 },
+  { tag: "group-admin-1", path: /\/admin$/, menuItems: 8 },
+  { tag: "parent-1", path: /\/szulo\/ertesitesek$/, menuItems: 8 },
+  { tag: "teacher-1", path: /\/teacher\/schedule$/, menuItems: 5 },
 ] as const;
 
 for (const { tag, path, menuItems } of ROLE_LANDINGS) {

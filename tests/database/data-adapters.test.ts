@@ -6,6 +6,7 @@ import type { AdminOperation } from "../../src/application/index.ts";
 import {
   BUSINESS_CODE_STATES,
   createAdminPort,
+  createEventPort,
   createParentPort,
   createRotaPort,
   createTeacherPort,
@@ -394,10 +395,14 @@ for (const schema of DIRECTORY_SCHEMAS) {
       });
 
       it("shows the task detail with the notes only to the family that holds a place", async () => {
+        await db.query(
+          "insert into event_notices (organization_id, event_id, position, text) select organization_id, id, 1, 'mogyoró' from events where id = $1",
+          [EVENT_1],
+        );
         const own = await (await asParent("parent")).get(TASK_1);
         assert.equal(own.state, "success");
         if (own.state === "success") {
-          assert.equal(own.data.allergenNote, "mogyoró");
+          assert.deepEqual(own.data.eventNotices, ["mogyoró"]);
           assert.equal(own.data.ownContributionNote, "Almás pite");
           assert.equal(own.data.assignmentId, ASSIGNMENT_F1_T1);
           assert.equal(own.data.state, "cancellation-pending");
@@ -405,7 +410,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
         const stranger = await (await asParent("parentOther")).get(TASK_1);
         assert.equal(stranger.state, "success");
         if (stranger.state === "success") {
-          assert.equal(stranger.data.allergenNote, undefined);
+          assert.equal(stranger.data.eventNotices, undefined);
           assert.equal(stranger.data.ownContributionNote, undefined);
           assert.equal(stranger.data.state, "available");
         }
@@ -809,7 +814,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
         assert.deepEqual(restored, { state: "success", data: { completed: true } });
       });
 
-      it("lists, saves and reads events and tasks and clears or changes event notes", async () => {
+      it("lists, saves and reads events and tasks and changes an event's settings", async () => {
         const all = await admin("adminSame", "tasks.list");
         assert.equal(all.state, "success");
         const titles = all.data.items.map((item) => item.title);
@@ -853,25 +858,141 @@ for (const schema of DIRECTORY_SCHEMAS) {
           location: "Udvar",
         });
         assert.equal(created.state, "success");
-        const notes = await admin("adminSame", "notes.save", {
+        const configured = await admin("adminSame", "tasks.save", {
           id: EVENT_1,
           expectedVersion: renamed.data.version,
-          allergenNote: "tej",
-          supplyNote: "",
-          foodNote: "pite",
+          kind: "event",
+          isSummer: true,
+          foodSignupOn: true,
+          noticeLeadDays: 3,
         });
-        assert.equal(notes.state, "success");
+        assert.equal(configured.state, "success");
         const stored = (
-          await sql("select allergen_note, supply_note, food_note from events where id = $1", [
-            EVENT_1,
-          ])
+          await sql(
+            "select is_summer, food_signup_on, notice_lead_days from events where id = $1",
+            [EVENT_1],
+          )
         )[0];
-        assert.deepEqual(stored, { allergen_note: "tej", supply_note: null, food_note: "pite" });
+        assert.deepEqual(stored, { is_summer: true, food_signup_on: true, notice_lead_days: 3 });
         assert.equal(
           (await admin("adminOther", "tasks.save", { id: TASK_1, expectedVersion: 1, title: "x" }))
             .state,
           "denied",
         );
+      });
+
+      it("reads the event page and carries a sign-up, a food offer, notices and roles through the event adapter (U10)", async () => {
+        const asEvents = async (who: Who) => createEventPort((await services(who)).database);
+        const parentEvents = await asEvents("parent");
+        const adminEvents = await asEvents("adminSame");
+
+        // The manager writes the notices, the tale and two roles; the parent reads them on the page.
+        await db.query("update events set food_signup_on = true where id = $1", [EVENT_1]);
+        const first = await adminEvents.detail(EVENT_1);
+        assert.equal(first.state, "success");
+        if (first.state !== "success") return;
+        assert.equal(first.data.caller.canManage, true);
+        const noticed = await adminEvents.saveNotices({
+          idempotencyKey: nextKey("ev"),
+          eventId: EVENT_1,
+          expectedVersion: first.data.event.version,
+          notices: ["Hozzon váltócipőt", "Dió nélkül"],
+        });
+        assert.equal(noticed.state, "success");
+        const typedRole = await adminEvents.saveRole({
+          idempotencyKey: nextKey("ev"),
+          eventId: EVENT_1,
+          name: "Süteménysütő",
+          personName: "Tóth Mária",
+          isOrganiser: false,
+        });
+        assert.equal(typedRole.state, "success");
+        const ownerRole = await adminEvents.saveRole({
+          idempotencyKey: nextKey("ev"),
+          eventId: EVENT_1,
+          name: "Szervező",
+          parentId: PARENT_ROW_F1,
+          isOrganiser: true,
+        });
+        assert.equal(ownerRole.state, "success");
+
+        const signed = await parentEvents.addSignup({
+          idempotencyKey: nextKey("ev"),
+          eventId: EVENT_1,
+          note: "Segítek a pakolásban",
+        });
+        assert.equal(signed.state, "success");
+        const offered = await parentEvents.addOffer({
+          idempotencyKey: nextKey("ev"),
+          eventId: EVENT_1,
+          category: "bread",
+          text: "Házi kenyér",
+          hasMilk: false,
+          hasEgg: false,
+          hasGarlic: true,
+        });
+        assert.equal(offered.state, "success");
+
+        const page = await parentEvents.detail(EVENT_1);
+        assert.equal(page.state, "success");
+        if (page.state !== "success") return;
+        assert.deepEqual(page.data.notices, ["Hozzon váltócipőt", "Dió nélkül"]);
+        assert.deepEqual(page.data.roles.map((role) => [role.name, role.kind]).sort(), [
+          ["Szervező", "parent"],
+          ["Süteménysütő", "typed"],
+        ]);
+        assert.equal(page.data.signups.length, 1);
+        assert.equal(page.data.signups[0]?.isOwn, true);
+        assert.equal(page.data.caller.canSignUp, true);
+        assert.equal(page.data.caller.canManage, false);
+        const bread = page.data.food.categories.find((entry) => entry.category === "bread");
+        assert.equal(bread?.offers[0]?.hasGarlic, true);
+
+        // A sign-up is withdrawn with the version the screen saw; a stale screen is a conflict with its code.
+        const key = nextKey("ev");
+        const withdrawn = await parentEvents.withdrawSignup({
+          idempotencyKey: key,
+          signupId: signed.state === "success" ? (signed.data.id ?? "") : "",
+          expectedVersion: 1,
+        });
+        assert.equal(withdrawn.state, "success");
+        const second = await parentEvents.addOffer({
+          idempotencyKey: nextKey("ev"),
+          eventId: EVENT_1,
+          category: "bread",
+          text: "Még egy kenyér",
+          hasMilk: false,
+          hasEgg: false,
+          hasGarlic: false,
+        });
+        assert.equal(second.state, "success");
+        const changedTwice = await parentEvents.changeOffer({
+          idempotencyKey: nextKey("ev"),
+          offerId: offered.state === "success" ? (offered.data.id ?? "") : "",
+          expectedVersion: 99,
+          category: "bread",
+          text: "x",
+          hasMilk: false,
+          hasEgg: false,
+          hasGarlic: false,
+        });
+        refused(changedTwice as Outcome, "conflict", "VERSION_CONFLICT");
+
+        // The lists: the event is listed for everyone, a parent has no manage reach, the other community sees nothing.
+        const list = await parentEvents.list({ past: false });
+        assert.ok(list.state === "success" && list.data.items.some((item) => item.id === EVENT_1));
+        const groupList = await adminEvents.listForGroup({ groupId: GROUP_1, past: false });
+        assert.ok(groupList.state === "success" && groupList.data.canManage === true);
+        assert.deepEqual(await parentEvents.detail(uuid(99999)), { state: "denied" });
+        const stranger = await (
+          await asEvents("adminOther")
+        ).saveTale({
+          idempotencyKey: nextKey("ev"),
+          eventId: EVENT_1,
+          expectedVersion: 1,
+          tale: "x",
+        });
+        assert.equal(stranger.state, "denied");
       });
 
       it("gives a place to a chosen family and removes it", async () => {
@@ -1002,6 +1123,11 @@ for (const schema of DIRECTORY_SCHEMAS) {
           organizationId: ORGANIZATION,
         };
         const groupView = { kind: "group" as const, groupId: GROUP_1 };
+        // The schedule shows the name of the event's oldest role where the coordinator used to be (BR107).
+        await db.query(
+          "insert into event_roles (organization_id, event_id, name, person_name) select organization_id, id, 'Ünnepi felelős', 'Kiss Réka' from events where id = $1",
+          [EVENT_1],
+        );
         const outcome = await port.getSchedule({
           actorId: TEACHER_G1,
           scope,
@@ -1012,7 +1138,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
         const titles = outcome.data.entries.map((entry) => entry.title);
         assert.deepEqual(titles, ["Sütés", "Kerti munka"]);
         const baking = outcome.data.entries[0]!;
-        assert.equal(baking.coordinationDisplayName, "Kovács Mária");
+        assert.equal(baking.coordinationDisplayName, "Ünnepi felelős");
         assert.equal(baking.ownerDisplayName, "Fenyő család");
         assert.equal(baking.currentStatusLabel, "Nyitott");
         assert.ok(!JSON.stringify(outcome).includes("example.test"), "no contact detail");

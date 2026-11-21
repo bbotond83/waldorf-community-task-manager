@@ -39,11 +39,6 @@ const coreCases = [
   ["saveTaskAction", { id: "task-kert" }, "success"],
   ["assignTaskAction", { id: "task-kert" }, "success"],
   ["decideApprovalAction", { id: "approval-csere", decision: "approved" }, "success"],
-  [
-    "saveEventNotesAction",
-    { id: "event-lampa", expectedVersion: "2", allergenNote: " Invented note " },
-    "success",
-  ],
 ] as const;
 for (const [name, values, state] of coreCases) {
   it(name + " authorizes and returns its actual mutation outcome", async () => {
@@ -70,9 +65,6 @@ it("normalizes title validation, notes bounds and idempotent repeat", async () =
   signIn();
   expect((await core.saveRecordAction(initial, form({ title: " " }))).state).toBe("validation");
   expect((await core.saveTaskAction(initial, form({ title: " " }))).state).toBe("validation");
-  expect(
-    (await core.saveEventNotesAction(initial, form({ foodNote: "x".repeat(301) }))).state,
-  ).toBe("validation");
   const input = form({ id: "task-kert" });
   const first = await core.assignTaskAction(initial, input);
   expect(await core.assignTaskAction(initial, input)).toEqual(first);

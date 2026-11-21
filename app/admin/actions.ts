@@ -174,32 +174,6 @@ export async function decideApprovalAction(
   return mapped;
 }
 
-export async function saveEventNotesAction(
-  _state: AdminActionState,
-  formData: FormData,
-): Promise<AdminActionState> {
-  const context = parseMutationContext(formData);
-  if (!context.ok) return context.state;
-  const fields = ["allergenNote", "supplyNote", "foodNote"] as const;
-  const payload: Record<string, string> = {};
-  const fieldErrors: Record<string, string> = {};
-  for (const field of fields) {
-    const value = stringValue(formData, field).trim().replaceAll(/\s+/g, " ");
-    if (value.length > 300) fieldErrors[field] = "A megjegyzés legfeljebb 300 karakter lehet.";
-    payload[field] = value;
-  }
-  if (Object.keys(fieldErrors).length > 0) return mapApplicationResult(validation(fieldErrors));
-  const boundary = await resolveBoundary();
-  if (!boundary.ok) return boundary.state;
-  const result = await boundary.facade.saveEventNotes(boundary.session.applicationSession, {
-    scope: boundary.session.scope,
-    ...context.value,
-    payload,
-  });
-  if (result.state === "success") revalidatePath(`/admin/feladatok/${context.value.id}`);
-  return mapApplicationResult(result, "Az esemény engedélyezett megjegyzései mentve.");
-}
-
 async function runRecordStateAction(
   formData: FormData,
   operation: "archive" | "restore",

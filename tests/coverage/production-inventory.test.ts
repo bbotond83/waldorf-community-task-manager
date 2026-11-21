@@ -119,8 +119,11 @@ describe("honest executable denominator", () => {
     // group page (src/runtime/WorkingGroupDetail.tsx), the parent's join and leave panel, the two action files (parent and admin)
     // and the result mapper they share (app/_lib/working-group-result.ts): 245 + 8. U6 adds the unpicked list of the
     // admin dashboard (app/admin/_components/UnpickedList.tsx) and the weekend picker of the duty card
-    // (app/szulo/_components/WeekendPicker.tsx): 253 + 2.
-    expect(inventory.length).toBe(255);
+    // (app/szulo/_components/WeekendPicker.tsx): 253 + 2. U10's event screens then add nineteen: the shared event code
+    // (app/_events: person, facade resolver, address check, form fields, result mapper, actions, forms and screens: 8),
+    // the wording and scope helpers (src/application/event-format.ts) and the ten pages under esemenyek in the parent,
+    // teacher and admin areas (4 + 2 + 4): 257 + 19.
+    expect(inventory.length).toBe(276);
     for (const path of [
       "src/runtime/AppNav.tsx",
       "src/runtime/StatusBadge.tsx",

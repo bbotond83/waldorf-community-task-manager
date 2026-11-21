@@ -73,7 +73,9 @@ function toListItem(row: Row): DutyListItemModel {
 
 function toDetail(row: Row): DutyDetailModel {
   const assignmentId = optionalText(row, "assignment_id");
-  const allergenNote = optionalText(row, "allergen_note");
+  const eventNotices = Array.isArray(row.event_notices)
+    ? row.event_notices.filter((line): line is string => typeof line === "string")
+    : undefined;
   const ownContributionNote = optionalText(row, "own_contribution_note");
   return Object.freeze({
     id: text(row, "id"),
@@ -83,7 +85,7 @@ function toDetail(row: Row): DutyDetailModel {
     state: oneOf(row, "state", DUTY_STATES),
     version: dutyVersion(row),
     ...(assignmentId !== undefined ? { assignmentId } : {}),
-    ...(allergenNote !== undefined ? { allergenNote } : {}),
+    ...(eventNotices !== undefined ? { eventNotices: Object.freeze([...eventNotices]) } : {}),
     ...(ownContributionNote !== undefined ? { ownContributionNote } : {}),
   });
 }

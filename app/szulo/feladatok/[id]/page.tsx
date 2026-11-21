@@ -103,10 +103,14 @@ export default async function DutyDetailPage({
                 </a>
               </nav>
             )}
-            {duty.allergenNote !== undefined && (
-              <section className="parent-note-panel" data-testid="permitted-allergen-note">
-                <h2>Engedélyezett allergéninformáció</h2>
-                <p>{duty.allergenNote}</p>
+            {duty.eventNotices !== undefined && duty.eventNotices.length > 0 && (
+              <section className="parent-note-panel" data-testid="event-notices">
+                <h2>Közlemények</h2>
+                <ul>
+                  {duty.eventNotices.map((notice) => (
+                    <li key={notice}>{notice}</li>
+                  ))}
+                </ul>
               </section>
             )}
             {duty.assignmentId && (

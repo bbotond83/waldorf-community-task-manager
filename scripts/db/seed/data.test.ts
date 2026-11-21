@@ -29,6 +29,10 @@ const allIds = (plan: SeedPlan): string[] => [
   ...plan.children.map((entry) => entry.id),
   ...plan.accounts.flatMap((entry) => [entry.id, entry.grantId]),
   ...plan.events.map((entry) => entry.id),
+  ...plan.eventNotices.map((entry) => entry.id),
+  ...plan.eventRoles.map((entry) => entry.id),
+  ...plan.eventSignups.map((entry) => entry.id),
+  ...plan.foodOffers.map((entry) => entry.id),
   ...plan.tasks.map((entry) => entry.id),
   ...plan.assignments.map((entry) => entry.id),
   ...plan.notices.flatMap((entry) => [entry.id, entry.deliveryId]),
@@ -37,6 +41,30 @@ const allIds = (plan: SeedPlan): string[] => [
 
 describe("seed data: the small set", () => {
   const plan = buildSeedPlan("public", "small");
+
+  it("gives one event notices, roles (parent, typed name, organiser), sign-ups and food offers", () => {
+    const event = plan.events.find((entry) => entry.foodSignupOn)!;
+    assert.ok(event, "one event has food sign-up on");
+    assert.ok(plan.eventNotices.some((row) => row.eventId === event.id));
+    const roles = plan.eventRoles.filter((row) => row.eventId === event.id);
+    assert.ok(
+      roles.some((row) => row.personName !== null && row.parentId === null),
+      "typed name",
+    );
+    assert.ok(
+      roles.some((row) => row.isOrganiser && row.parentId !== null),
+      "organiser",
+    );
+    assert.ok(
+      roles.every((row) => !(row.parentId && row.personName)),
+      "never both",
+    );
+    assert.ok(plan.eventSignups.length > 0 && plan.foodOffers.length > 0);
+    const parents = new Set(plan.parents.map((parent) => parent.id));
+    for (const row of [...plan.eventSignups, ...plan.foodOffers]) {
+      assert.ok(parents.has(row.parentId), "a sign-up or offer belongs to a seeded parent");
+    }
+  });
 
   it("has the six working groups, 6 families with parents and children, a super admin, two group admins and a teacher", () => {
     assert.deepEqual(describePlan(plan), {

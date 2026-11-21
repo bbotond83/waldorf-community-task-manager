@@ -7,6 +7,7 @@ import {
   callFunction,
   FAMILY_1,
   FAMILY_2,
+  EVENT_1,
   GROUP_1,
   nextKey,
   openDirectoryDatabase,
@@ -413,6 +414,7 @@ for (const schema of NOTIFICATION_SCHEMAS) {
         change_request: REQUEST_1,
         rota_plan: PLAN,
         working_group: GROUP_1,
+        event: EVENT_1,
       };
       const registered = (
         await rows("select target_type from notice_targets order by target_type")

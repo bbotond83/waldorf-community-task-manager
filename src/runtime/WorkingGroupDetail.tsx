@@ -26,6 +26,8 @@ type Props = Readonly<{
   ownControls?: (model: WorkingGroupDetailModel) => ReactNode;
   /** What the caller can do about one member (a super admin's coordinator actions). */
   memberControls?: (member: WorkingGroupMember, model: WorkingGroupDetailModel) => ReactNode;
+  /** Further sections under the members, such as the group's events (U10); shown only when the group page loaded. */
+  extraSections?: ReactNode;
 }>;
 
 function MemberRow({
@@ -94,6 +96,7 @@ export function WorkingGroupDetail({
   directoryPath,
   ownControls,
   memberControls,
+  extraSections,
 }: Props) {
   const back = (
     <a
@@ -163,6 +166,7 @@ export function WorkingGroupDetail({
           </ul>
         )}
       </section>
+      {extraSections}
     </section>
   );
 }

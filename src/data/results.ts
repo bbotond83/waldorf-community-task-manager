@@ -54,6 +54,10 @@ const REASON_CODES: Readonly<Record<string, string>> = Object.freeze({
   locked: "VAL-LOCKED",
   taken: "VAL-TAKEN",
   before_start: "VAL-DATE-RANGE",
+  // The event commands (U10): `text_invalid` reads as the general invalid value.
+  too_many: "VAL-TOO-MANY",
+  outside_event: "VAL-OUTSIDE-EVENT",
+  person_invalid: "VAL-PERSON-INVALID",
 });
 
 const FIELD_CODES: Readonly<Record<string, string>> = Object.freeze({

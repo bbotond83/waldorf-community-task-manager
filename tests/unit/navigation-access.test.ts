@@ -9,6 +9,9 @@ const RESOURCE_BY_ROUTE: Readonly<Record<string, string>> = {
   "/szulo/cserek": "swap_request",
   "/szulo/ertesitesek": "notification",
   "/szulo/munkacsoportok": "working_group",
+  "/szulo/esemenyek": "event",
+  "/teacher/esemenyek": "event",
+  "/admin/esemenyek": "event",
   "/szulo/beosztas": "rota",
   "/szulo/szulok": "directory",
   "/teacher/szulok": "directory",
@@ -84,16 +87,24 @@ describe("navigation and default pages follow the access rules", () => {
       "Beosztás",
       "Cserék",
       "Munkacsoportok",
+      "Események",
       "Szülők",
       "Fiókom",
     ]);
-    expect(labels("teacher")).toEqual(["Beosztás", "Takarítás", "Munkacsoportok", "Szülők"]);
+    expect(labels("teacher")).toEqual([
+      "Beosztás",
+      "Takarítás",
+      "Munkacsoportok",
+      "Események",
+      "Szülők",
+    ]);
     expect(labels("group-admin")).toEqual([
       "Áttekintés",
       "Feladatok és események",
       "Jóváhagyások",
       "Archívum",
       "Munkacsoportok",
+      "Események",
       "Beosztás",
       "Szülők",
     ]);
@@ -104,6 +115,7 @@ describe("navigation and default pages follow the access rules", () => {
       "Jóváhagyások",
       "Archívum",
       "Munkacsoportok",
+      "Események",
       "Tanév",
       "Beosztás",
       "Szülők",
@@ -136,6 +148,7 @@ describe("navigation and default pages follow the access rules", () => {
       ["Beosztás", "/teacher/schedule"],
       ["Takarítás", "/teacher/beosztas"],
       ["Munkacsoportok", "/teacher/munkacsoportok"],
+      ["Események", "/teacher/esemenyek"],
       ["Szülők", "/teacher/szulok"],
     ]);
     expect(teacher.filter((item) => /beoszt/i.test(item.label))).toHaveLength(1);

@@ -1,0 +1,328 @@
+{
+  "stage": "code-generation",
+  "unit": "u10-events-and-signups",
+  "version": 1,
+  "writes": [
+    {
+      "path": "app/_events/EventForms.tsx"
+    },
+    {
+      "path": "app/_events/EventScreens.tsx"
+    },
+    {
+      "path": "app/_events/actions.ts"
+    },
+    {
+      "path": "app/_events/actor.ts"
+    },
+    {
+      "path": "app/_events/event-id.ts"
+    },
+    {
+      "path": "app/_events/event-payload.ts"
+    },
+    {
+      "path": "app/_events/event-result.ts"
+    },
+    {
+      "path": "app/_events/facade.ts"
+    },
+    {
+      "path": "app/admin/_components/TaskFields.tsx"
+    },
+    {
+      "path": "app/admin/_lib/record-payload.ts"
+    },
+    {
+      "path": "app/admin/actions.ts"
+    },
+    {
+      "path": "app/admin/esemenyek/[id]/page.tsx"
+    },
+    {
+      "path": "app/admin/esemenyek/[id]/szerkesztes/page.tsx"
+    },
+    {
+      "path": "app/admin/esemenyek/page.tsx"
+    },
+    {
+      "path": "app/admin/esemenyek/uj/page.tsx"
+    },
+    {
+      "path": "app/admin/feladatok/[id]/page.tsx"
+    },
+    {
+      "path": "app/admin/munkacsoportok/[id]/page.tsx"
+    },
+    {
+      "path": "app/globals.css"
+    },
+    {
+      "path": "app/szulo/esemenyek/[id]/page.tsx"
+    },
+    {
+      "path": "app/szulo/esemenyek/[id]/szerkesztes/page.tsx"
+    },
+    {
+      "path": "app/szulo/esemenyek/page.tsx"
+    },
+    {
+      "path": "app/szulo/esemenyek/uj/page.tsx"
+    },
+    {
+      "path": "app/szulo/feladatok/[id]/page.tsx"
+    },
+    {
+      "path": "app/szulo/munkacsoportok/[id]/page.tsx"
+    },
+    {
+      "path": "app/teacher/esemenyek/[id]/page.tsx"
+    },
+    {
+      "path": "app/teacher/esemenyek/page.tsx"
+    },
+    {
+      "path": "app/teacher/munkacsoportok/[id]/page.tsx"
+    },
+    {
+      "path": "package.json"
+    },
+    {
+      "path": "scripts/db/seed/data.test.ts"
+    },
+    {
+      "path": "scripts/db/seed/data.ts"
+    },
+    {
+      "path": "scripts/db/seed/write.test.ts"
+    },
+    {
+      "path": "scripts/db/seed/write.ts"
+    },
+    {
+      "path": "scripts/db/shuffled-tests.ts"
+    },
+    {
+      "path": "src/access/role-policy.test.ts"
+    },
+    {
+      "path": "src/access/role-policy.ts"
+    },
+    {
+      "path": "src/application/admin-facade.ts"
+    },
+    {
+      "path": "src/application/admin-payloads.ts"
+    },
+    {
+      "path": "src/application/authorization.ts"
+    },
+    {
+      "path": "src/application/contracts.ts"
+    },
+    {
+      "path": "src/application/event-facade.test.ts"
+    },
+    {
+      "path": "src/application/event-facade.ts"
+    },
+    {
+      "path": "src/application/event-format.test.ts"
+    },
+    {
+      "path": "src/application/event-format.ts"
+    },
+    {
+      "path": "src/application/facades.test.ts"
+    },
+    {
+      "path": "src/application/index.ts"
+    },
+    {
+      "path": "src/data/admin-port.test.ts"
+    },
+    {
+      "path": "src/data/admin-port.ts"
+    },
+    {
+      "path": "src/data/admin-tasks.ts"
+    },
+    {
+      "path": "src/data/copy.ts"
+    },
+    {
+      "path": "src/data/events.test.ts"
+    },
+    {
+      "path": "src/data/events.ts"
+    },
+    {
+      "path": "src/data/index.ts"
+    },
+    {
+      "path": "src/data/notification-use-cases.test.ts"
+    },
+    {
+      "path": "src/data/parent-port.test.ts"
+    },
+    {
+      "path": "src/data/parent-port.ts"
+    },
+    {
+      "path": "src/data/results.ts"
+    },
+    {
+      "path": "src/runtime/WorkingGroupDetail.tsx"
+    },
+    {
+      "path": "src/runtime/navigation.ts"
+    },
+    {
+      "path": "src/runtime/production/access.test.ts"
+    },
+    {
+      "path": "src/runtime/production/services.ts"
+    },
+    {
+      "path": "supabase/migrations/20261056_events_and_signups.sql"
+    },
+    {
+      "path": "supabase/migrations/20261057_event_list_signup_counts.sql"
+    },
+    {
+      "path": "tests/browser/directory-coordination.spec.ts"
+    },
+    {
+      "path": "tests/browser/events-screenshots.spec.ts"
+    },
+    {
+      "path": "tests/browser/events-timing.spec.ts"
+    },
+    {
+      "path": "tests/browser/events.spec.ts"
+    },
+    {
+      "path": "tests/browser/functional-fixes.spec.ts"
+    },
+    {
+      "path": "tests/browser/parent-detail-style.spec.ts"
+    },
+    {
+      "path": "tests/browser/parent-web.spec.ts"
+    },
+    {
+      "path": "tests/browser/runtime-foundation.spec.ts"
+    },
+    {
+      "path": "tests/browser/teacher-web.spec.ts"
+    },
+    {
+      "path": "tests/browser/visual-overhaul.spec.ts"
+    },
+    {
+      "path": "tests/coverage/admin-actions.test.ts"
+    },
+    {
+      "path": "tests/coverage/production-inventory.test.ts"
+    },
+    {
+      "path": "tests/database/community-roles.test.ts"
+    },
+    {
+      "path": "tests/database/coordination-functions.test.ts"
+    },
+    {
+      "path": "tests/database/coordination-schema.test.ts"
+    },
+    {
+      "path": "tests/database/data-adapters.test.ts"
+    },
+    {
+      "path": "tests/database/directory-support.ts"
+    },
+    {
+      "path": "tests/database/events-core.test.ts"
+    },
+    {
+      "path": "tests/database/events-for-later-units.test.ts"
+    },
+    {
+      "path": "tests/database/events-list-signups.test.ts"
+    },
+    {
+      "path": "tests/database/events-migration.test.ts"
+    },
+    {
+      "path": "tests/database/events-notices-roles.test.ts"
+    },
+    {
+      "path": "tests/database/events-removal.test.ts"
+    },
+    {
+      "path": "tests/database/events-signups-races.test.ts"
+    },
+    {
+      "path": "tests/database/events-signups.test.ts"
+    },
+    {
+      "path": "tests/database/events-support.ts"
+    },
+    {
+      "path": "tests/database/identity-catalogue.test.ts"
+    },
+    {
+      "path": "tests/database/kernel-signup.test.ts"
+    },
+    {
+      "path": "tests/database/notices-failures.test.ts"
+    },
+    {
+      "path": "tests/database/notices-send.test.ts"
+    },
+    {
+      "path": "tests/database/notifications-handoff.test.ts"
+    },
+    {
+      "path": "tests/database/schedule.test.ts"
+    },
+    {
+      "path": "tests/integration/admin-forms.test.tsx"
+    },
+    {
+      "path": "tests/integration/app-nav.test.tsx"
+    },
+    {
+      "path": "tests/integration/copy.test.ts"
+    },
+    {
+      "path": "tests/integration/event-actions.test.ts"
+    },
+    {
+      "path": "tests/integration/event-offer-change.test.tsx"
+    },
+    {
+      "path": "tests/integration/event-screens.test.tsx"
+    },
+    {
+      "path": "tests/integration/runtime-shell.test.tsx"
+    },
+    {
+      "path": "tests/support/port-doubles.ts"
+    },
+    {
+      "path": "tests/support/request-world.ts"
+    },
+    {
+      "path": "tests/unit/navigation-access.test.ts"
+    },
+    {
+      "path": "tests/unit/record-payload.test.ts"
+    },
+    {
+      "path": "tests/unit/runtime-boundaries.test.ts"
+    },
+    {
+      "path": "verification/authorization-matrix.json"
+    }
+  ]
+}

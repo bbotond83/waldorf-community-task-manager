@@ -185,10 +185,10 @@ export const NOTE_2 = uuid(842);
 export async function seedCoordinationWorld(db: pg.Client, schema: string): Promise<void> {
   await seedDirectoryWorld(db, schema);
   await db.query(
-    `insert into events (id, organization_id, group_id, title, location, coordinator_name, starts_at, ends_at, allergen_note, supply_note, food_note)
-     values ($1, $4, $5, 'Őszi ünnep', 'Tornaterem', 'Kovács Mária', now() + interval '10 days', now() + interval '10 days 3 hours', 'mogyoró', 'terítők', 'sütemény'),
-            ($2, $4, $6, 'Munkanap', 'Kert', null, now() + interval '12 days', now() + interval '12 days 4 hours', null, null, null),
-            ($3, $7, $8, 'Idegen ünnep', null, null, now() + interval '10 days', now() + interval '10 days 2 hours', 'tej', null, null)`,
+    `insert into events (id, organization_id, group_id, title, location, starts_at, ends_at)
+     values ($1, $4, $5, 'Őszi ünnep', 'Tornaterem', now() + interval '10 days', now() + interval '10 days 3 hours'),
+            ($2, $4, $6, 'Munkanap', 'Kert', now() + interval '12 days', now() + interval '12 days 4 hours'),
+            ($3, $7, $8, 'Idegen ünnep', null, now() + interval '10 days', now() + interval '10 days 2 hours')`,
     [
       EVENT_1,
       EVENT_2,

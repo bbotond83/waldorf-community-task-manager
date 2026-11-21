@@ -15,6 +15,7 @@ export {
   type DirectoryPort,
   type OwnProfileModel,
 } from "./directory.ts";
+export { createEventPort } from "./events.ts";
 export { createParentPort, PARENT_NOTIFICATION_USE_CASES } from "./parent-port.ts";
 export { BUSINESS_CODE_STATES, type BusinessCode } from "./results.ts";
 export {

@@ -446,3 +446,14 @@ used_by:
 - C11: `rota_adjust_picks_after_change` also keeps the rota week's family in step with the duty; a weekend family's week is named by its shelter-cleaning place (BR66.2).
 - C8: this unit's open question is settled by its six notice kinds (see the unit's `entities.md`).
 - C16: U14 decides what happens to the standings, slots and picks of a deleted or anonymised family.
+
+## Deltas from U10 (events, sign-ups and roles)
+
+- C1: the event row sits first in the lock order of every event path; its notice, role, sign-up and offer rows follow by ascending id, then its task rows by ascending id. Sign-up and offer commands never lock a family row (BR122.1). The audit action list gains `event.cancelled`, `event.organiser_marked`, `event.organiser_unmarked`, `event.signup_removed`, `event.offer_removed`, `event.name_cleared` and `event.removal_applied`.
+- C4: unchanged in shape. A sign-up with a note is not a duty and never calls it (BR112.1). A cancelled event closes its open tasks (BR118.1), as before.
+- C8: the notice registry gains the target `event` (facts function `notice_facts_event`) and the kinds `event_new`, `event_cancelled` and `event_changed`. The once key of a cancellation and of a change carries the event version.
+- C13: `event_organisers(event_id)` returns the coordinators of the event's group, or the super admins who hold a parent record for a community event, plus every active parent whose role on the event is marked organiser; no duplicates, empty for an unknown event. This settles the open question on other organisers. `event_is_summer` and `event_deadline` are as written. All three are internal.
+- C14: the list for a group is `event_list_for_group(group_id, past)`, not `event_list(group_id)`; the name `event_list(past)` is the community reader list. Both are readable by every signed-in reader of the community, not only by `can_manage_group`, because the event pages are public to the community (BR104.1); a group of another community answers denied. The caller block of each says what the caller may manage.
+- C16: `events_removal_preview(kind, id)` and `events_removal_apply(kind, id)` clear the links of sign-ups, offers and roles to a removed parent or family and keep the rows; the organiser mark goes with the link and an exactly matching typed name is cleared. A new read for the removal screen, `event_typed_roles_list(kind, id)`, is callable by a super admin only and lists the other typed names so they can be cleared one by one with `event_role_clear_name`.
+- C6: unchanged; sign-ups, offers and roles show people through `parent_display_name` and `family_display_name`, and a cleared role shows korábbi tag.
+- Removed: `event_save_notes` and the columns `allergen_note`, `supply_note`, `food_note` and `coordinator_name` of `events`. The event's notices (`event_notices_save`) replace the three notes, and `duty_get` returns them as `event_notices`.

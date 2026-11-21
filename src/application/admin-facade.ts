@@ -33,7 +33,6 @@ export type AdminOperation =
   | "assignments.remove"
   | "approvals.list"
   | "approvals.decide"
-  | "notes.save"
   | "families.names"
   | "reminders.list"
   | "reminders.retry"
@@ -193,13 +192,6 @@ export class AdminApplicationFacade {
       ...input,
       payload: { ...input.payload, decision: input.decision },
     });
-  }
-
-  saveEventNotes(
-    session: SessionContext,
-    input: AdminCommandInput,
-  ): Promise<ApplicationResult<AdminItemModel>> {
-    return this.command(session, "task", "notes.save", input);
   }
 
   private query<T>(
@@ -435,7 +427,7 @@ function invokeAdminCommand<T>(
   });
 }
 
-function matrixRowFor(
+export function matrixRowFor(
   session: SessionContext,
   scope: Scope,
 ): "AUTH-GROUP-ADMIN-CORE" | "AUTH-SUPER-ADMIN" {

@@ -64,21 +64,17 @@ export type AdminTaskPayload = Readonly<{
   startsAt?: string;
   endsAt?: string;
   location?: string;
-  /** Event: the person who coordinates it. */
-  coordinatorName?: string;
+  /** Event: the settings (BR102.1). An empty deadline or lead clears it; a missing key leaves it as stored. */
+  isSummer?: boolean;
+  signupDeadline?: string;
+  noticeLeadDays?: number | "";
+  foodSignupOn?: boolean;
   /** Task: open, closed or cancelled. Event: planned or cancelled. */
   status?: string;
 }>;
 
 /** `assignments.assign`: `id` is the task, `expectedVersion` the task's version. */
 export type AdminAssignPayload = Readonly<{ familyId: string }>;
-
-/** `notes.save`: `id` is the event; an empty text clears a note. */
-export type AdminNotesPayload = Readonly<{
-  allergenNote?: string;
-  supplyNote?: string;
-  foodNote?: string;
-}>;
 
 /** `records.archive` and `records.restore` may name the kind; without it the adapter looks it up. */
 export type AdminArchivePayload = Readonly<{ kind?: AdminRecordKind }>;

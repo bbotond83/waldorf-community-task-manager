@@ -136,12 +136,40 @@ export interface SeedPlan {
     groupId: string | null;
     title: string;
     location: string;
-    coordinator: string | null;
     startsAtHours: number;
     endsAtHours: number;
-    allergenNote: string | null;
-    supplyNote: string | null;
-    foodNote: string | null;
+    foodSignupOn: boolean;
+  }[];
+  /** Invented notices of an event, in the order shown (U10). */
+  eventNotices: { id: string; eventId: string; position: number; text: string }[];
+  /**
+   * Invented roles of an event: one held by a parent, one by a typed name, one organiser (a parent's role with the
+   * organiser mark). The first role of an event is the name the teacher schedule shows.
+   */
+  eventRoles: {
+    id: string;
+    eventId: string;
+    name: string;
+    parentId: string | null;
+    personName: string | null;
+    isOrganiser: boolean;
+  }[];
+  eventSignups: {
+    id: string;
+    eventId: string;
+    parentId: string;
+    familyId: string;
+    note: string | null;
+  }[];
+  foodOffers: {
+    id: string;
+    eventId: string;
+    parentId: string;
+    category: string;
+    text: string;
+    hasMilk: boolean;
+    hasEgg: boolean;
+    hasGarlic: boolean;
   }[];
   tasks: {
     id: string;
@@ -540,6 +568,10 @@ export function buildSeedPlan(
   for (const entry of coordinators) join(entry.parentKey, groups[entry.groupIndex]!);
 
   const events: SeedPlan["events"] = [];
+  const eventNotices: SeedPlan["eventNotices"] = [];
+  const eventRoles: SeedPlan["eventRoles"] = [];
+  const eventSignups: SeedPlan["eventSignups"] = [];
+  const foodOffers: SeedPlan["foodOffers"] = [];
   const tasks: SeedPlan["tasks"] = [];
   const assignments: SeedPlan["assignments"] = [];
   const EVENT_TITLES = ["Őszi vásár", "Közös kertrendezés", "Mikulás-délután"] as const;
@@ -554,12 +586,9 @@ export function buildSeedPlan(
       groupId: group.id,
       title: pick(EVENT_TITLES, g),
       location: pick(EVENT_PLACES, g),
-      coordinator: "Tóth Mária",
       startsAtHours: hours(eventDay, 14),
       endsAtHours: hours(eventDay, 18),
-      allergenNote: g === 0 ? "mogyoró, tej" : null,
-      supplyNote: g === 0 ? "terítők, tálcák" : null,
-      foodNote: g === 0 ? "házi sütemény" : null,
+      foodSignupOn: g === 0,
     });
     const baking = id(`task:${g + 1}:1`);
     const decorating = id(`task:${g + 1}:2`);
@@ -621,6 +650,74 @@ export function buildSeedPlan(
     place(baking, 2, "admin_assign", members[1]);
     place(decorating, 1, "parent_sign_up", members[2]);
     place(cleaning, 1, "admin_assign", members[0]);
+
+    // The first group's event shows every event feature: notices, roles (one held by a parent and marked organiser,
+    // one by a typed name), sign-ups and food offers. All names are invented.
+    if (g === 0) {
+      ["mogyoró", "tej", "Hozzon váltócipőt"].forEach((text, index) => {
+        eventNotices.push({
+          id: id(`event-notice:${eventId}:${index + 1}`),
+          eventId,
+          position: index + 1,
+          text,
+        });
+      });
+      const first = members[0];
+      const second = members[1];
+      const parentOf = (member: typeof first) => id(`parent:${families.indexOf(member!) + 1}:1`);
+      if (first) {
+        eventRoles.push({
+          id: id(`event-role:${eventId}:1`),
+          eventId,
+          name: "Szervező",
+          parentId: parentOf(first),
+          personName: null,
+          isOrganiser: true,
+        });
+      }
+      eventRoles.push({
+        id: id(`event-role:${eventId}:2`),
+        eventId,
+        name: "Süteménysütő",
+        parentId: null,
+        personName: "Tóth Mária",
+        isOrganiser: false,
+      });
+      for (const [slot, member] of [first, second].entries()) {
+        if (!member) continue;
+        eventSignups.push({
+          id: id(`event-signup:${eventId}:${slot + 1}`),
+          eventId,
+          parentId: parentOf(member),
+          familyId: member.id,
+          note: slot === 0 ? "Segítek a pakolásban" : null,
+        });
+      }
+      if (first) {
+        foodOffers.push({
+          id: id(`food-offer:${eventId}:1`),
+          eventId,
+          parentId: parentOf(first),
+          category: "savoury",
+          text: "Almás pite",
+          hasMilk: true,
+          hasEgg: true,
+          hasGarlic: false,
+        });
+      }
+      if (second) {
+        foodOffers.push({
+          id: id(`food-offer:${eventId}:2`),
+          eventId,
+          parentId: parentOf(second),
+          category: "bread",
+          text: "Házi kenyér",
+          hasMilk: false,
+          hasEgg: false,
+          hasGarlic: true,
+        });
+      }
+    }
   });
 
   // Community-wide items (BR1.1): an event with a task of its own scope, and a task without an event.
@@ -630,12 +727,9 @@ export function buildSeedPlan(
     groupId: null,
     title: "Közösségi nap",
     location: "Udvar",
-    coordinator: "Tóth Mária",
     startsAtHours: hours(16, 9),
     endsAtHours: hours(16, 13),
-    allergenNote: null,
-    supplyNote: null,
-    foodNote: null,
+    foodSignupOn: false,
   });
   tasks.push(
     {
@@ -731,6 +825,10 @@ export function buildSeedPlan(
     children,
     accounts,
     events,
+    eventNotices,
+    eventRoles,
+    eventSignups,
+    foodOffers,
     tasks,
     assignments,
     notices,

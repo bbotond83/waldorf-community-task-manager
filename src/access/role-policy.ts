@@ -52,7 +52,14 @@ export function effectiveGrants(grants: readonly RoleGrant[]): RoleGrant[] {
   });
 }
 // A group administrator manages their working groups' work. Family records are a super admin's (BR3.9).
-const CORE_RESOURCES = new Set(["dashboard", "task", "assignment", "approval", "archive"]);
+const CORE_RESOURCES = new Set([
+  "dashboard",
+  "task",
+  "assignment",
+  "approval",
+  "archive",
+  "event_manage",
+]);
 const TRACKING_FIELDS = new Set([
   "display_name",
   "participant_name",
@@ -74,7 +81,14 @@ const FAMILY_ONLY_ACTIONS: readonly AuthorizationAction[] = Object.freeze(["resp
 // holds them, a super admin included (BR31.2, BR32.1, NFR3.4).
 // Joining and leaving a working group is the parent's own act too (BR40): the database acts for the caller's own
 // current parent, so a super admin has no right to it.
-const PARENT_ONLY_RESOURCES = new Set(["own_profile", "own_account", "working_group_membership"]);
+const PARENT_ONLY_RESOURCES = new Set([
+  "own_profile",
+  "own_account",
+  "working_group_membership",
+  // Signing up for an event and offering food: the database acts for the caller's own parent (BR108.1, BR113.1).
+  "event_signup",
+  "food_offer",
+]);
 export function grantAllows(
   grant: Pick<RoleGrant, "role" | "scope" | "revokedAt">,
   request: AuthorizationRequest,
@@ -90,6 +104,8 @@ export function grantAllows(
   if (FAMILY_ONLY_ACTIONS.includes(request.action) && grant.role !== "parent") return false;
   // Every signed-in role reads the working groups (BR2.3).
   if (request.resource.kind === "working_group") return request.action === "read";
+  // Every signed-in role reads the event pages (BR104.1).
+  if (request.resource.kind === "event") return request.action === "read";
   // Every signed-in role reads the published rota (BR24.1).
   if (request.resource.kind === "rota") return request.action === "read";
   // Every signed-in role opens the parent directory; which fields come back is decided in the database (BR30).
@@ -129,6 +145,10 @@ function parentCan({ action, resource }: AuthorizationRequest): boolean {
     // Joining a working group and leaving it (BR40).
     case "working_group_membership":
       return action === "create" || action === "update";
+    // Signing up for an event and offering food, changing and withdrawing them (BR108.1, BR113.1).
+    case "event_signup":
+    case "food_offer":
+      return action === "create" || action === "update" || action === "delete";
     // A duty card of the family's own rota duty; the database checks that the family holds it (BR24.2). This also
     // serves a group admin who is a parent: the parent grant carries the read, the group admin grant adds nothing.
     case "rota_duty":

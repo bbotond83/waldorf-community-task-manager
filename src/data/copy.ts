@@ -120,6 +120,47 @@ export function workingGroupMessage(
   return (answer.code && WORKING_GROUP_CODE_MESSAGES[answer.code]) || DIRECTORY_REFUSAL_FALLBACK;
 }
 
+/**
+ * What a person reads for each refusal of the event commands (U10). A refused field names its reason (`person_invalid`,
+ * `too_many`, `outside_event`, `text_invalid`), which the adapter turns into the field codes below (`text_invalid` is
+ * the general `VAL-INVALID`); the other codes come as the answer's code. An access refusal (a missing or
+ * other-community event) reads as the unavailable event, so a person cannot tell which it was.
+ */
+const EVENT_CODE_MESSAGES: Readonly<Record<string, string>> = Object.freeze({
+  EVENT_CLOSED: "Erre az eseményre már lezárult a jelentkezés.",
+  EVENT_LIMIT_REACHED: "Ehhez az eseményhez nem adható több ilyen elem.",
+  FOOD_SIGNUP_OFF: "Ennél az eseménynél nincs ételfelajánlás.",
+  EVENT_UNAVAILABLE: "Ez az esemény nem érhető el.",
+  GROUP_UNAVAILABLE: "Ez a munkacsoport nem érhető el.",
+  VERSION_CONFLICT: "Az oldal közben megváltozott. Frissítsd, és próbáld újra.",
+  ROLE_ORGANISER_NEEDS_ACCOUNT: "Szervező csak fiókkal rendelkező szülő lehet.",
+  no_typed_name: "Ennek a szerepnek nincs beírt neve.",
+});
+
+const EVENT_REASON_MESSAGES: Readonly<Record<string, string>> = Object.freeze({
+  "VAL-PERSON-INVALID": "Ez a személy nem választható ehhez a szerephez.",
+  "VAL-TOO-MANY": "Ennél több elem nem adható meg.",
+  "VAL-OUTSIDE-EVENT": "Az időpont az eseményen kívül esik.",
+  "VAL-INVALID": "Az egyik megadott adat nem megfelelő.",
+  "VAL-ARCHIVED": "Ez az elem már archivált, ezért nem módosítható.",
+  "VAL-DATE-RANGE": "A jelentkezési határidő nem lehet az esemény vége után.",
+});
+
+export function eventMessage(answer: {
+  state: string;
+  code?: string | undefined;
+  fieldErrors?: Readonly<Record<string, string>> | undefined;
+}): string {
+  if (answer.state === "denied") return EVENT_CODE_MESSAGES.EVENT_UNAVAILABLE!;
+  const byCode = answer.code && EVENT_CODE_MESSAGES[answer.code];
+  if (byCode) return byCode;
+  for (const reason of Object.values(answer.fieldErrors ?? {})) {
+    const known = EVENT_REASON_MESSAGES[reason];
+    if (known) return known;
+  }
+  return DIRECTORY_REFUSAL_FALLBACK;
+}
+
 export function directoryRefusalMessage(code: string | undefined): string {
   return (code && DIRECTORY_REFUSAL_MESSAGES[code]) || DIRECTORY_REFUSAL_FALLBACK;
 }

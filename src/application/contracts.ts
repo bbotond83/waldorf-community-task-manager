@@ -83,6 +83,8 @@ export type AuthorizationMatrixRowId =
   | "AUTH-GROUP-ADMIN-CORE"
   | "AUTH-WORKING-GROUPS"
   | "AUTH-PARENT-GROUP-MEMBERSHIP"
+  | "AUTH-EVENTS"
+  | "AUTH-PARENT-EVENT-SIGNUP"
   | "AUTH-ROTA-OVERVIEW"
   | "AUTH-ROTA-DUTY"
   | "AUTH-DIRECTORY"
@@ -140,7 +142,8 @@ export type DutyDetailModel = Readonly<{
   state: DutyListItemModel["state"];
   version: number;
   assignmentId?: string;
-  allergenNote?: string;
+  /** The lines at the top of the duty's event, for the family that holds a place and for a manager (BR103.1). */
+  eventNotices?: readonly string[];
   ownContributionNote?: string;
 }>;
 
@@ -206,6 +209,118 @@ export type WorkingGroupChangeModel = Readonly<{
   version: number | null;
   alreadyMember: boolean;
 }>;
+
+/** One row of an event list (BR104.2): open events soonest first, or the ended ones newest first. */
+export type EventListItem = Readonly<{
+  id: string;
+  title: string;
+  location?: string;
+  startsAt: string;
+  endsAt: string;
+  status: "planned" | "cancelled";
+  isFinished: boolean;
+  groupId?: string;
+  groupName?: string;
+  /** How many sign-ups the event has, and whether the calling parent has one (false without a parent record). */
+  signupCount: number;
+  isSignedUp: boolean;
+}>;
+
+export type EventListModel = Readonly<{
+  items: readonly EventListItem[];
+  /** What the caller may manage: the whole community, or the listed groups' events (a list for one group has `canManage`). */
+  canManageCommunity: boolean;
+  managedGroupIds: readonly string[];
+  canManage?: boolean;
+}>;
+
+export type EventRoleModel = Readonly<{
+  id: string;
+  name: string;
+  kind: "parent" | "typed" | "former";
+  displayName: string;
+  parentId?: string;
+  isOrganiser: boolean;
+  version: number;
+}>;
+
+export type EventSignupModel = Readonly<{
+  id: string;
+  parentDisplayName: string;
+  familyDisplayName: string;
+  note?: string;
+  chosenAt?: string;
+  version: number;
+  isOwn: boolean;
+}>;
+
+export type FoodOfferModel = Readonly<{
+  id: string;
+  parentDisplayName: string;
+  text: string;
+  hasMilk: boolean;
+  hasEgg: boolean;
+  hasGarlic: boolean;
+  version: number;
+  isOwn: boolean;
+}>;
+
+export const FOOD_CATEGORIES = Object.freeze([
+  "spreads",
+  "bread",
+  "free_from",
+  "savoury",
+  "sweet",
+  "drinks",
+  "vegetables_fruit",
+  "other",
+] as const);
+export type FoodCategory = (typeof FOOD_CATEGORIES)[number];
+
+/** One event page in a single document (NFR9.4): the event, its notices, roles, sign-ups and food offers. */
+export type EventDetailModel = Readonly<{
+  event: Readonly<{
+    id: string;
+    title: string;
+    location?: string;
+    startsAt: string;
+    endsAt: string;
+    status: "planned" | "cancelled";
+    isFinished: boolean;
+    isOpen: boolean;
+    groupId?: string;
+    groupName?: string;
+    isSummer: boolean;
+    signupDeadline?: string;
+    noticeLeadDays?: number;
+    foodSignupOn: boolean;
+    tale?: string;
+    version: number;
+  }>;
+  notices: readonly string[];
+  roles: readonly EventRoleModel[];
+  signups: readonly EventSignupModel[];
+  food: Readonly<{
+    on: boolean;
+    categories: readonly Readonly<{ category: FoodCategory; offers: readonly FoodOfferModel[] }>[];
+  }>;
+  caller: Readonly<{ canManage: boolean; canSignUp: boolean }>;
+}>;
+
+/** What an event command returns: the row's id and its new version (none for a removal). */
+export type EventChangeModel = Readonly<{ id: string | null; version: number | null }>;
+
+/** A typed name on an event role, for the removal screen's super-admin list (BR124.2). */
+export type TypedRoleItem = Readonly<{
+  roleId: string;
+  roleName: string;
+  personName: string;
+  version: number;
+  eventId: string;
+  eventTitle: string;
+  startsAt: string;
+}>;
+export type TypedRoleListModel = Readonly<{ items: readonly TypedRoleItem[] }>;
 
 /** The school year a calendar or plan screen is showing. */
 export type RotaSchoolYear = Readonly<{
@@ -553,11 +668,12 @@ export type AdminItemDetails = Readonly<{
   startsAt?: string;
   endsAt?: string;
   location?: string;
-  coordinatorName?: string;
-  /** Event: the three notes admins write. */
-  allergenNote?: string;
-  supplyNote?: string;
-  foodNote?: string;
+  /** Event: the settings (BR102.1) and the year's tale (BR107.1). */
+  isSummer?: boolean;
+  signupDeadline?: string;
+  noticeLeadDays?: number;
+  foodSignupOn?: boolean;
+  tale?: string;
 }>;
 
 export type AdminItemKind = "family" | "child" | "group" | "school-year" | "event" | "task";

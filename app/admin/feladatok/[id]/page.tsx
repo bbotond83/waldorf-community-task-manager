@@ -3,14 +3,13 @@ import { AdminBackLink } from "../../_components/AdminBackLink.tsx";
 import {
   AdminMutationForm,
   AdminSelectField,
-  AdminTextareaField,
   AdminTextField,
 } from "../../_components/AdminMutationForm.tsx";
 import { TaskFields } from "../../_components/TaskFields.tsx";
 import { resolveAdminLookups } from "../../_lib/request-lookups.ts";
 import { AsyncStatePanel } from "../../_components/AsyncStatePanel.tsx";
 import { DeveloperDetails } from "../../_components/DeveloperDetails.tsx";
-import { assignTaskAction, saveEventNotesAction, saveTaskAction } from "../../actions.ts";
+import { assignTaskAction, saveTaskAction } from "../../actions.ts";
 import { resolveAdminFacade } from "../../_lib/facade.ts";
 import { resolveAdminSession } from "../../_lib/session.ts";
 import type { AdminItemModel, ApplicationResult } from "../../../../src/application/index.ts";
@@ -137,49 +136,6 @@ export default async function TaskDetailPage({
                     />
                   </>
                 )}
-              </AdminMutationForm>
-            )}
-            {task.state === "scheduled" && (
-              <AdminMutationForm
-                action={saveEventNotesAction}
-                submitLabel="Megjegyzések mentése"
-                testId="admin-event-notes-form"
-                longForm={task.kind === "event"}
-              >
-                <input type="hidden" name="id" value={task.id} />
-                <input type="hidden" name="expectedVersion" value={task.version ?? 1} />
-                <input
-                  type="hidden"
-                  name="idempotencyKey"
-                  value={`event:notes:${task.id}:${randomUUID()}`}
-                />
-                <fieldset>
-                  <legend>Engedélyezett eseménymegjegyzések</legend>
-                  <AdminTextareaField
-                    id="allergenNote"
-                    name="allergenNote"
-                    label="Allergénnel kapcsolatos adminisztrátori megjegyzés"
-                    defaultValue={task.details?.allergenNote}
-                    maxLength={300}
-                    testId="admin-event-allergen-note-input"
-                  />
-                  <AdminTextareaField
-                    id="supplyNote"
-                    name="supplyNote"
-                    label="Eszközigény"
-                    defaultValue={task.details?.supplyNote}
-                    maxLength={300}
-                    testId="admin-event-supply-note-input"
-                  />
-                  <AdminTextareaField
-                    id="foodNote"
-                    name="foodNote"
-                    label="Ételhez kapcsolódó megjegyzés"
-                    defaultValue={task.details?.foodNote}
-                    maxLength={300}
-                    testId="admin-event-food-note-input"
-                  />
-                </fieldset>
               </AdminMutationForm>
             )}
             <DeveloperDetails>
