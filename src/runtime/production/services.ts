@@ -2,6 +2,7 @@ import {
   AdminApplicationFacade,
   AuthorizationContract,
   DirectoryApplicationFacade,
+  EventApplicationFacade,
   FacadePipeline,
   ParentApplicationFacade,
   RotaApplicationFacade,
@@ -12,6 +13,7 @@ import {
   classifyDataFailure,
   createAdminPort,
   createDirectoryPort,
+  createEventPort,
   createParentPort,
   createRotaPort,
   createTeacherPort,
@@ -38,6 +40,8 @@ export type RequestServices = Readonly<{
   rota: RotaApplicationFacade;
   /** The parent directory, the parent's own profile and the removal of a parent (U3). */
   directory: DirectoryApplicationFacade;
+  /** Event pages, sign-ups, food offers, notices and roles (U10); the screens come after the owner's design approval. */
+  events: EventApplicationFacade;
 }>;
 
 export interface ProductionServices {
@@ -64,6 +68,7 @@ export function createProductionServices(database: DatabaseClient): ProductionSe
         ),
         rota: new RotaApplicationFacade(pipeline, createRotaPort(asPerson)),
         directory: new DirectoryApplicationFacade(pipeline, createDirectoryPort(asPerson)),
+        events: new EventApplicationFacade(pipeline, createEventPort(asPerson)),
       });
     },
   };

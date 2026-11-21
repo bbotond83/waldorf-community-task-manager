@@ -73,9 +73,26 @@ export const AUTHORIZATION_MATRIX: readonly MatrixRow[] = Object.freeze([
     id: "AUTH-GROUP-ADMIN-CORE",
     roles: ["group_admin"],
     actions: ["read", "create", "update", "manage"],
-    resources: ["dashboard", "task", "assignment", "approval", "archive"],
+    resources: ["dashboard", "task", "assignment", "approval", "archive", "event_manage"],
     fields: DISPLAY_NAME_FIELDS,
     navigation: { id: "admin-dashboard", label: "Áttekintés", href: "/admin" },
+  },
+  {
+    // Every signed-in role reads the event pages (BR104.1); the database decides which parts.
+    id: "AUTH-EVENTS",
+    roles: ["parent", "group_admin", "kindergarten_teacher", "super_admin"],
+    actions: ["read"],
+    resources: ["event"],
+    fields: [],
+  },
+  {
+    // Signing up and offering food is the parent's own act (BR108.1, BR113.1); the database acts for the caller's
+    // own parent and family. A group admin who is a parent acts through the parent grant.
+    id: "AUTH-PARENT-EVENT-SIGNUP",
+    roles: ["parent"],
+    actions: ["create", "update", "delete"],
+    resources: ["event_signup", "food_offer"],
+    fields: [],
   },
   {
     id: "AUTH-WORKING-GROUPS",
@@ -168,6 +185,9 @@ export const AUTHORIZATION_MATRIX: readonly MatrixRow[] = Object.freeze([
       "invitation",
       // Appointing and revoking a coordinator is a super admin's alone (BR41.1).
       "working_group_coordinator",
+      // An event's notices, tale and roles; clearing a typed name is a super admin's alone (BR124.2).
+      "event_manage",
+      "event_role_clear",
     ],
     fields: DISPLAY_NAME_FIELDS,
     navigation: { id: "admin-dashboard", label: "Áttekintés", href: "/admin" },

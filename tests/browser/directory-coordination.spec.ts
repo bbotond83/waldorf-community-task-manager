@@ -583,20 +583,10 @@ test("the extended admin forms create a family and a task, refuse a wrong assign
   await page.getByTestId("admin-assignment-form-submit-button").click();
   await expect(page.getByTestId("admin-assignment-form-state-success")).toBeVisible();
 
-  // Event notes: saved, and shown filled in on the next visit.
+  // The event page opens without the old coordinator and notes fields; the new notice screens come with U10's design.
   await page.goto(`/admin/feladatok/${EVENT}`);
-  await page.getByTestId("admin-event-allergen-note-input").fill("Dió nélkül");
-  await page.getByTestId("admin-event-supply-note-input").fill("Terítők");
+  await expect(page.getByTestId("admin-event-notes-form")).toHaveCount(0);
   await accessible(page, "event form");
-  await page.getByTestId("admin-event-notes-form-submit-button").click();
-  await expect(page.getByTestId("admin-event-notes-form-state-success")).toBeVisible();
-  await page.reload();
-  await expect(page.getByTestId("admin-event-allergen-note-input")).toHaveValue("Dió nélkül");
-  const note = await oneValue<{ allergen_note: string }>(
-    "select allergen_note from events where id = $1",
-    [EVENT],
-  );
-  expect(note.allergen_note).toBe("Dió nélkül");
   await context.close();
 });
 

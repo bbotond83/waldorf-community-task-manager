@@ -152,13 +152,7 @@ export function parseTaskExtras(
     else errors.status = "Érvénytelen állapot.";
   }
 
-  if (kind === "event") {
-    const coordinator = text(formData, "coordinatorName");
-    if (coordinator.length > TEXT_MAX) {
-      errors.coordinatorName = "A koordinátor neve legfeljebb 200 karakter lehet.";
-    }
-    payload.coordinatorName = coordinator;
-  } else {
+  if (kind !== "event") {
     const eventId = text(formData, "eventId");
     if (eventId) payload.eventId = eventId;
     const category = text(formData, "category");

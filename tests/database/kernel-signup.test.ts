@@ -12,6 +12,7 @@ import {
   callFunction,
   DEACTIVATED,
   DIRECTORY_SCHEMAS,
+  EVENT_1,
   FAMILY_1,
   FAMILY_2,
   FAMILY_NO_GROUP,
@@ -45,7 +46,7 @@ type Duty = {
   state: string;
   assignment_id: string | null;
   assignment_version: number | null;
-  allergen_note?: string | null;
+  event_notices?: string[] | null;
   own_contribution_note?: string | null;
 };
 
@@ -182,22 +183,26 @@ for (const schema of DIRECTORY_SCHEMAS) {
       );
     });
 
-    it("returns the detail with the allergen note and the own contribution note only to the assigned family (BR31.8, BR31.9)", async () => {
+    it("returns the detail with the event notices and the own contribution note only to the assigned family (BR31.8, BR31.9, BR103.1)", async () => {
+      await db.query(
+        "insert into event_notices (organization_id, event_id, position, text) select organization_id, id, 1, 'mogyoró' from events where id = $1",
+        [EVENT_1],
+      );
       const own = item(await get(PARENT_F1, TASK_1));
-      assert.equal(own.allergen_note, "mogyoró");
+      assert.deepEqual(own.event_notices, ["mogyoró"]);
       assert.equal(own.own_contribution_note, "Almás pite");
       assert.equal(own.assignment_id, ASSIGNMENT_F1_T1);
       // A family without a place: no allergen note and no contribution note.
       const bystander = item(await get(PARENT_F2, TASK_1));
       assert.equal(bystander.state, "available");
-      assert.equal(bystander.allergen_note ?? null, null);
+      assert.equal(bystander.event_notices ?? null, null);
       assert.equal(bystander.own_contribution_note ?? null, null);
       assert.equal(JSON.stringify(bystander).includes("mogyoró"), false);
       assert.equal(JSON.stringify(bystander).includes("Almás pite"), false);
       // Another family's note never shows up in the list either.
       assert.equal(JSON.stringify(await list(PARENT_F2)).includes("Almás pite"), false);
-      // A task without an event has no allergen note.
-      assert.equal(item(await get(PARENT_F1, TASK_2)).allergen_note ?? null, null);
+      // A task without an event has no event notices.
+      assert.equal(item(await get(PARENT_F1, TASK_2)).event_notices ?? null, null);
     });
 
     it("treats a missing, cancelled or foreign task as not found, and refuses accounts without a family or a session", async () => {

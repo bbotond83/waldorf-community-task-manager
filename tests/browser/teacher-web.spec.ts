@@ -125,8 +125,9 @@ test("Teacher current responsibility, assignment and status match list and detai
   const baking = world().id("task:1:1");
   await page.goto("/teacher/schedule");
   const row = entry(page, testInfo.project.name, baking);
-  // The seed places two families on the baking task; the first of them is the responsible one.
-  for (const text of ["Szabó család", "Horváth család", "Nyitott", "Tóth Mária"])
+  // The seed places two families on the baking task; the first of them is the responsible one. The event's
+  // oldest role (the organiser) is the name the schedule shows.
+  for (const text of ["Szabó család", "Horváth család", "Nyitott", "Szervező"])
     await expect(row).toContainText(text);
   await page.goto(`/teacher/schedule/${baking}`);
   for (const text of ["Szabó család", "Horváth család", "Nyitott"])
@@ -190,6 +191,7 @@ test("Teacher's menu lists Beosztás and Munkacsoportok, and the way back works 
     "Beosztás",
     "Takarítás",
     "Munkacsoportok",
+    "Események",
     "Szülők",
   ]);
   await expect(page.getByTestId("brand-link")).toHaveAttribute("href", "/teacher/schedule");

@@ -44,7 +44,6 @@ vi.mock("../../app/admin/actions.ts", () => {
     archiveRecordAction: record("archiveRecord"),
     saveTaskAction: record("saveTask"),
     assignTaskAction: record("assignTask"),
-    saveEventNotesAction: record("saveEventNotes"),
   };
 });
 
@@ -404,7 +403,7 @@ describe("the task and event form", () => {
       </AdminMutationForm>,
     );
     fireEvent.change(screen.getByLabelText("Típus"), { target: { value: "event" } });
-    expect(screen.getByLabelText("Koordinátor neve")).toBeInTheDocument();
+    expect(screen.queryByLabelText("Koordinátor neve")).not.toBeInTheDocument();
     expect(screen.queryByLabelText("Férőhelyek száma")).not.toBeInTheDocument();
     expect(screen.queryByLabelText("Esemény")).not.toBeInTheDocument();
     expect(screen.getByLabelText("Helyszín")).not.toBeRequired();
@@ -546,9 +545,7 @@ describe("the admin pages with real data", () => {
     kind: "event",
     details: {
       groupId: "g-1",
-      allergenNote: "Dió nélkül",
-      supplyNote: "Terítők",
-      foodNote: "Sütemény",
+      tale: "Egyszer volt",
     },
   };
 
@@ -595,28 +592,12 @@ describe("the admin pages with real data", () => {
     );
   });
 
-  it("shows an event with its three notes filled in, errors tied to their note, and no assignment", async () => {
+  it("shows an event without an assignment form and without the old coordinator or notes fields", async () => {
     await detail(EVENT);
-    expect(screen.getByLabelText("Allergénnel kapcsolatos adminisztrátori megjegyzés")).toHaveValue(
-      "Dió nélkül",
-    );
-    expect(screen.getByLabelText("Eszközigény")).toHaveValue("Terítők");
-    expect(screen.getByLabelText("Ételhez kapcsolódó megjegyzés")).toHaveValue("Sütemény");
     expect(screen.queryByTestId("admin-assignment-form")).not.toBeInTheDocument();
-    expect(screen.getByLabelText("Koordinátor neve")).toBeInTheDocument();
-    world.answer = {
-      state: "validation",
-      message: "Ellenőrizze a megadott adatokat.",
-      fieldErrors: { supplyNote: "A megjegyzés legfeljebb 300 karakter lehet." },
-    };
-    fireEvent.submit(screen.getByTestId("admin-event-notes-form"));
-    await screen.findByRole("alert");
-    expect(screen.getByLabelText("Eszközigény")).toHaveAttribute("aria-invalid", "true");
-    expect(screen.getByLabelText("Eszközigény")).toHaveAccessibleDescription(
-      "A megjegyzés legfeljebb 300 karakter lehet.",
-    );
-    // What was typed stays for the next try.
-    expect(screen.getByLabelText("Eszközigény")).toHaveValue("Terítők");
+    expect(screen.queryByLabelText("Koordinátor neve")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Eszközigény")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("admin-event-notes-form")).not.toBeInTheDocument();
   });
 
   it("keeps the old task detail page for an item without a kind", async () => {

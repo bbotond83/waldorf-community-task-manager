@@ -17,7 +17,6 @@ import {
   listApprovals,
   listTasks,
   removeAssignment,
-  saveNotes,
   saveTask,
 } from "./admin-tasks.ts";
 import { DataGateway } from "./gateway.ts";
@@ -63,7 +62,6 @@ export const DATABASE_ADMIN_OPERATIONS: readonly AdminOperation[] = Object.freez
   "assignments.remove",
   "approvals.list",
   "approvals.decide",
-  "notes.save",
   "governance.list",
   "governance.update",
   "lifecycle.list",
@@ -127,8 +125,6 @@ export class DatabaseAdminPort implements AdminApplicationPort {
         return listApprovals(this.gateway, input.payload);
       case "approvals.decide":
         return decideApproval(this.gateway, call);
-      case "notes.save":
-        return saveNotes(this.gateway, call);
       case "governance.list":
         return listGrants(this.gateway);
       case "governance.update":

@@ -254,18 +254,15 @@ describe("parseTaskExtras", () => {
     });
   });
 
-  it("reads an event with its coordinator and a status", () => {
+  it("reads an event with a status and no coordinator", () => {
     const { payload, errors } = parseTaskExtras(
       "event",
       form({ ...complete, coordinatorName: "Kovács Mária", status: "cancelled", location: "" }),
       true,
     );
     expect(errors).toEqual({});
-    expect(payload).toMatchObject({
-      coordinatorName: "Kovács Mária",
-      status: "cancelled",
-      location: "",
-    });
+    expect(payload).toMatchObject({ status: "cancelled", location: "" });
+    expect(payload).not.toHaveProperty("coordinatorName");
     expect(payload).not.toHaveProperty("capacity");
     expect(payload).not.toHaveProperty("category");
   });
@@ -337,10 +334,6 @@ describe("parseTaskExtras", () => {
     expect(
       parseTaskExtras("task", form({ ...complete, capacity: "2.5" }), true).errors.capacity,
     ).toBe("A férőhelyek száma 1 és 50 közötti egész szám lehet.");
-    expect(
-      parseTaskExtras("event", form({ ...complete, coordinatorName: "c".repeat(201) }), true).errors
-        .coordinatorName,
-    ).toBe("A koordinátor neve legfeljebb 200 karakter lehet.");
     expect(
       parseTaskExtras("task", form({ ...complete, status: "closed" }), false).payload.status,
     ).toBe("closed");

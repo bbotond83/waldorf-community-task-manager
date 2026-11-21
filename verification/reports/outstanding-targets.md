@@ -1,6 +1,6 @@
 # Outstanding Target Evidence
 
-Bound to local tested Git SHA `e4869a9b08e59145514b27042e5f0f98ef63d166` and manifest `waldorf-scenarios-v1`. Synthetic success does not satisfy any row below.
+Bound to local tested Git SHA `2da7e079434edb9e6361f706deb0eb5685cd99d3` and manifest `waldorf-scenarios-v1`. Synthetic success does not satisfy any row below.
 
 | Scenario | Required environment/target | Status |
 |---|---|---|

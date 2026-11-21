@@ -103,7 +103,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
       assert.deepEqual([bare.rows[0].location, bare.rows[0].category], ["-", "general"]);
     });
 
-    it("limits an event's notes, times and status", async () => {
+    it("limits an event's tale, deadline, lead days, times and status", async () => {
       const insertEvent = (overrides: Record<string, unknown>) => {
         const row = {
           organization_id: ORGANIZATION,
@@ -120,9 +120,10 @@ for (const schema of DIRECTORY_SCHEMAS) {
         );
       };
       for (const overrides of [
-        { allergen_note: "x".repeat(301) },
-        { supply_note: "x".repeat(301) },
-        { food_note: "x".repeat(301) },
+        { tale: "x".repeat(5001) },
+        { notice_lead_days: 0 },
+        { notice_lead_days: 61 },
+        { signup_deadline: "2030-01-02" },
         { location: "x".repeat(201) },
         { ends_at: "2030-01-01T09:00:00Z" },
         { status: "postponed" },
@@ -133,7 +134,11 @@ for (const schema of DIRECTORY_SCHEMAS) {
           JSON.stringify(overrides).slice(0, 40),
         );
       }
-      await insertEvent({ allergen_note: "x".repeat(300) });
+      await insertEvent({
+        tale: "x".repeat(5000),
+        notice_lead_days: 60,
+        signup_deadline: "2030-01-01",
+      });
     });
 
     it("allows one place per family and task that is not removed, and a new one after a removal (answer Q4)", async () => {
@@ -418,20 +423,16 @@ for (const schema of DIRECTORY_SCHEMAS) {
       }
     });
 
-    it("keeps the allergen, supply and food notes of an event from every parent, teacher and admin out of reach (BR31.9, NFR1.29)", async () => {
+    it("keeps event rows from every parent and teacher and shows admins the events of their groups (BR31.9, NFR1.29)", async () => {
       const notesAs = (account: string) =>
         asActor(
           db,
           schema,
           authenticated(account),
           async () =>
-            (
-              await db.query(
-                "select id, allergen_note, supply_note, food_note from events order by id",
-              )
-            ).rows as {
+            (await db.query("select id, title from events order by id")).rows as {
               id: string;
-              allergen_note: string | null;
+              title: string;
             }[],
         );
       // Parents and teachers read no event rows at all: the use-case functions of the next steps return
@@ -447,8 +448,8 @@ for (const schema of DIRECTORY_SCHEMAS) {
       }
       // Admins read the notes of the events of their groups only.
       assert.deepEqual(
-        (await notesAs(VIEWERS.adminSame)).map((row) => [row.id, row.allergen_note]),
-        [[EVENT_1, "mogyoró"]],
+        (await notesAs(VIEWERS.adminSame)).map((row) => [row.id, row.title]),
+        [[EVENT_1, "Őszi ünnep"]],
       );
       assert.deepEqual(
         (await notesAs(VIEWERS.adminOther)).map((row) => row.id),

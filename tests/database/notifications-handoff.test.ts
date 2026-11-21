@@ -651,7 +651,19 @@ for (const schema of NOTIFICATION_SCHEMAS) {
       assert.equal(eventResult.state, "success");
       assert.equal(await liveJobs(TASK_1), 0);
       assert.equal(await liveJobs(TASK_2), otherEventsJobs, "a task of another event is untouched");
-      assert.equal(await total(), baseline, "none of these writes a notice");
+      // Since the events unit (BR118) a cancelled event tells the families that hold a place or a sign-up: those
+      // notices, and only those, are new. The job work above still writes none.
+      const cancelledNotices = (
+        await db.query(
+          "select count(*)::int as n from notifications where kind = 'event_cancelled'",
+        )
+      ).rows[0].n as number;
+      assert.ok(cancelledNotices > 0, "the cancelled event told its families");
+      assert.equal(
+        await total(),
+        baseline + cancelledNotices,
+        "every notice written after the baseline is an event-cancelled notice",
+      );
     });
 
     it("removes the notices and recipient rows of a family that goes through the lifecycle, with no personal link left (lifecycle.run, NFR1.56)", async () => {

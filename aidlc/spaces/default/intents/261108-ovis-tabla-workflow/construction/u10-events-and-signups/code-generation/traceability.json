@@ -1,0 +1,350 @@
+{
+  "stage": "code-generation",
+  "unit": "u10-events-and-signups",
+  "upstream_ids": [
+    "BR100",
+    "BR101",
+    "BR102",
+    "BR104",
+    "BR117",
+    "BR118",
+    "BR103",
+    "BR105",
+    "BR106",
+    "BR107",
+    "BR108",
+    "BR109",
+    "BR110",
+    "BR111",
+    "BR112",
+    "BR113",
+    "BR114",
+    "BR115",
+    "BR116",
+    "BR119",
+    "BR120",
+    "BR121",
+    "BR122",
+    "BR123",
+    "BR124",
+    "AC11.1.1",
+    "AC11.1.2",
+    "AC11.1.3",
+    "AC11.2.1",
+    "AC11.2.2",
+    "AC11.2.3",
+    "AC11.3.1",
+    "AC11.3.2",
+    "AC11.3.3",
+    "AC11.4.1",
+    "AC11.4.2",
+    "AC11.4.3",
+    "AC17.1.1",
+    "AC17.1.4",
+    "AC17.1.6",
+    "NFR3",
+    "NFR3.9",
+    "NFR4",
+    "NFR4.8",
+    "NFR5",
+    "NFR5.2",
+    "NFR5.4",
+    "NFR5.5",
+    "NFR6.3",
+    "NFR6.4",
+    "NFR7",
+    "NFR7.3",
+    "NFR7.4",
+    "NFR8",
+    "NFR9",
+    "NFR10",
+    "NFR11"
+  ],
+  "coverage": [
+    {
+      "id": "BR100",
+      "status": "OK",
+      "target": "tests/database/events-core.test.ts"
+    },
+    {
+      "id": "BR101",
+      "status": "OK",
+      "target": "tests/database/events-core.test.ts"
+    },
+    {
+      "id": "BR102",
+      "status": "OK",
+      "target": "tests/database/events-core.test.ts"
+    },
+    {
+      "id": "BR104",
+      "status": "OK",
+      "target": "tests/database/events-core.test.ts"
+    },
+    {
+      "id": "BR117",
+      "status": "OK",
+      "target": "tests/database/events-core.test.ts"
+    },
+    {
+      "id": "BR118",
+      "status": "OK",
+      "target": "tests/database/events-core.test.ts"
+    },
+    {
+      "id": "BR103",
+      "status": "OK",
+      "target": "tests/database/events-notices-roles.test.ts"
+    },
+    {
+      "id": "BR105",
+      "status": "OK",
+      "target": "tests/database/events-notices-roles.test.ts"
+    },
+    {
+      "id": "BR106",
+      "status": "OK",
+      "target": "tests/database/events-notices-roles.test.ts"
+    },
+    {
+      "id": "BR107",
+      "status": "OK",
+      "target": "tests/database/events-notices-roles.test.ts"
+    },
+    {
+      "id": "BR108",
+      "status": "OK",
+      "target": "tests/database/events-signups.test.ts"
+    },
+    {
+      "id": "BR109",
+      "status": "OK",
+      "target": "tests/database/events-signups.test.ts"
+    },
+    {
+      "id": "BR110",
+      "status": "OK",
+      "target": "tests/database/events-signups.test.ts"
+    },
+    {
+      "id": "BR111",
+      "status": "OK",
+      "target": "tests/database/events-signups.test.ts"
+    },
+    {
+      "id": "BR112",
+      "status": "OK",
+      "target": "tests/database/events-signups.test.ts"
+    },
+    {
+      "id": "BR113",
+      "status": "OK",
+      "target": "tests/database/events-signups.test.ts"
+    },
+    {
+      "id": "BR114",
+      "status": "OK",
+      "target": "tests/database/events-signups.test.ts"
+    },
+    {
+      "id": "BR115",
+      "status": "OK",
+      "target": "tests/database/events-signups.test.ts"
+    },
+    {
+      "id": "BR116",
+      "status": "OK",
+      "target": "tests/database/events-signups.test.ts"
+    },
+    {
+      "id": "BR119",
+      "status": "OK",
+      "target": "tests/database/events-removal.test.ts"
+    },
+    {
+      "id": "BR120",
+      "status": "OK",
+      "target": "tests/database/events-removal.test.ts"
+    },
+    {
+      "id": "BR121",
+      "status": "OK",
+      "target": "tests/database/events-removal.test.ts"
+    },
+    {
+      "id": "BR122",
+      "status": "OK",
+      "target": "tests/database/events-removal.test.ts"
+    },
+    {
+      "id": "BR123",
+      "status": "OK",
+      "target": "tests/database/events-removal.test.ts"
+    },
+    {
+      "id": "BR124",
+      "status": "OK",
+      "target": "tests/database/events-removal.test.ts"
+    },
+    {
+      "id": "AC11.1.1",
+      "status": "OK",
+      "target": "tests/browser/events.spec.ts"
+    },
+    {
+      "id": "AC11.1.2",
+      "status": "OK",
+      "target": "tests/browser/events.spec.ts"
+    },
+    {
+      "id": "AC11.1.3",
+      "status": "OK",
+      "target": "tests/browser/events.spec.ts"
+    },
+    {
+      "id": "AC11.2.1",
+      "status": "OK",
+      "target": "tests/browser/events.spec.ts"
+    },
+    {
+      "id": "AC11.2.2",
+      "status": "OK",
+      "target": "tests/browser/events.spec.ts"
+    },
+    {
+      "id": "AC11.2.3",
+      "status": "OK",
+      "target": "tests/browser/events.spec.ts"
+    },
+    {
+      "id": "AC11.3.1",
+      "status": "OK",
+      "target": "tests/integration/event-screens.test.tsx"
+    },
+    {
+      "id": "AC11.3.2",
+      "status": "OK",
+      "target": "tests/integration/event-screens.test.tsx"
+    },
+    {
+      "id": "AC11.3.3",
+      "status": "OK",
+      "target": "tests/integration/event-screens.test.tsx"
+    },
+    {
+      "id": "AC11.4.1",
+      "status": "OK",
+      "target": "tests/integration/event-offer-change.test.tsx"
+    },
+    {
+      "id": "AC11.4.2",
+      "status": "OK",
+      "target": "tests/integration/event-offer-change.test.tsx"
+    },
+    {
+      "id": "AC11.4.3",
+      "status": "OK",
+      "target": "tests/integration/event-offer-change.test.tsx"
+    },
+    {
+      "id": "AC17.1.1",
+      "status": "OK",
+      "target": "tests/database/events-removal.test.ts"
+    },
+    {
+      "id": "AC17.1.4",
+      "status": "OK",
+      "target": "tests/database/events-removal.test.ts"
+    },
+    {
+      "id": "AC17.1.6",
+      "status": "OK",
+      "target": "tests/database/events-removal.test.ts"
+    },
+    {
+      "id": "NFR3",
+      "status": "OK",
+      "target": "tests/database/events-signups-races.test.ts"
+    },
+    {
+      "id": "NFR3.9",
+      "status": "OK",
+      "target": "tests/database/events-signups-races.test.ts"
+    },
+    {
+      "id": "NFR4",
+      "status": "OK",
+      "target": "tests/browser/events.spec.ts"
+    },
+    {
+      "id": "NFR4.8",
+      "status": "OK",
+      "target": "tests/browser/events.spec.ts"
+    },
+    {
+      "id": "NFR5",
+      "status": "OK",
+      "target": "tests/database/events-signups.test.ts"
+    },
+    {
+      "id": "NFR5.2",
+      "status": "OK",
+      "target": "tests/database/events-signups.test.ts"
+    },
+    {
+      "id": "NFR5.4",
+      "status": "OK",
+      "target": "tests/database/events-signups.test.ts"
+    },
+    {
+      "id": "NFR5.5",
+      "status": "OK",
+      "target": "tests/database/events-signups.test.ts"
+    },
+    {
+      "id": "NFR6.3",
+      "status": "OK",
+      "target": "tests/database/events-core.test.ts"
+    },
+    {
+      "id": "NFR6.4",
+      "status": "OK",
+      "target": "tests/database/events-core.test.ts"
+    },
+    {
+      "id": "NFR7",
+      "status": "OK",
+      "target": "tests/database/events-notices-roles.test.ts"
+    },
+    {
+      "id": "NFR7.3",
+      "status": "OK",
+      "target": "tests/database/events-notices-roles.test.ts"
+    },
+    {
+      "id": "NFR7.4",
+      "status": "OK",
+      "target": "tests/database/events-notices-roles.test.ts"
+    },
+    {
+      "id": "NFR8",
+      "status": "OK",
+      "target": "tests/integration/event-screens.test.tsx"
+    },
+    {
+      "id": "NFR9",
+      "status": "OK",
+      "target": "tests/browser/events-timing.spec.ts"
+    },
+    {
+      "id": "NFR10",
+      "status": "OK",
+      "target": "tests/database/events-migration.test.ts"
+    },
+    {
+      "id": "NFR11",
+      "status": "OK",
+      "target": "tests/database/events-migration.test.ts"
+    }
+  ]
+}

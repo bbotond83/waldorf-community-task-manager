@@ -220,7 +220,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
           "event_save($1, $2::jsonb)",
           [key(), eventBody(GROUP_2, { id: EVENT_2, expected_version: 1 })],
         ],
-        ["event_save_notes($1, $2, 1, 'a', 'b', 'c')", [key(), EVENT_2]],
+        ["event_notices_save($1, $2, 1, '[]'::jsonb)", [key(), EVENT_2]],
         [
           "task_save($1, $2::jsonb)",
           [key(), taskBody(GROUP_2, { id: TASK_3, expected_version: 1 })],
@@ -272,7 +272,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
       }
       // NFR3.3: a real item out of reach and a made-up id answer alike.
       for (const [sql, real] of [
-        ["event_save_notes($1, $2, 1, 'a', 'b', 'c')", EVENT_2],
+        ["event_notices_save($1, $2, 1, '[]'::jsonb)", EVENT_2],
         ["assignment_remove($1, $2, 1)", ASSIGNMENT_F2_T3],
       ] as const) {
         const onReal = await call(ADMIN_G1, sql, [nextKey("a"), real]);

@@ -454,6 +454,141 @@
       "effect": "deny"
     },
     {
+      "id": "AUTH-EVENT-READ-PARENT-ALLOW",
+      "role": "parent",
+      "scope": "community",
+      "route": "/szulo/esemenyek/**",
+      "actions": ["read"],
+      "resources": ["event", "event_signup", "food_offer", "event_role"],
+      "fields": ["SF-DISPLAY-NAME", "SF-PARTICIPANT-NAME"],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-EVENT-SIGNUP-PARENT-ALLOW",
+      "role": "parent",
+      "scope": "linked-family",
+      "route": "/szulo/esemenyek/**",
+      "actions": ["create", "update", "delete"],
+      "resources": ["event_signup", "food_offer"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-EVENT-SIGNUP-OTHER-FAMILY-DENY",
+      "role": "parent",
+      "scope": "unrelated-family",
+      "route": "/szulo/esemenyek/**",
+      "actions": ["update", "delete"],
+      "resources": ["event_signup", "food_offer"],
+      "fields": [],
+      "effect": "deny"
+    },
+    {
+      "id": "AUTH-EVENT-SIGNUP-GROUP-ADMIN-PARENT-ALLOW",
+      "role": "group_admin",
+      "scope": "linked-family",
+      "route": "/szulo/esemenyek/**",
+      "actions": ["create", "update", "delete"],
+      "resources": ["event_signup", "food_offer"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-EVENT-TEACHER-READ-ALLOW",
+      "role": "kindergarten_teacher",
+      "scope": "community",
+      "route": "/teacher/esemenyek/**",
+      "actions": ["read"],
+      "resources": ["event", "event_role"],
+      "fields": ["SF-DISPLAY-NAME"],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-EVENT-TEACHER-WRITE-DENY",
+      "role": "kindergarten_teacher",
+      "scope": "community",
+      "route": "/teacher/esemenyek/**",
+      "actions": ["create", "update", "delete"],
+      "resources": ["event", "event_role", "event_signup", "food_offer"],
+      "fields": [],
+      "effect": "deny"
+    },
+    {
+      "id": "AUTH-EVENT-MANAGE-GROUP-ADMIN-ALLOW",
+      "role": "group_admin",
+      "scope": "granted-group",
+      "route": "/admin/esemenyek/**",
+      "actions": ["read", "create", "update"],
+      "resources": ["event", "event_notice", "event_role", "event_tale"],
+      "fields": ["SF-DISPLAY-NAME", "SF-PARTICIPANT-NAME"],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-EVENT-MANAGE-GROUP-ADMIN-OUT-OF-SCOPE-DENY",
+      "role": "group_admin",
+      "scope": "ungranted-group",
+      "route": "/admin/esemenyek/**",
+      "actions": ["create", "update", "delete"],
+      "resources": [
+        "event",
+        "event_notice",
+        "event_role",
+        "event_tale",
+        "event_signup",
+        "food_offer"
+      ],
+      "fields": [],
+      "effect": "deny"
+    },
+    {
+      "id": "AUTH-EVENT-MANAGE-COORDINATOR-PARENT-VIEW-ALLOW",
+      "role": "group_admin",
+      "scope": "granted-group",
+      "route": "/szulo/esemenyek/**",
+      "actions": ["read", "create", "update"],
+      "resources": ["event", "event_notice", "event_role", "event_tale"],
+      "fields": ["SF-DISPLAY-NAME", "SF-PARTICIPANT-NAME"],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-EVENT-MANAGE-COORDINATOR-PARENT-VIEW-OUT-OF-SCOPE-DENY",
+      "role": "group_admin",
+      "scope": "ungranted-group",
+      "route": "/szulo/esemenyek/**",
+      "actions": ["create", "update", "delete"],
+      "resources": ["event", "event_notice", "event_role", "event_tale"],
+      "fields": [],
+      "effect": "deny"
+    },
+    {
+      "id": "AUTH-EVENT-MANAGE-SUPER-ADMIN-ALLOW",
+      "role": "super_admin",
+      "scope": "organization",
+      "route": "/admin/esemenyek/**",
+      "actions": ["read", "create", "update", "delete"],
+      "resources": [
+        "event",
+        "event_notice",
+        "event_role",
+        "event_tale",
+        "event_signup",
+        "food_offer",
+        "event_role_clear"
+      ],
+      "fields": ["SF-DISPLAY-NAME", "SF-PARTICIPANT-NAME"],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-EVENT-MANAGE-NON-MANAGER-DENY",
+      "role": "parent",
+      "scope": "community",
+      "route": "/admin/esemenyek/**",
+      "actions": ["create", "update", "delete"],
+      "resources": ["event", "event_notice", "event_role", "event_tale", "event_role_clear"],
+      "fields": [],
+      "effect": "deny"
+    },
+    {
       "id": "AUTH-DIRECTORY-PARENT-ALLOW",
       "role": "parent",
       "scope": "community",

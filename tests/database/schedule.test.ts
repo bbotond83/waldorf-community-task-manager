@@ -81,6 +81,11 @@ for (const schema of DIRECTORY_SCHEMAS) {
       ).rows[0].d as string;
 
     it("returns a granted group's tasks ordered by start with the fields of the model (BR33.3)", async () => {
+      // The event's oldest role gives the coordination name (U10); the typed name column is gone.
+      await db.query(
+        "insert into event_roles (organization_id, event_id, name, person_name) select organization_id, id, 'Kovács Mária', 'Kovács Mária' from events where id = $1",
+        [EVENT_1],
+      );
       const result = await schedule(TEACHER_G1, GROUP_1);
       assert.equal(result.state, "success");
       const list = entries(result);

@@ -134,7 +134,8 @@ test("Parent sees permitted allergen text and edits only the own contribution no
   page,
 }) => {
   await page.goto(`/szulo/feladatok/${world().id(BAKING)}`);
-  await expect(page.getByTestId("permitted-allergen-note")).toContainText("mogyoró, tej");
+  await expect(page.getByTestId("event-notices")).toContainText("mogyoró");
+  await expect(page.getByTestId("event-notices")).toContainText("tej");
   await page.getByTestId("contribution-note-input").fill("Papírpoharakat viszünk.");
   await page.getByTestId("contribution-form-submit-button").click();
   await expect(page.getByTestId("contribution-form-state-success")).toContainText(

@@ -227,10 +227,6 @@ describe("role application facades", () => {
         decision: "approved",
         idempotencyKey: "admin:key-0006",
       }),
-      facade.saveEventNotes(kindergartenSession, {
-        ...command,
-        idempotencyKey: "admin:key-0007",
-      }),
       facade.listFamilyNames(kindergartenSession, organizationScope),
       facade.listArchive(kindergartenSession, organizationScope),
       facade.reminders.list(kindergartenSession, organizationScope),

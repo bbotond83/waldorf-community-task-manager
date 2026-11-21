@@ -157,16 +157,6 @@ export function TaskFields({
         required={kind === "task"}
         testId="admin-task-location-input"
       />
-      {kind === "event" && (
-        <AdminTextField
-          id="coordinatorName"
-          name="coordinatorName"
-          label="Koordinátor neve"
-          defaultValue={details?.coordinatorName}
-          maxLength={200}
-          testId="admin-task-coordinator-input"
-        />
-      )}
       {mode === "edit" && (
         <AdminSelectField
           id="status"

@@ -1,8 +1,8 @@
 # Local Acceptance Report
 
-- Git SHA: `e4869a9b08e59145514b27042e5f0f98ef63d166`
-- Manifest: `waldorf-scenarios-v1` (SHA-256 `4e68ad6add77a9eab04ae0373dfed066d1a3a169cf4cded00ecbb2a29c32946c`)
-- Generated from evidence completed at: `2026-11-17T09:59:32.222Z`
+- Git SHA: `2da7e079434edb9e6361f706deb0eb5685cd99d3`
+- Manifest: `waldorf-scenarios-v1` (SHA-256 `57430e6a4462be338b96c914f9f017107c83669ea6357d51bd639b85781d9f6d`)
+- Generated from evidence completed at: `2026-11-21T06:55:43.746Z`
 - Results: 31 PASS, 0 FAIL, 6 OUTSTANDING
 
 | Scenario | Target | Result | Tool | Artifact |

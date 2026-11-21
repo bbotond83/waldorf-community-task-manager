@@ -4,6 +4,10 @@
 ## Interpretations
 <!-- example: 2026-05-29T10:14:32Z — chose REST over GraphQL; the consuming team only needs CRUD, revisit if subscriptions land -->
 
+- 2026-11-17T14:20:00Z [unit u10-events-and-signups] — The sign-up deadline is shown and blocks nothing; FR13.3 says only that it is shown to parents, and the checklists work owns the reminders around it.
+- 2026-11-17T14:20:00Z [unit u10-events-and-signups] — The leaving and new family rule applies to event tasks, not to the voluntary sign-up with a note; the unit notes name only event tasks and a sign-up holds no duty.
+- 2026-11-17T14:20:00Z [unit u10-events-and-signups] — Every signed-in reader sees every event, other working groups' included; FR1.2 and FR1.6 give the community read access and only changing is limited to the group.
+
 - 2026-11-09T07:11:20Z [unit u1-community-foundation] — Sign-up, assignment and swaps no longer depend on working-group membership; contracts C2 and C18 give parents the whole community and list no membership refusal, so today's membership checks go in U1 rather than waiting for U6 or U7.
 - 2026-11-09T07:11:20Z [unit u1-community-foundation] — Group-wide reminders reach families with an active member parent, and every family for a community-wide task; requirements are silent and U5 replaces the mechanism, so this keeps today's setting working.
 
@@ -40,6 +44,8 @@
 
 ## Tradeoffs
 <!-- example: 2026-05-29T10:14:32Z — picked TDD over BDD this run; the team is unit-first and the domain is well-understood -->
+- 2026-11-17T14:20:00Z [unit u10-events-and-signups] — A role's person is either a parent with an account or a typed name, never both; the organiser mark needs the parent, which lets removal clear it, at the cost of a second kind of role holder.
+- 2026-11-17T14:20:00Z [unit u10-events-and-signups] — The event's typed coordinator name is dropped in favour of roles; the teacher schedule then shows the oldest role instead, so one place holds "who is responsible" and removal has one typed field to clear.
 - 2026-11-09T07:11:20Z [unit u1-community-foundation] — The six groups load from one repository list used by the seed rather than a dedicated install function; a function would be speculative until the hosting work exists, and that work must load the same list.
 - 2026-11-09T07:11:20Z [unit u1-community-foundation] — Teachers read events through the schedule only, with no new table right; event rows hold notes other readers must not see, and U10 adds a proper events read.
 
@@ -62,3 +68,7 @@
 - 2026-11-15T12:01:26Z [unit u4-working-groups] — The mockup's group page also lists the group's events and to-do tasks; those sections arrive with U10 and U12, so U4's page shows members only until then.
 - 2026-11-15T13:05:00Z [unit u4-working-groups] — U14 must call U4's removal block before U3's directory block, because U3's block clears the account link and the coordinator grants can then no longer be found.
 <!-- example: 2026-05-29T10:14:32Z — confirm the retention window with compliance before the next stage hardens the schema -->
+- 2026-11-17T14:20:00Z [unit u10-events-and-signups] — U14 decides whether the note of an anonymised sign-up is cleared too; a note could contain a name.
+- 2026-11-17T14:20:00Z [unit u10-events-and-signups] — U11 decides what happens to today's event tasks (Q6 kept them); contract C4's event_task origin stays unused until then.
+
+- 2026-11-21T06:04:15Z — [unit u10-events-and-signups] Replay after Request Changes: kept the approved design and corrected two rules to match the built behaviour; BR110.1 now says a repeated withdrawal answers denied, and BR119.1 says event_list_for_group is readable by every signed-in reader and carries the count and own flag.

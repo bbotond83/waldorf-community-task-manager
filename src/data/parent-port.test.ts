@@ -87,7 +87,7 @@ test("the duty detail carries the notes only when the database returns them", as
           state: "assigned",
           assignment_id: id(40),
           assignment_version: 7,
-          allergen_note: "mogyoró",
+          event_notices: ["Hozzon váltócipőt", "Dió nélkül"],
           own_contribution_note: "Almás pite",
         }),
       }),
@@ -96,7 +96,7 @@ test("the duty detail carries the notes only when the database returns them", as
   assert.equal(outcome?.state, "success");
   if (outcome?.state === "success") {
     assert.equal(outcome.data.assignmentId, id(40));
-    assert.equal(outcome.data.allergenNote, "mogyoró");
+    assert.deepEqual(outcome.data.eventNotices, ["Hozzon váltócipőt", "Dió nélkül"]);
     assert.equal(outcome.data.ownContributionNote, "Almás pite");
     assert.equal(outcome.data.version, 7);
     assert.equal(outcome.data.location, "Konyha");
@@ -104,7 +104,7 @@ test("the duty detail carries the notes only when the database returns them", as
   assert.deepEqual(fake.rpcCalls[0], { name: "duty_get", args: { p_task_id: id(1) } });
   const plain = port({ rpc: () => envelope("success", null, { item: dutyItem() }) });
   const detail = await plain.port.getDuty?.({ actorId: "a", familyId: "f", dutyId: id(1) });
-  assert.ok(detail?.state === "success" && !("allergenNote" in detail.data));
+  assert.ok(detail?.state === "success" && !("eventNotices" in detail.data));
 });
 
 test("an id that is not a uuid, and a task that does not exist, both read as denied", async () => {

@@ -9,7 +9,14 @@ import type {
 import { COMMUNITY_GROUP } from "../application/admin-payloads.ts";
 import { APPROVAL_KIND_TITLES } from "./copy.ts";
 import type { DataGateway } from "./gateway.ts";
-import { defined, likePattern, payloadNumber, payloadText, type Payload } from "./payload.ts";
+import {
+  defined,
+  likePattern,
+  payloadFlag,
+  payloadNumber,
+  payloadText,
+  type Payload,
+} from "./payload.ts";
 import { refused, toOutcome } from "./results.ts";
 import { asRow, asRows, integer, isUuid, optionalText, text, type Row } from "./values.ts";
 
@@ -78,10 +85,11 @@ function eventItem(row: Row): AdminItemModel {
       startsAt: text(row, "starts_at"),
       endsAt: text(row, "ends_at"),
       ...present(row, "location", "location"),
-      ...present(row, "coordinator_name", "coordinatorName"),
-      ...present(row, "allergen_note", "allergenNote"),
-      ...present(row, "supply_note", "supplyNote"),
-      ...present(row, "food_note", "foodNote"),
+      isSummer: row.is_summer === true,
+      foodSignupOn: row.food_signup_on === true,
+      ...present(row, "signup_deadline", "signupDeadline"),
+      ...(typeof row.notice_lead_days === "number" ? { noticeLeadDays: row.notice_lead_days } : {}),
+      ...present(row, "tale", "tale"),
     }),
   });
 }
@@ -107,7 +115,7 @@ function groupOf(payload: Payload, stored: string | undefined): string | undefin
 const TASK_COLUMNS =
   "id,group_id,event_id,title,category,capacity,starts_at,ends_at,location,status,version";
 const EVENT_COLUMNS =
-  "id,group_id,title,location,coordinator_name,starts_at,ends_at,allergen_note,supply_note,food_note,status,version";
+  "id,group_id,title,location,starts_at,ends_at,is_summer,signup_deadline,notice_lead_days,food_signup_on,tale,status,version";
 
 /** tasks.list: events and tasks of the admin's reach, soonest first, with the screens' status words. */
 export async function listTasks(
@@ -181,10 +189,16 @@ export async function saveTask(
       group_id: groupOf(payload, fromRow("group_id")),
       title: payloadText(payload, "title")?.trim() ?? fromRow("title"),
       location: payloadText(payload, "location") ?? fromRow("location"),
-      coordinator_name: payloadText(payload, "coordinatorName") ?? fromRow("coordinator_name"),
       starts_at: payloadText(payload, "startsAt") ?? fromRow("starts_at"),
       ends_at: payloadText(payload, "endsAt") ?? fromRow("ends_at"),
       status: payloadText(payload, "status") ?? fromRow("status"),
+      // A key left out keeps the stored setting; the database does the same (BR102.1).
+      is_summer: payloadFlag(payload, "isSummer"),
+      food_signup_on: payloadFlag(payload, "foodSignupOn"),
+      signup_deadline: payloadText(payload, "signupDeadline"),
+      // An empty lead clears the stored one; a key left out keeps it.
+      notice_lead_days:
+        payload.noticeLeadDays === "" ? "" : payloadNumber(payload, "noticeLeadDays"),
     });
     const envelope = await gateway.call(
       "event_save",
@@ -221,38 +235,6 @@ export async function saveTask(
       id: result.reference ?? id,
       title: String(body.title ?? ""),
       state: TASK_STATES[String(body.status ?? "open")] ?? "open",
-      version: typeof result.version === "number" ? result.version : (expectedVersion ?? 0) + 1,
-    }),
-  );
-}
-
-/** notes.save: the three notes of an event (an empty text clears one). `id` is the event. */
-export async function saveNotes(
-  gateway: DataGateway,
-  call: TaskCall,
-): Promise<DomainOutcome<AdminItemModel>> {
-  const { payload } = call;
-  const id = payloadText(payload, "id") ?? "";
-  if (!isUuid(id)) return { state: "denied" };
-  const key = call.idempotencyKey ?? "";
-  const expectedVersion = payloadNumber(payload, "expectedVersion");
-  const envelope = await gateway.call(
-    "event_save_notes",
-    {
-      p_idempotency_key: key,
-      p_event_id: id,
-      p_expected_version: expectedVersion ?? null,
-      p_allergen_note: payloadText(payload, "allergenNote") ?? "",
-      p_supply_note: payloadText(payload, "supplyNote") ?? "",
-      p_food_note: payloadText(payload, "foodNote") ?? "",
-    },
-    key,
-  );
-  return toOutcome(envelope, (result) =>
-    Object.freeze({
-      id,
-      title: "",
-      state: "notes-saved",
       version: typeof result.version === "number" ? result.version : (expectedVersion ?? 0) + 1,
     }),
   );

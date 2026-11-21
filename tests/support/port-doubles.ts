@@ -84,7 +84,7 @@ const DUTY_FIXTURES: readonly DutyDetailModel[] = Object.freeze([
     location: "Napsugár Waldorf Óvoda kertje",
     state: "available",
     version: 1,
-    allergenNote: "Dióféléktől mentes közös étkezés.",
+    eventNotices: Object.freeze(["Dióféléktől mentes közös étkezés."]),
     ownContributionNote: "Gyümölcsöt viszünk.",
   }),
   Object.freeze({
@@ -111,7 +111,7 @@ const DUTY_FIXTURES: readonly DutyDetailModel[] = Object.freeze([
     state: "assigned",
     version: 4,
     assignmentId: "assignment-lampas",
-    allergenNote: "A sütemények összetevőit külön jelöljük.",
+    eventNotices: Object.freeze(["A sütemények összetevőit külön jelöljük."]),
     ownContributionNote: "Almalevet viszünk.",
   }),
 ]);
@@ -624,8 +624,6 @@ export class AdminPortDouble implements AdminApplicationPort {
         return this.list(this.approvals, scope, payload);
       case "approvals.decide":
         return this.decideApproval(scope, payload);
-      case "notes.save":
-        return this.saveNotes(scope, payload);
       case "reminders.list":
         return this.listReminders();
       case "reminders.retry":
@@ -779,21 +777,6 @@ export class AdminPortDouble implements AdminApplicationPort {
     approval.state = decision;
     approval.version = (approval.version ?? 1) + 1;
     return { state: "success", data: { outcome: decision } };
-  }
-
-  private saveNotes(
-    scope: Scope,
-    payload: Readonly<Record<string, unknown>>,
-  ): DomainOutcome<AdminItemModel> {
-    const task = this.tasks.find((candidate) => candidate.id === payload.id);
-    if (!task || task.kind !== "event" || !isInScope(task, scope)) return { state: "denied" };
-    if (task.version !== payload.expectedVersion)
-      return { state: "conflict", code: "VERSION_CONFLICT" };
-    task.version = (task.version ?? 1) + 1;
-    return {
-      state: "success",
-      data: { id: task.id, title: task.title, state: "notes-saved", version: task.version },
-    };
   }
 
   private updateItem(

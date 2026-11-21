@@ -2,6 +2,7 @@ import {
   AdminApplicationFacade,
   AuthorizationContract,
   DirectoryApplicationFacade,
+  EventApplicationFacade,
   FacadePipeline,
   IdempotencyCoordinator,
   InMemoryIdempotencyStore,
@@ -10,6 +11,7 @@ import {
   TeacherApplicationFacade,
   WorkingGroupApplicationFacade,
   type DomainOutcome,
+  type EventApplicationPort,
   type RotaApplicationPort,
   type WorkingGroupApplicationPort,
   type WorkingGroupChangeModel,
@@ -110,6 +112,25 @@ export class WorkingGroupPortDouble implements WorkingGroupApplicationPort {
     return this.commandOutcome;
   }
 }
+
+/** An event port with no events: every read and command is refused, as the screens are not built yet. */
+const EVENT_PORT_DOUBLE: EventApplicationPort = {
+  list: deniedOutcome,
+  listForGroup: deniedOutcome,
+  detail: deniedOutcome,
+  saveNotices: deniedOutcome,
+  saveTale: deniedOutcome,
+  saveRole: deniedOutcome,
+  removeRole: deniedOutcome,
+  clearRoleName: deniedOutcome,
+  typedRoles: deniedOutcome,
+  addSignup: deniedOutcome,
+  changeSignup: deniedOutcome,
+  withdrawSignup: deniedOutcome,
+  addOffer: deniedOutcome,
+  changeOffer: deniedOutcome,
+  withdrawOffer: deniedOutcome,
+};
 
 /** A rota port with nothing published: the overview is empty, everything else is refused. */
 const ROTA_PORT_DOUBLE: RotaApplicationPort = {
@@ -302,6 +323,8 @@ export function createRequestWorld() {
       // The rota screens come after the owner's design approval; until then nothing is planned or published.
       rota: new RotaApplicationFacade(pipeline, ROTA_PORT_DOUBLE),
       directory: new DirectoryApplicationFacade(pipeline, directoryPort),
+      // The event screens come after the owner's design approval; until then every event read is empty.
+      events: new EventApplicationFacade(pipeline, EVENT_PORT_DOUBLE),
     });
   }
 
