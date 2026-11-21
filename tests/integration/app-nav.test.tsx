@@ -75,6 +75,7 @@ describe("AppNav for a parent", () => {
       "Cserék",
       "Munkacsoportok",
       "Események",
+      "Könyvtár",
       "Szülők",
       "Fiókom",
     ]);

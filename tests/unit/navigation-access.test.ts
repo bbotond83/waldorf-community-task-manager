@@ -12,6 +12,9 @@ const RESOURCE_BY_ROUTE: Readonly<Record<string, string>> = {
   "/szulo/esemenyek": "event",
   "/teacher/esemenyek": "event",
   "/admin/esemenyek": "event",
+  "/szulo/konyvtar": "library",
+  "/teacher/konyvtar": "library",
+  "/admin/konyvtar": "library",
   "/szulo/beosztas": "rota",
   "/szulo/szulok": "directory",
   "/teacher/szulok": "directory",
@@ -88,6 +91,7 @@ describe("navigation and default pages follow the access rules", () => {
       "Cserék",
       "Munkacsoportok",
       "Események",
+      "Könyvtár",
       "Szülők",
       "Fiókom",
     ]);
@@ -96,6 +100,7 @@ describe("navigation and default pages follow the access rules", () => {
       "Takarítás",
       "Munkacsoportok",
       "Események",
+      "Könyvtár",
       "Szülők",
     ]);
     expect(labels("group-admin")).toEqual([
@@ -105,6 +110,7 @@ describe("navigation and default pages follow the access rules", () => {
       "Archívum",
       "Munkacsoportok",
       "Események",
+      "Könyvtár",
       "Beosztás",
       "Szülők",
     ]);
@@ -116,6 +122,7 @@ describe("navigation and default pages follow the access rules", () => {
       "Archívum",
       "Munkacsoportok",
       "Események",
+      "Könyvtár",
       "Tanév",
       "Beosztás",
       "Szülők",
@@ -149,6 +156,7 @@ describe("navigation and default pages follow the access rules", () => {
       ["Takarítás", "/teacher/beosztas"],
       ["Munkacsoportok", "/teacher/munkacsoportok"],
       ["Események", "/teacher/esemenyek"],
+      ["Könyvtár", "/teacher/konyvtar"],
       ["Szülők", "/teacher/szulok"],
     ]);
     expect(teacher.filter((item) => /beoszt/i.test(item.label))).toHaveLength(1);

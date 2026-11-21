@@ -37,6 +37,7 @@ test.describe("parent: notifications stay under Értesítések", () => {
       "Cserék",
       "Munkacsoportok",
       "Események",
+      "Könyvtár",
       "Szülők",
       "Fiókom",
     ]);

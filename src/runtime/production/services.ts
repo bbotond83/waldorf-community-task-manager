@@ -3,6 +3,7 @@ import {
   AuthorizationContract,
   DirectoryApplicationFacade,
   EventApplicationFacade,
+  LibraryApplicationFacade,
   FacadePipeline,
   ParentApplicationFacade,
   RotaApplicationFacade,
@@ -14,6 +15,7 @@ import {
   createAdminPort,
   createDirectoryPort,
   createEventPort,
+  createLibraryPort,
   createParentPort,
   createRotaPort,
   createTeacherPort,
@@ -42,6 +44,8 @@ export type RequestServices = Readonly<{
   directory: DirectoryApplicationFacade;
   /** Event pages, sign-ups, food offers, notices and roles (U10); the screens come after the owner's design approval. */
   events: EventApplicationFacade;
+  /** The lending library: list, book pages, borrowing, returning and watches (U13). */
+  library: LibraryApplicationFacade;
 }>;
 
 export interface ProductionServices {
@@ -69,6 +73,7 @@ export function createProductionServices(database: DatabaseClient): ProductionSe
         rota: new RotaApplicationFacade(pipeline, createRotaPort(asPerson)),
         directory: new DirectoryApplicationFacade(pipeline, createDirectoryPort(asPerson)),
         events: new EventApplicationFacade(pipeline, createEventPort(asPerson)),
+        library: new LibraryApplicationFacade(pipeline, createLibraryPort(asPerson)),
       });
     },
   };

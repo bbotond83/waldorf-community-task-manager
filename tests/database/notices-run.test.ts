@@ -111,7 +111,9 @@ for (const schema of NOTIFICATION_SCHEMAS) {
         [
           ["duty_reminders", "success"],
           ["housekeeping", "success"],
-          // The checks of the rota unit (U6), registered in the same run.
+          // The lending library's daily return reminder (U13) and the checks of the rota unit (U6), registered in the
+          // same run.
+          ["library_return_due", "success"],
           ["rota_week_reminder", "success"],
           ["weekend_picks_reminder", "success"],
         ],
@@ -139,6 +141,7 @@ for (const schema of NOTIFICATION_SCHEMAS) {
         [
           { check_name: "duty_reminders", outcome: "success", created: 2 },
           { check_name: "housekeeping", outcome: "success", created: 0 },
+          { check_name: "library_return_due", outcome: "success", created: 0 },
           { check_name: "rota_week_reminder", outcome: "success", created: 0 },
           { check_name: "weekend_picks_reminder", outcome: "success", created: 0 },
         ],
@@ -224,6 +227,7 @@ for (const schema of NOTIFICATION_SCHEMAS) {
             ["aa_step4", "success"],
             ["duty_reminders", "success"],
             ["housekeeping", "success"],
+            ["library_return_due", "success"],
             ["rota_week_reminder", "success"],
             ["weekend_picks_reminder", "success"],
           ],

@@ -788,6 +788,96 @@
       "resources": ["reminder", "lifecycle", "settings", "role_grant", "governance"],
       "fields": [],
       "effect": "deny"
+    },
+    {
+      "id": "AUTH-LIBRARY-READ-PARENT-ALLOW",
+      "role": "parent",
+      "scope": "community",
+      "route": "/szulo/konyvtar/**",
+      "actions": ["read"],
+      "resources": ["library"],
+      "fields": ["SF-DISPLAY-NAME"],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-LIBRARY-READ-GROUP-ADMIN-ALLOW",
+      "role": "group_admin",
+      "scope": "community",
+      "route": "/szulo/konyvtar/**",
+      "actions": ["read"],
+      "resources": ["library"],
+      "fields": ["SF-DISPLAY-NAME"],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-LIBRARY-READ-SUPER-ADMIN-ALLOW",
+      "role": "super_admin",
+      "scope": "community",
+      "route": "/szulo/konyvtar/**",
+      "actions": ["read"],
+      "resources": ["library"],
+      "fields": ["SF-DISPLAY-NAME"],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-LIBRARY-READ-TEACHER-ALLOW",
+      "role": "kindergarten_teacher",
+      "scope": "community",
+      "route": "/teacher/konyvtar/**",
+      "actions": ["read"],
+      "resources": ["library"],
+      "fields": ["SF-DISPLAY-NAME"],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-LIBRARY-COMMANDS-PARENT-ALLOW",
+      "role": "parent",
+      "scope": "linked-family",
+      "route": "/szulo/konyvtar/**",
+      "actions": ["create", "update", "delete"],
+      "resources": ["library_book"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-LIBRARY-COMMANDS-GROUP-ADMIN-PARENT-ALLOW",
+      "role": "group_admin",
+      "scope": "linked-family",
+      "route": "/szulo/konyvtar/**",
+      "actions": ["create", "update", "delete"],
+      "resources": ["library_book"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-LIBRARY-COMMANDS-SUPER-ADMIN-ALLOW",
+      "role": "super_admin",
+      "scope": "community",
+      "route": "/szulo/konyvtar/**",
+      "actions": ["create", "update", "delete"],
+      "resources": ["library_book"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-LIBRARY-TEACHER-WRITE-DENY",
+      "role": "kindergarten_teacher",
+      "scope": "community",
+      "route": "/teacher/konyvtar/**",
+      "actions": ["create", "update", "delete"],
+      "resources": ["library_book"],
+      "fields": [],
+      "effect": "deny"
+    },
+    {
+      "id": "AUTH-LIBRARY-OTHER-COMMUNITY-DENY",
+      "role": "any_authenticated",
+      "scope": "other-community",
+      "route": "/szulo/konyvtar/**",
+      "actions": ["read", "create", "update", "delete"],
+      "resources": ["library", "library_book"],
+      "fields": [],
+      "effect": "deny"
     }
   ]
 }

@@ -33,6 +33,9 @@ const allIds = (plan: SeedPlan): string[] => [
   ...plan.eventRoles.map((entry) => entry.id),
   ...plan.eventSignups.map((entry) => entry.id),
   ...plan.foodOffers.map((entry) => entry.id),
+  ...plan.books.map((entry) => entry.id),
+  ...plan.loans.map((entry) => entry.id),
+  ...plan.watches.map((entry) => entry.id),
   ...plan.tasks.map((entry) => entry.id),
   ...plan.assignments.map((entry) => entry.id),
   ...plan.notices.flatMap((entry) => [entry.id, entry.deliveryId]),
@@ -66,6 +69,37 @@ describe("seed data: the small set", () => {
     }
   });
 
+  it("gives the library an owned book, a typed owner, a closed loan, an open loan, a late loan and watches", () => {
+    assert.equal(plan.books.length, 6);
+    assert.ok(plan.books.some((book) => book.ownerParentId !== null && book.ownerName === null));
+    const typed = plan.books.filter((book) => book.ownerName !== null);
+    assert.ok(typed.length > 0 && typed.every((book) => book.sourceKey && !book.ownerParentId));
+    assert.ok(
+      plan.loans.some((loan) => loan.returnedDaysAgo !== null),
+      "closed loan",
+    );
+    const open = plan.loans.filter((loan) => loan.returnedDaysAgo === null);
+    assert.ok(
+      open.some((loan) => (loan.untilInDays ?? 0) > 0),
+      "open loan with a date",
+    );
+    assert.ok(
+      open.some((loan) => (loan.untilInDays ?? 0) < 0),
+      "late loan",
+    );
+    const books = new Map(plan.books.map((book) => [book.id, book]));
+    for (const watch of plan.watches) {
+      const holder = open.find((loan) => loan.bookId === watch.bookId);
+      assert.ok(holder, "a watch is on a borrowed book");
+      assert.notEqual(holder.borrowerParentId, watch.parentId, "the holder does not watch");
+      assert.notEqual(
+        books.get(watch.bookId)?.ownerParentId,
+        watch.parentId,
+        "the owner does not watch",
+      );
+    }
+  });
+
   it("has the six working groups, 6 families with parents and children, a super admin, two group admins and a teacher", () => {
     assert.deepEqual(describePlan(plan), {
       groups: 6,
@@ -74,6 +108,9 @@ describe("seed data: the small set", () => {
       children: 8,
       accounts: 10,
       events: 3,
+      books: 6,
+      loans: 4,
+      watches: 4,
       tasks: 8,
       assignments: 8,
       notices: 2,
