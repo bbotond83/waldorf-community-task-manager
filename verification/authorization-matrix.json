@@ -878,6 +878,126 @@
       "resources": ["library", "library_book"],
       "fields": [],
       "effect": "deny"
+    },
+    {
+      "id": "AUTH-RECURRING-READ-PARENT-ALLOW",
+      "role": "parent",
+      "scope": "community",
+      "route": "/szulo/ismetlodo/**",
+      "actions": ["read"],
+      "resources": ["recurring"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-RECURRING-READ-GROUP-ADMIN-ALLOW",
+      "role": "group_admin",
+      "scope": "community",
+      "route": "/szulo/ismetlodo/**",
+      "actions": ["read"],
+      "resources": ["recurring"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-RECURRING-READ-SUPER-ADMIN-ALLOW",
+      "role": "super_admin",
+      "scope": "community",
+      "route": "/admin/ismetlodo/**",
+      "actions": ["read"],
+      "resources": ["recurring"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-RECURRING-READ-TEACHER-ALLOW",
+      "role": "kindergarten_teacher",
+      "scope": "community",
+      "route": "/teacher/munkacsoportok/**",
+      "actions": ["read"],
+      "resources": ["recurring"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-RECURRING-DUTY-PARENT-ALLOW",
+      "role": "parent",
+      "scope": "linked-family",
+      "route": "/szulo/ismetlodo/**",
+      "actions": ["update"],
+      "resources": ["recurring_duty"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-RECURRING-DUTY-GROUP-ADMIN-ALLOW",
+      "role": "group_admin",
+      "scope": "group",
+      "route": "/szulo/ismetlodo/**",
+      "actions": ["update"],
+      "resources": ["recurring_duty"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-RECURRING-DUTY-SUPER-ADMIN-ALLOW",
+      "role": "super_admin",
+      "scope": "organization",
+      "route": "/admin/ismetlodo/**",
+      "actions": ["update"],
+      "resources": ["recurring_duty"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-RECURRING-DUTY-TEACHER-DENY",
+      "role": "kindergarten_teacher",
+      "scope": "community",
+      "route": "/teacher/munkacsoportok/**",
+      "actions": ["update"],
+      "resources": ["recurring_duty"],
+      "fields": [],
+      "effect": "deny"
+    },
+    {
+      "id": "AUTH-RECURRING-MANAGE-GROUP-ADMIN-ALLOW",
+      "role": "group_admin",
+      "scope": "group",
+      "route": "/szulo/ismetlodo/**",
+      "actions": ["read", "create", "update", "manage"],
+      "resources": ["recurring_schedule"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-RECURRING-MANAGE-SUPER-ADMIN-ALLOW",
+      "role": "super_admin",
+      "scope": "organization",
+      "route": "/admin/ismetlodo/**",
+      "actions": ["read", "create", "update", "manage"],
+      "resources": ["recurring_schedule"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-RECURRING-MANAGE-PARENT-TEACHER-DENY",
+      "role": "any_authenticated",
+      "scope": "parent-or-teacher-without-group-admin-grant",
+      "route": "/szulo/ismetlodo/**",
+      "actions": ["read", "create", "update", "manage"],
+      "resources": ["recurring_schedule"],
+      "fields": [],
+      "effect": "deny"
+    },
+    {
+      "id": "AUTH-RECURRING-OTHER-COMMUNITY-DENY",
+      "role": "any_authenticated",
+      "scope": "other-community",
+      "route": "/szulo/ismetlodo/**",
+      "actions": ["read", "create", "update", "manage"],
+      "resources": ["recurring", "recurring_duty", "recurring_schedule"],
+      "fields": [],
+      "effect": "deny"
     }
   ]
 }

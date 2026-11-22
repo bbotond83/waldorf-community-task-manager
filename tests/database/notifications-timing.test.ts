@@ -130,8 +130,8 @@ for (const schema of DIRECTORY_SCHEMAS) {
       assert.equal(run.state, "success");
       assert.deepEqual(
         run.checks.map((check) => check.outcome),
-        ["success", "success", "success", "success", "success", "success"],
-        "all six daily checks ran without failing",
+        ["success", "success", "success", "success", "success", "success", "success"],
+        "all seven daily checks ran without failing (the recurring-duty check is the seventh)",
       );
       report(
         `daily run on ${NOTIFICATION_DATASET.jobs} due jobs in ${schema}: ${SECONDS(elapsed)} s (fails above 30 s)`,

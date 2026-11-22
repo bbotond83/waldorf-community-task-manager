@@ -10,6 +10,7 @@ export const PARENT_NAVIGATION: readonly NavigationItem[] = [
   { id: "parent-rota", label: "Beosztás", href: "/szulo/beosztas" },
   { id: "parent-swaps", label: "Cserék", href: "/szulo/cserek" },
   { id: "parent-working-groups", label: "Munkacsoportok", href: "/szulo/munkacsoportok" },
+  { id: "parent-recurring", label: "Ismétlődők", href: "/szulo/ismetlodo" },
   { id: "parent-events", label: "Események", href: "/szulo/esemenyek" },
   { id: "parent-library", label: "Könyvtár", href: "/szulo/konyvtar" },
   { id: "parent-directory", label: "Szülők", href: "/szulo/szulok" },
@@ -34,6 +35,8 @@ export const GROUP_ADMIN_NAVIGATION: readonly NavigationItem[] = [
   { id: "admin-archive", label: "Archívum", href: "/admin/archivum" },
   { id: "admin-working-groups", label: "Munkacsoportok", href: "/admin/munkacsoportok" },
   { id: "admin-events", label: "Események", href: "/admin/esemenyek" },
+  // The personal recurring-duty page is the parent page: a group admin is also a parent, who marks duties done there.
+  { id: "admin-recurring", label: "Ismétlődők", href: "/szulo/ismetlodo" },
   // The library is the parent page: an admin is also a parent of a family, who borrows and adds books there.
   { id: "admin-library", label: "Könyvtár", href: "/szulo/konyvtar" },
   // The overview is the parent page: a group admin is also a parent of a family, who reads it there (BR24.1).

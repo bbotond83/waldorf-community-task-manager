@@ -415,7 +415,20 @@ for (const schema of NOTIFICATION_SCHEMAS) {
          values ($1, $2, 'Mese a leak tesztből', 'Kitalált Szerző', 'Kitalált Gazda', 'leak-test')`,
         [BOOK, ORGANIZATION],
       );
+      const RECURRING_SCHEDULE = "99999999-0000-4000-8000-000000000004";
+      const RECURRING_OCCURRENCE = "99999999-0000-4000-8000-000000000005";
+      await db.query(
+        `insert into recurring_schedules (id, organization_id, title, category, owner_kind, working_group_id, interval_kind,
+           interval_count, start_date)
+         values ($1, $2, 'Kitalált ismétlődő munka', 'kert', 'group', $3, 'weeks', 1, '2026-12-07')`,
+        [RECURRING_SCHEDULE, ORGANIZATION, GROUP_1],
+      );
+      await db.query(
+        `insert into recurring_occurrences (id, organization_id, schedule_id, due_date) values ($1, $2, $3, '2026-12-07')`,
+        [RECURRING_OCCURRENCE, ORGANIZATION, RECURRING_SCHEDULE],
+      );
       const targets: Record<string, string> = {
+        recurring_duty: RECURRING_OCCURRENCE,
         book: BOOK,
         task: TASK_1,
         change_request: REQUEST_1,

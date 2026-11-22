@@ -59,6 +59,9 @@ const CORE_RESOURCES = new Set([
   "approval",
   "archive",
   "event_manage",
+  // A coordinator adds, changes, switches off and skips their group's recurring duties (BR142 to BR146).
+  "recurring_schedule",
+  "recurring_duty",
 ]);
 const TRACKING_FIELDS = new Set([
   "display_name",
@@ -108,6 +111,8 @@ export function grantAllows(
   if (request.resource.kind === "event") return request.action === "read";
   // Every signed-in role reads the library pages, a teacher too (BR130.1).
   if (request.resource.kind === "library") return request.action === "read";
+  // Every signed-in role reads the recurring duties, a teacher too; the database decides which parts.
+  if (request.resource.kind === "recurring") return request.action === "read";
   // Every signed-in role reads the published rota (BR24.1).
   if (request.resource.kind === "rota") return request.action === "read";
   // Every signed-in role opens the parent directory; which fields come back is decided in the database (BR30).
@@ -156,6 +161,10 @@ function parentCan({ action, resource }: AuthorizationRequest): boolean {
     // through the default grant, a group admin who is a parent through the parent grant.
     case "library_book":
       return action === "create" || action === "update" || action === "delete";
+    // Marking a recurring duty done, taking the mark back and skipping it: the database checks that the parent
+    // belongs to the owner. A super admin acts through the default grant (and cannot mark done, D-SEC-1).
+    case "recurring_duty":
+      return action === "update";
     // A duty card of the family's own rota duty; the database checks that the family holds it (BR24.2). This also
     // serves a group admin who is a parent: the parent grant carries the read, the group admin grant adds nothing.
     case "rota_duty":

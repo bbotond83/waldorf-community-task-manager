@@ -204,6 +204,47 @@ export function libraryMessage(answer: {
   return DIRECTORY_REFUSAL_FALLBACK;
 }
 
+/**
+ * What a person reads for each refusal of the recurring-duty commands (U9). A refused field names its reason, which the
+ * adapter turns into the field codes; the form field it belongs to decides the words, so a person is told which
+ * entry to correct. An access refusal reads as "not allowed", never as which part was missing.
+ */
+const RECURRING_CODE_MESSAGES: Readonly<Record<string, string>> = Object.freeze({
+  RECURRING_CLOSED: "Ez az ismétlődő feladat már le van zárva.",
+  RECURRING_UNDO_TOO_LATE:
+    "A kész jelölés már nem vonható vissza, mert több mint egy napja történt.",
+  VERSION_CONFLICT: "Közben valaki módosította, töltsd újra.",
+  idempotency_key_reused: "Ezt a kérést már elküldted, de más tartalommal. Töltsd újra az oldalt.",
+  authorization_denied: "Ezt a műveletet nem végezheted el.",
+});
+
+const RECURRING_FIELD_MESSAGES: Readonly<Record<string, string>> = Object.freeze({
+  title: "Adj meg egy címet, legfeljebb 200 karakterrel.",
+  category: "A kategória legfeljebb 100 karakter lehet.",
+  interval: "Az ismétlődés 1 és 52 hét közötti szám lehet.",
+  startDate: "Adj meg egy első időpontot.",
+  season: "Az idény két hónap között lehet, a kezdő hónap nem lehet a záró után.",
+  owner: "Ez a felelős nem választható ehhez a feladathoz.",
+  reason: "Adj meg egy indoklást, legfeljebb 200 karakterrel.",
+  expectedVersion: "Közben valaki módosította, töltsd újra.",
+});
+
+export function recurringMessage(answer: {
+  state: string;
+  code?: string | undefined;
+  fieldErrors?: Readonly<Record<string, string>> | undefined;
+}): string {
+  if (answer.state === "denied") return RECURRING_CODE_MESSAGES.authorization_denied!;
+  const byCode = answer.code && RECURRING_CODE_MESSAGES[answer.code];
+  if (byCode) return byCode;
+  for (const [field, reason] of Object.entries(answer.fieldErrors ?? {})) {
+    if (reason === "VAL-CANNOT-CHANGE") return "A feladat felelőse utólag nem módosítható.";
+    const known = RECURRING_FIELD_MESSAGES[field];
+    if (known) return known;
+  }
+  return DIRECTORY_REFUSAL_FALLBACK;
+}
+
 export function directoryRefusalMessage(code: string | undefined): string {
   return (code && DIRECTORY_REFUSAL_MESSAGES[code]) || DIRECTORY_REFUSAL_FALLBACK;
 }

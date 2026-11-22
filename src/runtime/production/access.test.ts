@@ -66,6 +66,7 @@ test("a parent's family comes from the linked Parent and the matching family gra
       "/szulo/beosztas",
       "/szulo/cserek",
       "/szulo/munkacsoportok",
+      "/szulo/ismetlodo",
       "/szulo/esemenyek",
       "/szulo/konyvtar",
       "/szulo/szulok",

@@ -439,10 +439,13 @@ export function RotaDutyCard({
   result,
   backHref,
   renderPicker,
+  extra,
 }: Readonly<{
   result: ApplicationResult<RotaDutyCardModel>;
   backHref: string;
   renderPicker?: (card: RotaDutyCardModel, own: WeekendOwnPickModel) => ReactNode;
+  /** A further line of the card, such as the bottle cleaning of a water week (U9); shown only when the card loaded. */
+  extra?: ReactNode;
 }>) {
   const card = result.state === "success" || result.state === "recovery" ? result.data : undefined;
   const text = card ? cardText(card) : undefined;
@@ -501,6 +504,7 @@ export function RotaDutyCard({
               </p>
             </>
           )}
+          {extra}
           {card.ownPick && (
             <section
               className="parent-rota-picker"

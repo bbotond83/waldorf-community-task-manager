@@ -194,6 +194,26 @@ export interface SeedPlan {
   }[];
   /** Invented return watches on borrowed books. */
   watches: { id: string; bookId: string; parentId: string }[];
+  /**
+   * The recurring duties (U9): the starting list of the community and one family schedule. Their occurrences are made by
+   * the writer from the due-date function of the database, so they follow the published water weeks.
+   */
+  recurringSchedules: {
+    id: string;
+    title: string;
+    category: string;
+    ownerKind: "group" | "family" | "rota_week";
+    groupId: string | null;
+    familyId: string | null;
+    rotaJob: string | null;
+    intervalCount: number;
+    startDate: string;
+    seasonFromMonth: number | null;
+    seasonToMonth: number | null;
+    isActive: boolean;
+  }[];
+  /** The account that is named as the person who skipped a past occurrence (the super admin). */
+  recurringSkippedByAccountId: string;
   tasks: {
     id: string;
     groupId: string | null;
@@ -419,6 +439,87 @@ const BREAK_WEEKS = [
   { weekStart: "2026-12-28", label: "Téli szünet" },
   { weekStart: "2027-04-05", label: "Tavaszi szünet" },
 ] as const;
+
+/**
+ * The starting list of recurring duties (U9), with invented Hungarian titles. `owner` is the index of the working group in
+ * `WORKING_GROUPS` or `"rota"` for the water week. The bottle cleaning runs every 4th published water week; the three
+ * rabbit items of the animal care are switched off; the garden items have seasons (months, both included).
+ */
+export const RECURRING_START = "2026-08-31";
+export const RECURRING_STARTING_LIST: readonly {
+  key: string;
+  title: string;
+  category: string;
+  owner: number | "rota";
+  interval: number;
+  season?: readonly [number, number];
+  active?: boolean;
+}[] = [
+  {
+    key: "bottles",
+    title: "Vizespalackok tisztítása",
+    category: "víz",
+    owner: "rota",
+    interval: 4,
+  },
+  { key: "hens-feed", title: "Tyúkok etetése és itatása", category: "tyúk", owner: 5, interval: 1 },
+  { key: "hens-bedding", title: "Tyúkól almozása", category: "tyúk", owner: 5, interval: 1 },
+  {
+    key: "goats",
+    title: "Kecskék etetése, friss szalma",
+    category: "kecske",
+    owner: 5,
+    interval: 1,
+  },
+  {
+    key: "rabbit-feed",
+    title: "Nyulak etetése",
+    category: "nyúl",
+    owner: 5,
+    interval: 1,
+    active: false,
+  },
+  {
+    key: "rabbit-cage",
+    title: "Nyúlketrec takarítása",
+    category: "nyúl",
+    owner: 5,
+    interval: 1,
+    active: false,
+  },
+  {
+    key: "rabbit-water",
+    title: "Nyúl itatók ellenőrzése",
+    category: "nyúl",
+    owner: 5,
+    interval: 1,
+    active: false,
+  },
+  {
+    key: "playground",
+    title: "Játszótér körbejárása",
+    category: "játszótér",
+    owner: 0,
+    interval: 4,
+  },
+  {
+    key: "maintenance",
+    title: "Épület és udvar körbejárása",
+    category: "karbantartás",
+    owner: 1,
+    interval: 4,
+  },
+  { key: "mowing", title: "Fűnyírás", category: "kert", owner: 1, interval: 2, season: [4, 10] },
+  { key: "weeding", title: "Gyomlálás", category: "kert", owner: 1, interval: 3, season: [4, 9] },
+  {
+    key: "compost",
+    title: "Komposzt átrakása",
+    category: "kert",
+    owner: 1,
+    interval: 6,
+    season: [3, 11],
+  },
+];
 
 const pick = <T>(list: readonly T[], index: number): T => list[index % list.length]!;
 
@@ -981,6 +1082,38 @@ export function buildSeedPlan(
     },
     { id: id("standing:new"), familyId: families[families.length - 1]!.id, standing: "new" },
   ];
+  // The recurring duties (U9): the starting list of the community plus one family schedule. The rows hold the schedules;
+  // the writer makes the occurrences of the school year from them with the database's own due-date function.
+  const recurringSchedules: SeedPlan["recurringSchedules"] = RECURRING_STARTING_LIST.map(
+    (entry) => ({
+      id: id(`recurring:${entry.key}`),
+      title: entry.title,
+      category: entry.category,
+      ownerKind: entry.owner === "rota" ? "rota_week" : "group",
+      groupId: entry.owner === "rota" ? null : groups[entry.owner]!.id,
+      familyId: null,
+      rotaJob: entry.owner === "rota" ? "water_carrying" : null,
+      intervalCount: entry.interval,
+      startDate: RECURRING_START,
+      seasonFromMonth: entry.season?.[0] ?? null,
+      seasonToMonth: entry.season?.[1] ?? null,
+      isActive: entry.active ?? true,
+    }),
+  );
+  recurringSchedules.push({
+    id: id("recurring:family-compost"),
+    title: "Komposztláda kiürítése",
+    category: "kert",
+    ownerKind: "family",
+    groupId: null,
+    familyId: families[0]!.id,
+    rotaJob: null,
+    intervalCount: 2,
+    startDate: RECURRING_START,
+    seasonFromMonth: null,
+    seasonToMonth: null,
+    isActive: true,
+  });
   const published = rotaPlanState === "published";
   const rotaPlan: SeedPlan["rotaPlan"] = {
     id: id("rota-plan"),
@@ -1012,6 +1145,8 @@ export function buildSeedPlan(
     books,
     loans,
     watches,
+    recurringSchedules,
+    recurringSkippedByAccountId: accounts[0]!.id,
     tasks,
     assignments,
     changeRequests,
@@ -1044,6 +1179,7 @@ export function describePlan(plan: SeedPlan): Record<string, number> {
     books: plan.books.length,
     loans: plan.loans.length,
     watches: plan.watches.length,
+    recurringSchedules: plan.recurringSchedules.length,
     tasks: plan.tasks.length,
     assignments: plan.assignments.length,
     changeRequests: plan.changeRequests.length,

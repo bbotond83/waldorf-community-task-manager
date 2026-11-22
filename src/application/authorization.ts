@@ -112,6 +112,31 @@ export const AUTHORIZATION_MATRIX: readonly MatrixRow[] = Object.freeze([
     fields: [],
   },
   {
+    // Every signed-in role reads the recurring duties, a teacher too (BR141); the database decides which parts.
+    id: "AUTH-RECURRING",
+    roles: ["parent", "group_admin", "kindergarten_teacher", "super_admin"],
+    actions: ["read"],
+    resources: ["recurring"],
+    fields: [],
+  },
+  {
+    // Marking a duty done, undoing it and skipping it. A group admin who is a parent marks through the parent grant;
+    // the database decides who belongs to the owner and repeats every check.
+    id: "AUTH-RECURRING-DUTY",
+    roles: ["parent", "group_admin", "super_admin"],
+    actions: ["update"],
+    resources: ["recurring_duty"],
+    fields: [],
+  },
+  {
+    // Schedules are kept by a coordinator for their group and by a super admin for every owner (BR142).
+    id: "AUTH-RECURRING-MANAGE",
+    roles: ["group_admin", "super_admin"],
+    actions: ["read", "create", "update", "manage"],
+    resources: ["recurring_schedule"],
+    fields: [],
+  },
+  {
     id: "AUTH-WORKING-GROUPS",
     roles: ["parent", "group_admin", "kindergarten_teacher", "super_admin"],
     actions: ["read"],

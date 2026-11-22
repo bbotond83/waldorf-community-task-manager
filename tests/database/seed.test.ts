@@ -76,6 +76,7 @@ describe("seed on the real stack", () => {
     assert.equal(await rowCount(db, A, "books"), counts.books);
     assert.equal(await rowCount(db, A, "loans"), counts.loans);
     assert.equal(await rowCount(db, A, "return_watches"), counts.watches);
+    assert.equal(await rowCount(db, A, "recurring_schedules"), counts.recurringSchedules);
     const families = (await db.query(`select id::text from "${A}".families order by id`)).rows.map(
       (row) => row.id,
     );
@@ -125,6 +126,59 @@ describe("seed on the real stack", () => {
     assert.equal(await rowCount(db, A, "groups"), 6);
     assert.equal(await rowCount(db, A, "accounts"), 34);
     assert.equal((await schemaUsers(db, A)).length, 34);
+  });
+
+  it("U9: the large set holds the starting list with a school year of occurrences: switched-off items have none, the bottle cleaning follows every 4th published water week, the past is done or skipped by a person who belongs there", async () => {
+    const { deps, lines } = realSeedDeps();
+    assert.equal(await seedMain(["--schema", A, "--large"], deps), 0, lines.join("\n"));
+    const one = async (sql: string) => (await db.query(sql.replaceAll("{S}", `"${A}"`))).rows[0];
+    assert.equal(await rowCount(db, A, "recurring_schedules"), 13);
+    assert.equal(
+      (await one("select count(*)::int as n from {S}.recurring_schedules where not is_active")).n,
+      3,
+    );
+    assert.equal(
+      (
+        await one(
+          "select count(*)::int as n from {S}.recurring_occurrences o join {S}.recurring_schedules s on s.id = o.schedule_id where not s.is_active",
+        )
+      ).n,
+      0,
+      "a switched-off schedule has no occurrence",
+    );
+    const bottles = await db.query(
+      `select to_char(o.due_date, 'YYYY-MM-DD') as due, w.family_id is not null as held
+         from ${`"${A}"`}.recurring_occurrences o
+         join ${`"${A}"`}.recurring_schedules s on s.id = o.schedule_id and s.owner_kind = 'rota_week'
+         join ${`"${A}"`}.rota_weeks w on w.id = o.rota_week_id
+        order by o.due_date`,
+    );
+    assert.ok(bottles.rows.length >= 2, `the bottle weeks so far: ${bottles.rows.length}`);
+    assert.ok(bottles.rows.every((row) => row.held === true));
+    const gaps = await db.query(
+      `select count(*)::int as n from (
+         select row_number() over (order by w.week_start) as n_week, w.week_start
+           from ${`"${A}"`}.rota_weeks w join ${`"${A}"`}.rota_plans p on p.id = w.plan_id and p.status = 'published'
+          where w.job = 'water_carrying') x
+        where (x.n_week - 1) % 4 = 0
+          and not exists (select 1 from ${`"${A}"`}.recurring_occurrences o where o.due_date = x.week_start)
+          and x.week_start >= date '2026-09-01' and x.week_start <= current_date + 14
+          and exists (select 1 from ${`"${A}"`}.rota_weeks w2 where w2.week_start = x.week_start and w2.job = 'water_carrying' and w2.family_id is not null)`,
+    );
+    assert.equal(gaps.rows[0].n, 0, "every 4th published water week has an occurrence");
+    const states = await db.query(
+      `select status, count(*)::int as n from ${`"${A}"`}.recurring_occurrences group by status order by status`,
+    );
+    const seen = Object.fromEntries(states.rows.map((row) => [row.status, row.n]));
+    assert.ok(seen.done > 0 && seen.open > 0, JSON.stringify(seen));
+    const strangers = await db.query(
+      `select count(*)::int as n from ${`"${A}"`}.recurring_occurrences o
+         join ${`"${A}"`}.recurring_schedules s on s.id = o.schedule_id
+        where o.status = 'done' and s.owner_kind = 'group'
+          and not exists (select 1 from ${`"${A}"`}.group_memberships m
+                           where m.group_id = s.working_group_id and m.parent_id = o.done_by_parent_id)`,
+    );
+    assert.equal(strangers.rows[0].n, 0, "a group duty is done by a member of the group");
   });
 
   it("lets each seeded role sign in for real with its fictitious password, and sees what its role may see", async () => {

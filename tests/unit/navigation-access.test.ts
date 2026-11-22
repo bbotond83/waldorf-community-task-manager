@@ -12,6 +12,7 @@ const RESOURCE_BY_ROUTE: Readonly<Record<string, string>> = {
   "/szulo/esemenyek": "event",
   "/teacher/esemenyek": "event",
   "/admin/esemenyek": "event",
+  "/szulo/ismetlodo": "recurring",
   "/szulo/konyvtar": "library",
   "/teacher/konyvtar": "library",
   "/admin/konyvtar": "library",
@@ -91,6 +92,7 @@ describe("navigation and default pages follow the access rules", () => {
       "Beosztás",
       "Cserék",
       "Munkacsoportok",
+      "Ismétlődők",
       "Események",
       "Könyvtár",
       "Szülők",
@@ -112,6 +114,7 @@ describe("navigation and default pages follow the access rules", () => {
       "Archívum",
       "Munkacsoportok",
       "Események",
+      "Ismétlődők",
       "Könyvtár",
       "Beosztás",
       "Szülők",
@@ -136,7 +139,11 @@ describe("navigation and default pages follow the access rules", () => {
   });
 
   it("gives the super admin every group admin item", () => {
-    expect(labels("super-admin")).toEqual(expect.arrayContaining(labels("group-admin")));
+    // "Ismétlődők" is a parent's own page (the family's and the groups' duties); a super admin has no family and
+    // reaches a group's recurring duties from the group's page instead.
+    expect(labels("super-admin")).toEqual(
+      expect.arrayContaining(labels("group-admin").filter((label) => label !== "Ismétlődők")),
+    );
   });
 
   it("sends the group admin to the parent rota overview and the super admin to the planning page (BR24.1)", () => {

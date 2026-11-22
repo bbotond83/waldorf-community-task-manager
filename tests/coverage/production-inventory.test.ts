@@ -127,8 +127,13 @@ describe("honest executable denominator", () => {
     // (app/_library: person, facade resolver, address check, result mapper, actions, forms and screens: 7) and the six
     // pages under konyvtar in the parent and teacher areas (4 + 2): 276 + 16. The admin area's four library pages
     // (a super admin without a parent record of their own opens the library there): 292 + 4. U7 adds the administrator
-    // swap list page (app/admin/cserek/page.tsx): 296 + 1.
-    expect(inventory.length).toBe(297);
+    // swap list page (app/admin/cserek/page.tsx): 296 + 1. U9's recurring duties add seven so far: the facade
+    // (src/application/recurring-facade.ts), the data adapter (src/data/recurring.ts) and the shared recurring code
+    // (app/_recurring: person, facade resolver, form reader, result mapper, actions: 5): 297 + 7. The screens add eleven
+    // more: the format helpers (src/application/recurring-format.ts), the forms and screens (app/_recurring: 2) and
+    // eight pages (the group page in the parent, teacher and admin areas, my duties, and the new and change forms in the
+    // parent and admin areas): 304 + 11.
+    expect(inventory.length).toBe(315);
     for (const path of [
       "src/runtime/AppNav.tsx",
       "src/runtime/StatusBadge.tsx",

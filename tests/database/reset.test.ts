@@ -212,6 +212,11 @@ describe("reset on the real stack", () => {
 
   it("changes nothing when the emptying fails: the schema and its accounts are as they were", async () => {
     await seed(A);
+    // The reset's own daily run creates the notices that are due (the overdue recurring duties of the seed). That run is
+    // not what the emptying protects, so it is made once here and the snapshot is taken after it; the second run of the
+    // same day creates nothing more.
+    await bindSchema(db, A);
+    await db.query("select timed_checks_run_system('daily')");
     const before = await dumpSchema(db, A, RUN_RECORDS);
     const { deps, lines } = realSeedDeps({
       connect: async (url) => {

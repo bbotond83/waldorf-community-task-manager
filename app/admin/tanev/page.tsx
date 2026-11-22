@@ -1,4 +1,9 @@
-import type { SchoolCalendarModel } from "../../../src/application/index.ts";
+import type {
+  ApplicationResult,
+  RecurringScheduleListModel,
+  SchoolCalendarModel,
+} from "../../../src/application/index.ts";
+import { terminalFailure } from "../../../src/application/results.ts";
 import {
   formatLongDay,
   formatShortDay,
@@ -8,6 +13,8 @@ import {
 } from "../../../src/application/rota-format.ts";
 import { StatusBadge } from "../../../src/runtime/StatusBadge.tsx";
 import { resolveRotaFacade } from "../../_identity/rota-facade.ts";
+import { resolveRecurringFacade } from "../../_recurring/facade.ts";
+import { BottleIntervalPanel } from "../../_recurring/RecurringScreens.tsx";
 import { AdminAccessState } from "../_components/AdminAccessState.tsx";
 import { AdminMutationForm, AdminTextField } from "../_components/AdminMutationForm.tsx";
 import { resolveAdminSession } from "../_lib/session.ts";
@@ -30,11 +37,14 @@ export default async function SchoolYearPage({
     searchParams,
   ]);
   if (session.state !== "success" || !rota) return <AdminAccessState kind="denied" embedded />;
-  const result = await rota.getCalendar(
-    session.data.applicationSession,
-    session.data.scope,
-    tanev || undefined,
-  );
+  const [result, recurring] = await Promise.all([
+    rota.getCalendar(session.data.applicationSession, session.data.scope, tanev || undefined),
+    resolveRecurringFacade(),
+  ]);
+  // The bottle-cleaning interval is one more read; a failed one shows its own message in its own panel.
+  const bottle = recurring
+    ? await recurring.adminList(session.data.applicationSession, session.data.scope)
+    : terminalFailure<RecurringScheduleListModel>();
   if (result.state === "denied" || result.state === "invalidated") {
     return <AdminAccessState kind="denied" embedded />;
   }
@@ -52,10 +62,16 @@ export default async function SchoolYearPage({
       </section>
     );
   }
-  return <SchoolYearScreen model={result.data} />;
+  return <SchoolYearScreen model={result.data} bottle={bottle} />;
 }
 
-function SchoolYearScreen({ model }: Readonly<{ model: SchoolCalendarModel }>) {
+function SchoolYearScreen({
+  model,
+  bottle,
+}: Readonly<{
+  model: SchoolCalendarModel;
+  bottle: ApplicationResult<RecurringScheduleListModel>;
+}>) {
   const year = model.schoolYear;
   return (
     <section className="admin-page admin-rota-page" data-testid="admin-school-year-page">
@@ -152,6 +168,7 @@ function SchoolYearScreen({ model }: Readonly<{ model: SchoolCalendarModel }>) {
             </section>
             <BreakWeeks model={model} schoolYearId={year.id} />
           </div>
+          <BottleIntervalPanel result={bottle} />
           <StandingsPanel model={model} schoolYearId={year.id} />
           <FlaggedDuties model={model} />
           <WeekTable model={model} />
