@@ -1,0 +1,308 @@
+{
+  "stage": "code-generation",
+  "unit": "u7-swaps-and-duty-changes",
+  "upstream_ids": [
+    "BR71.3",
+    "BR74.1",
+    "BR76.2",
+    "BR77.3",
+    "NFR1.3",
+    "NFR3.4",
+    "NFR3.5",
+    "AC8.2.1",
+    "AC8.2.2",
+    "AC8.2.3",
+    "AC8.2.5",
+    "AC8.2.6",
+    "AC8.2.8",
+    "AC8.3.1",
+    "BR70.1",
+    "BR70.3",
+    "BR71.1",
+    "BR72.1",
+    "BR77.2",
+    "NFR3.9",
+    "AC5.4.1",
+    "AC5.4.2",
+    "AC5.4.3",
+    "AC5.4.4",
+    "AC5.4.5",
+    "AC5.4.6",
+    "AC8.2.4",
+    "AC8.2.10",
+    "AC8.3.2",
+    "BR70.2",
+    "BR74",
+    "BR75",
+    "BR76",
+    "NFR3",
+    "NFR4",
+    "AC8.2.9",
+    "BR77.1",
+    "NFR5",
+    "AC8.2.7",
+    "BR73",
+    "BR77.4",
+    "NFR10.1",
+    "C9",
+    "C16",
+    "C19",
+    "NFR9.1",
+    "NFR9.2",
+    "NFR9.3",
+    "NFR8",
+    "NFR9.4"
+  ],
+  "coverage": [
+    {
+      "id": "BR71.3",
+      "status": "OK",
+      "target": "tests/database/swaps-propose-answer.test.ts"
+    },
+    {
+      "id": "BR74.1",
+      "status": "OK",
+      "target": "tests/database/swaps-picks.test.ts"
+    },
+    {
+      "id": "BR76.2",
+      "status": "OK",
+      "target": "tests/database/swaps-picks.test.ts"
+    },
+    {
+      "id": "BR77.3",
+      "status": "OK",
+      "target": "tests/database/swaps-for-later-units.test.ts"
+    },
+    {
+      "id": "NFR1.3",
+      "status": "OK",
+      "target": "tests/database/coordination-schema.test.ts"
+    },
+    {
+      "id": "NFR3.4",
+      "status": "OK",
+      "target": "tests/database/swaps-for-later-units.test.ts"
+    },
+    {
+      "id": "NFR3.5",
+      "status": "OK",
+      "target": "tests/database/swaps-for-later-units.test.ts"
+    },
+    {
+      "id": "AC8.2.1",
+      "status": "OK",
+      "target": "tests/database/swaps-propose-answer.test.ts"
+    },
+    {
+      "id": "AC8.2.2",
+      "status": "OK",
+      "target": "tests/database/swaps-propose-answer.test.ts"
+    },
+    {
+      "id": "AC8.2.3",
+      "status": "OK",
+      "target": "tests/database/swaps-propose-answer.test.ts"
+    },
+    {
+      "id": "AC8.2.5",
+      "status": "OK",
+      "target": "tests/database/swaps-propose-answer.test.ts"
+    },
+    {
+      "id": "AC8.2.6",
+      "status": "OK",
+      "target": "tests/database/swaps-propose-answer.test.ts"
+    },
+    {
+      "id": "AC8.2.8",
+      "status": "OK",
+      "target": "tests/database/swaps-propose-answer.test.ts"
+    },
+    {
+      "id": "AC8.3.1",
+      "status": "OK",
+      "target": "tests/database/swaps-propose-answer.test.ts"
+    },
+    {
+      "id": "BR70.1",
+      "status": "OK",
+      "target": "tests/database/swaps-propose-answer.test.ts"
+    },
+    {
+      "id": "BR70.3",
+      "status": "OK",
+      "target": "tests/database/swaps-propose-answer.test.ts"
+    },
+    {
+      "id": "BR71.1",
+      "status": "OK",
+      "target": "tests/database/swaps-propose-answer.test.ts"
+    },
+    {
+      "id": "BR72.1",
+      "status": "OK",
+      "target": "tests/database/swaps-propose-answer.test.ts"
+    },
+    {
+      "id": "BR77.2",
+      "status": "OK",
+      "target": "tests/database/swaps-propose-answer.test.ts"
+    },
+    {
+      "id": "NFR3.9",
+      "status": "OK",
+      "target": "tests/database/swaps-propose-answer.test.ts"
+    },
+    {
+      "id": "AC5.4.1",
+      "status": "OK",
+      "target": "tests/database/swaps-admin.test.ts"
+    },
+    {
+      "id": "AC5.4.2",
+      "status": "OK",
+      "target": "tests/database/swaps-admin.test.ts"
+    },
+    {
+      "id": "AC5.4.3",
+      "status": "OK",
+      "target": "tests/database/swaps-admin.test.ts"
+    },
+    {
+      "id": "AC5.4.4",
+      "status": "OK",
+      "target": "tests/database/swaps-admin.test.ts"
+    },
+    {
+      "id": "AC5.4.5",
+      "status": "OK",
+      "target": "tests/database/swaps-admin.test.ts"
+    },
+    {
+      "id": "AC5.4.6",
+      "status": "OK",
+      "target": "tests/database/swaps-admin.test.ts"
+    },
+    {
+      "id": "AC8.2.4",
+      "status": "OK",
+      "target": "tests/database/swaps-admin.test.ts"
+    },
+    {
+      "id": "AC8.2.10",
+      "status": "OK",
+      "target": "tests/database/swaps-admin.test.ts"
+    },
+    {
+      "id": "AC8.3.2",
+      "status": "OK",
+      "target": "tests/database/swaps-admin.test.ts"
+    },
+    {
+      "id": "BR70.2",
+      "status": "OK",
+      "target": "tests/database/swaps-admin.test.ts"
+    },
+    {
+      "id": "BR74",
+      "status": "OK",
+      "target": "tests/database/swaps-admin.test.ts"
+    },
+    {
+      "id": "BR75",
+      "status": "OK",
+      "target": "tests/database/swaps-admin.test.ts"
+    },
+    {
+      "id": "BR76",
+      "status": "OK",
+      "target": "tests/database/swaps-admin.test.ts"
+    },
+    {
+      "id": "NFR3",
+      "status": "OK",
+      "target": "tests/database/swaps-admin.test.ts"
+    },
+    {
+      "id": "NFR4",
+      "status": "OK",
+      "target": "tests/database/swaps-admin.test.ts"
+    },
+    {
+      "id": "AC8.2.9",
+      "status": "OK",
+      "target": "tests/database/swaps-races.test.ts"
+    },
+    {
+      "id": "BR77.1",
+      "status": "OK",
+      "target": "tests/database/swaps-races.test.ts"
+    },
+    {
+      "id": "NFR5",
+      "status": "OK",
+      "target": "tests/database/swaps-races.test.ts"
+    },
+    {
+      "id": "AC8.2.7",
+      "status": "OK",
+      "target": "tests/database/swaps-for-later-units.test.ts"
+    },
+    {
+      "id": "BR73",
+      "status": "OK",
+      "target": "tests/database/swaps-for-later-units.test.ts"
+    },
+    {
+      "id": "BR77.4",
+      "status": "OK",
+      "target": "tests/database/swaps-for-later-units.test.ts"
+    },
+    {
+      "id": "NFR10.1",
+      "status": "OK",
+      "target": "tests/database/swaps-for-later-units.test.ts"
+    },
+    {
+      "id": "C9",
+      "status": "OK",
+      "target": "tests/database/swaps-for-later-units.test.ts"
+    },
+    {
+      "id": "C16",
+      "status": "OK",
+      "target": "tests/database/swaps-for-later-units.test.ts"
+    },
+    {
+      "id": "C19",
+      "status": "OK",
+      "target": "tests/database/swaps-for-later-units.test.ts"
+    },
+    {
+      "id": "NFR9.1",
+      "status": "OK",
+      "target": "tests/database/swaps-timing.test.ts"
+    },
+    {
+      "id": "NFR9.2",
+      "status": "OK",
+      "target": "tests/database/swaps-timing.test.ts"
+    },
+    {
+      "id": "NFR9.3",
+      "status": "OK",
+      "target": "tests/database/swaps-timing.test.ts"
+    },
+    {
+      "id": "NFR8",
+      "status": "OK",
+      "target": "tests/browser/swaps.spec.ts"
+    },
+    {
+      "id": "NFR9.4",
+      "status": "OK",
+      "target": "tests/browser/swaps.spec.ts"
+    }
+  ]
+}

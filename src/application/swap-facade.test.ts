@@ -93,6 +93,7 @@ class SwapPort implements ParentApplicationPort {
           version: 1,
           ownTaskTitle: "A",
           ownTaskStartsAt: "2026-11-02T10:00:00Z",
+          status: "open" as const,
         },
       ],
     });

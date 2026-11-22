@@ -126,8 +126,9 @@ describe("honest executable denominator", () => {
     // (src/application/library-facade.ts, library-format.ts) and the data adapter (src/data/library.ts: 3), the shared library code
     // (app/_library: person, facade resolver, address check, result mapper, actions, forms and screens: 7) and the six
     // pages under konyvtar in the parent and teacher areas (4 + 2): 276 + 16. The admin area's four library pages
-    // (a super admin without a parent record of their own opens the library there): 292 + 4.
-    expect(inventory.length).toBe(296);
+    // (a super admin without a parent record of their own opens the library there): 292 + 4. U7 adds the administrator
+    // swap list page (app/admin/cserek/page.tsx): 296 + 1.
+    expect(inventory.length).toBe(297);
     for (const path of [
       "src/runtime/AppNav.tsx",
       "src/runtime/StatusBadge.tsx",

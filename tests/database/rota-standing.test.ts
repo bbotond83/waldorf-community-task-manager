@@ -335,8 +335,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
         true,
         await version("change_requests", id),
       ]);
-      assert.equal(refused.code, "DUTY_INELIGIBLE");
-      assert.equal(refused.reason, undefined);
+      assert.equal(refused.code, "SWAP_CANNOT_BE_APPLIED");
       assert.equal(
         (await db.query("select status from change_requests where id = $1", [id])).rows[0].status,
         "open",

@@ -466,3 +466,16 @@ used_by:
 - C16: `library_removal_preview(kind, id)` and `library_removal_apply(kind, id)` also delete the subject's return watches, clear closed-loan borrower links and clear the owner link of the subject's books, besides flagging held books. Both return `held_loan_ids` (opaque open-loan ids, no names or titles) beside `to_clear` and `to_flag`. A subject that holds nothing returns zero counts and an empty list.
 - C17: `migration_load_book(source_key, organization_id, payload)` takes a title, authors, an optional description and either an owner parent (`owner_parent_id`) or a typed owner name (`owner_name`). A second call with the same source key creates nothing. The refusal fields are `title`, `authors`, `description`, `owner` (`one_only` or `one_required`), `owner_name` and `owner_parent_id`; the answer carries no cell value. Reads of a removed, missing or other-community book answer the same BOOK_UNAVAILABLE refusal.
 - C3 and C20: used unchanged (the changeover date and the family standing).
+
+## Deltas from U7 (swaps and duty changes)
+
+- C1: every swap, cancellation and reassignment command locks the duty rows ascending, then the place rows ascending, then the request row, in one pass; no command locks a family row just to check a family's standing. The audit action list gains `swap.reversed` and `duty.reassigned`.
+- C5: `place_add(task, family)` is added (internal): it gives a duty that has room a place for one family (BR74.1). A swap exchanges the family on the two place rows; the duty rows do not move.
+- C8: the notice registry gains the target `change_request` (facts function `notice_facts_change_request`) and the kinds `swap_withdrawn`, `swap_expired`, `swap_cancelled`, `swap_reversed` and `duty_reassigned`.
+- C9: the check `dutychanges_swap_expiry_check` joins the daily checks; it expires open swaps and cancellation requests whose earlier duty has started and returns their places to active.
+- C11: `rota_check_change` accepts a change that names no new family; `rota_adjust_picks_after_change` follows an exchange of two places.
+- C16: `dutychanges_removal_preview` and `dutychanges_removal_apply` end every open request of a removed family and tell the other family; closed requests keep their rows.
+- C19: a duty with an open request cannot be changed by another command; the new block is `dutychanges_lock`.
+- Reads: `swap_candidates`, `swap_incoming`, `swap_list`, `cancellation_list` and `rota_week_duties` (super admin only, for the rota hand-over panel) are new; `change_requests` stays closed to direct reads. `swap_decide` loses its grant (BR75.4); `dashboard_get` and `notification_list` read the open requests.
+- Commands: `swap_request`, `swap_respond`, `swap_withdraw`, `cancellation_request`, `cancellation_decide`, `duty_reassign` and `swap_reverse`, each ending through the usual envelope with `revoke all` and an explicit `grant execute`.
+

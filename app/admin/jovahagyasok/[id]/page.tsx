@@ -53,6 +53,10 @@ export default async function ApprovalDetailPage({
               <p>
                 Állapot: <StatusBadge {...statusDisplay(approval.state)} />
               </p>
+              <p className="form-hint" data-testid="admin-approval-rota-note">
+                Ha a kérelem heti beosztás feladatáról szól, a jóváhagyás után a hét üres marad, és
+                a beosztásban „lemondva” jelenik meg.
+              </p>
               <p className="admin-safe-reason">
                 A kérelem részletei a jóváhagyási típus engedélyezett, személyes adatot nem
                 tartalmazó összefoglalója.

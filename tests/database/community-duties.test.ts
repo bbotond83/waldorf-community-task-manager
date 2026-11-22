@@ -171,13 +171,14 @@ for (const schema of DIRECTORY_SCHEMAS) {
 
     it("BR4.3 allowed", async () => {
       await addSource();
-      assert.equal((await swap(PARENT_F1, SWAP_SOURCE, ASSIGNMENT_F2_T3)).state, "success");
       const candidates = await call(PARENT_F2, "swap_candidates($1)", [ASSIGNMENT_F2_T3]);
       assert.equal(candidates.state, "success");
+      const made = await swap(PARENT_F1, SWAP_SOURCE, ASSIGNMENT_F2_T3);
+      assert.equal(made.state, "success", JSON.stringify(made));
     });
     it("BR4.3 pending refused", async () => {
       const result = await swap(PARENT_F2, ASSIGNMENT_F2_T3, ASSIGNMENT_F1_T1);
-      assert.deepEqual([result.state, result.code], ["conflict", "REQUEST_CONFLICT"]);
+      assert.deepEqual([result.state, result.code], ["conflict", "REQUEST_DUPLICATE"]);
     });
     it("BR4.3 other community", async () => {
       await addSource();

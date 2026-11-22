@@ -490,9 +490,14 @@ for (const schema of DIRECTORY_SCHEMAS) {
         | { task_id: string; task_version: number; place_id: string; place_version: number }
         | undefined;
       assert.ok(duty, "the first family holds a weekend duty");
-      const refused = async (account: string, sql: string, values: unknown[]) => {
+      const refused = async (
+        account: string,
+        sql: string,
+        values: unknown[],
+        code = "DUTY_ROTA_MANAGED",
+      ) => {
         const result = await call(account, sql, values);
-        assert.deepEqual([result.state, result.code], ["conflict", "DUTY_ROTA_MANAGED"], sql);
+        assert.deepEqual([result.state, result.code], ["conflict", code], sql);
       };
       await refused(PARENT_F2, "duty_sign_up($1, $2, $3)", [
         nextKey("a"),
@@ -510,18 +515,20 @@ for (const schema of DIRECTORY_SCHEMAS) {
         duty.place_id,
         duty.place_version,
       ]);
-      await refused(PARENT_F1, "swap_request($1, $2, $3, $4, $5, null)", [
-        nextKey("a"),
-        duty.place_id,
-        duty.place_version,
-        ASSIGNMENT_F2_T3,
-        1,
-      ]);
-      await refused(PARENT_F1, "cancellation_request($1, $2, $3, null)", [
-        nextKey("a"),
-        duty.place_id,
-        duty.place_version,
-      ]);
+      // U7: a weekend slot duty follows its week, so a swap of it has its own refusal.
+      await refused(
+        PARENT_F1,
+        "swap_request($1, $2, $3, $4, $5, null)",
+        [nextKey("a"), duty.place_id, duty.place_version, ASSIGNMENT_F2_T3, 1],
+        "SWAP_SLOT_FOLLOWS_WEEK",
+      );
+      // U7: cancelling a rota duty is a request now; this one is refused for its own reason.
+      await refused(
+        PARENT_F1,
+        "cancellation_request($1, $2, $3, null)",
+        [nextKey("a"), duty.place_id, duty.place_version],
+        "SWAP_SLOT_FOLLOWS_WEEK",
+      );
       await refused(SUPER_ADMIN, "task_save($1, $2::jsonb)", [
         nextKey("a"),
         JSON.stringify({ id: duty.task_id, expected_version: duty.task_version, title: "Más" }),

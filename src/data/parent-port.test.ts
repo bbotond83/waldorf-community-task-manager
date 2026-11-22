@@ -251,7 +251,7 @@ test("swap and cancellation refusals keep their codes", async () => {
   for (const [state, code] of [
     ["invalidated", "REQUEST_VERSION_STALE"],
     ["conflict", "REQUEST_DUPLICATE"],
-    ["conflict", "REQUEST_CONFLICT"],
+    ["conflict", "DUTY_INELIGIBLE"],
     ["conflict", "DUTY_ALREADY_ASSIGNED"],
     ["conflict", "SWAP_CANNOT_BE_APPLIED"],
   ] as const) {
@@ -451,6 +451,7 @@ test("the family's open requests carry the kind and direction, with the partner 
       request_id: id(1),
       kind: "swap",
       version: 1,
+      status: "open",
       direction: "incoming",
       own_task_title: "Díszítés",
       own_task_starts_at: "2026-11-03T10:00:00+00:00",
@@ -462,6 +463,7 @@ test("the family's open requests carry the kind and direction, with the partner 
       request_id: id(2),
       kind: "cancellation",
       version: 2,
+      status: "open",
       direction: "outgoing",
       own_task_title: "Sütés",
       own_task_starts_at: "2026-11-02T10:00:00+00:00",
@@ -530,8 +532,5 @@ test("the contribution note is saved against the duty and returned trimmed", asy
 });
 
 test("the parent use cases that change assignments are listed for U4", () => {
-  assert.deepEqual(
-    [...PARENT_NOTIFICATION_USE_CASES],
-    ["duty.sign_up", "swap.request", "swap.respond", "swap.withdraw", "cancellation.request"],
-  );
+  assert.deepEqual([...PARENT_NOTIFICATION_USE_CASES], ["duty.sign_up"]);
 });

@@ -1,0 +1,34 @@
+{
+  "stage": "functional-design",
+  "unit": "u7-swaps-and-duty-changes",
+  "upstream_ids": [
+    "AC5.4.1", "AC5.4.2", "AC5.4.3", "AC5.4.4", "AC5.4.5", "AC5.4.6",
+    "AC8.2.1", "AC8.2.2", "AC8.2.3", "AC8.2.4", "AC8.2.5", "AC8.2.6", "AC8.2.7", "AC8.2.8", "AC8.2.9", "AC8.2.10",
+    "AC8.3.1", "AC8.3.2"
+  ],
+  "coverage": [
+    { "id": "AC5.4.1", "status": "OK", "target": "BR70.2, BR74.1, BR74.4" },
+    { "id": "AC5.4.2", "status": "OK", "target": "BR74.2" },
+    { "id": "AC5.4.3", "status": "OK", "target": "BR72.3, BR74.4" },
+    { "id": "AC5.4.4", "status": "OK", "target": "BR74.3, BR75.2, BR73.2" },
+    { "id": "AC5.4.5", "status": "OK", "target": "BR70.1, BR70.2" },
+    { "id": "AC5.4.6", "status": "OK", "target": "BR74.4" },
+    { "id": "AC8.2.1", "status": "OK", "target": "BR70.1, BR71.1, BR72.1, BR72.2, BR77.2" },
+    { "id": "AC8.2.2", "status": "OK", "target": "BR71.4" },
+    { "id": "AC8.2.3", "status": "OK", "target": "BR72.3, BR71.2" },
+    { "id": "AC8.2.4", "status": "OK", "target": "BR70.2, BR75.1, BR75.3" },
+    { "id": "AC8.2.5", "status": "OK", "target": "BR72.4" },
+    { "id": "AC8.2.6", "status": "OK", "target": "BR72.5" },
+    { "id": "AC8.2.7", "status": "OK", "target": "BR73.1" },
+    { "id": "AC8.2.8", "status": "OK", "target": "BR71.3" },
+    { "id": "AC8.2.9", "status": "OK", "target": "BR71.3, BR71.5, BR72.1, BR77.1" },
+    { "id": "AC8.2.10", "status": "OK", "target": "BR75.2" },
+    { "id": "AC8.3.1", "status": "OK", "target": "BR70.3, BR71.5, BR75.1" },
+    { "id": "AC8.3.2", "status": "OK", "target": "BR70.3, BR76.1, BR76.2, BR76.3" }
+  ],
+  "reverse": [
+    { "id": "BR75.4", "status": "N/A", "target": "owner's answer Q4: administrators no longer approve or reject pending swaps" },
+    { "id": "BR77.3", "status": "N/A", "target": "contract C16: this unit's removal block for U14" },
+    { "id": "BR77.4", "status": "N/A", "target": "team.md Testing Posture: the fixed list of database tests" }
+  ]
+}

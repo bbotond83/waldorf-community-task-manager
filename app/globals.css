@@ -1365,6 +1365,27 @@ nav a:hover {
   gap: 0.75rem;
 }
 
+.swap-request-reason {
+  margin: 0.5rem 0;
+  padding: 0.5rem 0.75rem;
+  border-left: 0.35rem solid var(--color-border);
+  background: var(--color-info-bg);
+  color: var(--color-read-text);
+  font-style: italic;
+}
+
+.swap-status-chip {
+  display: inline-block;
+  padding: 0.2rem 0.7rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-read-bg);
+  color: var(--color-read-text);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 600;
+  vertical-align: middle;
+}
+
 /*
  * Notification card: the whole content is one link on the left, the "read" checkbox sits beside
  * it on the right. The form is transparent to the grid so the status message can span the card.
@@ -3787,5 +3808,27 @@ nav a:hover {
   border: 0;
   padding: 0;
   background: transparent;
+  box-shadow: none;
+}
+
+/* An administrator swap card: the pair as the title, the status under it, the reverse form as a plain block. */
+.admin-swap-card {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 1rem;
+}
+.admin-swap-card h2 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+.admin-swap-card p {
+  margin: 0;
+}
+.admin-swap-card form {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
   box-shadow: none;
 }

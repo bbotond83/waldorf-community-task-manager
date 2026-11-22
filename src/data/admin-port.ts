@@ -15,6 +15,9 @@ import {
   decideApproval,
   getDashboard,
   listApprovals,
+  listSwaps,
+  reassignDuty,
+  reverseSwap,
   listTasks,
   removeAssignment,
   saveTask,
@@ -35,15 +38,13 @@ import { listFamilyNames } from "./working-groups.ts";
 
 /**
  * The use cases of this adapter that change a family's assignments, and so need a notification once U4
- * connects them (BR31.10): the admin's decisions, a place given or removed, a task that is cancelled (its
- * places are removed) and a family that is archived. Together with the parent adapter's list this is every
+ * connects them (BR31.10): a place given or removed, a task that is cancelled (its places are removed) and a family
+ * that is archived. The cancellation decision, the reassignment and the swap reversal decide their own notices (U7). Together with the parent adapter's list this is every
  * use case that changes assignments; a test asserts it.
  */
 export const ADMIN_NOTIFICATION_USE_CASES = Object.freeze([
   "assignment.assign",
   "assignment.remove",
-  "swap.decide",
-  "cancellation.decide",
   "task.save",
   "family.archive",
 ] as const);
@@ -62,6 +63,9 @@ export const DATABASE_ADMIN_OPERATIONS: readonly AdminOperation[] = Object.freez
   "assignments.remove",
   "approvals.list",
   "approvals.decide",
+  "swaps.list",
+  "swaps.reverse",
+  "duties.reassign",
   "governance.list",
   "governance.update",
   "lifecycle.list",
@@ -125,6 +129,12 @@ export class DatabaseAdminPort implements AdminApplicationPort {
         return listApprovals(this.gateway, input.payload);
       case "approvals.decide":
         return decideApproval(this.gateway, call);
+      case "swaps.list":
+        return listSwaps(this.gateway, input.payload);
+      case "swaps.reverse":
+        return reverseSwap(this.gateway, call);
+      case "duties.reassign":
+        return reassignDuty(this.gateway, call);
       case "governance.list":
         return listGrants(this.gateway);
       case "governance.update":

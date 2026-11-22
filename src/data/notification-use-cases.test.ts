@@ -27,9 +27,13 @@ function definitions(): Map<string, Fn> {
     .sort()) {
     const text = readFileSync(`${DIRECTORY}/${file}`, "utf8");
     const statements = text.matchAll(
-      /create (?:or replace )?function (\w+)\s*\(|alter function (\w+)\s*\([^)]*\)\s*rename to (\w+)/gi,
+      /create (?:or replace )?function (\w+)\s*\(|alter function (\w+)\s*\([^)]*\)\s*rename to (\w+)|drop function (?:if exists )?(\w+)\s*\(/gi,
     );
     for (const match of statements) {
+      if (match[4]) {
+        functions.delete(match[4]);
+        continue;
+      }
       if (match[2]) {
         const moved = functions.get(match[2]);
         if (moved) {
@@ -107,6 +111,22 @@ const ROTA_DECIDED_ITSELF = [
   "weekend_pick_assign",
 ];
 
+/**
+ * U7 (20261059) replaces the wrapped swap and cancellation functions of U3 and U4 with functions that decide their own
+ * notices and reminders inside the same transaction (a proposal, an answer, a withdrawal, a reversal and a reassignment
+ * tell the families concerned; a cancellation request and its decision are the exception that has its own notice kind).
+ * So none is a wrapped use case of the hand-off list; `tests/database/swaps-*.test.ts` proves them.
+ */
+const U7_DECIDED_ITSELF = [
+  "swap_request",
+  "swap_respond",
+  "swap_withdraw",
+  "cancellation_request",
+  "cancellation_decide",
+  "duty_reassign",
+  "swap_reverse",
+];
+
 test("the use cases U4 must connect to notifications are exactly the callable functions that change assignments", () => {
   const functions = definitions();
   assert.ok(functions.size > 80, "the migrations were read");
@@ -116,7 +136,8 @@ test("the use cases U4 must connect to notifications are exactly the callable fu
       (name) =>
         callable.has(name) &&
         !IMPORT_WITHOUT_NOTICES.includes(name) &&
-        !ROTA_DECIDED_ITSELF.includes(name),
+        !ROTA_DECIDED_ITSELF.includes(name) &&
+        !U7_DECIDED_ITSELF.includes(name),
     )
     .sort();
   const listed = NOTIFICATION_USE_CASES.map((name) => name.replaceAll(".", "_")).sort();
@@ -140,6 +161,7 @@ test("the internal helpers that change assignments are reached only through list
     ...NOTIFICATION_USE_CASES.map((name) => name.replaceAll(".", "_")),
     ...IMPORT_WITHOUT_NOTICES,
     ...ROTA_DECIDED_ITSELF,
+    ...U7_DECIDED_ITSELF,
   ]);
   for (const helper of internal) {
     const callers = [...functions.values()].filter(
@@ -157,14 +179,9 @@ test("the internal helpers that change assignments are reached only through list
  * leaves without behaviour must not have a wrapper at all. The behaviour itself is proven on the real stack by
  * `tests/database/notifications-handoff.test.ts`.
  */
-const WITHOUT_BEHAVIOUR = ["swap_withdraw", "cancellation_request", "family_restore"];
-/** U2 puts a wrapper on these two that only refuses a rota duty (BR25.1); it still writes no notice and plans no job. */
-const ROTA_GUARD_ONLY = ["swap_withdraw", "cancellation_request"];
-/** The two decisions share one body; the wrapper is placed there. */
-const SHARED_BODY: Record<string, string> = {
-  swap_decide: "coordination_decide",
-  cancellation_decide: "coordination_decide",
-};
+const WITHOUT_BEHAVIOUR = ["family_restore"];
+const ROTA_GUARD_ONLY: string[] = [];
+const SHARED_BODY: Record<string, string> = {};
 
 test("every use case of the list and every extra function has a U4 hook, or is decided to have none", () => {
   const functions = definitions();
@@ -212,9 +229,6 @@ test("a refusal or a replay of a wrapped use case writes nothing: the hook runs 
     "duty_sign_up",
     "assignment_assign",
     "assignment_remove",
-    "swap_request",
-    "swap_respond",
-    "coordination_decide",
     "family_archive",
     "task_save",
     "event_save",
@@ -266,5 +280,45 @@ test("the U10 functions change no assignment and are not part of the hand-off li
       false,
       `${name} is not a wrapped use case`,
     );
+  }
+});
+
+/**
+ * U7 functions decide their own notices (BR71.5, BR72.2, BR72.5, BR73.2, BR74.3, BR75.2, BR76.3): each of them that
+ * tells someone does it through the helpers that write the notice and the reminder plan inside the same function, and
+ * only after the work has succeeded and the key is not a replay.
+ */
+test("the U7 functions are defined and tell the families through their own helpers", () => {
+  const functions = definitions();
+  const callable = callableBySignedInAccounts();
+  for (const name of U7_DECIDED_ITSELF) {
+    assert.ok(functions.has(name), `${name} exists`);
+    assert.ok(callable.has(name), `${name} is callable by signed-in accounts`);
+    assert.equal(functions.has(`${name}_core`), false, `${name} has no wrapper`);
+    assert.doesNotMatch(functions.get(name)!.body, /notification_after_/, name);
+  }
+  for (const name of [
+    "swap_request",
+    "swap_respond",
+    "swap_withdraw",
+    "swap_reverse",
+    "cancellation_decide",
+  ]) {
+    assert.match(functions.get(name)!.body, /dutychanges_notify\(/, `${name} tells the families`);
+  }
+  assert.match(functions.get("duty_reassign")!.body, /notice_send\(/);
+  for (const retired of [
+    "swap_decide",
+    "coordination_decide",
+    "coordination_decide_core",
+    "swap_request_core",
+    "swap_respond_core",
+    "swap_withdraw_core",
+    "cancellation_request_core",
+    "notification_after_swap_request",
+    "notification_after_swap_response",
+    "notification_after_decision",
+  ]) {
+    assert.equal(functions.has(retired), false, `${retired} is gone`);
   }
 });

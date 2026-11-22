@@ -129,7 +129,7 @@ describe("the swap request page with a partner list", () => {
 
   it("sends the chosen partner, both versions, the reason and a new key for every attempt", async () => {
     // The first attempt is refused, so the form keeps the choice and the reason for the second.
-    world.answer = { state: "conflict", message: "Nem sikerült.", code: "REQUEST_CONFLICT" };
+    world.answer = { state: "conflict", message: "Nem sikerült.", code: "DUTY_INELIGIBLE" };
     await renderSwapPage();
     fireEvent.click(screen.getAllByRole("radio")[1]!);
     fireEvent.change(screen.getByLabelText("Indoklás"), { target: { value: "Beteg a gyerek" } });
@@ -204,6 +204,7 @@ const INCOMING: SwapRequestView = {
   version: 2,
   ownTaskTitle: "Kerti előkészítés",
   ownTaskStartsAt: "2026-11-05T08:00:00+00:00",
+  status: "open",
   partnerTaskTitle: "Sütés",
   partnerTaskStartsAt: "2026-11-10T09:00:00+00:00",
   partnerFamilyName: "Napraforgó család",
@@ -223,8 +224,54 @@ const OUTGOING_CANCELLATION: SwapRequestView = {
   version: 1,
   ownTaskTitle: "Takarítás",
   ownTaskStartsAt: "2026-11-12T08:00:00+00:00",
+  status: "open",
   ownWhen: "2026. november 12. 09:00",
 };
+
+describe("the ended requests of the swaps board", () => {
+  const ended = (id: string, status: SwapRequestView["status"], endedReason: string) => ({
+    ...OUTGOING_SWAP,
+    id,
+    status,
+    endedReason,
+    reason: "Időpont-ütközés",
+  });
+
+  it("lists each ended request with its status and why it ended, and no button", () => {
+    render(
+      <SwapRequestsBoard
+        incoming={[]}
+        outgoing={[]}
+        ended={[
+          ended("22222222-0000-4000-8000-000000000001", "expired", "earlier_duty_started"),
+          ended("22222222-0000-4000-8000-000000000002", "rejected", "declined"),
+          ended("22222222-0000-4000-8000-000000000003", "withdrawn", "withdrawn_by_requester"),
+        ]}
+      />,
+    );
+    expect(screen.getByRole("heading", { level: 2, name: "Lezárt kérések" })).toBeVisible();
+    expect(screen.getByText("Lejárt")).toBeVisible();
+    expect(screen.getByText("Elutasítva")).toBeVisible();
+    expect(screen.getByText("Visszavonva")).toBeVisible();
+    expect(screen.getByText("A korábbi feladat már elkezdődött.")).toBeVisible();
+    expect(screen.getByText("A másik család elutasította.")).toBeVisible();
+    expect(screen.getAllByText("„Időpont-ütközés”")).toHaveLength(3);
+    expect(screen.queryByRole("button")).toBeNull();
+    expect(screen.queryByTestId("swap-requests-empty")).toBeNull();
+  });
+
+  it("shows no ended section when nothing ended", () => {
+    render(<SwapRequestsBoard incoming={[INCOMING]} outgoing={[]} />);
+    expect(screen.queryByTestId("swap-ended-section")).toBeNull();
+  });
+
+  it("shows the reason on an open request", () => {
+    render(
+      <SwapRequestsBoard incoming={[{ ...INCOMING, reason: "Beteg a gyerek" }]} outgoing={[]} />,
+    );
+    expect(screen.getByText("„Beteg a gyerek”")).toBeVisible();
+  });
+});
 
 describe("the incoming swaps board", () => {
   it("names the partner task on Confirm and Decline and the own task on Withdraw", () => {

@@ -256,7 +256,13 @@ for (const schema of DIRECTORY_SCHEMAS) {
         candidates: (assignmentId: string) => port.listSwapCandidates!({ ...base, assignmentId }),
         incoming: () => port.listSwapRequests!(base),
         respond: (requestId: string, accept: boolean) =>
-          port.respondToSwap!({ ...base, requestId, accept, idempotencyKey: nextKey("rs") }),
+          port.respondToSwap!({
+            ...base,
+            requestId,
+            accept,
+            expectedVersion: 1,
+            idempotencyKey: nextKey("rs"),
+          }),
         withdraw: (requestId: string) =>
           port.withdrawRequest!({ ...base, requestId, idempotencyKey: nextKey("wd") }),
         note: (dutyId: string, note: string) =>
@@ -500,8 +506,8 @@ for (const schema of DIRECTORY_SCHEMAS) {
           data: { id: requested.data.id, outcome: "applied" },
         });
         assert.equal(
-          (await sql("select task_id from assignments where id = $1", [A_F1_T4]))[0].task_id,
-          TASK_5,
+          (await sql("select family_id from assignments where id = $1", [A_F1_T4]))[0].family_id,
+          FAMILY_2,
           "the places were exchanged",
         );
         refused(await f2.respond(requested.data.id, true), "conflict", "SWAP_REQUEST_NOT_OPEN");
@@ -583,7 +589,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
           "the new request is listed",
         );
         assert.equal(item.title, "Lemondási kérelem – Sütés");
-        const decided = await admin("adminSame", "approvals.decide", {
+        const decided = await admin("super", "approvals.decide", {
           id: fresh.data.id,
           expectedVersion: item.version,
           decision: "approved",
@@ -1216,6 +1222,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
           ...f2Input,
           requestId: requested.data.id,
           accept: true,
+          expectedVersion: 1,
           idempotencyKey: nextKey("fac-rs"),
         });
         assert.equal(answered.state, "success");
@@ -1375,7 +1382,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
         const placeId = first.state === "success" ? first.data.id : "";
         check(await f1.cancel(ASSIGNMENT_F1_T1, 1), "conflict", "REQUEST_DUPLICATE");
         check(await f1.cancel(placeId, 99), "invalidated", "REQUEST_VERSION_STALE");
-        check(await f1.swap(placeId, ASSIGNMENT_F1_T1, 1, 1), "conflict", "REQUEST_CONFLICT");
+        check(await f1.swap(placeId, ASSIGNMENT_F1_T1, 1, 1), "conflict", "DUTY_ALREADY_ASSIGNED");
         await swapWorld();
         const swapped = await f1.swap(
           A_F1_T4,
@@ -1388,7 +1395,10 @@ for (const schema of DIRECTORY_SCHEMAS) {
         await db.query("update tasks set starts_at = now() - interval '1 day' where id = $1", [
           TASK_5,
         ]);
-        check(await f2.respond(swapped.data.id, true), "conflict", "SWAP_CANNOT_BE_APPLIED");
+        check(await f2.respond(swapped.data.id, true), "conflict", "SWAP_EXPIRED");
+        await db.query("update tasks set starts_at = now() + interval '15 days' where id = $1", [
+          TASK_5,
+        ]);
         const withdrawnFirst = await f1.withdraw(swapped.data.id);
         assert.equal(withdrawnFirst.state, "success");
         check(await f2.respond(swapped.data.id, true), "conflict", "SWAP_REQUEST_NOT_OPEN");
@@ -1402,20 +1412,34 @@ for (const schema of DIRECTORY_SCHEMAS) {
           await version("assignments", A_F2_T5),
         );
         assert.equal(second.state, "success");
-        check(await f1.swap(A_F1_T4, A_F2_T5, 1, 1), "conflict", "REQUEST_DUPLICATE");
+        check(
+          await f1.swap(
+            A_F1_T4,
+            A_F2_T5,
+            await version("assignments", A_F1_T4),
+            await version("assignments", A_F2_T5),
+          ),
+          "conflict",
+          "REQUEST_DUPLICATE",
+        );
         const another = await f2.swap(A_F2_T5, A_F1_T4, 99, 99);
         check(another, "invalidated", "REQUEST_VERSION_STALE");
 
-        // Approvals
-        const listed = await admin("adminSame", "approvals.list", { state: "pending" });
+        // Approvals: a swap needs none, so a cancellation request is what the admin decides.
+        if (second.state === "success")
+          assert.equal((await f1.withdraw(second.data.id)).state, "success");
+        const cancelRequest = await f1.cancel(A_F1_T4, await version("assignments", A_F1_T4));
+        assert.equal(cancelRequest.state, "success");
+        const listed = await admin("super", "approvals.list", { state: "pending" });
         const open = must(
           listed.data.items.find(
-            (entry) => entry.id === (second.state === "success" ? second.data.id : ""),
+            (entry) =>
+              entry.id === (cancelRequest.state === "success" ? cancelRequest.data.id : ""),
           ),
           "the open request is listed",
         );
         check(
-          await admin("adminSame", "approvals.decide", {
+          await admin("super", "approvals.decide", {
             id: open.id,
             expectedVersion: 99,
             decision: "approved",
@@ -1425,7 +1449,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
         );
         assert.equal(
           (
-            await admin("adminSame", "approvals.decide", {
+            await admin("super", "approvals.decide", {
               id: open.id,
               expectedVersion: open.version,
               decision: "rejected",
@@ -1434,7 +1458,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
           "success",
         );
         check(
-          await admin("adminSame", "approvals.decide", {
+          await admin("super", "approvals.decide", {
             id: open.id,
             expectedVersion: open.version,
             decision: "rejected",
@@ -1508,7 +1532,19 @@ for (const schema of DIRECTORY_SCHEMAS) {
         // governance screen: the only account that may revoke a super admin's grant is a super admin, and a
         // revoking super admin is always left standing (their own grant answers GRANT_SELF_LOCKOUT first). It is
         // proven by the mapping table in src/data/results.test.ts instead.
-        const unreachable = new Set(["GRANT_LAST_SUPER_ADMIN"]);
+        // The U7 codes that only the swap and duty-change commands return are proven, with their states, by
+        // tests/database/swaps-*.test.ts.
+        const unreachable = new Set([
+          "GRANT_LAST_SUPER_ADMIN",
+          "SWAP_CANNOT_BE_APPLIED",
+          "SWAP_SLOT_FOLLOWS_WEEK",
+          "SWAP_NOT_APPLIED",
+          "SWAP_CHANGED_SINCE",
+          "CANCELLATION_EXPIRED",
+          "REQUEST_CONFLICT",
+          "DUTY_INELIGIBLE",
+          "DUTY_HAS_SEVERAL_PLACES",
+        ]);
         for (const [code, state] of Object.entries(BUSINESS_CODE_STATES)) {
           if (unreachable.has(code)) continue;
           assert.equal(seen.get(code), state, `${code} is returned as ${state}`);

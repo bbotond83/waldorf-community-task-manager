@@ -30,6 +30,7 @@ import {
   TEACHER_G1,
   uuid,
 } from "./directory-support.ts";
+import { failureOf } from "./stack-support.ts";
 
 type Result = Awaited<ReturnType<typeof callFunction>>;
 type Entry = {
@@ -332,7 +333,6 @@ for (const schema of DIRECTORY_SCHEMAS) {
         "parent_profiles",
         "children",
         "contribution_notes",
-        "change_requests",
       ]) {
         const rows = await asActor(
           db,
@@ -343,6 +343,13 @@ for (const schema of DIRECTORY_SCHEMAS) {
         );
         assert.equal(rows, 0, table);
       }
+      // U7: change_requests is closed to every signed-in role; it is read only through the swap functions.
+      const failure = await failureOf(() =>
+        asActor(db, schema, authenticated(TEACHER_G1), () =>
+          db.query("select count(*) from change_requests"),
+        ),
+      );
+      assert.equal(failure?.code, "42501");
     });
   });
 }

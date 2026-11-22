@@ -13,6 +13,28 @@ export type SwapRequestView = SwapRequestItemModel &
 
 const KIND_LABEL = { swap: "Cserekérelem", cancellation: "Lemondási kérelem" } as const;
 
+const STATUS_LABEL: Readonly<Record<SwapRequestItemModel["status"], string>> = {
+  open: "Válaszra vár",
+  applied: "Elfogadva",
+  approved: "Jóváhagyva",
+  rejected: "Elutasítva",
+  withdrawn: "Visszavonva",
+  expired: "Lejárt",
+  cancelled: "Megszűnt",
+  reversed: "Visszafordítva",
+};
+
+/** Why a request ended, in words for the family. */
+const ENDED_REASON_TEXT: Readonly<Record<string, string>> = {
+  declined: "A másik család elutasította.",
+  withdrawn_by_requester: "A kérelmező visszavonta.",
+  earlier_duty_started: "A korábbi feladat már elkezdődött.",
+  duty_started: "A feladat már elkezdődött.",
+  duty_reassigned: "Az adminisztrátor másik családnak adta a feladatot.",
+  family_removed: "A kérelemben szereplő család már nem tagja a közösségnek.",
+  administrator_rejected: "Az adminisztrátor elutasította.",
+};
+
 /**
  * The open requests of the family: the swap requests other families addressed to it, with Confirm and
  * Decline, and the family's own open requests, with Withdraw. One status region at the top announces the
@@ -22,7 +44,13 @@ const KIND_LABEL = { swap: "Cserekérelem", cancellation: "Lemondási kérelem" 
 export function SwapRequestsBoard({
   incoming,
   outgoing,
-}: Readonly<{ incoming: readonly SwapRequestView[]; outgoing: readonly SwapRequestView[] }>) {
+  ended = [],
+}: Readonly<{
+  incoming: readonly SwapRequestView[];
+  outgoing: readonly SwapRequestView[];
+  /** Requests that are no longer open, newest first, each with what became of it. */
+  ended?: readonly SwapRequestView[];
+}>) {
   const [last, setLast] = useState<ParentActionState>({ state: "initial" });
   const regionRef = useRef<HTMLDivElement>(null);
 
@@ -51,7 +79,7 @@ export function SwapRequestsBoard({
           )}
         </div>
       )}
-      {incoming.length === 0 && outgoing.length === 0 && (
+      {incoming.length === 0 && outgoing.length === 0 && ended.length === 0 && (
         <p data-testid="swap-requests-empty">Jelenleg nincs nyitott cserekérelem.</p>
       )}
       <section aria-labelledby="incoming-heading" data-testid="swap-incoming-section">
@@ -92,6 +120,57 @@ export function SwapRequestsBoard({
           </ul>
         )}
       </section>
+      {ended.length > 0 && (
+        <section aria-labelledby="ended-heading" data-testid="swap-ended-section">
+          <h2 id="ended-heading">Lezárt kérések</h2>
+          <ul className="parent-collection" data-testid="swap-ended-list">
+            {ended.map((item) => (
+              <li
+                className="parent-card swap-request-card"
+                key={item.id}
+                data-testid={`swap-ended-${item.id}`}
+              >
+                <EndedCard item={item} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+    </div>
+  );
+}
+
+function ReasonNote({ reason }: Readonly<{ reason?: string | undefined }>) {
+  return reason ? (
+    <blockquote className="swap-request-reason" data-testid="swap-reason">
+      „{reason}”
+    </blockquote>
+  ) : null;
+}
+
+/** A request that is over: its status, why it ended and what was asked, with no button. */
+function EndedCard({ item }: Readonly<{ item: SwapRequestView }>) {
+  const why = item.endedReason ? ENDED_REASON_TEXT[item.endedReason] : undefined;
+  return (
+    <div className="swap-request-text">
+      <h3>
+        {KIND_LABEL[item.kind]}{" "}
+        <span className="swap-status-chip" data-testid={`swap-status-${item.id}`}>
+          {STATUS_LABEL[item.status]}
+        </span>
+      </h3>
+      <p>
+        Az Önök feladata: <strong>{item.ownTaskTitle}</strong> ({item.ownWhen}).
+      </p>
+      {item.kind === "swap" && item.partnerTaskTitle !== undefined && (
+        <p>
+          Cserélnének erre: <strong>{item.partnerTaskTitle}</strong>
+          {item.partnerWhen ? ` (${item.partnerWhen})` : ""}
+          {item.partnerFamilyName ? `, ${item.partnerFamilyName}` : ""}.
+        </p>
+      )}
+      <ReasonNote reason={item.reason} />
+      {why && <p className="form-hint">{why}</p>}
     </div>
   );
 }
@@ -146,6 +225,7 @@ function IncomingCard({
           A csere után ezt a feladatot vállalnák: <strong>{partnerTask}</strong>
           {item.partnerWhen ? ` (${item.partnerWhen})` : ""}.
         </p>
+        <ReasonNote reason={item.reason} />
       </div>
       <input type="hidden" name="id" value={item.id} />
       <input type="hidden" name="expectedVersion" value={item.version} />
@@ -193,6 +273,7 @@ function OutgoingCard({
             {item.partnerFamilyName ? `, ${item.partnerFamilyName}` : ""}.
           </p>
         )}
+        <ReasonNote reason={item.reason} />
         <p className="form-hint">
           {item.kind === "swap"
             ? "A másik család válaszára vagy az adminisztrátor döntésére vár."

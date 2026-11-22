@@ -148,7 +148,6 @@ for (const schema of NOTIFICATION_SCHEMAS) {
       source: { id: string; version: number },
       target: { id: string; version: number },
     ) => {
-      covered.add("swap.request");
       return as(account, "swap_request($1, $2, $3, $4, $5, $6)", [
         nextKey("sw"),
         source.id,
@@ -334,12 +333,11 @@ for (const schema of NOTIFICATION_SCHEMAS) {
       assert.equal(await total(), before + 1, "the requester and their co-parent got nothing");
       assert.deepEqual(await recipients(TASK_P), [FAMILY_A], "a request changes no job");
       // B declines: the requester's parents are told, B gets nothing new.
-      covered.add("swap.respond");
       const declined = await as(ACCOUNT_B, "swap_respond($1, $2, $3, $4)", [
         nextKey("no"),
         requested.reference,
         false,
-        null,
+        1,
       ]);
       assert.deepEqual([declined.state, declined.outcome], ["success", "declined"]);
       assert.deepEqual(await kinds(PARENT_A), ["sign_up_confirmed", "swap_decided"]);
@@ -364,13 +362,16 @@ for (const schema of NOTIFICATION_SCHEMAS) {
       const second = await swapRequest(ACCOUNT_A, aNow, bNow);
       assert.equal(second.state, "success");
       const afterSecond = await total();
-      covered.add("swap.withdraw");
       const withdrawn = await as(ACCOUNT_A, "swap_withdraw($1, $2)", [
         nextKey("wd"),
         second.reference,
       ]);
       assert.equal(withdrawn.state, "success");
-      assert.equal(await total(), afterSecond, "a withdrawal creates no notice");
+      assert.equal(
+        await total(),
+        afterSecond + 1,
+        "a withdrawal tells only the other family's parent",
+      );
       const shown = (await as(ACCOUNT_B, "notification_list()")).items as {
         title: string;
         timing: string;
@@ -388,7 +389,7 @@ for (const schema of NOTIFICATION_SCHEMAS) {
         nextKey("yes"),
         requested.reference,
         true,
-        null,
+        1,
       ]);
       assert.deepEqual([confirmed.state, confirmed.outcome], ["success", "applied"]);
       for (const parent of [PARENT_A, PARENT_A2, PARENT_B]) {
@@ -420,7 +421,6 @@ for (const schema of NOTIFICATION_SCHEMAS) {
     it("lets an admin decide a swap or a cancellation: notices to the families involved, and the jobs follow an approval (swap.decide, cancellation.decide, cancellation.request)", async () => {
       const { a } = await bothSignedUp();
       // A cancellation request creates nothing; a rejection tells the requester and changes no job.
-      covered.add("cancellation.request");
       const before = await total();
       const cancel = await as(ACCOUNT_A, "cancellation_request($1, $2, $3, $4)", [
         nextKey("cr"),
@@ -430,12 +430,11 @@ for (const schema of NOTIFICATION_SCHEMAS) {
       ]);
       assert.equal(cancel.state, "success");
       assert.equal(await total(), before, "admins are not notified in U4");
-      covered.add("cancellation.decide");
       const rejected = await as(ADMIN_G1, "cancellation_decide($1, $2, $3, $4)", [
         nextKey("cd"),
         cancel.reference,
         false,
-        null,
+        1,
       ]);
       assert.deepEqual([rejected.state, rejected.outcome], ["success", "rejected"]);
       assert.deepEqual(await kinds(PARENT_A), ["sign_up_confirmed", "cancellation_decided"]);
@@ -454,7 +453,7 @@ for (const schema of NOTIFICATION_SCHEMAS) {
         nextKey("cd"),
         second.reference,
         true,
-        null,
+        1,
       ]);
       assert.deepEqual([approved.state, approved.outcome], ["success", "approved"]);
       assert.equal(
@@ -469,14 +468,13 @@ for (const schema of NOTIFICATION_SCHEMAS) {
       const bNow = await placeOf(FAMILY_B, TASK_Q);
       const requested = await swapRequest(ACCOUNT_A, aAgain, bNow);
       const countBefore = await total();
-      covered.add("swap.decide");
-      const approvedSwap = await as(ADMIN_G1, "swap_decide($1, $2, $3, $4)", [
+      const accepted = await as(ACCOUNT_B, "swap_respond($1, $2, $3, $4)", [
         nextKey("sd"),
         requested.reference,
         true,
-        null,
+        1,
       ]);
-      assert.deepEqual([approvedSwap.state, approvedSwap.outcome], ["success", "approved"]);
+      assert.deepEqual([accepted.state, accepted.outcome], ["success", "applied"]);
       assert.equal(await total(), countBefore + 3, "A's two parents and B's parent");
       assert.deepEqual(
         [await recipients(TASK_P), await recipients(TASK_Q)],
@@ -485,15 +483,15 @@ for (const schema of NOTIFICATION_SCHEMAS) {
       const aQ = await placeOf(FAMILY_A, TASK_Q);
       const bP = await placeOf(FAMILY_B, TASK_P);
       const again = await swapRequest(ACCOUNT_A, aQ, bP);
-      const beforeReject = await total();
-      const rejectedSwap = await as(ADMIN_G1, "swap_decide($1, $2, $3, $4)", [
+      const beforeDecline = await total();
+      const declined = await as(ACCOUNT_B, "swap_respond($1, $2, $3, $4)", [
         nextKey("sd"),
         again.reference,
         false,
-        null,
+        1,
       ]);
-      assert.deepEqual([rejectedSwap.state, rejectedSwap.outcome], ["success", "rejected"]);
-      assert.equal(await total(), beforeReject + 3, "a rejection tells both families as well");
+      assert.deepEqual([declined.state, declined.outcome], ["success", "declined"]);
+      assert.equal(await total(), beforeDecline + 2, "a decline tells the requester's family");
       assert.deepEqual(
         [await recipients(TASK_P), await recipients(TASK_Q)],
         [[FAMILY_B], [FAMILY_A]],
@@ -864,7 +862,7 @@ for (const schema of NOTIFICATION_SCHEMAS) {
           nextKey("yes"),
           requested.reference,
           true,
-          null,
+          1,
         ]);
         assert.equal(failure?.code, "XX000");
         assert.equal((await placeOf(FAMILY_A, TASK_P)).id, a.id, "the places were not exchanged");

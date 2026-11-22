@@ -878,27 +878,22 @@ test("removing a place sends the assignment and its version", async () => {
   });
 });
 
-const REQUEST_ROW = (extra: Row = {}) => ({
-  id: id(40),
-  kind: "swap",
+const CANCELLATION_ROW = (extra: Row = {}) => ({
+  request_id: id(40),
   status: "open",
   version: 1,
-  assignments: { tasks: { title: "Sütés" } },
+  task_title: "Sütés",
   ...extra,
 });
 
-test("approvals are listed with a title from the kind and the task, and a state filter maps to the stored statuses", async () => {
+test("approvals are the cancellation requests of the admin's reach, titled by the task, and a state filter picks their states", async () => {
   const rows = [
-    REQUEST_ROW(),
-    REQUEST_ROW({
-      id: id(41),
-      kind: "cancellation",
-      status: "applied",
-      assignments: [{ tasks: [{ title: "Díszítés" }] }],
-    }),
-    REQUEST_ROW({ id: id(42), status: "rejected", assignments: null }),
+    CANCELLATION_ROW(),
+    CANCELLATION_ROW({ request_id: id(41), status: "approved", task_title: "Díszítés" }),
+    CANCELLATION_ROW({ request_id: id(42), status: "rejected", task_title: null }),
+    CANCELLATION_ROW({ request_id: id(43), status: "expired" }),
   ];
-  const { fake, run } = admin({ table: tables({ change_requests: rows }) });
+  const { fake, run } = admin({ rpc: () => envelope("success", null, { items: rows }) });
   const outcome = await run("approvals.list", {});
   assert.equal(outcome.state, "success");
   if (outcome.state !== "success") return;
@@ -906,27 +901,26 @@ test("approvals are listed with a title from the kind and the task, and a state 
   assert.deepEqual(
     items.map((item) => [item.title, item.state]),
     [
-      ["Feladatcsere-kérelem – Sütés", "pending"],
+      ["Lemondási kérelem – Sütés", "pending"],
       ["Lemondási kérelem – Díszítés", "approved"],
-      ["Feladatcsere-kérelem", "rejected"],
+      ["Lemondási kérelem", "rejected"],
     ],
   );
-  await run("approvals.list", { state: "approved" });
-  const inStep = fake.queries[1]?.steps.find(([step]) => step === "in");
-  assert.deepEqual(inStep?.[2], ["approved", "applied"]);
-  assert.ok(
-    fake.queries[0]?.steps.some(
-      ([step, column, value]) => step === "neq" && column === "status" && value === "withdrawn",
-    ),
+  assert.equal(fake.rpcCalls[0]?.name, "cancellation_list");
+  const approved = await run("approvals.list", { state: "approved" });
+  assert.equal(
+    approved.state === "success" && (approved.data as { items: unknown[] }).items.length,
+    1,
   );
-  const none = admin({ table: tables({}) });
+  const none = admin({ rpc: () => envelope("success", null, { items: [] }) });
   assert.deepEqual(await none.run("approvals.list", {}), { state: "empty" });
+  const denied = admin({ rpc: () => envelope("denied", "authorization_denied") });
+  assert.deepEqual(await denied.run("approvals.list", {}), { state: "denied" });
 });
 
-test("a decision finds the request kind when the screen does not send it", async () => {
+test("a decision calls the cancellation decision and a swap is not decided here", async () => {
   const { fake, run } = admin({
     rpc: () => envelope("success", null, { outcome: "approved" }, id(40)),
-    table: tables({ change_requests: [{ id: id(40), kind: "cancellation" }] }),
   });
   const outcome = await run(
     "approvals.decide",
@@ -943,34 +937,19 @@ test("a decision finds the request kind when the screen does not send it", async
     { id: id(40), expectedVersion: 1, decision: "rejected", kind: "swap" },
     KEY,
   );
-  assert.equal(fake.rpcCalls[1]?.name, "swap_decide");
-  assert.equal(fake.rpcCalls[1]?.args.p_approve, false);
-  assert.equal(swap.state, "success");
+  assert.deepEqual(swap, { state: "denied" });
+  assert.equal(fake.rpcCalls.length, 1);
 });
 
 test("a decision reads the outcome from what the admin sent when the key is repeated", async () => {
   const { run } = admin({ rpc: () => envelope("success", "replayed", {}, id(40)) });
   assert.deepEqual(
-    await run(
-      "approvals.decide",
-      { id: id(40), expectedVersion: 1, decision: "rejected", kind: "swap" },
-      KEY,
-    ),
-    {
-      state: "success",
-      data: { outcome: "rejected" },
-    },
+    await run("approvals.decide", { id: id(40), expectedVersion: 1, decision: "rejected" }, KEY),
+    { state: "success", data: { outcome: "rejected" } },
   );
   assert.deepEqual(
-    await run(
-      "approvals.decide",
-      { id: id(40), expectedVersion: 1, decision: "approved", kind: "swap" },
-      KEY,
-    ),
-    {
-      state: "success",
-      data: { outcome: "approved" },
-    },
+    await run("approvals.decide", { id: id(40), expectedVersion: 1, decision: "approved" }, KEY),
+    { state: "success", data: { outcome: "approved" } },
   );
 });
 
@@ -981,8 +960,8 @@ test("a missing or unknown decision is refused and nothing is sent to the databa
     });
     const payload =
       decision === undefined
-        ? { id: id(40), expectedVersion: 1, kind: "swap" }
-        : { id: id(40), expectedVersion: 1, kind: "swap", decision };
+        ? { id: id(40), expectedVersion: 1 }
+        : { id: id(40), expectedVersion: 1, decision };
     assert.deepEqual(await run("approvals.decide", payload, KEY), {
       state: "validation",
       fieldErrors: { decision: "VAL-INVALID" },
@@ -992,26 +971,19 @@ test("a missing or unknown decision is refused and nothing is sent to the databa
   }
 });
 
-test("approval refusals keep their states and an unknown request is denied", async () => {
+test("approval refusals keep their states and an invalid request id is denied", async () => {
   for (const [state, code] of [
     ["conflict", "APPROVAL_ALREADY_DECIDED"],
     ["invalidated", "APPROVAL_INVALIDATED"],
-    ["conflict", "SWAP_CANNOT_BE_APPLIED"],
+    ["conflict", "CANCELLATION_EXPIRED"],
   ] as const) {
     const { run } = admin({ rpc: () => envelope(state, code) });
     assert.deepEqual(
-      await run(
-        "approvals.decide",
-        { id: id(40), expectedVersion: 1, decision: "approved", kind: "swap" },
-        KEY,
-      ),
+      await run("approvals.decide", { id: id(40), expectedVersion: 1, decision: "approved" }, KEY),
       { state, code },
     );
   }
-  const { run } = admin({ table: tables({}) });
-  assert.deepEqual(await run("approvals.decide", { id: id(40), expectedVersion: 1 }, KEY), {
-    state: "denied",
-  });
+  const { run } = admin({});
   assert.deepEqual(await run("approvals.decide", { id: "x", expectedVersion: 1 }, KEY), {
     state: "denied",
   });
@@ -1276,13 +1248,109 @@ test("the reminder operations and the family name list are answered by the datab
 test("the admin use cases that change assignments are listed for U4", () => {
   assert.deepEqual(
     [...ADMIN_NOTIFICATION_USE_CASES],
+    ["assignment.assign", "assignment.remove", "task.save", "family.archive"],
+  );
+});
+
+test("swaps are listed with both families and duties, and an applied swap that can no longer be reversed says so", async () => {
+  const swap = (extra: Row = {}) => ({
+    request_id: id(50),
+    status: "applied",
+    version: 3,
+    can_reverse: true,
+    source_family_name: "Fenyő család",
+    source_task_title: "Sütés",
+    target_family_name: "Bükk család",
+    target_task_title: "Takarítás",
+    ...extra,
+  });
+  const { fake, run } = admin({
+    rpc: () =>
+      envelope("success", null, {
+        items: [
+          swap(),
+          swap({ request_id: id(51), can_reverse: false }),
+          swap({ request_id: id(52), status: "open" }),
+        ],
+      }),
+  });
+  const outcome = await run("swaps.list", { schoolYearId: id(9) });
+  assert.equal(outcome.state, "success");
+  if (outcome.state !== "success") return;
+  const items = (outcome.data as { items: { title: string; state: string; version: number }[] })
+    .items;
+  assert.deepEqual(
+    items.map((item) => [item.state, item.version]),
     [
-      "assignment.assign",
-      "assignment.remove",
-      "swap.decide",
-      "cancellation.decide",
-      "task.save",
-      "family.archive",
+      ["applied", 3],
+      ["applied-final", 3],
+      ["pending", 3],
     ],
+  );
+  assert.equal(items[0]?.title, "Fenyő család: Sütés ↔ Bükk család: Takarítás");
+  assert.deepEqual(fake.rpcCalls[0], { name: "swap_list", args: { p_school_year_id: id(9) } });
+  const none = admin({ rpc: () => envelope("success", null, { items: [] }) });
+  assert.deepEqual(await none.run("swaps.list", {}), { state: "empty" });
+  const denied = admin({ rpc: () => envelope("denied", "authorization_denied") });
+  assert.deepEqual(await denied.run("swaps.list", {}), { state: "denied" });
+});
+
+test("a swap is reversed by its request id and version, and refusals keep their states", async () => {
+  const { fake, run } = admin({ rpc: () => envelope("success", null, {}, id(50)) });
+  const done = await run("swaps.reverse", { id: id(50), expectedVersion: 3 }, KEY);
+  assert.deepEqual(done, {
+    state: "success",
+    data: { id: id(50), title: "", state: "reversed", version: 4 },
+  });
+  assert.deepEqual(fake.rpcCalls[0], {
+    name: "swap_reverse",
+    args: { p_idempotency_key: KEY, p_request_id: id(50), p_expected_version: 3 },
+  });
+  assert.deepEqual(await run("swaps.reverse", { id: "x", expectedVersion: 3 }, KEY), {
+    state: "denied",
+  });
+  for (const [state, code] of [
+    ["conflict", "SWAP_CHANGED_SINCE"],
+    ["conflict", "SWAP_NOT_APPLIED"],
+    ["invalidated", "REQUEST_VERSION_STALE"],
+  ] as const) {
+    const refusal = admin({ rpc: () => envelope(state, code) });
+    assert.deepEqual(await refusal.run("swaps.reverse", { id: id(50), expectedVersion: 3 }, KEY), {
+      state,
+      code,
+    });
+  }
+});
+
+test("a duty is reassigned with the version of its place and the new family, and a missing family is refused", async () => {
+  const { fake, run } = admin({
+    rpc: () => envelope("success", null, { assignment_version: 5 }, id(60)),
+  });
+  const done = await run(
+    "duties.reassign",
+    { id: id(61), expectedVersion: 4, familyId: id(2) },
+    KEY,
+  );
+  assert.deepEqual(done, {
+    state: "success",
+    data: { id: id(61), title: "", state: "assigned", version: 5 },
+  });
+  assert.deepEqual(fake.rpcCalls[0], {
+    name: "duty_reassign",
+    args: { p_idempotency_key: KEY, p_duty_id: id(61), p_expected_version: 4, p_family_id: id(2) },
+  });
+  assert.deepEqual(await run("duties.reassign", { id: id(61), expectedVersion: 4 }, KEY), {
+    state: "validation",
+    fieldErrors: { familyId: "VAL-REQUIRED" },
+    code: "field_invalid",
+  });
+  assert.deepEqual(
+    await run("duties.reassign", { id: "x", expectedVersion: 4, familyId: id(2) }, KEY),
+    { state: "denied" },
+  );
+  const refusal = admin({ rpc: () => envelope("conflict", "DUTY_HAS_SEVERAL_PLACES") });
+  assert.deepEqual(
+    await refusal.run("duties.reassign", { id: id(61), expectedVersion: 4, familyId: id(2) }, KEY),
+    { state: "conflict", code: "DUTY_HAS_SEVERAL_PLACES" },
   );
 });

@@ -44,6 +44,7 @@ export async function requestSwapAction(
     assignmentId: stringValue(formData, "assignmentId"),
     counterpartId: counterpart.value.id,
     counterpartVersion: counterpart.value.version,
+    reason: stringValue(formData, "reason").trim(),
     expectedVersion: context.value.expectedVersion,
     idempotencyKey: context.value.idempotencyKey,
   });
@@ -143,6 +144,7 @@ export async function requestCancellationAction(
     familyScope: boundary.session.familyScope,
     familyId: boundary.session.familyId,
     assignmentId: stringValue(formData, "assignmentId"),
+    reason: stringValue(formData, "reason").trim(),
     expectedVersion: context.value.expectedVersion,
     idempotencyKey: context.value.idempotencyKey,
   });

@@ -41,6 +41,12 @@ const COORDINATION_TABLES = [
   "contribution_notes",
 ] as const;
 
+/**
+ * The tables a signed-in role may read. U7 closed `change_requests` to every signed-in role: the requests and their
+ * reasons are read through the swap and cancellation functions only (BR70.3, NFR1.3).
+ */
+const READABLE_TABLES = COORDINATION_TABLES.filter((table) => table !== "change_requests");
+
 /** Coordination tables: constraints, unique rules, indexes, the role matrix and note visibility (BR31.1, BR31.8, BR31.9, NFR1.26, NFR1.29, NFR1.31, NFR3.6). */
 for (const schema of DIRECTORY_SCHEMAS) {
   describe(`coordination schema in ${schema}`, () => {
@@ -270,16 +276,6 @@ for (const schema of DIRECTORY_SCHEMAS) {
         source_task_id: TASK_3,
       });
       assert.equal(
-        await failureOf(() =>
-          db.query(
-            "update change_requests set status = 'approved' where assignment_id = $1 and status = 'open'",
-            [ASSIGNMENT_F1_T1],
-          ),
-        ).then((e) => e?.code),
-        "23514",
-        "a decision names who decided and when",
-      );
-      assert.equal(
         await failureOf(() => request({ reason: "x".repeat(501), status: "applied" })).then(
           (e) => e?.code,
         ),
@@ -383,19 +379,6 @@ for (const schema of DIRECTORY_SCHEMAS) {
         signedOut: 0,
         otherOrganizationAdmin: 1,
       },
-      change_requests: {
-        parent: 1,
-        coParent: 1,
-        parentOther: 0,
-        teacher: 0,
-        adminSame: 1,
-        adminOther: 0,
-        super: 1,
-        nogrant: 0,
-        deactivated: 0,
-        signedOut: 0,
-        otherOrganizationAdmin: 0,
-      },
       contribution_notes: {
         parent: 1,
         coParent: 1,
@@ -420,6 +403,15 @@ for (const schema of DIRECTORY_SCHEMAS) {
             `${table} as ${viewer}`,
           );
         }
+      }
+    });
+
+    it("lets no signed-in role read change_requests directly, whatever its scope (NFR1.3)", async () => {
+      for (const viewer of Object.keys(VIEWERS) as ViewerName[]) {
+        const failure = await failureOf(() =>
+          countAs(db, schema, VIEWERS[viewer], "change_requests"),
+        );
+        assert.equal(failure?.code, "42501", viewer);
       }
     });
 
@@ -485,7 +477,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
     });
 
     it("isolates organizations: an admin of the other organization reads nothing of the first and the other way round", async () => {
-      for (const table of COORDINATION_TABLES) {
+      for (const table of READABLE_TABLES) {
         assert.equal(
           await countAs(
             db,
@@ -539,7 +531,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
     });
 
     it("gives no application role a right to write any Coordination table and the service role no right at all", async () => {
-      for (const table of COORDINATION_TABLES) {
+      for (const table of READABLE_TABLES) {
         const column = "organization_id";
         const statements = [
           `insert into ${table} default values`,

@@ -76,6 +76,9 @@ export type AdminTaskPayload = Readonly<{
 /** `assignments.assign`: `id` is the task, `expectedVersion` the task's version. */
 export type AdminAssignPayload = Readonly<{ familyId: string }>;
 
+/** `duties.reassign`: `id` is the duty, `expectedVersion` the version of its place (or of the duty when it has none). */
+export type AdminReassignPayload = Readonly<{ familyId: string }>;
+
 /** `records.archive` and `records.restore` may name the kind; without it the adapter looks it up. */
 export type AdminArchivePayload = Readonly<{ kind?: AdminRecordKind }>;
 
