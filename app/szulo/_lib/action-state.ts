@@ -67,10 +67,16 @@ export const PARENT_CONFLICT_MESSAGES: Readonly<Record<string, string>> = Object
   DUTY_CLOSED: "Erre a feladatra már nem lehet jelentkezni, mert lezárták vagy elkezdődött.",
   DUTY_ALREADY_ASSIGNED: "A család már jelentkezett erre a feladatra.",
   REQUEST_DUPLICATE: "Ehhez a megbízáshoz már van függő kérelem.",
-  REQUEST_CONFLICT: "A kérelem a feladatok jelenlegi állapota miatt nem küldhető el.",
+  REQUEST_CONFLICT:
+    "Az egyik feladathoz időközben másik kérelem érkezett, ezért ez most nem indítható.",
+  DUTY_INELIGIBLE: "A család jelenlegi helyzete miatt ez a csere nem lehetséges.",
   SWAP_CANNOT_BE_APPLIED:
-    "A csere már nem hajtható végre, mert a feladatok időközben megváltoztak. A kérelem nyitva marad, az adminisztrátor dönthet róla, vagy a kérelmező visszavonhatja.",
+    "A csere már nem hajtható végre, mert a feladatok időközben megváltoztak. A kérelem nyitva marad, a kérelmező visszavonhatja.",
   SWAP_REQUEST_NOT_OPEN: "Ez a kérelem már nem nyitott: időközben visszavonták vagy elbírálták.",
+  SWAP_EXPIRED: "A csere kérelme lejárt, mert az egyik feladat már elkezdődött.",
+  CANCELLATION_EXPIRED: "A lemondási kérelem lejárt, mert a feladat már elkezdődött.",
+  SWAP_SLOT_FOLLOWS_WEEK:
+    "A hétvégi nyitás vagy zárás a hetet követi, ezért nem cserélhető. Válasszon másik feladatot.",
 });
 
 function conflictMessage(code: string): string {

@@ -33,19 +33,13 @@ import { asRow, integer, isUuid, oneOf, optionalText, text, type Row } from "./v
  */
 
 /**
- * The use cases of this adapter that change a family's assignments, and so need a notification once U4
- * connects them (BR31.10): a sign-up, a swap request, the other family's answer, a withdrawal and a
- * cancellation request. The admin side adds the decisions, the removal of a place and the family archive
- * (see `ADMIN_NOTIFICATION_USE_CASES`). A test asserts that these lists name exactly the use cases that
- * change assignments, so a new use case cannot be added without deciding about its notification.
+ * The use cases of this adapter that change a family's assignments and are wrapped by U4's notification hook
+ * (BR31.10): the sign-up. The swap and cancellation requests, the answer and the withdrawal were wrapped too until U7
+ * (20261059) replaced them with functions that decide their own notices inside the same transaction. The admin side
+ * adds the removal of a place and the family archive (see `ADMIN_NOTIFICATION_USE_CASES`). A test asserts that these
+ * lists name exactly the wrapped use cases, so a new use case cannot be added without deciding about its notification.
  */
-export const PARENT_NOTIFICATION_USE_CASES = Object.freeze([
-  "duty.sign_up",
-  "swap.request",
-  "swap.respond",
-  "swap.withdraw",
-  "cancellation.request",
-] as const);
+export const PARENT_NOTIFICATION_USE_CASES = Object.freeze(["duty.sign_up"] as const);
 
 const DUTY_STATES = [
   "available",
@@ -264,6 +258,8 @@ export class DatabaseParentPort implements ParentApplicationPort {
             const partnerTaskTitle = optionalText(row, "partner_task_title");
             const partnerTaskStartsAt = optionalText(row, "partner_task_starts_at");
             const partnerFamilyName = optionalText(row, "partner_family_name");
+            const endedReason = optionalText(row, "ended_reason");
+            const reason = optionalText(row, "reason");
             return Object.freeze({
               id: text(row, "request_id"),
               kind: oneOf(row, "kind", ["swap", "cancellation"] as const),
@@ -274,6 +270,18 @@ export class DatabaseParentPort implements ParentApplicationPort {
               ...(partnerTaskTitle !== undefined ? { partnerTaskTitle } : {}),
               ...(partnerTaskStartsAt !== undefined ? { partnerTaskStartsAt } : {}),
               ...(partnerFamilyName !== undefined ? { partnerFamilyName } : {}),
+              status: oneOf(row, "status", [
+                "open",
+                "applied",
+                "rejected",
+                "withdrawn",
+                "expired",
+                "cancelled",
+                "approved",
+                "reversed",
+              ] as const),
+              ...(endedReason !== undefined ? { endedReason } : {}),
+              ...(reason !== undefined ? { reason } : {}),
             });
           }),
         ),

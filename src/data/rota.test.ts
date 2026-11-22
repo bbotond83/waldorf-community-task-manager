@@ -242,6 +242,47 @@ test("the plan read maps weeks, family counts, hand changes and what blocks publ
   });
 });
 
+test("a published plan read adds the duty and place version of each week that has them", async () => {
+  const published = { ...plan, plan: { ...plan.plan, status: "published" } };
+  const { fake, port } = rota({
+    rpc: (name) =>
+      name === "rota_week_duties"
+        ? envelope("success", null, {
+            items: [{ week_id: WEEK, duty_id: DUTY, place_version: 4 }],
+          })
+        : envelope("success", null, published, PLAN),
+  });
+  const outcome = await port.plan({ schoolYearId: YEAR });
+  assert.deepEqual(
+    fake.rpcCalls.map((call) => call.name),
+    ["rota_plan_get", "rota_week_duties"],
+  );
+  assert.equal(outcome.state, "success");
+  if (outcome.state !== "success") return;
+  assert.equal(outcome.data.weeks[0]?.dutyId, DUTY);
+  assert.equal(outcome.data.weeks[0]?.placeVersion, 4);
+  assert.equal(outcome.data.weeks[1]?.dutyId, undefined, "a week without a place has none");
+});
+
+test("a published plan read still answers when the duty read is refused, and a draft never asks", async () => {
+  const published = { ...plan, plan: { ...plan.plan, status: "published" } };
+  const refused = rota({
+    rpc: (name) =>
+      name === "rota_week_duties"
+        ? envelope("denied", "authorization_denied")
+        : envelope("success", null, published, PLAN),
+  });
+  const outcome = await refused.port.plan({ schoolYearId: YEAR });
+  assert.equal(outcome.state, "success");
+  if (outcome.state === "success") assert.equal(outcome.data.weeks[0]?.dutyId, undefined);
+  const draft = rota({ rpc: () => envelope("success", null, plan, PLAN) });
+  await draft.port.plan({ schoolYearId: YEAR });
+  assert.deepEqual(
+    draft.fake.rpcCalls.map((call) => call.name),
+    ["rota_plan_get"],
+  );
+});
+
 test("the plan read names the rota and the reason of every blocker and warning (BR62.3, BR62.6, BR62.7)", async () => {
   const { port } = rota({ rpc: () => envelope("success", null, plan, PLAN) });
   const outcome = await port.plan({});
@@ -335,6 +376,15 @@ test("a plan with an unknown status or empty reason is a malformed response, nev
       }),
   });
   await assert.rejects(() => badReason.port.plan({}), TerminalDataFailure);
+  const cancelled = rota({
+    rpc: () =>
+      envelope("success", null, {
+        ...plan,
+        items: [{ ...plan.items[1], empty_reason: "cancelled" }],
+      }),
+  });
+  const read = await cancelled.port.plan({});
+  assert.equal(read.state === "success" && read.data.weeks[0]?.emptyReason, "cancelled");
 });
 
 const overviewItem = (over: Record<string, unknown> = {}) => ({

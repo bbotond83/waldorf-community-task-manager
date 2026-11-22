@@ -61,6 +61,7 @@ describe("seed writer", () => {
       "event_roles",
       "tasks",
       "assignments",
+      "change_requests",
       "event_signups",
       "food_offers",
       "books",

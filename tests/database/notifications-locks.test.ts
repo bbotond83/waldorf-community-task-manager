@@ -218,7 +218,7 @@ for (const schema of NOTIFICATION_SCHEMAS) {
           }),
         ]);
         await client.query("select set_config('request.jwt.claim.sub', $1, true)", [ACCOUNT_B]);
-        const answered = await client.query("select swap_respond($1, $2, true, null) as result", [
+        const answered = await client.query("select swap_respond($1, $2, true, 1) as result", [
           nextKey("yes"),
           request,
         ]);
@@ -267,7 +267,7 @@ for (const schema of NOTIFICATION_SCHEMAS) {
           }),
         ]);
         await client.query("select set_config('request.jwt.claim.sub', $1, true)", [ACCOUNT_B]);
-        await client.query("select swap_respond($1, $2, true, null)", [nextKey("yes"), request]);
+        await client.query("select swap_respond($1, $2, true, 1)", [nextKey("yes"), request]);
         await client.query("reset role");
       });
       // Family B is archived, so under the group scope it is no recipient of any live job; the active families
@@ -355,7 +355,7 @@ for (const schema of NOTIFICATION_SCHEMAS) {
         const answered = settle(
           as(
             ACCOUNT_B,
-            "swap_respond($1, $2, true, null)",
+            "swap_respond($1, $2, true, 1)",
             [nextKey("yes"), request],
             connections[1]!,
           ),
@@ -394,7 +394,7 @@ for (const schema of NOTIFICATION_SCHEMAS) {
           settle(
             as(
               ACCOUNT_B,
-              "swap_respond($1, $2, true, null)",
+              "swap_respond($1, $2, true, 1)",
               [nextKey("yes"), request],
               connections[1]!,
             ),

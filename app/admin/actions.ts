@@ -174,6 +174,54 @@ export async function decideApprovalAction(
   return mapped;
 }
 
+/** An administrator undoes an applied swap: both families get their old duties back (BR75.2). */
+export async function reverseSwapAction(
+  _state: AdminActionState,
+  formData: FormData,
+): Promise<AdminActionState> {
+  const context = parseMutationContext(formData);
+  if (!context.ok) return context.state;
+  const boundary = await resolveBoundary();
+  if (!boundary.ok) return boundary.state;
+  const result = await boundary.facade.reverseSwap(boundary.session.applicationSession, {
+    scope: boundary.session.scope,
+    ...context.value,
+    payload: {},
+  });
+  if (result.state === "success") {
+    revalidatePath("/admin/cserek");
+    revalidatePath("/admin/beosztas");
+    return { state: "success", message: "A csere visszafordítva.", code: result.code };
+  }
+  return mapApplicationResult(result);
+}
+
+/** An administrator gives a future duty to another family (BR74.1); `id` is the duty, `familyId` the new family. */
+export async function reassignDutyAction(
+  _state: AdminActionState,
+  formData: FormData,
+): Promise<AdminActionState> {
+  const context = parseMutationContext(formData);
+  if (!context.ok) return context.state;
+  const familyId = stringValue(formData, "familyId");
+  if (!familyId) {
+    return mapApplicationResult(validation({ familyId: "Válasszon családot." }));
+  }
+  const boundary = await resolveBoundary();
+  if (!boundary.ok) return boundary.state;
+  const result = await boundary.facade.reassignDuty(boundary.session.applicationSession, {
+    scope: boundary.session.scope,
+    ...context.value,
+    payload: { familyId },
+  });
+  if (result.state === "success") {
+    revalidatePath("/admin/beosztas");
+    revalidatePath("/admin/cserek");
+    return { state: "success", message: "A feladat új családot kapott.", code: result.code };
+  }
+  return mapApplicationResult(result);
+}
+
 async function runRecordStateAction(
   formData: FormData,
   operation: "archive" | "restore",

@@ -301,57 +301,42 @@ export async function removeAssignment(
 const APPROVAL_STATES: Readonly<Record<string, string>> = Object.freeze({
   open: "pending",
   approved: "approved",
-  applied: "approved",
   rejected: "rejected",
 });
 
-const STATUS_FILTER: Readonly<Record<string, readonly string[]>> = Object.freeze({
-  pending: ["open"],
-  approved: ["approved", "applied"],
-  rejected: ["rejected"],
-});
-
-function taskTitleOf(row: Row): string | undefined {
-  const assignment = row.assignments;
-  const first = Array.isArray(assignment) ? assignment[0] : assignment;
-  if (!first || typeof first !== "object") return undefined;
-  const task = (first as Row).tasks;
-  const one = Array.isArray(task) ? task[0] : task;
-  return one && typeof one === "object" ? optionalText(one as Row, "title") : undefined;
-}
-
-/** approvals.list: swap and cancellation requests of the admin's reach, newest first, withdrawn ones left out. */
+/**
+ * approvals.list: the cancellation requests the admin may decide, newest first (a swap needs no approval any more, so
+ * the list holds cancellations only). The function does the reach filtering; requests that expired or ended without a
+ * decision need no action and are left out.
+ */
 export async function listApprovals(
   gateway: DataGateway,
   payload: Payload,
 ): Promise<DomainOutcome<AdminListModel>> {
   const state = payloadText(payload, "state");
-  const statuses = state ? STATUS_FILTER[state] : undefined;
-  const data = await gateway.select("approvals.list", (client) => {
-    const query = client
-      .from("change_requests")
-      .select("id,kind,status,version,assignments!assignment_id(tasks(title))")
-      .neq("status", "withdrawn") as unknown as Filterable;
-    return (statuses ? query.in("status", statuses) : query)
-      .order("created_at", { ascending: false })
-      .limit(500);
-  });
-  const items = asRows(data).map((row) => {
-    const kind = text(row, "kind") === "cancellation" ? "cancellation" : "swap";
-    const task = taskTitleOf(row);
-    return Object.freeze({
-      id: text(row, "id"),
-      title: task ? `${APPROVAL_KIND_TITLES[kind]} – ${task}` : APPROVAL_KIND_TITLES[kind],
-      state: APPROVAL_STATES[text(row, "status")] ?? "pending",
-      version: integer(row, "version"),
-    });
-  });
+  const envelope = await gateway.call("cancellation_list", {});
+  const outcome = toOutcome(envelope, (current) => asRows(current.items));
+  if (outcome.state !== "success") return outcome as DomainOutcome<AdminListModel>;
+  const items = outcome.data
+    .filter((row) => text(row, "status") in APPROVAL_STATES)
+    .map((row) => {
+      const task = optionalText(row, "task_title");
+      return Object.freeze({
+        id: text(row, "request_id"),
+        title: task
+          ? `${APPROVAL_KIND_TITLES.cancellation} – ${task}`
+          : APPROVAL_KIND_TITLES.cancellation,
+        state: APPROVAL_STATES[text(row, "status")] ?? "pending",
+        version: integer(row, "version"),
+      });
+    })
+    .filter((item) => !state || item.state === state);
   return items.length > 0
     ? { state: "success", data: { items: Object.freeze(items) } }
     : { state: "empty" };
 }
 
-/** approvals.decide: `id` is the request; a swap and a cancellation have their own decision function. */
+/** approvals.decide: `id` is the cancellation request; a swap is decided by the families, not here. */
 export async function decideApproval(
   gateway: DataGateway,
   call: TaskCall,
@@ -359,18 +344,7 @@ export async function decideApproval(
   const { payload } = call;
   const id = payloadText(payload, "id") ?? "";
   if (!isUuid(id)) return { state: "denied" };
-  let kind = payloadText(payload, "kind");
-  if (kind !== "swap" && kind !== "cancellation") {
-    const rows = asRows(
-      await gateway.select("approvals.kind", (client) =>
-        (client.from("change_requests").select("kind") as unknown as Filterable)
-          .eq("id", id)
-          .limit(1),
-      ),
-    );
-    kind = rows[0] ? text(rows[0], "kind") : undefined;
-  }
-  if (kind !== "swap" && kind !== "cancellation") return { state: "denied" };
+  if (payloadText(payload, "kind") === "swap") return { state: "denied" };
   const key = call.idempotencyKey ?? "";
   // Fail closed: an approval is irreversible, so only the two known words decide anything.
   const decision = payloadText(payload, "decision");
@@ -379,7 +353,7 @@ export async function decideApproval(
   }
   const approve = decision === "approved";
   const envelope = await gateway.call(
-    kind === "swap" ? "swap_decide" : "cancellation_decide",
+    "cancellation_decide",
     {
       p_idempotency_key: key,
       p_request_id: id,
@@ -398,6 +372,99 @@ export async function decideApproval(
           : "rejected";
     return Object.freeze({ outcome });
   });
+}
+
+const SWAP_STATES: Readonly<Record<string, string>> = Object.freeze({
+  open: "pending",
+  applied: "applied",
+  reversed: "reversed",
+  rejected: "rejected",
+  withdrawn: "withdrawn",
+  expired: "expired",
+  cancelled: "cancelled",
+});
+
+/**
+ * swaps.list: the swaps the admin may see (BR75.1), pending and ended, newest first. The title names both duties and
+ * both families; `state` is `applied` while the admin can still reverse it and `applied-final` once it can not.
+ */
+export async function listSwaps(
+  gateway: DataGateway,
+  payload: Payload,
+): Promise<DomainOutcome<AdminListModel>> {
+  const year = payloadText(payload, "schoolYearId");
+  const envelope = await gateway.call("swap_list", { p_school_year_id: year ?? null });
+  const outcome = toOutcome(envelope, (current) => asRows(current.items));
+  if (outcome.state !== "success") return outcome as DomainOutcome<AdminListModel>;
+  const items = outcome.data.map((row) => {
+    const status = text(row, "status");
+    const reversible = status === "applied" && row.can_reverse === true;
+    return Object.freeze({
+      id: text(row, "request_id"),
+      title: `${text(row, "source_family_name")}: ${text(row, "source_task_title")} ↔ ${text(row, "target_family_name")}: ${text(row, "target_task_title")}`,
+      state:
+        status === "applied" && !reversible ? "applied-final" : (SWAP_STATES[status] ?? status),
+      version: integer(row, "version"),
+    });
+  });
+  return items.length > 0
+    ? { state: "success", data: { items: Object.freeze(items) } }
+    : { state: "empty" };
+}
+
+/** swaps.reverse: `id` is the swap request and `expectedVersion` its version. */
+export async function reverseSwap(
+  gateway: DataGateway,
+  call: TaskCall,
+): Promise<DomainOutcome<AdminItemModel>> {
+  const { payload } = call;
+  const id = payloadText(payload, "id") ?? "";
+  if (!isUuid(id)) return { state: "denied" };
+  const key = call.idempotencyKey ?? "";
+  const expectedVersion = payloadNumber(payload, "expectedVersion");
+  const envelope = await gateway.call(
+    "swap_reverse",
+    { p_idempotency_key: key, p_request_id: id, p_expected_version: expectedVersion ?? null },
+    key,
+  );
+  return toOutcome(envelope, () =>
+    Object.freeze({ id, title: "", state: "reversed", version: (expectedVersion ?? 0) + 1 }),
+  );
+}
+
+/** duties.reassign: `id` is the duty, `expectedVersion` the version of its place, `familyId` the new family (BR74.1). */
+export async function reassignDuty(
+  gateway: DataGateway,
+  call: TaskCall,
+): Promise<DomainOutcome<AdminItemModel>> {
+  const { payload } = call;
+  const dutyId = payloadText(payload, "id") ?? "";
+  const familyId = payloadText(payload, "familyId");
+  if (!familyId) return refused({ familyId: "VAL-REQUIRED" }, "field_invalid");
+  if (!isUuid(dutyId) || !isUuid(familyId)) return { state: "denied" };
+  const key = call.idempotencyKey ?? "";
+  const expectedVersion = payloadNumber(payload, "expectedVersion");
+  const envelope = await gateway.call(
+    "duty_reassign",
+    {
+      p_idempotency_key: key,
+      p_duty_id: dutyId,
+      p_expected_version: expectedVersion ?? null,
+      p_family_id: familyId,
+    },
+    key,
+  );
+  return toOutcome(envelope, (result) =>
+    Object.freeze({
+      id: dutyId,
+      title: "",
+      state: "assigned",
+      version:
+        typeof result.assignment_version === "number"
+          ? result.assignment_version
+          : (expectedVersion ?? 0) + 1,
+    }),
+  );
 }
 
 /** dashboard.get: the counts for the admin's reach (BR32.5). */

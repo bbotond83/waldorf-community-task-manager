@@ -18,6 +18,7 @@ import { AdminAccessState } from "../_components/AdminAccessState.tsx";
 import { AdminMutationForm } from "../_components/AdminMutationForm.tsx";
 import { YearSwitcher } from "../_components/RotaParts.tsx";
 import { resolveAdminSession } from "../_lib/session.ts";
+import { reassignDutyAction } from "../actions.ts";
 import {
   discardDraftAction,
   makeDraftAction,
@@ -291,7 +292,7 @@ function WeekPlan({ model, job }: Readonly<{ model: RotaPlanModel; job: RotaJob 
             <tr>
               <th scope="col">Hét</th>
               <th scope="col">Felelős család</th>
-              {draft && <th scope="col">Módosítás</th>}
+              <th scope="col">{draft ? "Módosítás" : "Átadás"}</th>
             </tr>
           </thead>
           <tbody>
@@ -331,12 +332,57 @@ function WeekRow({
             label={
               week.emptyReason === "no_family"
                 ? "Üres: nincs aktív család"
-                : "Üres: még nincs család"
+                : week.emptyReason === "cancelled"
+                  ? "Üres: a család lemondta"
+                  : "Üres: még nincs család"
             }
             symbol={{ icon: "warning", character: "" }}
           />
         )}
       </td>
+      {!draft && (
+        <td>
+          {week.dutyId && week.placeVersion !== undefined ? (
+            <details data-testid={`admin-rota-handover-${week.weekStart}`}>
+              <summary>Átadás másik családnak</summary>
+              <AdminMutationForm
+                action={reassignDutyAction}
+                submitLabel="Átadom"
+                testId={`admin-rota-reassign-${week.weekStart}`}
+              >
+                <input type="hidden" name="id" value={week.dutyId} />
+                <input type="hidden" name="expectedVersion" value={week.placeVersion} />
+                <input
+                  type="hidden"
+                  name="idempotencyKey"
+                  value={`reassign:${week.id}:v${week.placeVersion}`}
+                />
+                <label htmlFor={`handover-${week.id}`}>Család</label>
+                <select
+                  id={`handover-${week.id}`}
+                  name="familyId"
+                  defaultValue=""
+                  data-testid={`admin-rota-handover-family-${week.weekStart}`}
+                >
+                  <option value="" disabled>
+                    Válasszon családot
+                  </option>
+                  {model.families
+                    .filter((family) => family.familyId !== week.familyId)
+                    .map((family) => (
+                      <option key={family.familyId} value={family.familyId}>
+                        {family.displayName}
+                      </option>
+                    ))}
+                </select>
+                <p className="form-hint">A beosztás és a hétvégi választás követi a változást.</p>
+              </AdminMutationForm>
+            </details>
+          ) : (
+            "Nincs teendő"
+          )}
+        </td>
+      )}
       {draft && (
         <td>
           {week.isBreak ? (

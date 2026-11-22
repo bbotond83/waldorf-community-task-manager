@@ -281,7 +281,7 @@ export async function writeSeedPlan(client: SqlClient, plan: SeedPlan): Promise<
     await insertRows(
       client,
       "assignments",
-      ["id", "organization_id", "task_id", "family_id", "parent_id", "source"],
+      ["id", "organization_id", "task_id", "family_id", "parent_id", "source", "status"],
       plan.assignments.map((assignment) => [
         assignment.id,
         organization,
@@ -289,6 +289,51 @@ export async function writeSeedPlan(client: SqlClient, plan: SeedPlan): Promise<
         assignment.familyId,
         assignment.parentId,
         assignment.source,
+        assignment.status,
+      ]),
+    );
+    await insertRows(
+      client,
+      "change_requests",
+      [
+        "id",
+        "organization_id",
+        "assignment_id",
+        "target_assignment_id",
+        "kind",
+        "status",
+        "ended_reason",
+        "reason",
+        "source_task_id",
+        "source_assignment_version",
+        "target_task_id",
+        "target_assignment_version",
+        "source_family_id",
+        "target_family_id",
+        "source_confirmed",
+        "target_confirmed",
+        "decided_at",
+      ],
+      plan.changeRequests.map((request) => [
+        request.id,
+        organization,
+        request.assignmentId,
+        request.targetAssignmentId,
+        request.kind,
+        request.status,
+        request.endedReason,
+        request.reason,
+        request.sourceTaskId,
+        1,
+        request.targetTaskId,
+        request.targetAssignmentId ? 1 : null,
+        request.sourceFamilyId,
+        request.targetFamilyId,
+        request.kind === "swap",
+        false,
+        request.status === "approved" || request.endedReason === "administrator_rejected"
+          ? new Date().toISOString()
+          : null,
       ]),
     );
     await insertRows(

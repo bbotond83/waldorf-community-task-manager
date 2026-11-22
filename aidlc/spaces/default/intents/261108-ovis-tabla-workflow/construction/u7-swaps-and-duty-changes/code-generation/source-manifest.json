@@ -1,0 +1,220 @@
+{
+  "stage": "code-generation",
+  "unit": "u7-swaps-and-duty-changes",
+  "version": 1,
+  "writes": [
+    {
+      "path": "app/admin/_lib/action-state.ts"
+    },
+    {
+      "path": "app/admin/actions.ts"
+    },
+    {
+      "path": "app/admin/beosztas/page.tsx"
+    },
+    {
+      "path": "app/admin/cserek/page.tsx"
+    },
+    {
+      "path": "app/admin/jovahagyasok/[id]/page.tsx"
+    },
+    {
+      "path": "app/globals.css"
+    },
+    {
+      "path": "app/szulo/_components/SwapRequestsBoard.tsx"
+    },
+    {
+      "path": "app/szulo/_lib/action-state.ts"
+    },
+    {
+      "path": "app/szulo/actions.ts"
+    },
+    {
+      "path": "app/szulo/cserek/page.tsx"
+    },
+    {
+      "path": "package.json"
+    },
+    {
+      "path": "scripts/db/seed/commands.test.ts"
+    },
+    {
+      "path": "scripts/db/seed/data.test.ts"
+    },
+    {
+      "path": "scripts/db/seed/data.ts"
+    },
+    {
+      "path": "scripts/db/seed/write.test.ts"
+    },
+    {
+      "path": "scripts/db/seed/write.ts"
+    },
+    {
+      "path": "scripts/db/shuffled-tests.ts"
+    },
+    {
+      "path": "scripts/verification/ci-config.test.ts"
+    },
+    {
+      "path": "src/application/admin-facade.ts"
+    },
+    {
+      "path": "src/application/admin-payloads.ts"
+    },
+    {
+      "path": "src/application/contracts.ts"
+    },
+    {
+      "path": "src/application/swap-facade.test.ts"
+    },
+    {
+      "path": "src/data/admin-port.test.ts"
+    },
+    {
+      "path": "src/data/admin-port.ts"
+    },
+    {
+      "path": "src/data/admin-tasks.ts"
+    },
+    {
+      "path": "src/data/notification-use-cases.test.ts"
+    },
+    {
+      "path": "src/data/parent-port.test.ts"
+    },
+    {
+      "path": "src/data/parent-port.ts"
+    },
+    {
+      "path": "src/data/results.test.ts"
+    },
+    {
+      "path": "src/data/results.ts"
+    },
+    {
+      "path": "src/data/rota.test.ts"
+    },
+    {
+      "path": "src/data/rota.ts"
+    },
+    {
+      "path": "src/runtime/navigation.ts"
+    },
+    {
+      "path": "supabase/migrations/20261059_swaps_and_duty_changes.sql"
+    },
+    {
+      "path": "supabase/migrations/20261060_rota_week_duties.sql"
+    },
+    {
+      "path": "tests/browser/directory-coordination.spec.ts"
+    },
+    {
+      "path": "tests/browser/swap-screenshots.spec.ts"
+    },
+    {
+      "path": "tests/browser/swaps.spec.ts"
+    },
+    {
+      "path": "tests/browser/visual-overhaul.spec.ts"
+    },
+    {
+      "path": "tests/coverage/admin-actions.test.ts"
+    },
+    {
+      "path": "tests/coverage/production-inventory.test.ts"
+    },
+    {
+      "path": "tests/database/community-duties.test.ts"
+    },
+    {
+      "path": "tests/database/coordination-schema.test.ts"
+    },
+    {
+      "path": "tests/database/data-adapters.test.ts"
+    },
+    {
+      "path": "tests/database/directory-timing.test.ts"
+    },
+    {
+      "path": "tests/database/identity-catalogue.test.ts"
+    },
+    {
+      "path": "tests/database/notices-run.test.ts"
+    },
+    {
+      "path": "tests/database/notices-send.test.ts"
+    },
+    {
+      "path": "tests/database/notifications-functions.test.ts"
+    },
+    {
+      "path": "tests/database/notifications-handoff.test.ts"
+    },
+    {
+      "path": "tests/database/notifications-timing.test.ts"
+    },
+    {
+      "path": "tests/database/rota-four-plan.test.ts"
+    },
+    {
+      "path": "tests/database/rota-plan.test.ts"
+    },
+    {
+      "path": "tests/database/rota-standing.test.ts"
+    },
+    {
+      "path": "tests/database/schedule.test.ts"
+    },
+    {
+      "path": "tests/database/swaps-admin.test.ts"
+    },
+    {
+      "path": "tests/database/swaps-for-later-units.test.ts"
+    },
+    {
+      "path": "tests/database/swaps-propose-answer.test.ts"
+    },
+    {
+      "path": "tests/database/swaps-races.test.ts"
+    },
+    {
+      "path": "tests/database/swaps-rota.test.ts"
+    },
+    {
+      "path": "tests/database/swaps-support.ts"
+    },
+    {
+      "path": "tests/database/swaps-timing.test.ts"
+    },
+    {
+      "path": "tests/integration/copy.test.ts"
+    },
+    {
+      "path": "tests/integration/runtime-shell.test.tsx"
+    },
+    {
+      "path": "tests/integration/swap-actions.test.ts"
+    },
+    {
+      "path": "tests/integration/swap-screens.test.tsx"
+    },
+    {
+      "path": "tests/support/port-doubles.ts"
+    },
+    {
+      "path": "tests/unit/navigation-access.test.ts"
+    },
+    {
+      "path": "verification/reports/local-acceptance.json"
+    },
+    {
+      "path": "verification/reports/local-acceptance.md"
+    },
+    {
+      "path": "verification/reports/outstanding-targets.md"
+    }
+  ]
+}

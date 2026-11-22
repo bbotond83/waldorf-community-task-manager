@@ -35,6 +35,13 @@ export const BUSINESS_CODE_STATES = Object.freeze({
   REQUEST_CONFLICT: "conflict",
   SWAP_CANNOT_BE_APPLIED: "conflict",
   SWAP_REQUEST_NOT_OPEN: "conflict",
+  SWAP_EXPIRED: "conflict",
+  SWAP_SLOT_FOLLOWS_WEEK: "conflict",
+  SWAP_NOT_APPLIED: "conflict",
+  SWAP_CHANGED_SINCE: "conflict",
+  CANCELLATION_EXPIRED: "conflict",
+  DUTY_INELIGIBLE: "conflict",
+  DUTY_HAS_SEVERAL_PLACES: "conflict",
   // Lifecycle
   LIFECYCLE_STALE: "invalidated",
   LIFECYCLE_BLOCKED: "conflict",

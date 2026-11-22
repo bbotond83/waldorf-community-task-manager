@@ -113,6 +113,7 @@ describe("seed data: the small set", () => {
       watches: 4,
       tasks: 8,
       assignments: 8,
+      changeRequests: 2,
       notices: 2,
       standings: 2,
       plans: 1,
@@ -492,7 +493,7 @@ describe("seed data: passwords and lookups", () => {
 
   it("prints counts only: no names, addresses or passwords", () => {
     const text = JSON.stringify(describePlan(buildSeedPlan("public", "small")));
-    assert.match(text, /^\{("[a-z]+":\d+,?)+\}$/);
+    assert.match(text, /^\{("[A-Za-z]+":\d+,?)+\}$/);
     for (const password of Object.values(SEED_PASSWORDS)) assert.ok(!text.includes(password));
   });
 });

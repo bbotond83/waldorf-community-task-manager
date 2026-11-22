@@ -30,9 +30,11 @@
 
 - 2026-11-16T05:49:19Z — [unit u6-full-rotas-and-weekend-picks] Judge a rota week's changeover eligibility by its Monday; the stories give only a date, and a week that contains the changeover date would otherwise leave its weekend duties and pick with a family that may not hold them. Recorded as an assumption for the owner.
 - 2026-11-16T05:49:19Z — [unit u6-full-rotas-and-weekend-picks] Treat a family with no standing row as staying; contract C20 said "null when the family has no row", but backfilling a row for every family and year would keep two copies of one fact. Listed as a contract delta.
+- 2026-11-21T16:41:47Z [unit u7-swaps-and-duty-changes] — Read "the administrator" in AC8.2.4 and AC8.3.2 as a super admin for rota duties and an admin reaching the group for other duties, the same reach as assigning a duty today; the stories name no role and AC5.4.5 refuses working-group admins only for rota duties.
 
 ## Deviations
 <!-- example: 2026-05-29T10:14:32Z — skipped the optional caching layer the stage prose suggested; the dataset is small enough that it adds risk -->
+- 2026-11-21T16:41:47Z [unit u7-swaps-and-duty-changes] — U7 changes U6's rota_adjust_picks_after_change so a change with no new family empties the week with reason cancelled and returns its pick; the owner's Q3 answer frees a rota duty on an approved cancellation, and C11 only knew changes to another family. Listed as a C11 contract delta.
 - 2026-11-21T08:50:00Z [unit u13-lending-library] — U13's removal block also clears closed-loan borrower links and the owner link of the subject's books and deletes return watches; contract C16 listed only flagging held books and removing watches, but a deleted family or parent would otherwise leave links to nothing.
 - 2026-11-21T08:50:00Z [unit u13-lending-library] — A super admin may change a book's owner and record a return only for a book with no owner who has rights; Q1 to Q3 left both open and a typed-name or ownerless book would otherwise be stuck.
 
@@ -65,6 +67,9 @@
 
 - 2026-11-16T05:49:19Z — [unit u6-full-rotas-and-weekend-picks] Give the weekend family all five weekend places at publishing and let a pick move one, instead of leaving opening and closing places open until picked; "the weekend family does the rest" then needs no step at all, and the overview, done marks and removal read places only. The cost is one contract delta: the pick functions call place_reassign.
 - 2026-11-16T05:49:19Z — [unit u6-full-rotas-and-weekend-picks] Compute flagged duties when read instead of storing a flag; a later change of standing or changeover date then needs no clean-up, and the removal block has nothing to write.
+
+- 2026-11-21T16:41:47Z [unit u7-swaps-and-duty-changes] — Kept the one change_requests table and widened it, instead of a new swap table; today's requests, notices and approvals screen already read it, at the cost of more statuses and nullable swap-only columns.
+- 2026-11-21T16:41:47Z [unit u7-swaps-and-duty-changes] — The decider of a request stays an account id rather than a parent id, because a super admin may have no parent record; removal clears it by account, which settles the C16 open question.
 
 ## Open questions
 

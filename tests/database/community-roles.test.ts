@@ -252,7 +252,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
         assert.equal((await call(ADMIN_G1, sql, values)).state, "denied", sql);
       }
       // The approval of group 1's request belongs to group 1's admin.
-      const decide = await call(ADMIN_G2, "cancellation_decide($1, $2, true, null)", [
+      const decide = await call(ADMIN_G2, "cancellation_decide($1, $2, true, 1)", [
         key(),
         REQUEST_1,
       ]);

@@ -353,7 +353,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
               FAMILY_1,
               version,
             ]),
-            callFunction(connections[1]!, schema, PARENT_F2, "swap_respond($1, $2, true, null)", [
+            callFunction(connections[1]!, schema, PARENT_F2, "swap_respond($1, $2, true, 1)", [
               nextKey("y"),
               uuid(891),
             ]),

@@ -168,7 +168,7 @@ export const ELEVATED: Record<
   //  assignment_assign, assignment_remove: admin placements that read memberships by typed id;
   //  swap_candidates, swap_incoming: show another family's task title, date and display name;
   //  swap_request, swap_respond, swap_withdraw, cancellation_request: change two families' assignments;
-  //  swap_decide, cancellation_decide: an admin's decision, with the approval audit event;
+  //  cancellation_decide, duty_reassign, swap_reverse: an admin's decision, with its audit event;
   //  family_archive, family_restore: Directory records plus Coordination assignments and requests;
   //  dashboard_get: counts across Coordination for an admin's reach;
   //  governance_revoke: U2's grant functions plus the self-lockout check;
@@ -184,14 +184,12 @@ export const ELEVATED: Record<
   duty_sign_up: "authenticated",
   assignment_assign: "authenticated",
   assignment_remove: "authenticated",
-  coordination_decide: INTERNAL,
   swap_candidates: "authenticated",
   swap_request: "authenticated",
   swap_respond: "authenticated",
   swap_incoming: "authenticated",
   swap_withdraw: "authenticated",
   cancellation_request: "authenticated",
-  swap_decide: "authenticated",
   cancellation_decide: "authenticated",
   family_archive: "authenticated",
   family_restore: "authenticated",
@@ -247,16 +245,10 @@ export const ELEVATED: Record<
   notification_notify_family: INTERNAL,
   notification_after_place_added: INTERNAL,
   notification_after_place_removed: INTERNAL,
-  notification_after_swap_request: INTERNAL,
-  notification_after_swap_response: INTERNAL,
-  notification_after_decision: INTERNAL,
   notification_after_lifecycle: INTERNAL,
   duty_sign_up_core: INTERNAL,
   assignment_assign_core: INTERNAL,
   assignment_remove_core: INTERNAL,
-  swap_request_core: INTERNAL,
-  swap_respond_core: INTERNAL,
-  coordination_decide_core: INTERNAL,
   family_archive_core: INTERNAL,
   task_save_core: INTERNAL,
   event_save_core: INTERNAL,
@@ -301,6 +293,7 @@ export const ELEVATED: Record<
   rota_plan_publish: "authenticated",
   school_calendar_get: "authenticated",
   rota_plan_get: "authenticated",
+  rota_week_duties: "authenticated",
   rota_overview: "authenticated",
   rota_duty_card: "authenticated",
   school_year_for: INTERNAL,
@@ -316,8 +309,6 @@ export const ELEVATED: Record<
   duty_rota_managed: INTERNAL,
   duty_rota_managed_places: INTERNAL,
   duty_rota_managed_request: INTERNAL,
-  swap_withdraw_core: INTERNAL,
-  cancellation_request_core: INTERNAL,
   // Ovis tábla U6 (C10, C11, C12, C16, C20, BR60 to BR64). The standing command, the two weekend pick commands and
   // the unpicked list are signed-in commands that check their caller themselves; the eligibility checks, the draft
   // and notice helpers, the timed checks and the change and removal functions for later units are internal.
@@ -332,7 +323,6 @@ export const ELEVATED: Record<
   family_hold_reason: INTERNAL,
   family_may_hold_duty: INTERNAL,
   family_standing: INTERNAL,
-  swap_standing_check: INTERNAL,
   rota_adjust_picks_after_change: INTERNAL,
   rota_check_change: INTERNAL,
   rota_draft_compute: INTERNAL,
@@ -364,6 +354,23 @@ export const ELEVATED: Record<
   library_due_check: INTERNAL,
   library_removal_apply: INTERNAL,
   library_removal_preview: INTERNAL,
+  // U7 (swaps and duty changes): the commands and reads check their caller; the helpers, the daily check and the removal pair are internal.
+  cancellation_list: "authenticated",
+  swap_list: "authenticated",
+  swap_reverse: "authenticated",
+  duty_reassign: "authenticated",
+  place_add: INTERNAL,
+  dutychanges_earliest_start: INTERNAL,
+  dutychanges_end_request: INTERNAL,
+  dutychanges_is_rota: INTERNAL,
+  dutychanges_lock: INTERNAL,
+  dutychanges_notify: INTERNAL,
+  dutychanges_pick_places: INTERNAL,
+  dutychanges_record_denial: INTERNAL,
+  dutychanges_removal_apply: INTERNAL,
+  dutychanges_removal_preview: INTERNAL,
+  dutychanges_swap_check: INTERNAL,
+  dutychanges_swap_expiry_check: INTERNAL,
   migration_load_book: "service_role",
   rota_week_reminder_check: INTERNAL,
   weekend_pick_alert_send: INTERNAL,

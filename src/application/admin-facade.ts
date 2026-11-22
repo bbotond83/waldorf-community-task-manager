@@ -33,6 +33,9 @@ export type AdminOperation =
   | "assignments.remove"
   | "approvals.list"
   | "approvals.decide"
+  | "swaps.list"
+  | "swaps.reverse"
+  | "duties.reassign"
   | "families.names"
   | "reminders.list"
   | "reminders.retry"
@@ -192,6 +195,31 @@ export class AdminApplicationFacade {
       ...input,
       payload: { ...input.payload, decision: input.decision },
     });
+  }
+
+  /** The swaps the admin may see, pending and ended, each with whether it can be reversed now (BR75.1). */
+  listSwaps(
+    session: SessionContext,
+    scope: Scope,
+    query: Readonly<Record<string, unknown>> = {},
+  ): Promise<ApplicationResult<AdminListModel>> {
+    return this.query(session, scope, "approval", "swaps.list", query);
+  }
+
+  /** Reverses an applied swap (BR75.2); `id` is the swap request and `expectedVersion` its version. */
+  reverseSwap(
+    session: SessionContext,
+    input: AdminCommandInput,
+  ): Promise<ApplicationResult<AdminItemModel>> {
+    return this.command(session, "approval", "swaps.reverse", input);
+  }
+
+  /** Gives a future duty to another family (BR74.1); `id` is the duty, `expectedVersion` the version the screen showed. */
+  reassignDuty(
+    session: SessionContext,
+    input: AdminCommandInput,
+  ): Promise<ApplicationResult<AdminItemModel>> {
+    return this.command(session, "assignment", "duties.reassign", input);
   }
 
   private query<T>(

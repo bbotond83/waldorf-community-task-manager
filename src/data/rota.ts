@@ -144,7 +144,7 @@ function toCalendar(envelope: Envelope): SchoolCalendarModel {
   });
 }
 
-const EMPTY_REASONS = ["no_family", "cleared"] as const;
+const EMPTY_REASONS = ["no_family", "cleared", "cancelled"] as const;
 
 function toPlanWeek(row: Row): RotaPlanWeek {
   const familyId = optionalText(row, "family_id");
@@ -485,7 +485,34 @@ export function createRotaPort(database: DatabaseClient): RotaApplicationPort {
       const envelope = await gateway.call("rota_plan_get", {
         p_school_year_id: schoolYearId ?? null,
       });
-      return toOutcome(envelope, toPlan);
+      const outcome = toOutcome(envelope, toPlan);
+      if (outcome.state !== "success" || outcome.data.plan?.status !== "published") return outcome;
+      // A published plan: add the duty and place version behind each week, so the page can hand a week over.
+      const duties = await gateway.call("rota_week_duties", {
+        p_school_year_id: schoolYearId ?? null,
+      });
+      if (duties.state !== "success") return outcome;
+      const byWeek = new Map(
+        asRows(duties.items).map((row) => [text(row, "week_id"), row] as const),
+      );
+      return {
+        ...outcome,
+        data: Object.freeze({
+          ...outcome.data,
+          weeks: Object.freeze(
+            outcome.data.weeks.map((week) => {
+              const row = byWeek.get(week.id);
+              return row
+                ? Object.freeze({
+                    ...week,
+                    dutyId: text(row, "duty_id"),
+                    placeVersion: integer(row, "place_version"),
+                  })
+                : week;
+            }),
+          ),
+        }),
+      };
     },
     makeDraft: ({ idempotencyKey, schoolYearId }) =>
       command(

@@ -39,6 +39,8 @@ const coreCases = [
   ["saveTaskAction", { id: "task-kert" }, "success"],
   ["assignTaskAction", { id: "task-kert" }, "success"],
   ["decideApprovalAction", { id: "approval-csere", decision: "approved" }, "success"],
+  ["reverseSwapAction", { id: "swap-1" }, "success"],
+  ["reassignDutyAction", { id: "task-kert", familyId: "family-feny" }, "success"],
 ] as const;
 for (const [name, values, state] of coreCases) {
   it(name + " authorizes and returns its actual mutation outcome", async () => {
@@ -138,6 +140,22 @@ it("refuses a missing or unknown approval decision before anything is decided (f
     (await core.decideApprovalAction(initial, form({ id: "approval-csere", decision: "approved" })))
       .state,
   ).toBe("success");
+});
+it("refuses a duty reassignment without a family and maps the reversal and clash refusals", async () => {
+  signIn();
+  const none = await core.reassignDutyAction(initial, form({ id: "task-kert" }));
+  expect(none.state).toBe("validation");
+  expect(none.fieldErrors?.familyId).toBeTruthy();
+  force("changed-since");
+  const reversal = await core.reverseSwapAction(initial, form({ id: "swap-1" }));
+  expect(reversal.state).toBe("conflict");
+  expect(reversal.message).toContain("nem vonható vissza");
+  force("clash");
+  const clash = await core.reassignDutyAction(
+    initial,
+    form({ id: "task-kert", familyId: "family-feny" }),
+  );
+  expect(clash.state).toBe("conflict");
 });
 it("distinguishes rejected and already-decided approvals", async () => {
   signIn();

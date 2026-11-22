@@ -440,9 +440,12 @@ export type RotaPlanWeek = Readonly<{
   isBreak: boolean;
   familyId?: string;
   familyDisplayName?: string;
-  emptyReason?: "no_family" | "cleared";
+  emptyReason?: "no_family" | "cleared" | "cancelled";
   changedByAdmin: boolean;
   version: number;
+  /** Of a published week with a family: the duty and the version of its place, for handing the week over (BR74.1). */
+  dutyId?: string;
+  placeVersion?: number;
 }>;
 
 /**
@@ -682,6 +685,20 @@ export type SwapRequestItemModel = Readonly<{
   partnerTaskTitle?: string;
   partnerTaskStartsAt?: string;
   partnerFamilyName?: string;
+  /** Open while it waits for an answer; every other value is an ended request, kept for 60 days. */
+  status:
+    | "open"
+    | "applied"
+    | "rejected"
+    | "withdrawn"
+    | "expired"
+    | "cancelled"
+    | "approved"
+    | "reversed";
+  /** Why an ended request ended (declined, withdrawn, the duty started, an administrator's decision, ...). */
+  endedReason?: string;
+  /** The family's own reason; the other family and the administrators see it too. */
+  reason?: string;
 }>;
 
 export type SwapRequestListModel = Readonly<{ requests: readonly SwapRequestItemModel[] }>;

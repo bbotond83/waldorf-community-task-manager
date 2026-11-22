@@ -188,17 +188,22 @@ for (const schema of DIRECTORY_SCHEMAS) {
       );
       let lastRequest: { state: string; code: string | null } | undefined;
       const requested = await timed("swap request", TYPICAL.action, async () => {
-        await db.query("update change_requests set status = 'withdrawn'");
-        await db.query("update assignments set status = 'active' where id = $1", [mine.reference]);
+        await db.query("update change_requests set status = 'withdrawn' where status = 'open'");
+        await db.query(
+          "update assignments set status = 'active' where status in ('swap_pending', 'cancellation_pending')",
+        );
         const own = (
           await db.query("select version from assignments where id = $1", [mine.reference])
+        ).rows[0].version;
+        const partnerVersion = (
+          await db.query("select version from assignments where id = $1", [partner.assignment_id])
         ).rows[0].version;
         lastRequest = await fn(PARENT_F1, "swap_request($1, $2, $3, $4, $5)", [
           nextKey("sw"),
           mine.reference,
           own,
           partner.assignment_id,
-          partner.assignment_version,
+          partnerVersion,
         ]);
         return lastRequest;
       });
@@ -206,12 +211,10 @@ for (const schema of DIRECTORY_SCHEMAS) {
       assert.equal(lastRequest?.state, "success", JSON.stringify(lastRequest));
       const open = (await db.query("select id from change_requests where status = 'open'")).rows[0]
         .id as string;
-      // The partner may hold a place in any working group now (BR4.3), so a super admin decides.
-      const decided = await fn(SUPER_ADMIN, "swap_decide($1, $2, true, null)", [
-        nextKey("sd"),
-        open,
-      ]);
-      assert.equal(decided.state, "success");
+      // The other family answers or the requester withdraws; the withdrawal is timed here.
+      await timed("swap withdrawal", TYPICAL.action, async () =>
+        fn(PARENT_F1, "swap_withdraw($1, $2)", [nextKey("wd"), open]),
+      );
       await timed("approval decision", TYPICAL.action, async () => {
         const mineNow = (
           await db.query(
@@ -220,12 +223,15 @@ for (const schema of DIRECTORY_SCHEMAS) {
           )
         ).rows[0];
         await db.query("update change_requests set status = 'withdrawn' where status = 'open'");
+        await db.query(
+          "update assignments set status = 'active' where status in ('swap_pending', 'cancellation_pending')",
+        );
         const cancelled = await fn(PARENT_F1, "cancellation_request($1, $2, $3, null)", [
           nextKey("cn"),
           mineNow.id,
           mineNow.version,
         ]);
-        return fn(SUPER_ADMIN, "cancellation_decide($1, $2, false, null)", [
+        return fn(SUPER_ADMIN, "cancellation_decide($1, $2, false, 1)", [
           nextKey("cd"),
           cancelled.reference,
         ]);

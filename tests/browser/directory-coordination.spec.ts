@@ -438,12 +438,12 @@ test("a swap is requested from the partner list, confirmed by the other family a
   );
 
   const moved = await db.query(
-    "select id, task_id from assignments where id = any($1) order by id",
+    "select id, family_id from assignments where id = any($1) order by id",
     [[A_SW1, A_SW2]],
   );
-  expect(Object.fromEntries(moved.rows.map((row) => [row.id, row.task_id]))).toEqual({
-    [A_SW1]: T_SW2,
-    [A_SW2]: T_SW1,
+  expect(Object.fromEntries(moved.rows.map((row) => [row.id, row.family_id]))).toEqual({
+    [A_SW1]: F2,
+    [A_SW2]: F1,
   });
   // The first family now sees the new task as theirs.
   await first.page.goto(`/szulo/feladatok/${T_SW2}`);
@@ -459,9 +459,9 @@ function page_h1(page: Page) {
 test("a swap request can be declined or withdrawn from the incoming page", async ({ browser }) => {
   const first = await openSession(browser, parent1);
   const second = await openSession(browser, parent2);
-  // The first family now holds "Csere kettő"; asks the second family for "Csere egy" back.
+  // The first family now holds the place of "Csere kettő"; asks the second family for the place of "Csere egy" back.
   await first.page.goto(`/szulo/feladatok/${T_SW2}/csere`);
-  await first.page.getByTestId(`swap-candidate-${A_SW2}`).check();
+  await first.page.getByTestId(`swap-candidate-${A_SW1}`).check();
   await first.page.getByTestId("swap-reason-input").fill("Mégis visszacserélnénk");
   await first.page.getByTestId("swap-request-form-submit-button").click();
   await expect(first.page.getByTestId("swap-pending-panel")).toBeVisible();
@@ -472,7 +472,7 @@ test("a swap request can be declined or withdrawn from the incoming page", async
 
   // Own request: ask again, then withdraw it.
   await first.page.goto(`/szulo/feladatok/${T_SW2}/csere`);
-  await first.page.getByTestId(`swap-candidate-${A_SW2}`).check();
+  await first.page.getByTestId(`swap-candidate-${A_SW1}`).check();
   await first.page.getByTestId("swap-reason-input").fill("Még egyszer");
   await first.page.getByTestId("swap-request-form-submit-button").click();
   await expect(first.page.getByTestId("swap-pending-panel")).toBeVisible();

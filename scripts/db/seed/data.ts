@@ -210,6 +210,25 @@ export interface SeedPlan {
     familyId: string;
     parentId: string | null;
     source: "parent_sign_up" | "admin_assign";
+    /** A place in an open request waits in a pending state; every other seeded place is active. */
+    status: "active" | "swap_pending" | "cancellation_pending";
+  }[];
+  /**
+   * Invented change requests (U7): in the small set one open swap and one open cancellation request, in the large set
+   * also 200 ended cancellation requests in every ended status. The places of an open request wait in a pending state.
+   */
+  changeRequests: {
+    id: string;
+    kind: "swap" | "cancellation";
+    status: "open" | "approved" | "rejected" | "withdrawn" | "expired" | "cancelled";
+    endedReason: string | null;
+    assignmentId: string;
+    targetAssignmentId: string | null;
+    sourceTaskId: string;
+    targetTaskId: string | null;
+    sourceFamilyId: string;
+    targetFamilyId: string | null;
+    reason: string;
   }[];
   /**
    * Invented notices: one sign-up confirmation for each parent who signed up and has an account, each with its email
@@ -597,6 +616,7 @@ export function buildSeedPlan(
   const foodOffers: SeedPlan["foodOffers"] = [];
   const tasks: SeedPlan["tasks"] = [];
   const assignments: SeedPlan["assignments"] = [];
+  const changeRequests: SeedPlan["changeRequests"] = [];
   const EVENT_TITLES = ["Őszi vásár", "Közös kertrendezés", "Mikulás-délután"] as const;
   const EVENT_PLACES = ["Tornaterem", "Kert", "Aula"] as const;
   const hours = (day: number, hour: number) => day * 24 + hour;
@@ -667,12 +687,53 @@ export function buildSeedPlan(
         familyId: member.id,
         parentId: source === "parent_sign_up" ? id(`parent:${number}:1`) : null,
         source,
+        status: "active",
       });
     };
     place(baking, 1, "admin_assign", members[0]);
     place(baking, 2, "admin_assign", members[1]);
     place(decorating, 1, "parent_sign_up", members[2]);
     place(cleaning, 1, "admin_assign", members[0]);
+    // The open requests sit on families the older screens leave alone: in the first group a swap of the second family's
+    // baking place for the third family's decorating place (the third family is leaving, which still may take a duty
+    // before the changeover), in the second group a cancellation request on the third family's decorating place.
+    const placeOf = (task: string, slot: number) =>
+      assignments.find((entry) => entry.id === id(`assignment:${task}:${slot}`))!;
+    if (g === 0 && members[1] && members[2]) {
+      const mine = placeOf(baking, 2);
+      const theirs = placeOf(decorating, 1);
+      mine.status = theirs.status = "swap_pending";
+      changeRequests.push({
+        id: id("change-request:open-swap"),
+        kind: "swap",
+        status: "open",
+        endedReason: null,
+        assignmentId: mine.id,
+        targetAssignmentId: theirs.id,
+        sourceTaskId: baking,
+        targetTaskId: decorating,
+        sourceFamilyId: mine.familyId,
+        targetFamilyId: theirs.familyId,
+        reason: "Időpont-ütközés",
+      });
+    }
+    if (g === 1 && members[2]) {
+      const cancelled = placeOf(decorating, 1);
+      cancelled.status = "cancellation_pending";
+      changeRequests.push({
+        id: id("change-request:open-cancellation"),
+        kind: "cancellation",
+        status: "open",
+        endedReason: null,
+        assignmentId: cancelled.id,
+        targetAssignmentId: null,
+        sourceTaskId: decorating,
+        targetTaskId: null,
+        sourceFamilyId: cancelled.familyId,
+        targetFamilyId: null,
+        reason: "Beteg a gyerek",
+      });
+    }
 
     // The first group's event shows every event feature: notices, roles (one held by a parent and marked organiser,
     // one by a typed name), sign-ups and food offers. All names are invented.
@@ -846,6 +907,34 @@ export function buildSeedPlan(
   }
 
   const DELIVERY_STATES = ["queued", "sent", "failed"] as const;
+  if (size === "large") {
+    // 200 ended cancellation requests in every ended status, cycling over the places; the places stay active.
+    const ended = [
+      ["approved", null],
+      ["rejected", "administrator_rejected"],
+      ["withdrawn", "withdrawn_by_requester"],
+      ["expired", "duty_started"],
+      ["cancelled", "duty_reassigned"],
+    ] as const;
+    const pool = assignments.filter((entry) => entry.status === "active");
+    for (let index = 0; index < 200 && pool.length > 0; index += 1) {
+      const place = pool[index % pool.length]!;
+      const [status, endedReason] = ended[index % ended.length]!;
+      changeRequests.push({
+        id: id(`change-request:ended:${index + 1}`),
+        kind: "cancellation",
+        status,
+        endedReason,
+        assignmentId: place.id,
+        targetAssignmentId: null,
+        sourceTaskId: place.taskId,
+        targetTaskId: null,
+        sourceFamilyId: place.familyId,
+        targetFamilyId: null,
+        reason: "Régi kérelem",
+      });
+    }
+  }
   const notices: SeedPlan["notices"] = assignments
     .filter(
       (assignment) =>
@@ -925,6 +1014,7 @@ export function buildSeedPlan(
     watches,
     tasks,
     assignments,
+    changeRequests,
     notices,
     timedRuns,
   };
@@ -956,6 +1046,7 @@ export function describePlan(plan: SeedPlan): Record<string, number> {
     watches: plan.watches.length,
     tasks: plan.tasks.length,
     assignments: plan.assignments.length,
+    changeRequests: plan.changeRequests.length,
     notices: plan.notices.length,
     standings: plan.standings.length,
     plans: 1,

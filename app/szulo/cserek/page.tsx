@@ -35,8 +35,13 @@ export default async function SwapRequestsPage() {
       {/* An empty list still shows the board: the result of the last answer must outlive the request. */}
       {requests ? (
         <SwapRequestsBoard
-          incoming={requests.filter((item) => item.direction === "incoming").map(view)}
-          outgoing={requests.filter((item) => item.direction === "outgoing").map(view)}
+          incoming={requests
+            .filter((item) => item.status === "open" && item.direction === "incoming")
+            .map(view)}
+          outgoing={requests
+            .filter((item) => item.status === "open" && item.direction === "outgoing")
+            .map(view)}
+          ended={requests.filter((item) => item.status !== "open").map(view)}
         />
       ) : (
         <ParentStatePanel

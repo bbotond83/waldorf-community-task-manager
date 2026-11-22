@@ -323,7 +323,7 @@ export class ParentPortDouble implements ParentApplicationPort {
   ): DomainOutcome<RequestModel> {
     if (scenario.includes("retryable")) throw new RetryableDoubleFailure();
     if (scenario.includes("terminal")) throw new TerminalDoubleFailure();
-    if (scenario === "conflict") return { state: "conflict", code: "REQUEST_CONFLICT" };
+    if (scenario === "conflict") return { state: "conflict", code: "DUTY_INELIGIBLE" };
     if (scenario === "invalidated") return { state: "invalidated", code: "REQUEST_INVALIDATED" };
     const normalizedAssignmentId = assignmentId.split("--scenario-")[0]!;
     const assignedDuty = [...this.duties.values()].find(
@@ -649,6 +649,40 @@ export class AdminPortDouble implements AdminApplicationPort {
         };
       case "settings.save":
         return this.saveSettings(payload);
+      case "swaps.list":
+        return {
+          state: "success",
+          data: {
+            items: [
+              {
+                id: "swap-1",
+                title: "A család: Sütés ↔ B család: Díszítés",
+                state: "applied",
+                version: 2,
+              },
+              {
+                id: "swap-2",
+                title: "C család: Takarítás ↔ D család: Sütés",
+                state: "applied-final",
+                version: 3,
+              },
+              {
+                id: "swap-3",
+                title: "E család: Díszítés ↔ F család: Takarítás",
+                state: "pending",
+                version: 1,
+              },
+            ],
+          },
+        };
+      case "swaps.reverse":
+        return payload.scenario === "changed-since"
+          ? { state: "conflict", code: "SWAP_CHANGED_SINCE" }
+          : { state: "success", data: { id: String(payload.id), title: "", state: "reversed" } };
+      case "duties.reassign":
+        return payload.scenario === "clash"
+          ? { state: "conflict", code: "ROTA_SAME_WEEK_CLASH" }
+          : { state: "success", data: { id: String(payload.id), title: "", state: "assigned" } };
       default:
         return { state: "denied" };
     }

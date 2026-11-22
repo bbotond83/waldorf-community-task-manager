@@ -79,6 +79,7 @@ describe("requestSwapAction with the partner list", () => {
         counterpartId: PARTNER,
         counterpartVersion: 3,
         expectedVersion: 4,
+        reason: "Beteg a gyerek",
         idempotencyKey: "swap:0123456789abcdef",
       }),
     );

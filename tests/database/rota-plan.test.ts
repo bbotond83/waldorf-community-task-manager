@@ -1040,9 +1040,14 @@ for (const schema of DIRECTORY_SCHEMAS) {
     it("BR25.1 every change function refused DUTY_ROTA_MANAGED", async () => {
       await published();
       const duty = await dutyOf(FAMILY_1);
-      const refusedFor = async (account: string, sql: string, values: unknown[]) => {
+      const refusedFor = async (
+        account: string,
+        sql: string,
+        values: unknown[],
+        code = "DUTY_ROTA_MANAGED",
+      ) => {
         const result = await call(account, sql, values);
-        assert.deepEqual([result.state, result.code], ["conflict", "DUTY_ROTA_MANAGED"], sql);
+        assert.deepEqual([result.state, result.code], ["conflict", code], sql);
       };
       await refusedFor(PARENT_F2, "duty_sign_up($1, $2, $3)", [
         nextKey("a"),
@@ -1060,51 +1065,33 @@ for (const schema of DIRECTORY_SCHEMAS) {
         duty.place_id,
         duty.place_version,
       ]);
-      await refusedFor(PARENT_F1, "swap_request($1, $2, $3, $4, $5, null)", [
-        nextKey("a"),
-        duty.place_id,
-        duty.place_version,
-        ASSIGNMENT_F2_T3,
-        1,
-      ]);
-      await refusedFor(PARENT_F2, "swap_request($1, $2, $3, $4, $5, null)", [
-        nextKey("a"),
-        ASSIGNMENT_F2_T3,
-        1,
-        duty.place_id,
-        duty.place_version,
-      ]);
-      await refusedFor(PARENT_F1, "cancellation_request($1, $2, $3, null)", [
-        nextKey("a"),
-        duty.place_id,
-        duty.place_version,
-      ]);
+      // U7: rota duties can be swapped; the stale versions here are refused before the rota is looked at.
+      await refusedFor(
+        PARENT_F1,
+        "swap_request($1, $2, $3, $4, $5, null)",
+        [nextKey("a"), duty.place_id, duty.place_version, ASSIGNMENT_F2_T3, 1],
+        "DUTY_CLOSED",
+      );
+      // U7: rota duties can be swapped; the stale versions here are refused before the rota is looked at.
+      await refusedFor(
+        PARENT_F2,
+        "swap_request($1, $2, $3, $4, $5, null)",
+        [nextKey("a"), ASSIGNMENT_F2_T3, 1, duty.place_id, duty.place_version],
+        "DUTY_CLOSED",
+      );
+      // U7: cancelling a rota duty is a request now; this one is refused for its own reason.
+      await refusedFor(
+        PARENT_F1,
+        "cancellation_request($1, $2, $3, null)",
+        [nextKey("a"), duty.place_id, duty.place_version],
+        "DUTY_CLOSED",
+      );
       await refusedFor(SUPER_ADMIN, "task_save($1, $2::jsonb)", [
         nextKey("a"),
         JSON.stringify({ id: duty.task_id, expected_version: duty.task_version, title: "Más" }),
       ]);
       await refusedFor(SUPER_ADMIN, "family_archive($1, $2, $3)", [nextKey("a"), FAMILY_1, 1]);
-      // The request functions look at the places of the request.
-      const request = uuid(9500);
-      await db.query(
-        "insert into change_requests (id, organization_id, assignment_id, kind, requested_by_parent_id, source_task_id, source_assignment_version) values ($1, $2, $3, 'cancellation', (select id from parents where family_id = $4 and account_id = $5), $6, $7)",
-        [
-          request,
-          ORGANIZATION,
-          duty.place_id,
-          FAMILY_1,
-          PARENT_F1,
-          duty.task_id,
-          duty.place_version,
-        ],
-      );
-      await refusedFor(PARENT_F1, "swap_withdraw($1, $2)", [nextKey("a"), request]);
-      await refusedFor(PARENT_F2, "swap_respond($1, $2, true, null)", [nextKey("a"), request]);
-      await refusedFor(SUPER_ADMIN, "swap_decide($1, $2, true, null)", [nextKey("a"), request]);
-      await refusedFor(SUPER_ADMIN, "cancellation_decide($1, $2, true, null)", [
-        nextKey("a"),
-        request,
-      ]);
+      // U7: requests on rota duties are allowed and decided by the request functions; tests/database/swaps-rota.test.ts covers them.
       assert.equal(await count(db, "tasks", "title = 'Más'"), 0);
       assert.equal(
         (await db.query("select status from families where id = $1", [FAMILY_1])).rows[0].status,

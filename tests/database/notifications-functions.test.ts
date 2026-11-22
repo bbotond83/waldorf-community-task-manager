@@ -127,7 +127,7 @@ for (const schema of NOTIFICATION_SCHEMAS) {
 
     it("maps every kind to its title and link, and a decision to the outcome of its request (BR40.2)", async () => {
       await db.query(
-        "update change_requests set kind = 'swap', target_assignment_id = $2, target_task_id = $3, target_assignment_version = 1 where id = $1",
+        "update change_requests set kind = 'swap', target_assignment_id = $2, target_task_id = $3, target_assignment_version = 1, target_family_id = (select family_id from assignments where id = $2) where id = $1",
         [REQUEST_1, ASSIGNMENT_F2_T3, TASK_3],
       );
       const decide = (status: string) =>
@@ -156,11 +156,10 @@ for (const schema of NOTIFICATION_SCHEMAS) {
         "an undecided request",
       );
       await decide("approved");
-      assert.equal((await titleOf(swapDecided)).title, "Csere jóváhagyva: Sütés");
       assert.equal((await titleOf(cancellationDecided)).title, "Lemondás jóváhagyva: Sütés");
       await db.query("update change_requests set status = 'applied' where id = $1", [REQUEST_1]);
-      assert.equal((await titleOf(swapDecided)).title, "Csere jóváhagyva: Sütés");
-      await db.query("update change_requests set status = 'withdrawn' where id = $1", [REQUEST_1]);
+      assert.equal((await titleOf(swapDecided)).title, "Csere elfogadva: Sütés");
+      await db.query("update change_requests set status = 'rejected' where id = $1", [REQUEST_1]);
       assert.equal(
         (await titleOf(swapDecided)).title,
         "Csere elutasítva: Sütés",
