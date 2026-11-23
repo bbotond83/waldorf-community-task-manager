@@ -4,6 +4,7 @@ import {
   DirectoryApplicationFacade,
   EventApplicationFacade,
   LibraryApplicationFacade,
+  RecurringApplicationFacade,
   FacadePipeline,
   IdempotencyCoordinator,
   InMemoryIdempotencyStore,
@@ -14,6 +15,7 @@ import {
   type DomainOutcome,
   type EventApplicationPort,
   type LibraryApplicationPort,
+  type RecurringApplicationPort,
   type RotaApplicationPort,
   type WorkingGroupApplicationPort,
   type WorkingGroupChangeModel,
@@ -146,6 +148,21 @@ const LIBRARY_PORT_DOUBLE: LibraryApplicationPort = {
   returnBook: deniedOutcome,
   watch: deniedOutcome,
   unwatch: deniedOutcome,
+};
+
+/** A recurring-duty port with nothing planned: every read and command is refused, as the screens are not built yet. */
+const RECURRING_PORT_DOUBLE: RecurringApplicationPort = {
+  groupList: deniedOutcome,
+  card: deniedOutcome,
+  mine: deniedOutcome,
+  bottle: deniedOutcome,
+  adminList: deniedOutcome,
+  scheduleGet: deniedOutcome,
+  saveSchedule: deniedOutcome,
+  setActive: deniedOutcome,
+  markDone: deniedOutcome,
+  undoDone: deniedOutcome,
+  skip: deniedOutcome,
 };
 
 /** A rota port with nothing published: the overview is empty, everything else is refused. */
@@ -342,6 +359,7 @@ export function createRequestWorld() {
       // The event screens come after the owner's design approval; until then every event read is empty.
       events: new EventApplicationFacade(pipeline, EVENT_PORT_DOUBLE),
       library: new LibraryApplicationFacade(pipeline, LIBRARY_PORT_DOUBLE),
+      recurring: new RecurringApplicationFacade(pipeline, RECURRING_PORT_DOUBLE),
     });
   }
 

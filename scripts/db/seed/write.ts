@@ -378,6 +378,7 @@ export async function writeSeedPlan(client: SqlClient, plan: SeedPlan): Promise<
     await writeLibrary(client, plan);
     await writeNotices(client, plan);
     await writeRota(client, plan);
+    await writeRecurring(client, plan);
     await client.query("commit");
   } catch (error) {
     await client.query("rollback").catch(() => undefined);
@@ -453,6 +454,93 @@ async function writeLibrary(client: SqlClient, plan: SeedPlan): Promise<void> {
     "return_watches",
     ["id", "organization_id", "book_id", "parent_id"],
     plan.watches.map((watch) => [watch.id, organization, watch.bookId, watch.parentId]),
+  );
+}
+
+/**
+ * The recurring duties (U9): the schedules of the plan, then the occurrences of the school year (a few weeks back in the
+ * small set) up to 14 days ahead, made with the database's own due-date function so they follow the published water weeks
+ * and the seasons and are written the way the daily check writes them. The ids of the occurrences come from the schedule
+ * and the date, so a second seed writes the same rows. The past is then settled: about one occurrence in nine was skipped
+ * by the super admin and the rest were done by a parent of the group or family (or of the family on the water week), apart
+ * from the last two weeks, which stay open so the screens show open and overdue duties. A switched-off schedule has no
+ * occurrences.
+ */
+async function writeRecurring(client: SqlClient, plan: SeedPlan): Promise<void> {
+  const organization = plan.organization.id;
+  await insertRows(
+    client,
+    "recurring_schedules",
+    [
+      "id",
+      "organization_id",
+      "title",
+      "category",
+      "owner_kind",
+      "working_group_id",
+      "family_id",
+      "rota_job",
+      "interval_kind",
+      "interval_count",
+      "start_date",
+      "season_from_month",
+      "season_to_month",
+      "is_active",
+    ],
+    plan.recurringSchedules.map((schedule) => [
+      schedule.id,
+      organization,
+      schedule.title,
+      schedule.category,
+      schedule.ownerKind,
+      schedule.groupId,
+      schedule.familyId,
+      schedule.rotaJob,
+      schedule.ownerKind === "rota_week" ? "rota_weeks" : "weeks",
+      schedule.intervalCount,
+      schedule.startDate,
+      schedule.seasonFromMonth,
+      schedule.seasonToMonth,
+      schedule.isActive,
+    ]),
+  );
+  const scheduleIds = plan.recurringSchedules.map((schedule) => schedule.id);
+  await client.query(
+    `insert into recurring_occurrences (id, organization_id, schedule_id, due_date, rota_week_id)
+     select md5(s.id::text || ':' || d.due_date::text)::uuid, s.organization_id, s.id, d.due_date, d.rota_week_id
+       from recurring_schedules s
+      cross join lateral recurring_due_dates(s, greatest(date '2026-09-01', current_date - $3::integer), current_date + 14) d
+      where s.organization_id = $1::uuid and s.is_active and s.id = any ($2::uuid[])
+     on conflict do nothing`,
+    [organization, scheduleIds, plan.size === "large" ? 365 : 28],
+  );
+  await client.query(
+    `update recurring_occurrences o
+        set status = 'skipped', skipped_reason = 'Kihagyva a rossz idő miatt.',
+            skipped_at = ((o.due_date + 1)::timestamp + interval '9 hours') at time zone 'Europe/Budapest',
+            skipped_by_account_id = $2::uuid
+      where o.organization_id = $1::uuid and o.status = 'open' and o.due_date < current_date - 14
+        and get_byte(decode(md5(o.id::text), 'hex'), 0) % 9 = 0`,
+    [organization, plan.recurringSkippedByAccountId],
+  );
+  await client.query(
+    `update recurring_occurrences o
+        set status = 'done', done_by_parent_id = w.parent_id,
+            done_at = ((o.due_date + 1)::timestamp + interval '12 hours') at time zone 'Europe/Budapest'
+       from (select o2.id,
+                    coalesce(
+                      (select m.parent_id from group_memberships m
+                        where s.owner_kind = 'group' and m.group_id = s.working_group_id and m.status = 'active'
+                        order by m.parent_id limit 1),
+                      (select p.id from parents p where s.owner_kind = 'family' and p.family_id = s.family_id
+                        order by p.id limit 1),
+                      (select p.id from parents p join rota_weeks rw on rw.id = o2.rota_week_id
+                        where s.owner_kind = 'rota_week' and p.family_id = rw.family_id order by p.id limit 1)
+                    ) as parent_id
+               from recurring_occurrences o2 join recurring_schedules s on s.id = o2.schedule_id
+              where o2.organization_id = $1::uuid and o2.status = 'open' and o2.due_date < current_date - 14) w
+      where o.id = w.id and w.parent_id is not null`,
+    [organization],
   );
 }
 

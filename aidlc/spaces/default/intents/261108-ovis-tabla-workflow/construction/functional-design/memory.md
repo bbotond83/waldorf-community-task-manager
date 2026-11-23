@@ -85,3 +85,7 @@
 - 2026-11-21T08:50:00Z [unit u13-lending-library] — U15 should say that the spreadsheet's current holder of a book is not migrated and that a row with no authors is refused; U14 decides whether a leaving owner's books should be removed rather than left ownerless.
 
 - 2026-11-21T06:04:15Z — [unit u10-events-and-signups] Replay after Request Changes: kept the approved design and corrected two rules to match the built behaviour; BR110.1 now says a repeated withdrawal answers denied, and BR119.1 says event_list_for_group is readable by every signed-in reader and carries the count and own flag.
+
+- 2026-11-22T12:40:00Z [unit u9-recurring-duties] — Deviation: occurrences are their own records with their own done mark (ADR-003) and create no duty or place, unlike components.md ("occurrences are duties") and contract C18; a group has no single family to hold a place and a rota-week place would need every swap to move it. The cost is that occurrences cannot be swapped and need their own read for My tasks.
+- 2026-11-22T12:40:00Z [unit u9-recurring-duties] — Tradeoff: a rota-week occurrence reads its family live through rota_family_for, so swaps and reassignments move the bottle-cleaning duty with no change to U7.
+- 2026-11-22T12:40:00Z [unit u9-recurring-duties] — Interpretation: group reminders go to the group's coordinators only (members can still see and mark the duty), to avoid noise.

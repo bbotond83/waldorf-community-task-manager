@@ -1,5 +1,6 @@
 import { RotaDutyCard } from "../../../../src/runtime/RotaOverview.tsx";
 import { resolveRotaFacade } from "../../../_identity/rota-facade.ts";
+import { BottleLine, loadBottleLine } from "../../../_recurring/RecurringScreens.tsx";
 import { AdminAccessState } from "../../_components/AdminAccessState.tsx";
 import { resolveAdminSession } from "../../_lib/session.ts";
 
@@ -16,5 +17,16 @@ export default async function AdminRotaDutyPage({ params }: { params: Promise<{ 
   if (session.state !== "success" || !facade) return <AdminAccessState kind="denied" embedded />;
   // A made-up id reaches the database like any other and comes back as the same refusal.
   const result = await facade.getDutyCard(session.data.applicationSession, session.data.scope, id);
-  return <RotaDutyCard result={result} backHref="/admin/beosztas" />;
+  const bottle = await loadBottleLine(
+    { area: "admin", session: session.data.applicationSession, scope: session.data.scope },
+    result,
+    id,
+  );
+  return (
+    <RotaDutyCard
+      result={result}
+      backHref="/admin/beosztas"
+      extra={bottle ? <BottleLine result={bottle} /> : undefined}
+    />
+  );
 }

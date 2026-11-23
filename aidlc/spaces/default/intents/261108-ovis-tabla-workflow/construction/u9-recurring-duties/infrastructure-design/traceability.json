@@ -1,0 +1,31 @@
+{
+  "stage": "infrastructure-design",
+  "unit": "u9-recurring-duties",
+  "upstream_ids": [
+    "NFR1.1", "NFR3.6", "NFR3.7", "NFR4.4", "NFR4.6", "NFR4.7",
+    "NFR5.5", "NFR5.6", "NFR5.8",
+    "NFR6.1", "NFR6.3", "NFR7.3", "NFR7.5", "NFR7.9", "NFR7.10",
+    "NFR8.2", "NFR9.1", "NFR9.3", "NFR9.5"
+  ],
+  "coverage": [
+    { "id": "NFR1.1", "status": "OK", "target": "cicd-pipeline.md Privacy scan row: test addresses on the allowlist; infrastructure-specification.md Starting data: invented list" },
+    { "id": "NFR3.6", "status": "OK", "target": "infrastructure-specification.md Daily-run registry row: execute right for U5's service-role entry point only" },
+    { "id": "NFR3.7", "status": "OK", "target": "infrastructure-specification.md Storage row: no direct table rights, functions in one migration file" },
+    { "id": "NFR4.4", "status": "OK", "target": "infrastructure-specification.md Storage row: new audit action values in the migration" },
+    { "id": "NFR4.6", "status": "OK", "target": "infrastructure-specification.md Daily-run registry row; monitoring-design.md Metrics: timed_check_runs" },
+    { "id": "NFR4.7", "status": "OK", "target": "infrastructure-specification.md Notice registries row; monitoring-design.md Metrics: delivery-problems screen" },
+    { "id": "NFR5.5", "status": "OK", "target": "infrastructure-specification.md Infrastructure Services: unique key on schedule and due date" },
+    { "id": "NFR5.6", "status": "OK", "target": "infrastructure-specification.md Infrastructure Services: unique key; notice once keys through the registry" },
+    { "id": "NFR5.8", "status": "OK", "target": "infrastructure-specification.md Shared Infrastructure: C1 amendment note; Settled for Code Generation: lock list per command" },
+    { "id": "NFR6.1", "status": "OK", "target": "cicd-pipeline.md Unit tests row: coverage thresholds 80/80/80" },
+    { "id": "NFR6.3", "status": "OK", "target": "cicd-pipeline.md Database tests row: scripts, shuffled run, catalogue tests" },
+    { "id": "NFR7.3", "status": "OK", "target": "infrastructure-specification.md Storage row: database checks and removed flags" },
+    { "id": "NFR7.5", "status": "OK", "target": "infrastructure-specification.md Settled for Code Generation: one failing schedule does not stop the run; monitoring-design.md Alerts" },
+    { "id": "NFR7.9", "status": "OK", "target": "infrastructure-specification.md Storage row and cicd-pipeline.md Deployment and Rollback: row-count test" },
+    { "id": "NFR7.10", "status": "OK", "target": "cicd-pipeline.md Pipeline: verify:local in three browsers" },
+    { "id": "NFR8.2", "status": "OK", "target": "cicd-pipeline.md Browser flow row" },
+    { "id": "NFR9.1", "status": "OK", "target": "monitoring-design.md Metrics: timings on the large seed; infrastructure-specification.md Shared Infrastructure: large seed" },
+    { "id": "NFR9.3", "status": "OK", "target": "monitoring-design.md Metrics: daily check workload and budget" },
+    { "id": "NFR9.5", "status": "OK", "target": "cicd-pipeline.md Database tests row: existing timing tests run on the seeded database" }
+  ]
+}

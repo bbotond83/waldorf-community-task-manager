@@ -114,6 +114,8 @@ for (const schema of NOTIFICATION_SCHEMAS) {
           // The lending library's daily return reminder (U13) and the checks of the rota unit (U6), registered in the
           // same run.
           ["library_return_due", "success"],
+          // The recurring duties' daily check (U9).
+          ["recurring_duties", "success"],
           ["rota_week_reminder", "success"],
           ["swap_expiry", "success"],
           ["weekend_picks_reminder", "success"],
@@ -143,6 +145,7 @@ for (const schema of NOTIFICATION_SCHEMAS) {
           { check_name: "duty_reminders", outcome: "success", created: 2 },
           { check_name: "housekeeping", outcome: "success", created: 0 },
           { check_name: "library_return_due", outcome: "success", created: 0 },
+          { check_name: "recurring_duties", outcome: "success", created: 0 },
           { check_name: "rota_week_reminder", outcome: "success", created: 0 },
           { check_name: "swap_expiry", outcome: "success", created: 0 },
           { check_name: "weekend_picks_reminder", outcome: "success", created: 0 },
@@ -230,6 +233,7 @@ for (const schema of NOTIFICATION_SCHEMAS) {
             ["duty_reminders", "success"],
             ["housekeeping", "success"],
             ["library_return_due", "success"],
+            ["recurring_duties", "success"],
             ["rota_week_reminder", "success"],
             ["swap_expiry", "success"],
             ["weekend_picks_reminder", "success"],

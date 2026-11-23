@@ -284,6 +284,44 @@ test("the U10 functions change no assignment and are not part of the hand-off li
 });
 
 /**
+ * U9 (recurring duties) adds callable functions, but none changes a place: a recurring duty is a checklist item with a
+ * due date, not an assignment (C12). The daily check tells people through `notice_send` itself, so none is a wrapped use
+ * case of the hand-off list, and the removal pair of C16 writes the recurring tables only.
+ */
+test("the U9 functions change no assignment and are not part of the hand-off list", () => {
+  const functions = definitions();
+  const changing = writers(functions);
+  const u9 = [
+    "recurring_schedule_save",
+    "recurring_schedule_set_active",
+    "recurring_occurrence_mark_done",
+    "recurring_occurrence_undo_done",
+    "recurring_occurrence_skip",
+    "recurring_list_for_group",
+    "recurring_occurrence_get",
+    "recurring_my_occurrences",
+    "recurring_bottle_for_duty",
+    "recurring_list",
+    "recurring_schedule_get",
+    "recurring_list_admin",
+    "recurring_due_check",
+    "recurring_notice_facts",
+    "recurring_duties_removal_preview",
+    "recurring_duties_removal_apply",
+  ];
+  for (const name of u9) {
+    assert.ok(functions.has(name), `${name} is defined by the migrations`);
+    assert.equal(changing.has(name), false, `${name} writes no assignment`);
+    assert.equal(
+      NOTIFICATION_USE_CASES.some((useCase) => useCase.replaceAll(".", "_") === name),
+      false,
+      `${name} is not a wrapped use case`,
+    );
+  }
+  assert.match(functions.get("recurring_due_check")!.body, /notice_send\(/);
+});
+
+/**
  * U7 functions decide their own notices (BR71.5, BR72.2, BR72.5, BR73.2, BR74.3, BR75.2, BR76.3): each of them that
  * tells someone does it through the helpers that write the notice and the reminder plan inside the same function, and
  * only after the work has succeeded and the key is not a replay.

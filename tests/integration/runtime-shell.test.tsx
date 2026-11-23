@@ -81,13 +81,14 @@ describe("runtime shell", () => {
       "href",
       "/szulo/munkacsoportok",
     );
-    expect(navigation.getAllByRole("link")).toHaveLength(9);
+    expect(navigation.getAllByRole("link")).toHaveLength(10);
     expect(navigation.getAllByRole("link").map((link) => link.textContent)).toEqual([
       "Értesítések",
       "Feladatok",
       "Beosztás",
       "Cserék",
       "Munkacsoportok",
+      "Ismétlődők",
       "Események",
       "Könyvtár",
       "Szülők",
@@ -96,7 +97,7 @@ describe("runtime shell", () => {
   });
 
   it.each([
-    ["group-admin", 10],
+    ["group-admin", 11],
     ["super-admin", 15],
   ] as const)("shows the one menu of %s with %i items", (id, count) => {
     const profile = shellProfile(id);

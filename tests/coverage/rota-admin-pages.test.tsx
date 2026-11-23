@@ -17,6 +17,7 @@ vi.mock("next/navigation", () => ({
 
 const facade = vi.hoisted(() => ({ getCalendar: vi.fn(), getPlan: vi.fn() }));
 vi.mock("../../app/_identity/rota-facade.ts", () => ({ resolveRotaFacade: async () => facade }));
+vi.mock("../../app/_recurring/facade.ts", () => ({ resolveRecurringFacade: async () => undefined }));
 vi.mock("../../app/admin/_lib/session.ts", () => ({
   resolveAdminSession: async () => ({
     state: "success",

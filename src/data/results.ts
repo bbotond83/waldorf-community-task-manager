@@ -71,6 +71,8 @@ const REASON_CODES: Readonly<Record<string, string>> = Object.freeze({
   before_today: "VAL-BEFORE-TODAY",
   too_far: "VAL-TOO-FAR",
   holder_or_owner: "VAL-HOLDER-OR-OWNER",
+  // The recurring commands (U9): an owner that cannot be changed on an existing schedule.
+  cannot_change: "VAL-CANNOT-CHANGE",
   not_a_parent: "VAL-PERSON-INVALID",
   unknown: "VAL-PERSON-INVALID",
 });

@@ -3832,3 +3832,377 @@ nav a:hover {
   background: none;
   box-shadow: none;
 }
+
+/*
+ * Recurring duties (U9): a group's page, my duties, the schedule form, the bottle-cleaning line of a duty card and the
+ * bottle interval of the school calendar. The Stitch designs were followed for the order, the states and the wording;
+ * the bottom navigation bar, the week summary, the key-handover boxes and the duty descriptions and places were left
+ * out because no data stands behind them. A state is always a word with a symbol, never only a colour.
+ */
+.recurring-header h1 {
+  font-size: var(--text-headline-lg);
+  line-height: 1.15;
+}
+
+.recurring-intro {
+  margin: 0.5rem 0 1rem;
+  color: var(--color-muted);
+}
+
+.recurring-new {
+  margin-block: 1rem;
+}
+
+.recurring-section {
+  margin-block: 1.75rem;
+}
+
+.recurring-section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.recurring-section-head h2 {
+  margin: 0;
+  font-size: var(--text-headline-sm);
+}
+
+.recurring-count {
+  border-radius: var(--radius-pill);
+  padding: 0.1rem 0.7rem;
+  color: var(--color-muted);
+  background: var(--color-info-bg);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.recurring-list,
+.recurring-schedules,
+.recurring-history-list {
+  display: grid;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.recurring-card {
+  display: grid;
+  gap: 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  background: var(--color-surface);
+  box-shadow: var(--shadow);
+  overflow-wrap: break-word;
+}
+
+.recurring-card-overdue {
+  border-left: 0.35rem solid var(--color-primary);
+}
+
+.recurring-card-done {
+  border-left: 0.35rem solid var(--color-success);
+}
+
+.recurring-card-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.recurring-status {
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-pill);
+  padding: 0.1rem 0.7rem;
+  background: var(--color-info-bg);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.recurring-status-overdue {
+  color: var(--color-primary-dark);
+  background: var(--color-danger-bg);
+}
+
+.recurring-status-done {
+  color: var(--color-success);
+  background: var(--color-success-bg);
+}
+
+.recurring-status-skipped {
+  color: var(--color-read-text);
+  background: var(--color-read-bg);
+}
+
+.recurring-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.75rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-pill);
+  padding: 0.1rem 0.7rem;
+  color: var(--color-primary-dark);
+  background: var(--color-info-bg);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.recurring-chip-off {
+  color: var(--color-read-text);
+  background: var(--color-read-bg);
+}
+
+.recurring-edit-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-left: auto;
+  font-weight: 600;
+}
+
+.recurring-title {
+  margin: 0;
+  color: var(--color-primary-dark);
+  font-size: 1.2rem;
+  line-height: 1.25;
+}
+
+.recurring-meta,
+.recurring-done-line,
+.recurring-due,
+.recurring-skip-line p {
+  margin: 0;
+}
+
+.recurring-meta {
+  color: var(--color-muted);
+}
+
+.recurring-due {
+  border-radius: var(--radius);
+  padding: 0.5rem 0.75rem;
+  background: var(--color-info-bg);
+  font-weight: 600;
+}
+
+.recurring-card-overdue .recurring-due {
+  background: var(--color-danger-bg);
+}
+
+.recurring-reason {
+  border-radius: var(--radius);
+  padding: 0.5rem 0.75rem;
+  color: var(--color-read-text);
+  background: var(--color-read-bg);
+}
+
+.recurring-reason span {
+  font-weight: 700;
+}
+
+.recurring-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.recurring-actions .parent-form,
+.recurring-schedule-actions .parent-form {
+  margin: 0;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.recurring-actions .parent-form button[type="submit"] {
+  min-height: 44px;
+}
+
+.recurring-actions [data-testid^="recurring-undo-form"] button[type="submit"],
+.recurring-skip-toggle,
+.recurring-schedule-actions button[type="submit"] {
+  min-height: 44px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  padding: 0.75rem 1.1rem;
+  box-shadow: inset 0 0 0 1px var(--color-primary);
+  color: var(--color-primary-dark);
+  background: transparent;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.recurring-actions [data-testid^="recurring-undo-form"] button[type="submit"]:hover,
+.recurring-skip-toggle:hover,
+.recurring-schedule-actions button[type="submit"]:hover {
+  background: var(--color-info-bg);
+}
+
+.recurring-skip {
+  display: grid;
+  gap: 0.75rem;
+  min-width: min(100%, 14rem);
+}
+
+.recurring-skip-toggle {
+  justify-self: start;
+}
+
+.recurring-skip-panel[hidden] {
+  display: none;
+}
+
+.recurring-skip-panel .parent-form {
+  margin: 0;
+  background: var(--color-background);
+}
+
+.recurring-empty {
+  margin-block: 1rem;
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  color: var(--color-muted);
+  font-weight: 600;
+}
+
+.recurring-group-name {
+  margin: 1.25rem 0 0.5rem;
+  color: var(--color-primary);
+  font-size: 1rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.recurring-schedule {
+  display: grid;
+  gap: 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 0.75rem 1rem;
+  background: var(--color-surface);
+}
+
+.recurring-schedule-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.recurring-schedule-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.recurring-schedule-actions a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-weight: 600;
+}
+
+.recurring-history {
+  margin-block: 1.5rem;
+}
+
+.recurring-history summary {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--color-primary-dark);
+  font-weight: 600;
+}
+
+.recurring-history-list {
+  gap: 0.5rem;
+  padding-block: 0.5rem;
+}
+
+.recurring-note {
+  margin: 0 0 1rem;
+  border-left: 0.35rem solid var(--color-focus);
+  border-radius: var(--radius);
+  padding: 0.75rem 1rem;
+  background: var(--color-info-bg);
+}
+
+.recurring-season {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  border: 0;
+  border-radius: var(--radius);
+  padding: 0.75rem 1rem;
+  background: var(--color-info-bg);
+}
+
+.recurring-season legend {
+  padding: 0;
+  font-weight: 700;
+}
+
+.recurring-season p {
+  margin: 0;
+}
+
+.recurring-season select,
+.recurring-bottle-panel input {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 0.5rem;
+  padding: 0.65rem 0.75rem;
+  background: var(--color-surface);
+  font: inherit;
+}
+
+.recurring-owner {
+  margin: 0;
+  border-radius: var(--radius);
+  padding: 0.75rem 1rem;
+  color: var(--color-read-text);
+  background: var(--color-read-bg);
+}
+
+.recurring-field-invalid {
+  border-radius: var(--radius);
+  padding: 0.5rem;
+  background: var(--color-danger-bg);
+}
+
+.recurring-field-invalid .parent-field-error {
+  font-weight: 700;
+}
+
+.recurring-bottle {
+  margin-block: 1.5rem;
+}
+
+.recurring-bottle-panel .parent-form {
+  max-width: 28rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.recurring-group-link {
+  margin-block: 1.5rem;
+}
+
+.recurring-group-link h2 {
+  margin: 0 0 0.75rem;
+}

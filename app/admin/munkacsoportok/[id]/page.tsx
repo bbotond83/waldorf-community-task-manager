@@ -1,5 +1,6 @@
 import { terminalFailure } from "../../../../src/application/results.ts";
 import { EVENT_BASE_PATH } from "../../../_events/actor.ts";
+import { GroupRecurringLink } from "../../../_recurring/RecurringScreens.tsx";
 import { GroupEventsSection, loadGroupEvents } from "../../../_events/EventScreens.tsx";
 import { WorkingGroupDetail } from "../../../../src/runtime/WorkingGroupDetail.tsx";
 import { resolveWorkingGroupFacade } from "../../../teacher/_lib/facade.ts";
@@ -39,11 +40,14 @@ export default async function AdminWorkingGroupPage({
       directoryPath="/admin/szulok"
       extraSections={
         eventsActor ? (
-          <GroupEventsSection
-            actor={eventsActor}
-            groupId={id}
-            result={eventsResult ?? terminalFailure()}
-          />
+          <>
+            <GroupEventsSection
+              actor={eventsActor}
+              groupId={id}
+              result={eventsResult ?? terminalFailure()}
+            />
+            <GroupRecurringLink area="admin" groupId={id} />
+          </>
         ) : null
       }
       memberControls={(member, model) =>

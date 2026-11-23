@@ -74,6 +74,7 @@ describe("seed writer", () => {
       "timed_check_runs",
       "family_year_standings",
       "rota_plans",
+      "recurring_schedules",
     ]);
   });
 
@@ -135,6 +136,7 @@ describe("seed writer", () => {
     assert.equal(rowsOf("books"), plan.books.length);
     assert.equal(rowsOf("loans"), plan.loans.length);
     assert.equal(rowsOf("return_watches"), plan.watches.length);
+    assert.equal(rowsOf("recurring_schedules"), plan.recurringSchedules.length);
     assert.equal(rowsOf("tasks"), counts.tasks);
     assert.equal(rowsOf("assignments"), counts.assignments);
     const familyInsert = calls.find((call) => call.sql.startsWith('insert into "families"'))!;

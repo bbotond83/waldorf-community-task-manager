@@ -4,6 +4,7 @@ import {
   DirectoryApplicationFacade,
   EventApplicationFacade,
   LibraryApplicationFacade,
+  RecurringApplicationFacade,
   FacadePipeline,
   ParentApplicationFacade,
   RotaApplicationFacade,
@@ -17,6 +18,7 @@ import {
   createEventPort,
   createLibraryPort,
   createParentPort,
+  createRecurringPort,
   createRotaPort,
   createTeacherPort,
   createVersionPort,
@@ -46,6 +48,8 @@ export type RequestServices = Readonly<{
   events: EventApplicationFacade;
   /** The lending library: list, book pages, borrowing, returning and watches (U13). */
   library: LibraryApplicationFacade;
+  /** Recurring duties: group pages, my duties, the bottle line, marking done and the schedules (U9). */
+  recurring: RecurringApplicationFacade;
 }>;
 
 export interface ProductionServices {
@@ -74,6 +78,7 @@ export function createProductionServices(database: DatabaseClient): ProductionSe
         directory: new DirectoryApplicationFacade(pipeline, createDirectoryPort(asPerson)),
         events: new EventApplicationFacade(pipeline, createEventPort(asPerson)),
         library: new LibraryApplicationFacade(pipeline, createLibraryPort(asPerson)),
+        recurring: new RecurringApplicationFacade(pipeline, createRecurringPort(asPerson)),
       });
     },
   };

@@ -101,8 +101,8 @@ test("the sign-in screen stays usable and stable when images fail to load (R-05)
 // must land on the home page of its role, with the menu that role is allowed to see.
 const ROLE_LANDINGS = [
   { tag: "super-admin", path: /\/admin$/, menuItems: 15 },
-  { tag: "group-admin-1", path: /\/admin$/, menuItems: 10 },
-  { tag: "parent-1", path: /\/szulo\/ertesitesek$/, menuItems: 9 },
+  { tag: "group-admin-1", path: /\/admin$/, menuItems: 11 },
+  { tag: "parent-1", path: /\/szulo\/ertesitesek$/, menuItems: 10 },
   { tag: "teacher-1", path: /\/teacher\/schedule$/, menuItems: 6 },
 ] as const;
 

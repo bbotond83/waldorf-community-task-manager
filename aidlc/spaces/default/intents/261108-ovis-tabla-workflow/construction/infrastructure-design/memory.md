@@ -14,3 +14,5 @@
 
 ## Open questions
 <!-- example: 2026-05-29T10:14:32Z — confirm the retention window with compliance before the next stage hardens the schema -->
+
+- 2026-11-22T13:05:00Z [unit u9-recurring-duties] — Asked no infrastructure questions; nothing is hosted and the unit adds only database objects, registry rows and screens. The two Major points of the NFR Design review (lock list per command, rota-week renumbering after a republish) and its minor points (one failing schedule, execute right for the service-role entry point, skipped families and groups, C1 amendment in the contract summary) are decided in the "Settled for Code Generation" table of the infrastructure specification, because the NFR design files are frozen after review.

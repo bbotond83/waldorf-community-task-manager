@@ -36,6 +36,7 @@ const allIds = (plan: SeedPlan): string[] => [
   ...plan.books.map((entry) => entry.id),
   ...plan.loans.map((entry) => entry.id),
   ...plan.watches.map((entry) => entry.id),
+  ...plan.recurringSchedules.map((entry) => entry.id),
   ...plan.tasks.map((entry) => entry.id),
   ...plan.assignments.map((entry) => entry.id),
   ...plan.notices.flatMap((entry) => [entry.id, entry.deliveryId]),
@@ -100,6 +101,50 @@ describe("seed data: the small set", () => {
     }
   });
 
+  it("gives the recurring duties the starting list: bottle cleaning every 4th water week, six animal items with three rabbit items off, rounds every 4 weeks, garden items with seasons, and one family schedule (U9)", () => {
+    const schedules = plan.recurringSchedules;
+    const byTitle = (title: string) => schedules.find((entry) => entry.title === title)!;
+    const bottles = byTitle("Vizespalackok tisztítása");
+    assert.deepEqual(
+      [bottles.ownerKind, bottles.rotaJob, bottles.intervalCount, bottles.groupId],
+      ["rota_week", "water_carrying", 4, null],
+    );
+    const animals = schedules.filter((entry) => entry.groupId === plan.groups[5]!.id);
+    assert.equal(animals.length, 6);
+    assert.deepEqual(
+      animals.filter((entry) => !entry.isActive).map((entry) => entry.category),
+      ["nyúl", "nyúl", "nyúl"],
+    );
+    assert.equal(byTitle("Játszótér körbejárása").groupId, plan.groups[0]!.id);
+    assert.equal(byTitle("Játszótér körbejárása").intervalCount, 4);
+    assert.equal(byTitle("Épület és udvar körbejárása").intervalCount, 4);
+    assert.deepEqual(
+      [byTitle("Fűnyírás"), byTitle("Gyomlálás"), byTitle("Komposzt átrakása")].map((entry) => [
+        entry.intervalCount,
+        entry.seasonFromMonth,
+        entry.seasonToMonth,
+      ]),
+      [
+        [2, 4, 10],
+        [3, 4, 9],
+        [6, 3, 11],
+      ],
+    );
+    const family = schedules.filter((entry) => entry.ownerKind === "family");
+    assert.deepEqual(
+      family.map((entry) => entry.familyId),
+      [plan.families[0]!.id],
+    );
+    for (const entry of schedules) {
+      assert.ok(
+        entry.startDate >= "2026-08-31" && new Date(entry.startDate).getUTCDay() === 1,
+        "starts on a Monday",
+      );
+      assert.ok((entry.seasonFromMonth === null) === (entry.seasonToMonth === null));
+    }
+    assert.equal(plan.recurringSkippedByAccountId, plan.accounts[0]!.id);
+  });
+
   it("has the six working groups, 6 families with parents and children, a super admin, two group admins and a teacher", () => {
     assert.deepEqual(describePlan(plan), {
       groups: 6,
@@ -111,6 +156,7 @@ describe("seed data: the small set", () => {
       books: 6,
       loans: 4,
       watches: 4,
+      recurringSchedules: 13,
       tasks: 8,
       assignments: 8,
       changeRequests: 2,

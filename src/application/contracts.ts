@@ -87,6 +87,9 @@ export type AuthorizationMatrixRowId =
   | "AUTH-PARENT-EVENT-SIGNUP"
   | "AUTH-LIBRARY"
   | "AUTH-LIBRARY-COMMANDS"
+  | "AUTH-RECURRING"
+  | "AUTH-RECURRING-DUTY"
+  | "AUTH-RECURRING-MANAGE"
   | "AUTH-ROTA-OVERVIEW"
   | "AUTH-ROTA-DUTY"
   | "AUTH-DIRECTORY"
@@ -386,6 +389,80 @@ export type LibraryBookDetailModel = Readonly<{
 
 /** What a library command returns: the row's id and its new version (none for a removal or a watch). */
 export type LibraryChangeModel = Readonly<{ id: string | null; version: number | null }>;
+
+export type RecurringOwnerKind = "group" | "family" | "rota_week";
+
+/**
+ * One occurrence of a recurring duty with what the caller may do (U9). "Overdue" is not stored: it is an open
+ * occurrence whose due date has passed. A person appears only as a display name, a removed one as "korábbi tag".
+ */
+export type RecurringItem = Readonly<{
+  id: string;
+  scheduleId: string;
+  title: string;
+  category: string;
+  ownerKind: RecurringOwnerKind;
+  workingGroupId?: string;
+  groupName?: string;
+  dueDate: string;
+  status: "open" | "done" | "skipped";
+  isOverdue: boolean;
+  version: number;
+  doneByDisplayName?: string;
+  doneAt?: string;
+  skippedReason?: string;
+  skippedByDisplayName?: string;
+  canMarkDone: boolean;
+  canUndo: boolean;
+  canSkip: boolean;
+}>;
+
+/** A schedule as the form and the lists need it. The admin list adds the family's display name. */
+export type RecurringScheduleItem = Readonly<{
+  id: string;
+  title: string;
+  category: string;
+  ownerKind: RecurringOwnerKind;
+  workingGroupId?: string;
+  familyId?: string;
+  familyDisplayName?: string;
+  rotaJob?: string;
+  intervalKind: string;
+  intervalCount: number;
+  startDate: string;
+  seasonFromMonth?: number;
+  seasonToMonth?: number;
+  isActive: boolean;
+  version: number;
+}>;
+
+/** A working group's recurring page in one document (NFR9.4): its schedules, open and recent items, and the history. */
+export type RecurringGroupListModel = Readonly<{
+  group: Readonly<{ id: string; name: string; status: string }>;
+  schedules: readonly RecurringScheduleItem[];
+  items: readonly RecurringItem[];
+  history: readonly RecurringItem[];
+  canManage: boolean;
+  canMark: boolean;
+}>;
+
+/** One duty card: the occurrence and its schedule. */
+export type RecurringCardModel = Readonly<{ item: RecurringItem; schedule: RecurringScheduleItem }>;
+
+/** The items of the caller's family and groups, or of one rota week's duty card (the bottle-cleaning line). */
+export type RecurringItemsModel = Readonly<{ items: readonly RecurringItem[] }>;
+
+/** The schedules of families and rota jobs, for a super admin. */
+export type RecurringScheduleListModel = Readonly<{ items: readonly RecurringScheduleItem[] }>;
+
+/** One schedule for the form, and whether the caller may change it. */
+export type RecurringScheduleModel = Readonly<{
+  schedule: RecurringScheduleItem;
+  canManage: boolean;
+}>;
+
+/** What a recurring command returns: the row's id and its new version. */
+export type RecurringChangeModel = Readonly<{ id: string | null; version: number | null }>;
 
 /** The school year a calendar or plan screen is showing. */
 export type RotaSchoolYear = Readonly<{

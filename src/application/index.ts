@@ -44,5 +44,7 @@ export { EventApplicationFacade } from "./event-facade.ts";
 export type { EventApplicationPort } from "./event-facade.ts";
 export { LibraryApplicationFacade } from "./library-facade.ts";
 export type { LibraryApplicationPort } from "./library-facade.ts";
+export { RecurringApplicationFacade } from "./recurring-facade.ts";
+export type { RecurringApplicationPort, RecurringScheduleInput } from "./recurring-facade.ts";
 export { DirectoryApplicationFacade } from "./directory-facade.ts";
 export type { DirectoryApplicationPort } from "./directory-facade.ts";
