@@ -428,6 +428,7 @@ for (const schema of NOTIFICATION_SCHEMAS) {
         [RECURRING_OCCURRENCE, ORGANIZATION, RECURRING_SCHEDULE],
       );
       const targets: Record<string, string> = {
+        animal_signup: YEAR_1,
         recurring_duty: RECURRING_OCCURRENCE,
         book: BOOK,
         task: TASK_1,

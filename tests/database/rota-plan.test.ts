@@ -988,6 +988,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
         "duty_id",
         "family_display_name",
         "includes_watering",
+        "info_links",
         "is_break_week",
         "job",
         "no_fixed_day",

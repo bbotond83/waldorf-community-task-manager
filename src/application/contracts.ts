@@ -90,6 +90,11 @@ export type AuthorizationMatrixRowId =
   | "AUTH-RECURRING"
   | "AUTH-RECURRING-DUTY"
   | "AUTH-RECURRING-MANAGE"
+  | "AUTH-ANIMAL"
+  | "AUTH-ANIMAL-SLOT"
+  | "AUTH-ANIMAL-MANAGE"
+  | "AUTH-INFO"
+  | "AUTH-INFO-EDIT"
   | "AUTH-ROTA-OVERVIEW"
   | "AUTH-ROTA-DUTY"
   | "AUTH-DIRECTORY"
@@ -590,6 +595,99 @@ export type RecurringScheduleModel = Readonly<{
 /** What a recurring command returns: the row's id and its new version. */
 export type RecurringChangeModel = Readonly<{ id: string | null; version: number | null }>;
 
+/** One link from a duty to a section of the information page (U8). */
+export type InfoLink = Readonly<{ key: string; title: string }>;
+
+/**
+ * One morning or afternoon slot of the animal-care sign-up (U8). A taken slot shows the family's display name only.
+ * `canGiveUp` is true only for the caller's own slot more than 24 hours ahead and outside an open swap.
+ */
+export type AnimalSlotItem = Readonly<{
+  slotDate: string;
+  part: "morning" | "afternoon";
+  startTime: string;
+  dutyId: string;
+  dutyVersion: number;
+  placeId?: string;
+  placeVersion?: number;
+  familyName?: string;
+  mine: boolean;
+  inSwap: boolean;
+  started: boolean;
+  cancelled: boolean;
+  canGiveUp: boolean;
+  mayHold: boolean;
+  holdReason?: string;
+}>;
+
+/** The slots of a few weeks from a date, with the information links of the two parts. */
+export type AnimalSlotsModel = Readonly<{
+  schoolYearId: string;
+  fromDate: string;
+  toDate: string;
+  slots: readonly AnimalSlotItem[];
+  infoLinksMorning: readonly InfoLink[];
+  infoLinksAfternoon: readonly InfoLink[];
+}>;
+
+export type AnimalFairShareRow = Readonly<{
+  familyName: string;
+  count: number;
+  share: number;
+  activeWeeks: number;
+  mine: boolean;
+}>;
+
+/** The fair-share panel: the caller's own family, the year's average and every counted family. */
+export type AnimalFairShareModel = Readonly<{
+  average: number;
+  mine?: AnimalFairShareRow;
+  families: readonly AnimalFairShareRow[];
+}>;
+
+/** The animal-care settings of a school year for a super admin; `exists` is false before the first save. */
+export type AnimalCalendarModel = Readonly<{
+  schoolYearId: string;
+  exists: boolean;
+  morningStart: string;
+  afternoonStart: string;
+  careGroupId?: string;
+  generatedAt?: string;
+  slotCount: number;
+  version: number;
+  groups: readonly Readonly<{ id: string; name: string }>[];
+}>;
+
+/** What an animal-care command returns: the row's id, its new version and, for slot creation, how many were added. */
+export type AnimalChangeModel = Readonly<{
+  id: string | null;
+  version: number | null;
+  added?: number;
+}>;
+
+/** One section of the information page with what the caller may do to it. */
+export type InfoSectionItem = Readonly<{
+  id: string;
+  key: string;
+  title: string;
+  body: string;
+  owningGroupName?: string;
+  seasonMonths?: readonly number[];
+  position: number;
+  hidden: boolean;
+  version: number;
+  canEditText: boolean;
+  canEditAll: boolean;
+}>;
+
+export type InfoSectionsModel = Readonly<{
+  canManage: boolean;
+  ownerGroupNames: readonly string[];
+  items: readonly InfoSectionItem[];
+}>;
+
+export type InfoChangeModel = Readonly<{ id: string | null; version: number | null }>;
+
 /** The school year a calendar or plan screen is showing. */
 export type RotaSchoolYear = Readonly<{
   id: string;
@@ -795,6 +893,8 @@ export type RotaDutyCardModel = Readonly<{
   isBreakWeek: boolean;
   includesWatering: boolean;
   bottlesAtWeekEnd: boolean;
+  /** Sections of the information page that explain this duty (U8, BR88); empty when none applies. */
+  infoLinks: readonly InfoLink[];
   day?: "saturday" | "sunday" | "weekend";
   partOfDay?: "morning" | "evening" | "all_day";
   weekend?: WeekendStateModel;

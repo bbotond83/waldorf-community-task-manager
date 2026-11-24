@@ -134,7 +134,12 @@ describe("honest executable denominator", () => {
     // eight pages (the group page in the parent, teacher and admin areas, my duties, and the new and change forms in the
     // parent and admin areas): 304 + 11. U11 adds the checklist facade (src/application/checklist-facade.ts) and its
     // data adapter (src/data/checklists.ts) so far: 315 + 2.
-    expect(inventory.length).toBe(335);
+    // U8 adds the animal-care and information facades, their data adapters and the section-text renderer so far:
+    // 335 + 5. The screens add fourteen: the animal-care shared code (app/_animal: facade resolver, result mapper,
+    // actions, forms and screens: 5), the information code (app/_info: person, actions, forms, screens and the hash
+    // opener: 5) and four pages (the information page and its layout, the parent sign-up page and the admin settings
+    // page): 340 + 14.
+    expect(inventory.length).toBe(355);
     for (const path of [
       "src/runtime/AppNav.tsx",
       "src/runtime/StatusBadge.tsx",

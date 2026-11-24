@@ -85,9 +85,11 @@ for (const profile of ROLES) {
             ? "directory-page"
             : path === "/szulo/konyvtar"
               ? "library-list-page"
-              : path === "/szulo/ismetlodo"
-                ? "recurring-mine-page"
-                : "rota-overview-page";
+              : path === "/szulo/allatok"
+                ? "animal-page"
+                : path === "/szulo/ismetlodo"
+                  ? "recurring-mine-page"
+                  : "rota-overview-page";
         await expect(page.getByTestId(pageId)).toBeVisible();
         continue;
       }

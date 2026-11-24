@@ -609,6 +609,7 @@ test("the duty card maps the week and says there is no fixed day for a weekly du
       noFixedDay: true,
       isBreakWeek: false,
       includesWatering: false,
+      infoLinks: [],
       bottlesAtWeekEnd: false,
     },
   });
@@ -700,6 +701,16 @@ test("a picking family's duty card carries the weekend, its own pick state and t
     },
     { job: "front_garden", state: "not_needed" },
   ]);
+});
+
+test("the duty card carries the information links of the duty, and none when the field is missing (U8)", async () => {
+  const links = [{ key: "kert", title: "Kert" }];
+  const { port } = rota({
+    rpc: () => envelope("success", null, { item: { ...cardItem, info_links: links } }, DUTY),
+  });
+  const outcome = await port.dutyCard({ dutyId: DUTY });
+  assert.ok(outcome.state === "success");
+  if (outcome.state === "success") assert.deepEqual(outcome.data.infoLinks, links);
 });
 
 test("a weekend duty card maps the slot, the day and the part of the day, and a front-garden or water card its flags (BR65.2)", async () => {

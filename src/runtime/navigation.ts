@@ -13,6 +13,8 @@ export const PARENT_NAVIGATION: readonly NavigationItem[] = [
   { id: "parent-recurring", label: "Ismétlődők", href: "/szulo/ismetlodo" },
   { id: "parent-events", label: "Események", href: "/szulo/esemenyek" },
   { id: "parent-library", label: "Könyvtár", href: "/szulo/konyvtar" },
+  { id: "parent-animal-care", label: "Állatgondozás", href: "/szulo/allatok" },
+  { id: "parent-information", label: "Információ", href: "/informacio" },
   { id: "parent-directory", label: "Szülők", href: "/szulo/szulok" },
   { id: "parent-account", label: "Fiókom", href: "/szulo/fiokom" },
 ];
@@ -24,6 +26,8 @@ export const TEACHER_NAVIGATION: readonly NavigationItem[] = [
   { id: "teacher-working-groups", label: "Munkacsoportok", href: "/teacher/munkacsoportok" },
   { id: "teacher-events", label: "Események", href: "/teacher/esemenyek" },
   { id: "teacher-library", label: "Könyvtár", href: "/teacher/konyvtar" },
+  { id: "teacher-animal-care", label: "Állatgondozás", href: "/teacher/allatok" },
+  { id: "teacher-information", label: "Információ", href: "/informacio" },
   { id: "teacher-directory", label: "Szülők", href: "/teacher/szulok" },
 ];
 
@@ -39,6 +43,9 @@ export const GROUP_ADMIN_NAVIGATION: readonly NavigationItem[] = [
   { id: "admin-recurring", label: "Ismétlődők", href: "/szulo/ismetlodo" },
   // The library is the parent page: an admin is also a parent of a family, who borrows and adds books there.
   { id: "admin-library", label: "Könyvtár", href: "/szulo/konyvtar" },
+  // The sign-up page is the parent page: a group admin is also a parent of a family, who signs up there.
+  { id: "admin-animal-care", label: "Állatgondozás", href: "/szulo/allatok" },
+  { id: "admin-information", label: "Információ", href: "/informacio" },
   // The overview is the parent page: a group admin is also a parent of a family, who reads it there (BR24.1).
   { id: "admin-rota-overview", label: "Beosztás", href: "/szulo/beosztas" },
   // The directory is the parent page, which every signed-in role opens (BR30.1). "Fiókom" is the parent's own page.
@@ -56,6 +63,8 @@ export const SUPER_ADMIN_NAVIGATION: readonly NavigationItem[] = [
   { id: "admin-events", label: "Események", href: "/admin/esemenyek" },
   { id: "admin-templates", label: "Sablonok", href: "/admin/sablonok" },
   { id: "admin-library", label: "Könyvtár", href: "/admin/konyvtar" },
+  { id: "admin-animal-care", label: "Állatgondozás", href: "/admin/allatgondozas" },
+  { id: "admin-information", label: "Információ", href: "/informacio" },
   { id: "admin-school-year", label: "Tanév", href: "/admin/tanev" },
   { id: "admin-rota", label: "Beosztás", href: "/admin/beosztas" },
   { id: "admin-directory", label: "Szülők", href: "/admin/szulok" },

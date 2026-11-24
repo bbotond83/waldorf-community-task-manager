@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { Fragment, type ReactNode } from "react";
 import type {
   ApplicationResult,
   RotaDutyCardModel,
@@ -505,6 +505,17 @@ export function RotaDutyCard({
             </>
           )}
           {extra}
+          {card.infoLinks.length > 0 && (
+            <p className="parent-notice" data-testid="rota-card-info-links">
+              Tudnivalók:{" "}
+              {card.infoLinks.map((link, index) => (
+                <Fragment key={link.key}>
+                  {index > 0 && ", "}
+                  <a href={`/informacio#${link.key}`}>{link.title}</a>
+                </Fragment>
+              ))}
+            </p>
+          )}
           {card.ownPick && (
             <section
               className="parent-rota-picker"

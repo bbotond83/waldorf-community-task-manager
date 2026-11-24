@@ -196,6 +196,8 @@ describe("the other new words of the screens", () => {
       ["parent-recurring", "Ismétlődők", "/szulo/ismetlodo"],
       ["parent-events", "Események", "/szulo/esemenyek"],
       ["parent-library", "Könyvtár", "/szulo/konyvtar"],
+      ["parent-animal-care", "Állatgondozás", "/szulo/allatok"],
+      ["parent-information", "Információ", "/informacio"],
       ["parent-directory", "Szülők", "/szulo/szulok"],
       ["parent-account", "Fiókom", "/szulo/fiokom"],
     ]);

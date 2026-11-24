@@ -20,7 +20,7 @@
 - **Depth**: Standard
 - **Test Strategy**: Standard
 - **Review Override**: 
-- **Guard Policy**: off (from scope classic)
+- **Guard Policy**: relaxed (set by you)
 - **Sensors**: on (from scope classic)
 - **Learnings**: on (from scope classic)
 - **Summary Confirmation**: off (from scope classic)
@@ -49,6 +49,36 @@
 - **Unit Ownership**: solo
 
 - **Skeleton Stance**: scope-dependent
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -329,7 +359,7 @@
 - **Current Stage**: functional-design
 - **Next Stage**: nfr-requirements
 - **Status**: Running
-- **Last Updated**: 2026-11-23T21:30:16Z
+- **Last Updated**: 2026-11-24T11:07:20Z
 
 - **Construction Autonomy Mode**: gated
 

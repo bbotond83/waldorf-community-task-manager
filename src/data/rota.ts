@@ -406,6 +406,11 @@ function toDutyCard(envelope: Envelope): RotaDutyCardModel {
     isBreakWeek: flag(item, "is_break_week"),
     includesWatering: flag(item, "includes_watering"),
     bottlesAtWeekEnd: flag(item, "bottles_at_week_end"),
+    infoLinks: Object.freeze(
+      asRows(item.info_links ?? []).map((row) =>
+        Object.freeze({ key: text(row, "key"), title: text(row, "title") }),
+      ),
+    ),
     ...(day ? { day } : {}),
     ...(partOfDay ? { partOfDay } : {}),
     ...(weekend ? { weekend } : {}),

@@ -71,7 +71,18 @@ describe("seed on the real stack", () => {
     );
     assert.equal(await rowCount(db, A, "app_authorization_versions"), counts.accounts);
     assert.equal(await rowCount(db, A, "events"), counts.events);
-    assert.equal(await rowCount(db, A, "tasks"), counts.tasks);
+    // The year's animal-care slots (U8) have duties of their own, one per slot, so the plan's tasks are counted apart.
+    assert.equal(await rowCount(db, A, "tasks", "origin_kind <> 'animal_slot'"), counts.tasks);
+    assert.equal(
+      await rowCount(db, A, "tasks", "origin_kind = 'animal_slot'"),
+      await rowCount(db, A, "animal_slots"),
+    );
+    assert.ok((await rowCount(db, A, "animal_slots")) > 300);
+    assert.equal(await rowCount(db, A, "info_sections"), 6);
+    assert.equal(
+      await rowCount(db, A, "assignments", `task_id in (select duty_id from "${A}".animal_slots)`),
+      0,
+    );
     assert.equal(await rowCount(db, A, "assignments"), counts.assignments);
     assert.equal(await rowCount(db, A, "books"), counts.books);
     assert.equal(await rowCount(db, A, "loans"), counts.loans);
@@ -126,6 +137,29 @@ describe("seed on the real stack", () => {
     assert.equal(await rowCount(db, A, "groups"), 6);
     assert.equal(await rowCount(db, A, "accounts"), 34);
     assert.equal((await schemaUsers(db, A)).length, 34);
+  });
+
+  it("U8: the large set holds a school year of animal-care slots, about 60 in 100 held by an active family, one family per slot", async () => {
+    const { deps, lines } = realSeedDeps();
+    assert.equal(await seedMain(["--schema", A, "--large"], deps), 0, lines.join("\n"));
+    const slots = await rowCount(db, A, "animal_slots");
+    const held = await rowCount(
+      db,
+      A,
+      "assignments",
+      `task_id in (select duty_id from "${A}".animal_slots) and status = 'active'`,
+    );
+    assert.ok(slots > 300, `slots ${slots}`);
+    assert.ok(held / slots > 0.5 && held / slots < 0.7, `held ${held} of ${slots}`);
+    const families = new Set(
+      (
+        await db.query(
+          `select distinct family_id::text from "${A}".assignments where task_id in (select duty_id from "${A}".animal_slots)`,
+        )
+      ).rows.map((row) => row.family_id),
+    );
+    assert.ok(families.size > 20, "the held slots are spread over the families");
+    assert.equal(await rowCount(db, A, "info_sections"), 6);
   });
 
   it("U9: the large set holds the starting list with a school year of occurrences: switched-off items have none, the bottle cleaning follows every 4th published water week, the past is done or skipped by a person who belongs there", async () => {
@@ -222,6 +256,7 @@ describe("seed on the real stack", () => {
     assert.equal(await seedMain(["--schema", A], deps), 0, lines.join("\n"));
     // The starting checklist templates (U11) get random ids on each install, so they are compared by their counts.
     const templateTables = [
+      "info_sections",
       "checklist_templates",
       "checklist_template_sections",
       "checklist_template_tasks",
@@ -398,7 +433,7 @@ describe("seed on the real stack", () => {
       "every rota has a row for every school week",
     );
     assert.equal(
-      await rowCount(db, A, "tasks"),
+      await rowCount(db, A, "tasks", "origin_kind <> 'animal_slot'"),
       describePlan(small).tasks,
       "a draft makes no duty",
     );

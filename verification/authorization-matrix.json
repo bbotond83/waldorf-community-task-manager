@@ -998,6 +998,196 @@
       "resources": ["recurring", "recurring_duty", "recurring_schedule"],
       "fields": [],
       "effect": "deny"
+    },
+    {
+      "id": "AUTH-ANIMAL-READ-PARENT-ALLOW",
+      "role": "parent",
+      "scope": "community",
+      "route": "/szulo/allatok/**",
+      "actions": ["read"],
+      "resources": ["animal_care"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-ANIMAL-READ-GROUP-ADMIN-ALLOW",
+      "role": "group_admin",
+      "scope": "community",
+      "route": "/szulo/allatok/**",
+      "actions": ["read"],
+      "resources": ["animal_care"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-ANIMAL-READ-SUPER-ADMIN-ALLOW",
+      "role": "super_admin",
+      "scope": "community",
+      "route": "/admin/allatgondozas/**",
+      "actions": ["read"],
+      "resources": ["animal_care"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-ANIMAL-READ-TEACHER-ALLOW",
+      "role": "kindergarten_teacher",
+      "scope": "community",
+      "route": "/teacher/allatok/**",
+      "actions": ["read"],
+      "resources": ["animal_care"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-ANIMAL-SLOT-PARENT-ALLOW",
+      "role": "parent",
+      "scope": "linked-family",
+      "route": "/szulo/allatok/**",
+      "actions": ["update"],
+      "resources": ["animal_slot"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-ANIMAL-SLOT-GROUP-ADMIN-ALLOW",
+      "role": "group_admin",
+      "scope": "linked-family",
+      "route": "/szulo/allatok/**",
+      "actions": ["update"],
+      "resources": ["animal_slot"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-ANIMAL-SLOT-SUPER-ADMIN-ALLOW",
+      "role": "super_admin",
+      "scope": "organization",
+      "route": "/admin/allatgondozas/**",
+      "actions": ["update"],
+      "resources": ["animal_slot"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-ANIMAL-SLOT-TEACHER-DENY",
+      "role": "kindergarten_teacher",
+      "scope": "community",
+      "route": "/teacher/allatok/**",
+      "actions": ["update"],
+      "resources": ["animal_slot"],
+      "fields": [],
+      "effect": "deny"
+    },
+    {
+      "id": "AUTH-ANIMAL-MANAGE-SUPER-ADMIN-ALLOW",
+      "role": "super_admin",
+      "scope": "organization",
+      "route": "/admin/allatgondozas/**",
+      "actions": ["read", "create", "update"],
+      "resources": ["animal_calendar"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-ANIMAL-MANAGE-OTHERS-DENY",
+      "role": "any_authenticated",
+      "scope": "parent-group-admin-or-teacher",
+      "route": "/szulo/allatok/**",
+      "actions": ["read", "create", "update"],
+      "resources": ["animal_calendar"],
+      "fields": [],
+      "effect": "deny"
+    },
+    {
+      "id": "AUTH-ANIMAL-OTHER-COMMUNITY-DENY",
+      "role": "any_authenticated",
+      "scope": "other-community",
+      "route": "/szulo/allatok/**",
+      "actions": ["read", "create", "update"],
+      "resources": ["animal_care", "animal_slot", "animal_calendar"],
+      "fields": [],
+      "effect": "deny"
+    },
+    {
+      "id": "AUTH-INFO-READ-PARENT-ALLOW",
+      "role": "parent",
+      "scope": "community",
+      "route": "/informacio/**",
+      "actions": ["read"],
+      "resources": ["info"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-INFO-READ-GROUP-ADMIN-ALLOW",
+      "role": "group_admin",
+      "scope": "community",
+      "route": "/informacio/**",
+      "actions": ["read"],
+      "resources": ["info"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-INFO-READ-SUPER-ADMIN-ALLOW",
+      "role": "super_admin",
+      "scope": "community",
+      "route": "/informacio/**",
+      "actions": ["read"],
+      "resources": ["info"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-INFO-READ-TEACHER-ALLOW",
+      "role": "kindergarten_teacher",
+      "scope": "community",
+      "route": "/informacio/**",
+      "actions": ["read"],
+      "resources": ["info"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-INFO-EDIT-GROUP-ADMIN-ALLOW",
+      "role": "group_admin",
+      "scope": "group",
+      "route": "/informacio/**",
+      "actions": ["create", "update", "manage"],
+      "resources": ["info_section"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-INFO-EDIT-SUPER-ADMIN-ALLOW",
+      "role": "super_admin",
+      "scope": "organization",
+      "route": "/informacio/**",
+      "actions": ["create", "update", "manage"],
+      "resources": ["info_section"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-INFO-EDIT-PARENT-TEACHER-DENY",
+      "role": "any_authenticated",
+      "scope": "parent-or-teacher-without-group-admin-grant",
+      "route": "/informacio/**",
+      "actions": ["create", "update", "manage"],
+      "resources": ["info_section"],
+      "fields": [],
+      "effect": "deny"
+    },
+    {
+      "id": "AUTH-INFO-OTHER-COMMUNITY-DENY",
+      "role": "any_authenticated",
+      "scope": "other-community",
+      "route": "/informacio/**",
+      "actions": ["read", "create", "update", "manage"],
+      "resources": ["info", "info_section"],
+      "fields": [],
+      "effect": "deny"
     }
   ]
 }

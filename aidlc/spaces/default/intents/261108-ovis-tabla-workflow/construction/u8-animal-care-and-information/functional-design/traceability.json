@@ -1,0 +1,129 @@
+{
+  "stage": "functional-design",
+  "unit": "u8-animal-care-and-information",
+  "upstream_ids": [
+    "AC7.1.1",
+    "AC7.1.2",
+    "AC7.1.3",
+    "AC7.2.1",
+    "AC7.2.2",
+    "AC7.2.3",
+    "AC7.3.1",
+    "AC7.3.2",
+    "AC7.3.3",
+    "AC10.1.1",
+    "AC10.1.2",
+    "AC10.1.3",
+    "AC10.2.1",
+    "AC10.2.2"
+  ],
+  "coverage": [
+    {
+      "id": "AC7.1.1",
+      "status": "OK",
+      "target": "BR80.1, BR80.2, BR80.3, BR80.4, BR81.1, BR81.2, BR81.6"
+    },
+    {
+      "id": "AC7.1.2",
+      "status": "OK",
+      "target": "BR81.3, BR81.4"
+    },
+    {
+      "id": "AC7.1.3",
+      "status": "OK",
+      "target": "BR81.1"
+    },
+    {
+      "id": "AC7.2.1",
+      "status": "OK",
+      "target": "BR83.1, BR83.2, BR83.3, BR83.4"
+    },
+    {
+      "id": "AC7.2.2",
+      "status": "OK",
+      "target": "BR81.5, BR83.5, BR84.1, BR84.2, BR84.3"
+    },
+    {
+      "id": "AC7.2.3",
+      "status": "OK",
+      "target": "BR84.4"
+    },
+    {
+      "id": "AC7.3.1",
+      "status": "OK",
+      "target": "BR85.1, BR85.2, BR85.3, BR85.6"
+    },
+    {
+      "id": "AC7.3.2",
+      "status": "OK",
+      "target": "BR80.5, BR85.4"
+    },
+    {
+      "id": "AC7.3.3",
+      "status": "OK",
+      "target": "BR85.5"
+    },
+    {
+      "id": "AC10.1.1",
+      "status": "OK",
+      "target": "BR86.1, BR86.2, BR86.3"
+    },
+    {
+      "id": "AC10.1.2",
+      "status": "OK",
+      "target": "BR88.1"
+    },
+    {
+      "id": "AC10.1.3",
+      "status": "OK",
+      "target": "BR88.2, BR88.3"
+    },
+    {
+      "id": "AC10.2.1",
+      "status": "OK",
+      "target": "BR87.1, BR87.4, BR87.5, BR87.6"
+    },
+    {
+      "id": "AC10.2.2",
+      "status": "OK",
+      "target": "BR87.2, BR87.3"
+    },
+    {
+      "id": "BR81.7",
+      "status": "OK",
+      "target": "tests/database/animal-calendar-slots.test.ts (teacher schedule leaves out slots), tests/browser/animal-care.spec.ts (teacher page)"
+    }
+  ],
+  "reverse": [
+    {
+      "id": "BR82.1",
+      "status": "N/A",
+      "target": "giving up a slot: ADR-012 and contract C19; its acceptance criteria are added in functional-spec.md (Give-up 3)"
+    },
+    {
+      "id": "BR82.2",
+      "status": "N/A",
+      "target": "giving up a slot: ADR-012, assumption A6 and contract C19 (only animal-care slots)"
+    },
+    {
+      "id": "BR82.3",
+      "status": "N/A",
+      "target": "giving up a slot: ADR-012, refined-mockups Q5 and contract C19; functional-spec.md Give-up 1 and 2"
+    },
+    {
+      "id": "BR82.4",
+      "status": "N/A",
+      "target": "giving up a slot: contract C19 pending-swap rule; functional-spec.md Give-up 4"
+    },
+    {
+      "id": "BR82.5",
+      "status": "N/A",
+      "target": "giving up a slot: contract C19 and NFR5; functional-spec.md Give-up 1 and 5"
+    },
+    {
+      "id": "BR89.1",
+      "status": "N/A",
+      "target": "technical locking rule for NFR5 and the team's fixed lock order"
+    }
+  ]
+}

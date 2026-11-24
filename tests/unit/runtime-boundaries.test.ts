@@ -129,6 +129,8 @@ describe("role navigation", () => {
       "teacher-working-groups",
       "teacher-events",
       "teacher-library",
+      "teacher-animal-care",
+      "teacher-information",
       "teacher-directory",
     ]);
     expect(PARENT_NAVIGATION.map((item) => item.id)).toEqual([
@@ -140,6 +142,8 @@ describe("role navigation", () => {
       "parent-recurring",
       "parent-events",
       "parent-library",
+      "parent-animal-care",
+      "parent-information",
       "parent-directory",
       "parent-account",
     ]);

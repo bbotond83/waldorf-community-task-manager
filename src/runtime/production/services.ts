@@ -6,6 +6,8 @@ import {
   EventApplicationFacade,
   LibraryApplicationFacade,
   RecurringApplicationFacade,
+  AnimalCareApplicationFacade,
+  InformationApplicationFacade,
   FacadePipeline,
   ParentApplicationFacade,
   RotaApplicationFacade,
@@ -21,6 +23,8 @@ import {
   createLibraryPort,
   createParentPort,
   createRecurringPort,
+  createAnimalCarePort,
+  createInformationPort,
   createRotaPort,
   createTeacherPort,
   createVersionPort,
@@ -54,6 +58,10 @@ export type RequestServices = Readonly<{
   library: LibraryApplicationFacade;
   /** Recurring duties: group pages, my duties, the bottle line, marking done and the schedules (U9). */
   recurring: RecurringApplicationFacade;
+  /** Animal-care slots: the sign-up page, the fair share, giving up and the year's settings (U8). */
+  animalCare: AnimalCareApplicationFacade;
+  /** The information page and its editing (U8). */
+  information: InformationApplicationFacade;
 }>;
 
 export interface ProductionServices {
@@ -84,6 +92,8 @@ export function createProductionServices(database: DatabaseClient): ProductionSe
         checklists: new ChecklistApplicationFacade(pipeline, createChecklistPort(asPerson)),
         library: new LibraryApplicationFacade(pipeline, createLibraryPort(asPerson)),
         recurring: new RecurringApplicationFacade(pipeline, createRecurringPort(asPerson)),
+        animalCare: new AnimalCareApplicationFacade(pipeline, createAnimalCarePort(asPerson)),
+        information: new InformationApplicationFacade(pipeline, createInformationPort(asPerson)),
       });
     },
   };

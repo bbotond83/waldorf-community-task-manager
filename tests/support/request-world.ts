@@ -6,6 +6,8 @@ import {
   EventApplicationFacade,
   LibraryApplicationFacade,
   RecurringApplicationFacade,
+  AnimalCareApplicationFacade,
+  InformationApplicationFacade,
   FacadePipeline,
   IdempotencyCoordinator,
   InMemoryIdempotencyStore,
@@ -18,6 +20,8 @@ import {
   type EventApplicationPort,
   type LibraryApplicationPort,
   type RecurringApplicationPort,
+  type AnimalCareApplicationPort,
+  type InformationApplicationPort,
   type RotaApplicationPort,
   type WorkingGroupApplicationPort,
   type WorkingGroupChangeModel,
@@ -190,6 +194,22 @@ const RECURRING_PORT_DOUBLE: RecurringApplicationPort = {
   skip: deniedOutcome,
 };
 
+/** Animal-care and information ports with nothing set up: every read and command is refused, as the screens are not built yet. */
+const ANIMAL_PORT_DOUBLE: AnimalCareApplicationPort = {
+  slots: deniedOutcome,
+  fairShare: deniedOutcome,
+  calendar: deniedOutcome,
+  saveCalendar: deniedOutcome,
+  createSlots: deniedOutcome,
+  giveUp: deniedOutcome,
+};
+const INFORMATION_PORT_DOUBLE: InformationApplicationPort = {
+  list: deniedOutcome,
+  update: deniedOutcome,
+  create: deniedOutcome,
+  setHidden: deniedOutcome,
+};
+
 /** A rota port with nothing published: the overview is empty, everything else is refused. */
 const ROTA_PORT_DOUBLE: RotaApplicationPort = {
   calendar: deniedOutcome,
@@ -224,6 +244,7 @@ const ROTA_PORT_DOUBLE: RotaApplicationPort = {
             isBreakWeek: false,
             includesWatering: false,
             bottlesAtWeekEnd: false,
+            infoLinks: [],
           },
         }
       : { state: "denied" },
@@ -386,6 +407,8 @@ export function createRequestWorld() {
       checklists: new ChecklistApplicationFacade(pipeline, CHECKLIST_PORT_DOUBLE),
       library: new LibraryApplicationFacade(pipeline, LIBRARY_PORT_DOUBLE),
       recurring: new RecurringApplicationFacade(pipeline, RECURRING_PORT_DOUBLE),
+      animalCare: new AnimalCareApplicationFacade(pipeline, ANIMAL_PORT_DOUBLE),
+      information: new InformationApplicationFacade(pipeline, INFORMATION_PORT_DOUBLE),
     });
   }
 

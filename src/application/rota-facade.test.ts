@@ -86,6 +86,7 @@ function port() {
         isBreakWeek: false,
         includesWatering: false,
         bottlesAtWeekEnd: false,
+        infoLinks: [],
       }),
     setStanding: () => done("setStanding", { id: "s", version: 1 }),
     pickSlot: () => done("pickSlot", { id: "k", version: 2 }),

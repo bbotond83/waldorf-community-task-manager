@@ -4383,3 +4383,208 @@ nav a:hover {
   background: none;
   box-shadow: none;
 }
+
+/*
+ * Animal care and information (U8). The Stitch designs were followed for the order and wording: a fair-share panel above
+ * two weeks of day rows with a morning and an afternoon slot, and section disclosures on the information page. The school
+ * name, family names, key code, extra menu items and the undo button Stitch invented were left out. Panels stay one level.
+ */
+.parent-animal-days {
+  display: grid;
+  gap: 1rem;
+  margin: 0 0 1.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.parent-animal-day {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  background: var(--color-surface);
+  box-shadow: var(--shadow);
+}
+
+.parent-animal-day h3 {
+  margin: 0 0 0.75rem;
+  font-size: var(--text-headline-sm);
+}
+
+.parent-animal-slots {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.parent-animal-slot {
+  display: grid;
+  gap: 0.4rem;
+  border-radius: var(--radius);
+  padding: 0.75rem 1rem;
+  background: var(--color-info-bg);
+  scroll-margin-top: 5rem;
+}
+
+.parent-animal-slot h4 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.parent-animal-slot p {
+  margin: 0;
+}
+
+.parent-animal-time {
+  color: var(--color-muted);
+  font-weight: 400;
+}
+
+.parent-animal-share {
+  margin-block: 1rem;
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  background: var(--color-info-bg);
+}
+
+.parent-animal-share h2 {
+  margin: 0 0 0.5rem;
+  font-size: var(--text-headline-sm);
+}
+
+.parent-animal-families {
+  margin: 0.5rem 0 0;
+  padding-left: 1.25rem;
+}
+
+.parent-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.75rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-pill);
+  padding: 0.1rem 0.7rem;
+  color: var(--color-primary-dark);
+  background: var(--color-surface);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.parent-confirm summary {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--color-primary-dark);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.parent-confirm .parent-form {
+  margin-block: 0.5rem 0;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.admin-animal-slots {
+  margin-block: 1.5rem;
+}
+
+.info-header h1 {
+  font-size: var(--text-headline-lg);
+  line-height: 1.15;
+}
+
+.info-intro {
+  margin: 0.5rem 0 1rem;
+  color: var(--color-muted);
+}
+
+.info-list {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.info-section {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  box-shadow: var(--shadow);
+  scroll-margin-top: 5rem;
+}
+
+.info-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0.75rem 1.25rem;
+  cursor: pointer;
+}
+
+.info-title {
+  color: var(--color-primary-dark);
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.info-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.75rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-pill);
+  padding: 0.1rem 0.7rem;
+  background: var(--color-info-bg);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.info-body {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0 1.25rem 1.25rem;
+  overflow-wrap: break-word;
+}
+
+.info-owner {
+  margin: 0;
+  color: var(--color-muted);
+}
+
+.info-text p,
+.info-text ul,
+.info-text ol {
+  margin: 0 0 0.75rem;
+}
+
+.info-actions {
+  margin: 0;
+}
+
+.info-actions a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+.info-new {
+  margin-block: 1rem;
+}
+
+.info-month {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-right: 1rem;
+}
+
+.info-body .parent-form {
+  margin-block: 0;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+}
