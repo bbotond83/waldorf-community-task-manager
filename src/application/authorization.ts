@@ -137,6 +137,48 @@ export const AUTHORIZATION_MATRIX: readonly MatrixRow[] = Object.freeze([
     fields: [],
   },
   {
+    // Every signed-in role reads the animal-care sign-up page and its fair share, a teacher too (BR81.6, BR83).
+    id: "AUTH-ANIMAL",
+    roles: ["parent", "group_admin", "kindergarten_teacher", "super_admin"],
+    actions: ["read"],
+    resources: ["animal_care"],
+    fields: [],
+  },
+  {
+    // Giving up a slot: the database checks that the caller's family holds it (BR82.1). Signing up is the existing duty
+    // sign-up. A group admin who is a parent acts through the parent grant.
+    id: "AUTH-ANIMAL-SLOT",
+    roles: ["parent", "group_admin", "super_admin"],
+    actions: ["update"],
+    resources: ["animal_slot"],
+    fields: [],
+  },
+  {
+    // The year's times, alert group and slot creation are a super admin's alone (BR80.1).
+    id: "AUTH-ANIMAL-MANAGE",
+    roles: ["super_admin"],
+    actions: ["read", "create", "update"],
+    resources: ["animal_calendar"],
+    fields: [],
+  },
+  {
+    // Every signed-in role reads the information page (BR86.1).
+    id: "AUTH-INFO",
+    roles: ["parent", "group_admin", "kindergarten_teacher", "super_admin"],
+    actions: ["read"],
+    resources: ["info"],
+    fields: [],
+  },
+  {
+    // A coordinator edits the text of their group's sections, a super admin everything; the database decides which
+    // fields (BR87.1, BR87.6).
+    id: "AUTH-INFO-EDIT",
+    roles: ["group_admin", "super_admin"],
+    actions: ["create", "update", "manage"],
+    resources: ["info_section"],
+    fields: [],
+  },
+  {
     id: "AUTH-WORKING-GROUPS",
     roles: ["parent", "group_admin", "kindergarten_teacher", "super_admin"],
     actions: ["read"],

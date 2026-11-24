@@ -141,7 +141,12 @@ for (const schema of DIRECTORY_SCHEMAS) {
             version,
           ]),
         ]);
-        assert.equal(removed.state, "success", `round ${round}`);
+        // A claim that lands first changes the checklist version, so the removal then reads a version conflict.
+        assert.equal(
+          removed.state === "success" || removed.state === "conflict",
+          true,
+          `round ${round}: ${JSON.stringify(removed)}`,
+        );
         assert.equal(
           claimed.state === "success" ||
             claimed.state === "conflict" ||

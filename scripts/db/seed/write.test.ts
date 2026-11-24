@@ -51,6 +51,25 @@ describe("seed writer", () => {
     assert.ok(calls.slice(at).some((call) => /^insert into "event_notices"/.test(call.sql)));
   });
 
+  it("installs the starting information sections once and writes the animal-care slots after the calendar", async () => {
+    const { client, calls } = recorder();
+    await writeSeedPlan(client, plan);
+    const installs = calls.filter((call) => /info_starting_sections_install/.test(call.sql));
+    assert.equal(installs.length, 1);
+    assert.deepEqual(installs[0]!.values, [plan.organization.id]);
+    const calendar = calls.findIndex((call) => /^insert into "animal_calendars"/.test(call.sql));
+    const slots = calls.findIndex((call) => /insert into animal_slots/.test(call.sql));
+    assert.ok(calendar > -1 && slots > calendar);
+    assert.ok(!calls.some((call) => /':held'/.test(call.sql)), "the small set holds no slot");
+  });
+
+  it("holds about 60 in 100 animal-care slots in the large set only", async () => {
+    const large = buildSeedPlan("worker_2", "large");
+    const { client, calls } = recorder();
+    await writeSeedPlan(client, large);
+    assert.equal(calls.filter((call) => /':held'/.test(call.sql)).length, 1);
+  });
+
   it("writes the tables in the order their foreign keys need", async () => {
     const { client, calls } = recorder();
     await writeSeedPlan(client, plan);
@@ -86,6 +105,7 @@ describe("seed writer", () => {
       "family_year_standings",
       "rota_plans",
       "recurring_schedules",
+      "animal_calendars",
     ]);
   });
 

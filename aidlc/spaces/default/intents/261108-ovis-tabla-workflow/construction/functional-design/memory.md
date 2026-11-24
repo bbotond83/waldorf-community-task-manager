@@ -34,6 +34,9 @@
 - 2026-11-23T14:03:56Z [unit u11-checklists-and-templates] — Read "start from template only at creation" (Q7) as a copy allowed only into an event whose checklist is still empty; the event form saves the event first and copies second, so a failed copy can be retried from the empty event page without adding a template to a list that already has tasks.
 - 2026-11-23T14:03:56Z [unit u11-checklists-and-templates] — Placed "létszám megadása" (Szent Miklós) and "darabszám megadása" (Gyermekek búcsúnapja) in the teachers' sections of the starting templates; appendix F lost its parents and teachers columns when it was copied, and giving the head count is the teachers' information to the parents. Flagged for the owner at the gate.
 - 2026-11-23T14:03:56Z [unit u11-checklists-and-templates] — Appendix C lists nine areas, not the ten written in Q8; the big-cleaning template gets one section per area of appendix C as written.
+- 2026-11-24T04:01:57Z [unit u8-animal-care-and-information] — Read "the weekend animal-care duty" in the owner's Q6 answer as the weekend animal-care rota week and its weekend slots together, so the openings, closings and shelter cleaning all link to "Szombati takarítás" and "Állatok etetése és ápolása"; the answer named one duty, but U6 splits it into several places.
+- 2026-11-24T04:20:00Z [unit u8-animal-care-and-information] — After the review, at the owner's request: section owners are stored by group name and resolved in the current school year, because groups are per year and names are unique within a year; and families holding a slot whose start time changes get one notice, which the review left open as "notify or record why not".
+- 2026-11-24T04:01:57Z [unit u8-animal-care-and-information] — Read "the administrator" in AC7.3.2 as every super admin with a parent record, the same reading as U6's Friday-noon alert, because notices reach parents only.
 
 ## Deviations
 <!-- example: 2026-05-29T10:14:32Z — skipped the optional caching layer the stage prose suggested; the dataset is small enough that it adds risk -->
@@ -80,6 +83,8 @@
 - 2026-11-23T14:03:56Z [unit u11-checklists-and-templates] — Copying a template is its own command after the event is saved, not part of U10's event_save; it keeps Checklists depending on Events and not the other way round, at the cost of a second step that can fail on its own (the empty event can then be filled again).
 - 2026-11-23T14:03:56Z [unit u11-checklists-and-templates] — The template's default lead time only pre-fills the event form, and event_save stores it on the event; U11 never writes U10's event row, so the event keeps one owner.
 - 2026-11-23T14:03:56Z [unit u11-checklists-and-templates] — On removal, a claim on a task not yet done of an event not yet finished is deleted, so its helper place frees up and the unclaimed-task alert can see it; claims on done tasks or finished events are kept and anonymised for history.
+- 2026-11-24T04:01:57Z [unit u8-animal-care-and-information] — The fair-share counts and empty-slot lists are worked out when read instead of stored; only the month's reminder round is recorded (FairShareRound), so a missed first-weekday run is made up later that month without a second reminder and without stored counts that could go stale.
+- 2026-11-24T04:01:57Z [unit u8-animal-care-and-information] — Information sections keep no editor's name, only the time; who edited is not shown, and leaving the person out keeps contract C16 true that U8 needs no removal function.
 
 ## Open questions
 
@@ -100,3 +105,4 @@
 - 2026-11-22T12:40:00Z [unit u9-recurring-duties] — Deviation: occurrences are their own records with their own done mark (ADR-003) and create no duty or place, unlike components.md ("occurrences are duties") and contract C18; a group has no single family to hold a place and a rota-week place would need every swap to move it. The cost is that occurrences cannot be swapped and need their own read for My tasks.
 - 2026-11-22T12:40:00Z [unit u9-recurring-duties] — Tradeoff: a rota-week occurrence reads its family live through rota_family_for, so swaps and reassignments move the bottle-cleaning duty with no change to U7.
 - 2026-11-22T12:40:00Z [unit u9-recurring-duties] — Interpretation: group reminders go to the group's coordinators only (members can still see and mark the duty), to avoid noise.
+- 2026-11-24T04:01:57Z [unit u8-animal-care-and-information] — Confirm in the Stitch design where the super admin's animal-care settings screen sits (times, alert group, creating the year's slots); no mockup shows it yet.

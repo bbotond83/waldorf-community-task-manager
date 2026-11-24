@@ -1,0 +1,229 @@
+{
+  "stage": "code-generation",
+  "unit": "u8-animal-care-and-information",
+  "version": 1,
+  "writes": [
+    {
+      "path": "package.json"
+    },
+    {
+      "path": "supabase/migrations/20261068_animal_care_and_information.sql"
+    },
+    {
+      "path": "supabase/migrations/20261069_schedule_leaves_out_animal_slots.sql"
+    },
+    {
+      "path": "app/_animal/"
+    },
+    {
+      "path": "app/_info/"
+    },
+    {
+      "path": "app/informacio/"
+    },
+    {
+      "path": "app/szulo/allatok/"
+    },
+    {
+      "path": "app/admin/allatgondozas/"
+    },
+    {
+      "path": "app/globals.css"
+    },
+    {
+      "path": "scripts/db/seed/write.ts"
+    },
+    {
+      "path": "scripts/db/seed/write.test.ts"
+    },
+    {
+      "path": "scripts/db/shuffled-tests.ts"
+    },
+    {
+      "path": "src/access/role-policy.ts"
+    },
+    {
+      "path": "src/application/animal-care-facade.ts"
+    },
+    {
+      "path": "src/application/animal-care-facade.test.ts"
+    },
+    {
+      "path": "src/application/information-facade.ts"
+    },
+    {
+      "path": "src/application/information-facade.test.ts"
+    },
+    {
+      "path": "src/application/section-text.ts"
+    },
+    {
+      "path": "src/application/section-text.test.ts"
+    },
+    {
+      "path": "src/application/authorization.ts"
+    },
+    {
+      "path": "src/application/contracts.ts"
+    },
+    {
+      "path": "src/application/index.ts"
+    },
+    {
+      "path": "src/application/rota-facade.test.ts"
+    },
+    {
+      "path": "src/data/animal-care.ts"
+    },
+    {
+      "path": "src/data/animal-care.test.ts"
+    },
+    {
+      "path": "src/data/information.ts"
+    },
+    {
+      "path": "src/data/information.test.ts"
+    },
+    {
+      "path": "src/data/copy.ts"
+    },
+    {
+      "path": "src/data/index.ts"
+    },
+    {
+      "path": "src/data/notification-use-cases.test.ts"
+    },
+    {
+      "path": "src/data/rota.ts"
+    },
+    {
+      "path": "src/data/rota.test.ts"
+    },
+    {
+      "path": "src/runtime/RotaOverview.tsx"
+    },
+    {
+      "path": "src/runtime/navigation.ts"
+    },
+    {
+      "path": "src/runtime/production/access.test.ts"
+    },
+    {
+      "path": "src/runtime/production/services.ts"
+    },
+    {
+      "path": "tests/browser/animal-care.spec.ts"
+    },
+    {
+      "path": "tests/browser/animal-care-screenshots.spec.ts"
+    },
+    {
+      "path": "tests/browser/functional-fixes.spec.ts"
+    },
+    {
+      "path": "tests/browser/navigation-polish.spec.ts"
+    },
+    {
+      "path": "tests/browser/runtime-foundation.spec.ts"
+    },
+    {
+      "path": "tests/browser/teacher-web.spec.ts"
+    },
+    {
+      "path": "tests/browser/visual-overhaul.spec.ts"
+    },
+    {
+      "path": "tests/coverage/production-inventory.test.ts"
+    },
+    {
+      "path": "tests/database/animal-calendar-slots.test.ts"
+    },
+    {
+      "path": "tests/database/animal-checks.test.ts"
+    },
+    {
+      "path": "tests/database/animal-fair-share.test.ts"
+    },
+    {
+      "path": "tests/database/animal-migration.test.ts"
+    },
+    {
+      "path": "tests/database/animal-sign-up-give-up.test.ts"
+    },
+    {
+      "path": "tests/database/animal-slot-races.test.ts"
+    },
+    {
+      "path": "tests/database/animal-support.ts"
+    },
+    {
+      "path": "tests/database/animal-table-rights.test.ts"
+    },
+    {
+      "path": "tests/database/info-links-duty-card.test.ts"
+    },
+    {
+      "path": "tests/database/info-sections.test.ts"
+    },
+    {
+      "path": "tests/database/identity-catalogue.test.ts"
+    },
+    {
+      "path": "tests/database/notices-failures.test.ts"
+    },
+    {
+      "path": "tests/database/notices-run.test.ts"
+    },
+    {
+      "path": "tests/database/notices-send.test.ts"
+    },
+    {
+      "path": "tests/database/notifications-timing.test.ts"
+    },
+    {
+      "path": "tests/database/rota-plan.test.ts"
+    },
+    {
+      "path": "tests/database/seed.test.ts"
+    },
+    {
+      "path": "tests/integration/animal-care-actions.test.ts"
+    },
+    {
+      "path": "tests/integration/animal-care-screens.test.tsx"
+    },
+    {
+      "path": "tests/integration/app-nav.test.tsx"
+    },
+    {
+      "path": "tests/integration/copy.test.ts"
+    },
+    {
+      "path": "tests/integration/rota-weekend.test.tsx"
+    },
+    {
+      "path": "tests/integration/rota.test.tsx"
+    },
+    {
+      "path": "tests/integration/runtime-shell.test.tsx"
+    },
+    {
+      "path": "tests/support/request-world.ts"
+    },
+    {
+      "path": "tests/unit/navigation-access.test.ts"
+    },
+    {
+      "path": "tests/unit/runtime-boundaries.test.ts"
+    },
+    {
+      "path": "verification/authorization-matrix.json"
+    },
+    {
+      "path": "supabase/migrations/20261070_u8_review_fixes.sql"
+    },
+    {
+      "path": "app/teacher/allatok/"
+    }
+  ]
+}

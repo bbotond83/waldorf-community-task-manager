@@ -62,6 +62,8 @@ const CORE_RESOURCES = new Set([
   // A coordinator adds, changes, switches off and skips their group's recurring duties (BR142 to BR146).
   "recurring_schedule",
   "recurring_duty",
+  // A coordinator edits the text of their group's information sections; the database checks the group (BR87.1).
+  "info_section",
 ]);
 const TRACKING_FIELDS = new Set([
   "display_name",
@@ -115,6 +117,9 @@ export function grantAllows(
   if (request.resource.kind === "library") return request.action === "read";
   // Every signed-in role reads the recurring duties, a teacher too; the database decides which parts.
   if (request.resource.kind === "recurring") return request.action === "read";
+  // Every signed-in role reads the animal-care sign-up page and the information page (BR81.6, BR86.1).
+  if (request.resource.kind === "animal_care" || request.resource.kind === "info")
+    return request.action === "read";
   // Every signed-in role reads the published rota (BR24.1).
   if (request.resource.kind === "rota") return request.action === "read";
   // Every signed-in role opens the parent directory; which fields come back is decided in the database (BR30).
@@ -167,6 +172,9 @@ function parentCan({ action, resource }: AuthorizationRequest): boolean {
     // Marking a recurring duty done, taking the mark back and skipping it: the database checks that the parent
     // belongs to the owner. A super admin acts through the default grant (and cannot mark done, D-SEC-1).
     case "recurring_duty":
+      return action === "update";
+    // Giving up the family's own animal-care slot; the database checks that the family holds it (BR82.1).
+    case "animal_slot":
       return action === "update";
     // A duty card of the family's own rota duty; the database checks that the family holds it (BR24.2). This also
     // serves a group admin who is a parent: the parent grant carries the read, the group admin grant adds nothing.

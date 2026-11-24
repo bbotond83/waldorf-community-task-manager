@@ -116,6 +116,7 @@ const CARD: RotaDutyCardModel = {
   isBreakWeek: false,
   includesWatering: false,
   bottlesAtWeekEnd: false,
+  infoLinks: [],
   weekend: {
     weekStart: "2026-11-23",
     picksCloseAt: "2026-11-27T11:00:00Z",

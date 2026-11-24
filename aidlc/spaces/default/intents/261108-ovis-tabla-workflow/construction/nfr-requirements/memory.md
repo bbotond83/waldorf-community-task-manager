@@ -18,6 +18,8 @@
 
 ## Tradeoffs
 <!-- example: 2026-05-29T10:14:32Z — picked TDD over BDD this run; the team is unit-first and the domain is well-understood -->
+- 2026-11-24T04:25:00Z [unit u8-animal-care-and-information] — Section text is shown by a small renderer of the app's own rather than a Markdown package; the allowed formatting is four constructs, a new package would need a pinned version and review, and an own renderer that never emits raw HTML is easy to test for script injection.
+- 2026-11-24T04:25:00Z [unit u8-animal-care-and-information] — Saving the slot calendar and creating slots are audited like rota publishing, although NFR4 lists only rota publishing; both are administrator changes that move or create many families' duties at once. Sign-up, give-up and section edits are not audited.
 - 2026-11-15T13:40:00Z [unit u4-working-groups] — Joining and leaving are not audited; NFR4 does not list them and the membership row keeps join, end and reason, so an audit row would only duplicate it.
 - 2026-11-15T13:40:00Z [unit u4-working-groups] — Family erasure keeps deleting memberships rather than ending them; erasure removes history by design, so the ended-rows-stay rule covers leaving and removal only.
 

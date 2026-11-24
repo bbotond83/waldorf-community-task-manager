@@ -381,6 +381,7 @@ export async function writeSeedPlan(client: SqlClient, plan: SeedPlan): Promise<
     await writeNotices(client, plan);
     await writeRota(client, plan);
     await writeRecurring(client, plan);
+    await writeAnimalCare(client, plan);
     await client.query("commit");
   } catch (error) {
     await client.query("rollback").catch(() => undefined);
@@ -776,5 +777,71 @@ async function writeNotices(client: SqlClient, plan: SeedPlan): Promise<void> {
         check.errorCode,
       ]),
     ),
+  );
+}
+
+/**
+ * The animal-care calendar, the year's morning and afternoon slots and the information page (U8). The six starting
+ * sections come from the same function the migration step uses. The slots are written the way `animal_slots_create`
+ * writes them, with ids built from the calendar, the day and the part, so a second seed writes the same rows. The large
+ * set also has about 60 in 100 slots held, spread over the active families by a fixed rule, for the timing checks.
+ */
+async function writeAnimalCare(client: SqlClient, plan: SeedPlan): Promise<void> {
+  const organization = plan.organization.id;
+  await client.query("select info_starting_sections_install($1::uuid)", [organization]);
+  await insertRows(
+    client,
+    "animal_calendars",
+    ["id", "organization_id", "school_year_id", "generated_at"],
+    [[seedId(plan.schema, "animal-calendar"), organization, plan.schoolYear.id, null]],
+  );
+  const calendar = seedId(plan.schema, "animal-calendar");
+  await client.query(
+    `with wanted as (
+       select d.slot_date, p.part,
+              md5($1::text || ':slot:' || d.slot_date::text || ':' || p.part)::uuid as slot_id,
+              md5($1::text || ':duty:' || d.slot_date::text || ':' || p.part)::uuid as duty_id,
+              case p.part when 'morning' then c.morning_start else c.afternoon_start end as start_time
+         from animal_calendars c
+        cross join lateral school_weeks(c.school_year_id) w
+        cross join generate_series(0, 4) as o(n)
+        cross join lateral (select (w.week_start + o.n) as slot_date) d
+        cross join (values ('morning'), ('afternoon')) as p(part)
+        join school_years y on y.id = c.school_year_id
+        where c.id = $1::uuid and d.slot_date between y.starts_on and y.ends_on
+     ), made as (
+       insert into tasks (id, organization_id, group_id, title, category, capacity, starts_at, ends_at, origin_kind, origin_id)
+       select w.duty_id, $2::uuid, null,
+              case w.part when 'morning' then 'Reggeli állatgondozás' else 'Délutáni állatgondozás' end,
+              'állatgondozás', 1,
+              animal_slot_start(w.slot_date, w.start_time), animal_slot_start(w.slot_date, w.start_time) + interval '1 hour',
+              'animal_slot', w.slot_id
+         from wanted w
+       on conflict do nothing
+       returning id
+     )
+     insert into animal_slots (id, calendar_id, slot_date, part, duty_id)
+     select w.slot_id, $1::uuid, w.slot_date, w.part, w.duty_id from wanted w
+     on conflict do nothing`,
+    [calendar, organization],
+  );
+  await client.query(
+    "update animal_calendars set generated_at = now() where id = $1::uuid and generated_at is null",
+    [calendar],
+  );
+  if (plan.size !== "large") return;
+  await client.query(
+    `with families_in_order as (
+       select f.id, row_number() over (order by f.id) - 1 as n, count(*) over () as total
+         from families f where f.organization_id = $2::uuid and f.status = 'active'
+     )
+     insert into assignments (id, organization_id, task_id, family_id, source, status)
+     select md5(s.duty_id::text || ':held')::uuid, $2::uuid, s.duty_id, f.id, 'parent_sign_up', 'active'
+       from animal_slots s
+       join families_in_order f on f.n = (get_byte(decode(md5(s.id::text), 'hex'), 0) * 256
+                                          + get_byte(decode(md5(s.id::text), 'hex'), 1)) % f.total
+      where s.calendar_id = $1::uuid and get_byte(decode(md5(s.id::text), 'hex'), 2) % 100 < 60
+     on conflict do nothing`,
+    [calendar, organization],
   );
 }

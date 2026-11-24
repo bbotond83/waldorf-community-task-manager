@@ -193,6 +193,8 @@ test("Teacher's menu lists Beosztás and Munkacsoportok, and the way back works 
     "Munkacsoportok",
     "Események",
     "Könyvtár",
+    "Állatgondozás",
+    "Információ",
     "Szülők",
   ]);
   await expect(page.getByTestId("brand-link")).toHaveAttribute("href", "/teacher/schedule");

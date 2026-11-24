@@ -109,6 +109,9 @@ for (const schema of NOTIFICATION_SCHEMAS) {
       assert.deepEqual(
         answer.checks.map((check) => [check.check, check.outcome]),
         [
+          // U8's two animal-care checks: the empty-slot warnings and the monthly fair-share reminder.
+          ["animal_empty_slots", "success"],
+          ["animal_fair_share", "success"],
           // U11's two checks: the unclaimed-task alert and the lead-time notice.
           ["checklist_unclaimed_alert", "success"],
           ["duty_reminders", "success"],
@@ -145,6 +148,8 @@ for (const schema of NOTIFICATION_SCHEMAS) {
           )
         ).rows,
         [
+          { check_name: "animal_empty_slots", outcome: "success", created: 0 },
+          { check_name: "animal_fair_share", outcome: "success", created: 0 },
           { check_name: "checklist_unclaimed_alert", outcome: "success", created: 0 },
           { check_name: "duty_reminders", outcome: "success", created: 2 },
           { check_name: "event_lead_notice", outcome: "success", created: 0 },
@@ -235,6 +240,8 @@ for (const schema of NOTIFICATION_SCHEMAS) {
             ["broken_step2", "failed"],
             ["missing_step3", "missing"],
             ["aa_step4", "success"],
+            ["animal_empty_slots", "success"],
+            ["animal_fair_share", "success"],
             ["checklist_unclaimed_alert", "success"],
             ["duty_reminders", "success"],
             ["event_lead_notice", "success"],

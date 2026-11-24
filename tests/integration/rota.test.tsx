@@ -107,6 +107,7 @@ const CARD: RotaDutyCardModel = {
   isBreakWeek: false,
   includesWatering: false,
   bottlesAtWeekEnd: false,
+  infoLinks: [],
 };
 
 describe("RotaDutyCard", () => {
@@ -124,6 +125,30 @@ describe("RotaDutyCard", () => {
       <RotaDutyCard result={success({ ...CARD, isBreakWeek: true })} backHref="/szulo/beosztas" />,
     );
     expect(screen.getByTestId("rota-card-break")).toBeInTheDocument();
+  });
+
+  it("links to the information sections of the duty, and shows no line when there are none (U8)", () => {
+    const { rerender } = render(
+      <RotaDutyCard
+        result={success({
+          ...CARD,
+          infoLinks: [
+            { key: "kert", title: "Kert" },
+            { key: "viz", title: "Vízhordás" },
+          ],
+        })}
+        backHref="/szulo/beosztas"
+      />,
+    );
+    const line = screen.getByTestId("rota-card-info-links");
+    expect(line).toHaveTextContent("Tudnivalók: Kert, Vízhordás");
+    expect(screen.getByRole("link", { name: "Kert" })).toHaveAttribute("href", "/informacio#kert");
+    expect(screen.getByRole("link", { name: "Vízhordás" })).toHaveAttribute(
+      "href",
+      "/informacio#viz",
+    );
+    rerender(<RotaDutyCard result={success(CARD)} backHref="/szulo/beosztas" />);
+    expect(screen.queryByTestId("rota-card-info-links")).toBeNull();
   });
 
   it("shows the same refusal for every denied read", () => {

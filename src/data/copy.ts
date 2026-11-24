@@ -294,6 +294,48 @@ export function recurringMessage(answer: {
   return DIRECTORY_REFUSAL_FALLBACK;
 }
 
+/**
+ * What a person reads for each refusal of the animal-care and information commands (U8). The codes name what was
+ * refused; an access refusal reads as "not allowed", never as which part was missing, and giving up another family's
+ * slot reads like a slot that does not exist (BR82.1).
+ */
+const ANIMAL_CODE_MESSAGES: Readonly<Record<string, string>> = Object.freeze({
+  authorization_denied: "Ezt a műveletet nem végezheted el.",
+  SLOT_GIVE_UP_TOO_LATE:
+    "A kezdésig 24 óránál kevesebb van hátra, ezért már nem mondható le. Kérj cserét.",
+  SLOT_NOT_RELEASABLE: "Ez az időpont itt nem mondható le.",
+  REQUEST_CONFLICT: "Ehhez az időponthoz csere tartozik, előbb az végződjön be.",
+  DUTY_CLOSED: "Ez az időpont már elkezdődött.",
+  DUTY_FULL: "Már foglalt.",
+  DUTY_VERSION_STALE: "Közben változott az időpont, töltsd újra.",
+  DUTY_ALREADY_ASSIGNED: "Erre az időpontra már jelentkeztél.",
+  DUTY_INELIGIBLE: "Erre a napra a családod nem vállalhat időpontot.",
+  VERSION_CONFLICT: "Közben valaki módosította, töltsd újra.",
+  ANIMAL_TIMES_INVALID: "A reggeli kezdésnek korábbinak kell lennie a délutáninál.",
+  ANIMAL_GROUP_INVALID: "A riasztott csoport nem ennek a tanévnek a csoportja.",
+  INFO_TEXT_INVALID:
+    "A szövegben olyan hivatkozás van, ami nem http(s) cím vagy az alkalmazás saját oldala.",
+});
+
+export function animalMessage(answer: {
+  state: string;
+  code?: string | undefined;
+  fieldErrors?: Readonly<Record<string, string>> | undefined;
+}): string {
+  if (answer.state === "denied") return ANIMAL_CODE_MESSAGES.authorization_denied!;
+  const byCode = answer.code && ANIMAL_CODE_MESSAGES[answer.code];
+  if (byCode) return byCode;
+  const fields = Object.keys(answer.fieldErrors ?? {});
+  if (fields.includes("expectedVersion")) return ANIMAL_CODE_MESSAGES.VERSION_CONFLICT!;
+  if (fields.includes("owningGroupName"))
+    return "A felelős csoport nem ennek az évnek a csoportja.";
+  if (fields.includes("seasonMonths"))
+    return "A hónapok 1 és 12 közötti, különböző számok legyenek.";
+  if (fields.includes("title")) return "Add meg a címet, legfeljebb 120 karakterrel.";
+  if (fields.includes("body")) return "Add meg a szöveget, legfeljebb 20 000 karakterrel.";
+  return DIRECTORY_REFUSAL_FALLBACK;
+}
+
 export function directoryRefusalMessage(code: string | undefined): string {
   return (code && DIRECTORY_REFUSAL_MESSAGES[code]) || DIRECTORY_REFUSAL_FALLBACK;
 }

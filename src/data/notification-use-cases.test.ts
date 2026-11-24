@@ -127,6 +127,13 @@ const U7_DECIDED_ITSELF = [
   "swap_reverse",
 ];
 
+/**
+ * U8 (animal care) adds one callable function that changes a place: slot_give_up releases the caller's own slot. The
+ * family did it itself, so it is not told; it plans the family's reminders again on its own. Signing up uses the
+ * existing wrapped duty_sign_up, unchanged, so nothing else of U8 is a wrapped use case.
+ */
+const U8_DECIDED_ITSELF = ["slot_give_up"];
+
 test("the use cases U4 must connect to notifications are exactly the callable functions that change assignments", () => {
   const functions = definitions();
   assert.ok(functions.size > 80, "the migrations were read");
@@ -137,7 +144,8 @@ test("the use cases U4 must connect to notifications are exactly the callable fu
         callable.has(name) &&
         !IMPORT_WITHOUT_NOTICES.includes(name) &&
         !ROTA_DECIDED_ITSELF.includes(name) &&
-        !U7_DECIDED_ITSELF.includes(name),
+        !U7_DECIDED_ITSELF.includes(name) &&
+        !U8_DECIDED_ITSELF.includes(name),
     )
     .sort();
   const listed = NOTIFICATION_USE_CASES.map((name) => name.replaceAll(".", "_")).sort();
@@ -162,6 +170,7 @@ test("the internal helpers that change assignments are reached only through list
     ...IMPORT_WITHOUT_NOTICES,
     ...ROTA_DECIDED_ITSELF,
     ...U7_DECIDED_ITSELF,
+    ...U8_DECIDED_ITSELF,
   ]);
   for (const helper of internal) {
     const callers = [...functions.values()].filter(
@@ -408,5 +417,22 @@ test("the U7 functions are defined and tell the families through their own helpe
     "notification_after_decision",
   ]) {
     assert.equal(functions.has(retired), false, `${retired} is gone`);
+  }
+});
+
+test("the U8 functions are defined, slot_give_up plans reminders again and sends no wrapped notice", () => {
+  const functions = definitions();
+  const callable = callableBySignedInAccounts();
+  for (const name of U8_DECIDED_ITSELF) {
+    assert.ok(functions.has(name), `${name} exists`);
+    assert.ok(callable.has(name), `${name} is callable by signed-in accounts`);
+    assert.equal(functions.has(`${name}_core`), false, `${name} has no wrapper`);
+    assert.doesNotMatch(functions.get(name)!.body, /notification_after_/, name);
+    assert.match(functions.get(name)!.body, /reminder_plan\(/, name);
+  }
+  for (const name of ["animal_fair_share_check", "animal_empty_slots_check"]) {
+    assert.ok(functions.has(name), `${name} exists`);
+    assert.equal(callable.has(name), false, `${name} is internal`);
+    assert.match(functions.get(name)!.body, /notice_send\(/, name);
   }
 });
