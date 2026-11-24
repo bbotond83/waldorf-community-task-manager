@@ -2,6 +2,7 @@ import {
   AdminApplicationFacade,
   AuthorizationContract,
   DirectoryApplicationFacade,
+  ChecklistApplicationFacade,
   EventApplicationFacade,
   LibraryApplicationFacade,
   RecurringApplicationFacade,
@@ -15,6 +16,7 @@ import {
   classifyDataFailure,
   createAdminPort,
   createDirectoryPort,
+  createChecklistPort,
   createEventPort,
   createLibraryPort,
   createParentPort,
@@ -46,6 +48,8 @@ export type RequestServices = Readonly<{
   directory: DirectoryApplicationFacade;
   /** Event pages, sign-ups, food offers, notices and roles (U10); the screens come after the owner's design approval. */
   events: EventApplicationFacade;
+  /** Event checklists, claims, done marks and templates (U11); the screens come after the owner's design approval. */
+  checklists: ChecklistApplicationFacade;
   /** The lending library: list, book pages, borrowing, returning and watches (U13). */
   library: LibraryApplicationFacade;
   /** Recurring duties: group pages, my duties, the bottle line, marking done and the schedules (U9). */
@@ -77,6 +81,7 @@ export function createProductionServices(database: DatabaseClient): ProductionSe
         rota: new RotaApplicationFacade(pipeline, createRotaPort(asPerson)),
         directory: new DirectoryApplicationFacade(pipeline, createDirectoryPort(asPerson)),
         events: new EventApplicationFacade(pipeline, createEventPort(asPerson)),
+        checklists: new ChecklistApplicationFacade(pipeline, createChecklistPort(asPerson)),
         library: new LibraryApplicationFacade(pipeline, createLibraryPort(asPerson)),
         recurring: new RecurringApplicationFacade(pipeline, createRecurringPort(asPerson)),
       });

@@ -322,6 +322,56 @@ test("the U9 functions change no assignment and are not part of the hand-off lis
 });
 
 /**
+ * U11 (checklists and templates) adds callable functions, but none changes a place: taking a checklist task is not a duty
+ * (FR11.12, BR165.6). The two daily checks tell people through `notice_send` themselves, and U10's event_save is extended
+ * to include the parents holding a claim, so none is a wrapped use case of the hand-off list. The removal pair of C16 and
+ * the install write the checklist tables only.
+ */
+test("the U11 functions change no assignment and are not part of the hand-off list", () => {
+  const functions = definitions();
+  const changing = writers(functions);
+  const u11 = [
+    "template_save",
+    "template_set_removed",
+    "template_get",
+    "template_list_admin",
+    "template_list",
+    "template_options",
+    "checklist_copy_template",
+    "checklist_section_save",
+    "checklist_section_remove",
+    "checklist_task_save",
+    "checklist_task_remove",
+    "checklist_reorder",
+    "checklist_claim",
+    "checklist_claim_typed",
+    "checklist_claim_change",
+    "checklist_claim_withdraw",
+    "checklist_task_mark_done",
+    "checklist_task_undo_done",
+    "checklist_get",
+    "checklist_add_task",
+    "checklist_claimant_ids",
+    "event_lead_notice_check",
+    "checklist_unclaimed_check",
+    "checklists_removal_preview",
+    "checklists_removal_apply",
+    "checklist_starting_templates_install",
+  ];
+  for (const name of u11) {
+    assert.ok(functions.has(name), `${name} is defined by the migrations`);
+    assert.equal(changing.has(name), false, `${name} writes no assignment`);
+    assert.equal(
+      NOTIFICATION_USE_CASES.some((useCase) => useCase.replaceAll(".", "_") === name),
+      false,
+      `${name} is not a wrapped use case`,
+    );
+  }
+  assert.match(functions.get("event_lead_notice_check")!.body, /notice_send\(/);
+  assert.match(functions.get("checklist_unclaimed_check")!.body, /notice_send\(/);
+});
+
+/**
  * U7 functions decide their own notices (BR71.5, BR72.2, BR72.5, BR73.2, BR74.3, BR75.2, BR76.3): each of them that
  * tells someone does it through the helpers that write the notice and the reminder plan inside the same function, and
  * only after the work has succeeded and the key is not a replay.

@@ -116,12 +116,15 @@ for (const schema of DIRECTORY_SCHEMAS) {
     });
 
     it("BR1.3 allowed", async () => {
-      assert.equal(
-        (await saveTask(ADMIN_G1, taskBody(GROUP_1, { event_id: EVENT_1 }))).state,
-        "success",
-      );
+      // U11 retires new event links (BR169.1): a duty is saved without one, and a link is refused as retired.
+      assert.equal((await saveTask(ADMIN_G1, taskBody(GROUP_1, {}))).state, "success");
       const community = await saveEvent(SUPER_ADMIN, eventBody(null));
-      const task = await saveTask(SUPER_ADMIN, taskBody(null, { event_id: community.reference }));
+      const linked = await saveTask(SUPER_ADMIN, taskBody(null, { event_id: community.reference }));
+      assert.deepEqual(
+        [linked.state, linked.field, linked.reason],
+        ["validation", "event_id", "retired"],
+      );
+      const task = await saveTask(SUPER_ADMIN, taskBody(null, {}));
       assert.equal(task.state, "success");
       assert.equal(await count(db, "tasks", `id = '${task.reference}' and group_id is null`), 1);
     });
@@ -129,10 +132,10 @@ for (const schema of DIRECTORY_SCHEMAS) {
       const result = await saveTask(SUPER_ADMIN, taskBody(GROUP_2, { event_id: EVENT_1 }));
       assert.deepEqual(
         [result.state, result.field, result.reason],
-        ["validation", "event_id", "group_mismatch"],
+        ["validation", "event_id", "retired"],
       );
       const empty = await saveTask(SUPER_ADMIN, taskBody(null, { event_id: EVENT_1 }));
-      assert.deepEqual([empty.field, empty.reason], ["event_id", "group_mismatch"]);
+      assert.deepEqual([empty.field, empty.reason], ["event_id", "retired"]);
       await assert.rejects(
         db.query(
           `insert into tasks (organization_id, group_id, event_id, title, capacity, starts_at, ends_at)
@@ -148,7 +151,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
     });
     it("BR1.3 other group's event", async () => {
       const result = await saveTask(ADMIN_G2, taskBody(GROUP_2, { event_id: EVENT_1 }));
-      assert.equal(result.state, "denied");
+      assert.deepEqual([result.state, result.reason], ["validation", "retired"]);
       const missing = await saveTask(ADMIN_G2, taskBody(GROUP_2, { event_id: uuid(99123) }));
       assert.deepEqual(missing, result);
     });
@@ -161,7 +164,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
     });
     it("BR1.3 repeat", async () => {
       const key = nextKey("repeat");
-      const body = taskBody(GROUP_1, { event_id: EVENT_1 });
+      const body = taskBody(GROUP_1, {});
       const first = await saveTask(ADMIN_G1, body, key);
       const again = await saveTask(ADMIN_G1, body, key);
       assert.deepEqual([again.reference, again.code], [first.reference, "replayed"]);

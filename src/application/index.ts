@@ -40,6 +40,8 @@ export {
 export type { ValidationCode } from "./validation.ts";
 export { WorkingGroupApplicationFacade } from "./working-group-facade.ts";
 export type { WorkingGroupApplicationPort } from "./working-group-facade.ts";
+export { ChecklistApplicationFacade } from "./checklist-facade.ts";
+export type { ChecklistApplicationPort, ChecklistPayload } from "./checklist-facade.ts";
 export { EventApplicationFacade } from "./event-facade.ts";
 export type { EventApplicationPort } from "./event-facade.ts";
 export { LibraryApplicationFacade } from "./library-facade.ts";

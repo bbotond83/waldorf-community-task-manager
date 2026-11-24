@@ -28,6 +28,8 @@ const world = vi.hoisted(() => ({
     removeRole: vi.fn(),
   },
   admin: { saveTaskOrEvent: vi.fn() },
+  checklists: { copyTemplate: vi.fn() },
+  checklistsOn: true,
   revalidated: [] as string[],
   redirected: [] as string[],
 }));
@@ -43,6 +45,9 @@ vi.mock("../../app/_events/actor.ts", async (importOriginal) => ({
 }));
 vi.mock("../../app/_events/facade.ts", () => ({
   resolveEventFacade: async () => (world.facadeOn ? world.events : undefined),
+}));
+vi.mock("../../app/_checklists/facade.ts", () => ({
+  resolveChecklistFacade: async () => (world.checklistsOn ? world.checklists : undefined),
 }));
 vi.mock("../../app/admin/_lib/facade.ts", () => ({
   resolveAdminFacade: async () => (world.adminOn ? world.admin : undefined),
@@ -88,6 +93,8 @@ beforeEach(() => {
   world.actor = parentActor;
   world.facadeOn = true;
   world.adminOn = true;
+  world.checklistsOn = true;
+  world.checklists.copyTemplate.mockReset().mockResolvedValue(success({ id: EVENT, version: 1 }));
   world.revalidated.length = 0;
   world.redirected.length = 0;
   for (const fn of [...Object.values(world.events), world.admin.saveTaskOrEvent]) {
@@ -293,6 +300,37 @@ describe("saving, cancelling and the notice, tale and role editors", () => {
       payload: { kind: "event", title: "Kerti délután", foodSignupOn: true, noticeLeadDays: 7 },
     });
     expect(world.redirected).toEqual([`/szulo/esemenyek/${EVENT}/szerkesztes?mentve=uj`]);
+  });
+
+  it("copies the chosen template into a new event's list and sends the person to the checklist editor", async () => {
+    const TEMPLATE = "77777777-7777-4777-8777-777777777777";
+    await saveEventAction(initial, form({ ...eventFields, templateId: TEMPLATE }));
+    expect(world.checklists.copyTemplate.mock.calls[0]![1]).toMatchObject({
+      scope: groupScope,
+      eventId: EVENT,
+      templateId: TEMPLATE,
+      idempotencyKey: `checklist-copy:${EVENT}`,
+    });
+    // The real redirect ends the action; the test double lets it run on, so only the first address counts.
+    expect(world.redirected[0]).toBe(`/szulo/esemenyek/${EVENT}/feladatlista`);
+  });
+
+  it("still opens the checklist editor when the copy is refused or its facade is missing, and ignores a template on a change", async () => {
+    const TEMPLATE = "77777777-7777-4777-8777-777777777777";
+    world.checklistsOn = false;
+    await saveEventAction(initial, form({ ...eventFields, templateId: TEMPLATE }));
+    // The real redirect ends the action; the test double lets it run on, so only the first address counts.
+    expect(world.redirected[0]).toBe(`/szulo/esemenyek/${EVENT}/feladatlista`);
+    world.redirected.length = 0;
+    world.checklistsOn = true;
+    await saveEventAction(
+      initial,
+      form({ ...eventFields, id: EVENT, expectedVersion: "4", templateId: TEMPLATE }),
+    );
+    await saveEventAction(initial, form({ ...eventFields, templateId: "nem-azonosito" }));
+    expect(world.checklists.copyTemplate).not.toHaveBeenCalled();
+    expect(world.redirected[0]).toContain("mentve=1");
+    expect(world.redirected[1]).toContain("mentve=uj");
   });
 
   it("changes an existing event with its version and refuses a missing title or a bad number", async () => {

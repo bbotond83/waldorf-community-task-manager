@@ -1,0 +1,247 @@
+{
+  "stage": "code-generation",
+  "unit": "u11-checklists-and-templates",
+  "version": 1,
+  "writes": [
+    {
+      "path": "app/_checklists/ChecklistForms.tsx"
+    },
+    {
+      "path": "app/_checklists/ChecklistScreens.tsx"
+    },
+    {
+      "path": "app/_checklists/TemplateScreens.tsx"
+    },
+    {
+      "path": "app/_checklists/actions.ts"
+    },
+    {
+      "path": "app/_checklists/checklist-form.ts"
+    },
+    {
+      "path": "app/_checklists/checklist-result.ts"
+    },
+    {
+      "path": "app/_checklists/facade.ts"
+    },
+    {
+      "path": "app/_events/EventForms.tsx"
+    },
+    {
+      "path": "app/_events/EventScreens.tsx"
+    },
+    {
+      "path": "app/_events/actions.ts"
+    },
+    {
+      "path": "app/admin/_components/TaskFields.tsx"
+    },
+    {
+      "path": "app/admin/_lib/record-payload.ts"
+    },
+    {
+      "path": "app/admin/esemenyek/[id]/feladatlista/page.tsx"
+    },
+    {
+      "path": "app/admin/munkacsoportok/[id]/sablonok/[templateId]/page.tsx"
+    },
+    {
+      "path": "app/admin/munkacsoportok/[id]/sablonok/page.tsx"
+    },
+    {
+      "path": "app/admin/munkacsoportok/[id]/sablonok/uj/page.tsx"
+    },
+    {
+      "path": "app/admin/sablonok/[id]/page.tsx"
+    },
+    {
+      "path": "app/admin/sablonok/page.tsx"
+    },
+    {
+      "path": "app/admin/sablonok/uj/page.tsx"
+    },
+    {
+      "path": "app/globals.css"
+    },
+    {
+      "path": "app/szulo/esemenyek/[id]/feladatlista/page.tsx"
+    },
+    {
+      "path": "app/szulo/munkacsoportok/[id]/sablonok/[templateId]/page.tsx"
+    },
+    {
+      "path": "app/szulo/munkacsoportok/[id]/sablonok/page.tsx"
+    },
+    {
+      "path": "app/szulo/munkacsoportok/[id]/sablonok/uj/page.tsx"
+    },
+    {
+      "path": "package.json"
+    },
+    {
+      "path": "scripts/db/seed/write.test.ts"
+    },
+    {
+      "path": "scripts/db/seed/write.ts"
+    },
+    {
+      "path": "scripts/db/shuffled-tests.ts"
+    },
+    {
+      "path": "src/access/role-policy.test.ts"
+    },
+    {
+      "path": "src/access/role-policy.ts"
+    },
+    {
+      "path": "src/application/authorization.ts"
+    },
+    {
+      "path": "src/application/checklist-facade.test.ts"
+    },
+    {
+      "path": "src/application/checklist-facade.ts"
+    },
+    {
+      "path": "src/application/contracts.ts"
+    },
+    {
+      "path": "src/application/index.ts"
+    },
+    {
+      "path": "src/data/checklists.test.ts"
+    },
+    {
+      "path": "src/data/checklists.ts"
+    },
+    {
+      "path": "src/data/copy.ts"
+    },
+    {
+      "path": "src/data/index.ts"
+    },
+    {
+      "path": "src/data/notification-use-cases.test.ts"
+    },
+    {
+      "path": "src/runtime/navigation.ts"
+    },
+    {
+      "path": "src/runtime/production/services.ts"
+    },
+    {
+      "path": "supabase/migrations/20261067_checklists_and_templates.sql"
+    },
+    {
+      "path": "tests/browser/checklists-screenshots.spec.ts"
+    },
+    {
+      "path": "tests/browser/checklists.spec.ts"
+    },
+    {
+      "path": "tests/browser/visual-overhaul.spec.ts"
+    },
+    {
+      "path": "tests/coverage/production-inventory.test.ts"
+    },
+    {
+      "path": "tests/database/checklist-checks.test.ts"
+    },
+    {
+      "path": "tests/database/checklist-claims-races.test.ts"
+    },
+    {
+      "path": "tests/database/checklist-claims.test.ts"
+    },
+    {
+      "path": "tests/database/checklist-copy-read.test.ts"
+    },
+    {
+      "path": "tests/database/checklist-edit.test.ts"
+    },
+    {
+      "path": "tests/database/checklist-for-later-units.test.ts"
+    },
+    {
+      "path": "tests/database/checklist-migration.test.ts"
+    },
+    {
+      "path": "tests/database/checklist-removal.test.ts"
+    },
+    {
+      "path": "tests/database/checklist-starting-templates.test.ts"
+    },
+    {
+      "path": "tests/database/checklist-support.ts"
+    },
+    {
+      "path": "tests/database/checklist-templates.test.ts"
+    },
+    {
+      "path": "tests/database/community-structure.test.ts"
+    },
+    {
+      "path": "tests/database/coordination-functions.test.ts"
+    },
+    {
+      "path": "tests/database/events-for-later-units.test.ts"
+    },
+    {
+      "path": "tests/database/identity-catalogue.test.ts"
+    },
+    {
+      "path": "tests/database/notices-run.test.ts"
+    },
+    {
+      "path": "tests/database/notices-send.test.ts"
+    },
+    {
+      "path": "tests/database/notifications-timing.test.ts"
+    },
+    {
+      "path": "tests/database/seed.test.ts"
+    },
+    {
+      "path": "tests/database/task-event-link-retired.test.ts"
+    },
+    {
+      "path": "tests/integration/admin-extended-actions.test.ts"
+    },
+    {
+      "path": "tests/integration/admin-forms.test.tsx"
+    },
+    {
+      "path": "tests/integration/checklist-actions.test.ts"
+    },
+    {
+      "path": "tests/integration/checklist-screens.test.tsx"
+    },
+    {
+      "path": "tests/integration/event-actions.test.ts"
+    },
+    {
+      "path": "tests/integration/event-offer-change.test.tsx"
+    },
+    {
+      "path": "tests/integration/event-screens.test.tsx"
+    },
+    {
+      "path": "tests/integration/runtime-shell.test.tsx"
+    },
+    {
+      "path": "tests/support/request-world.ts"
+    },
+    {
+      "path": "tests/unit/checklist-form.test.ts"
+    },
+    {
+      "path": "tests/unit/navigation-access.test.ts"
+    },
+    {
+      "path": "tests/unit/record-payload.test.ts"
+    },
+    {
+      "path": "verification/authorization-matrix.json"
+    }
+  ]
+}

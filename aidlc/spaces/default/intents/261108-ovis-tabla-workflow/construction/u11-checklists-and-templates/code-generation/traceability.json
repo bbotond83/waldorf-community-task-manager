@@ -1,0 +1,260 @@
+{
+  "stage": "code-generation",
+  "unit": "u11-checklists-and-templates",
+  "upstream_ids": [
+    "BR163.2",
+    "BR165.4",
+    "BR170.4",
+    "BR169.1",
+    "BR170.6",
+    "AC12.2.1",
+    "AC12.2.4",
+    "AC12.3.3",
+    "BR160",
+    "BR162",
+    "BR170.1",
+    "BR170.3",
+    "NFR3",
+    "NFR5",
+    "AC12.3.1",
+    "AC12.3.2",
+    "AC12.1.4",
+    "BR163",
+    "BR164",
+    "BR167",
+    "BR169",
+    "NFR9.5",
+    "NFR9.7",
+    "AC12.1.1",
+    "AC12.1.3",
+    "AC13.1.5",
+    "BR165",
+    "BR166",
+    "NFR5.2",
+    "NFR5.5",
+    "AC13.1.2",
+    "AC13.1.3",
+    "AC13.1.6",
+    "BR168",
+    "NFR4",
+    "NFR10",
+    "NFR11",
+    "NFR3.9",
+    "NFR8",
+    "NFR9",
+    "NFR4.8",
+    "BR162.1"
+  ],
+  "coverage": [
+    {
+      "id": "BR163.2",
+      "status": "OK",
+      "target": "tests/database/checklist-copy-read.test.ts"
+    },
+    {
+      "id": "BR165.4",
+      "status": "OK",
+      "target": "tests/database/checklist-claims.test.ts"
+    },
+    {
+      "id": "BR170.4",
+      "status": "OK",
+      "target": "tests/database/checklist-removal.test.ts"
+    },
+    {
+      "id": "BR169.1",
+      "status": "OK",
+      "target": "tests/database/community-structure.test.ts"
+    },
+    {
+      "id": "BR170.6",
+      "status": "OK",
+      "target": "tests/database/checklist-for-later-units.test.ts"
+    },
+    {
+      "id": "AC12.2.1",
+      "status": "OK",
+      "target": "tests/database/checklist-edit.test.ts"
+    },
+    {
+      "id": "AC12.2.4",
+      "status": "OK",
+      "target": "tests/database/checklist-edit.test.ts"
+    },
+    {
+      "id": "AC12.3.3",
+      "status": "OK",
+      "target": "tests/database/checklist-starting-templates.test.ts"
+    },
+    {
+      "id": "BR160",
+      "status": "OK",
+      "target": "tests/database/checklist-templates.test.ts"
+    },
+    {
+      "id": "BR162",
+      "status": "OK",
+      "target": "tests/database/checklist-starting-templates.test.ts"
+    },
+    {
+      "id": "BR170.1",
+      "status": "OK",
+      "target": "tests/database/checklist-templates.test.ts"
+    },
+    {
+      "id": "BR170.3",
+      "status": "OK",
+      "target": "tests/database/checklist-templates.test.ts"
+    },
+    {
+      "id": "NFR3",
+      "status": "OK",
+      "target": "tests/database/checklist-claims-races.test.ts"
+    },
+    {
+      "id": "NFR5",
+      "status": "OK",
+      "target": "tests/database/checklist-claims-races.test.ts"
+    },
+    {
+      "id": "AC12.3.1",
+      "status": "OK",
+      "target": "tests/database/checklist-copy-read.test.ts"
+    },
+    {
+      "id": "AC12.3.2",
+      "status": "OK",
+      "target": "tests/database/checklist-copy-read.test.ts"
+    },
+    {
+      "id": "AC12.1.4",
+      "status": "OK",
+      "target": "tests/database/checklist-copy-read.test.ts"
+    },
+    {
+      "id": "BR163",
+      "status": "OK",
+      "target": "tests/database/checklist-copy-read.test.ts"
+    },
+    {
+      "id": "BR164",
+      "status": "OK",
+      "target": "tests/database/checklist-edit.test.ts"
+    },
+    {
+      "id": "BR167",
+      "status": "OK",
+      "target": "tests/database/checklist-copy-read.test.ts"
+    },
+    {
+      "id": "BR169",
+      "status": "OK",
+      "target": "tests/database/community-structure.test.ts"
+    },
+    {
+      "id": "NFR9.5",
+      "status": "OK",
+      "target": "tests/database/checklist-copy-read.test.ts"
+    },
+    {
+      "id": "NFR9.7",
+      "status": "OK",
+      "target": "tests/database/checklist-copy-read.test.ts"
+    },
+    {
+      "id": "AC12.1.1",
+      "status": "OK",
+      "target": "tests/database/checklist-claims.test.ts"
+    },
+    {
+      "id": "AC12.1.3",
+      "status": "OK",
+      "target": "tests/database/checklist-claims.test.ts"
+    },
+    {
+      "id": "AC13.1.5",
+      "status": "OK",
+      "target": "tests/database/checklist-claims.test.ts"
+    },
+    {
+      "id": "BR165",
+      "status": "OK",
+      "target": "tests/database/checklist-claims.test.ts"
+    },
+    {
+      "id": "BR166",
+      "status": "OK",
+      "target": "tests/database/checklist-claims.test.ts"
+    },
+    {
+      "id": "NFR5.2",
+      "status": "OK",
+      "target": "tests/database/checklist-claims-races.test.ts"
+    },
+    {
+      "id": "NFR5.5",
+      "status": "OK",
+      "target": "tests/database/checklist-claims-races.test.ts"
+    },
+    {
+      "id": "AC13.1.2",
+      "status": "OK",
+      "target": "tests/database/checklist-removal.test.ts"
+    },
+    {
+      "id": "AC13.1.3",
+      "status": "OK",
+      "target": "tests/database/checklist-removal.test.ts"
+    },
+    {
+      "id": "AC13.1.6",
+      "status": "OK",
+      "target": "tests/database/checklist-removal.test.ts"
+    },
+    {
+      "id": "BR168",
+      "status": "OK",
+      "target": "tests/database/checklist-checks.test.ts"
+    },
+    {
+      "id": "NFR4",
+      "status": "OK",
+      "target": "tests/database/notifications-timing.test.ts"
+    },
+    {
+      "id": "NFR10",
+      "status": "OK",
+      "target": "tests/database/checklist-claims.test.ts"
+    },
+    {
+      "id": "NFR11",
+      "status": "OK",
+      "target": "tests/database/checklist-removal.test.ts"
+    },
+    {
+      "id": "NFR3.9",
+      "status": "OK",
+      "target": "tests/unit/navigation-access.test.ts"
+    },
+    {
+      "id": "NFR8",
+      "status": "OK",
+      "target": "tests/browser/checklists.spec.ts"
+    },
+    {
+      "id": "NFR9",
+      "status": "OK",
+      "target": "tests/database/notifications-timing.test.ts"
+    },
+    {
+      "id": "NFR4.8",
+      "status": "OK",
+      "target": "tests/browser/checklists.spec.ts"
+    },
+    {
+      "id": "BR162.1",
+      "status": "OK",
+      "target": "tests/database/checklist-starting-templates.test.ts"
+    }
+  ]
+}

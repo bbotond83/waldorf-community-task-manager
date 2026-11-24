@@ -3,6 +3,7 @@
 import { useContext, useState, type ReactNode } from "react";
 import { isoToBudapestLocal } from "../../src/application/budapest-time.ts";
 import type {
+  TemplateOptionsModel,
   EventDetailModel,
   EventRoleModel,
   EventSignupModel,
@@ -18,6 +19,7 @@ import {
   ParentFieldErrorsContext,
   ParentMutationForm,
 } from "../szulo/_components/ParentMutationForm.tsx";
+import { TemplateChooser } from "../_checklists/ChecklistForms.tsx";
 import type { EventArea } from "./actor.ts";
 import {
   addOfferAction,
@@ -476,10 +478,13 @@ export function EventCoreForm({
   area,
   event,
   groups,
+  templates = [],
 }: Readonly<{
   area: EventArea;
   event?: EventModel;
   groups: readonly GroupOption[];
+  /** The templates a new event may start from (none for an existing event). */
+  templates?: TemplateOptionsModel["items"];
 }>) {
   const creating = event === undefined;
   return (
@@ -595,6 +600,7 @@ export function EventCoreForm({
         defaultChecked={event?.isSummer}
         testId="event-summer-input"
       />
+      {creating && templates.length > 0 && <TemplateChooser templates={templates} />}
     </ParentMutationForm>
   );
 }

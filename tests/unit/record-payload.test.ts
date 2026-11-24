@@ -248,7 +248,6 @@ describe("parseTaskExtras", () => {
       startsAt: "2026-11-05T08:00:00.000Z",
       endsAt: "2026-11-05T10:00:00.000Z",
       location: "Konyha",
-      eventId: "e-1",
       category: "sütés",
       capacity: 3,
     });

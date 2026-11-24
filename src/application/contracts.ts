@@ -315,6 +315,132 @@ export type EventDetailModel = Readonly<{
 /** What an event command returns: the row's id and its new version (none for a removal). */
 export type EventChangeModel = Readonly<{ id: string | null; version: number | null }>;
 
+/** The kinds of checklist section: for parents, for the organising team, and for the teachers (who only read it). */
+export const CHECKLIST_SECTION_KINDS = Object.freeze([
+  "parents",
+  "organisers",
+  "teachers",
+] as const);
+export type ChecklistSectionKind = (typeof CHECKLIST_SECTION_KINDS)[number];
+
+/** One person's claim on a checklist task: a parent with their family, or a name typed in by the organising team. */
+export type ChecklistClaimModel = Readonly<{
+  id: string;
+  version: number;
+  parentDisplayName?: string;
+  familyDisplayName?: string;
+  typedName?: string;
+  note?: string;
+  chosenAt?: string;
+  outsideEvent: boolean;
+  isOwn: boolean;
+  canRemove: boolean;
+}>;
+
+export type ChecklistTaskModel = Readonly<{
+  id: string;
+  position: number;
+  title: string;
+  place?: string;
+  props?: string;
+  priority?: number;
+  materials?: string;
+  tip?: string;
+  deadline?: string;
+  summerOnly: boolean;
+  helpersNeeded: number;
+  helpersTaken: number;
+  timeMatters: boolean;
+  sourceRef?: string;
+  version: number;
+  done?: Readonly<{ at: string; byDisplayName: string; isOwn: boolean }>;
+  claims: readonly ChecklistClaimModel[];
+  can: Readonly<{ claim: boolean; markDone: boolean; undoDone: boolean }>;
+}>;
+
+export type ChecklistSectionModel = Readonly<{
+  id: string;
+  position: number;
+  title: string;
+  kind: ChecklistSectionKind;
+  version: number;
+  tasks: readonly ChecklistTaskModel[];
+}>;
+
+/** An event's whole checklist in one document (NFR9.4); `allDone` is shown to the organising team only. */
+export type ChecklistModel = Readonly<{
+  eventId: string;
+  eventTitle: string;
+  checklistVersion: number;
+  copiedFromTemplateId?: string;
+  isEmpty: boolean;
+  isOpen: boolean;
+  isFinished: boolean;
+  isCancelled: boolean;
+  isSummer: boolean;
+  signupDeadline?: string;
+  allDone?: boolean;
+  sections: readonly ChecklistSectionModel[];
+  caller: Readonly<{ inTeam: boolean; canManage: boolean; canClaimTasks: boolean }>;
+}>;
+
+export type TemplateTaskModel = Readonly<{
+  id: string;
+  position: number;
+  title: string;
+  place?: string;
+  props?: string;
+  priority?: number;
+  materials?: string;
+  tip?: string;
+  summerOnly: boolean;
+  helpersNeeded: number;
+  timeMatters: boolean;
+}>;
+export type TemplateSectionModel = Readonly<{
+  id: string;
+  position: number;
+  title: string;
+  kind: ChecklistSectionKind;
+  tasks: readonly TemplateTaskModel[];
+}>;
+export type TemplateModel = Readonly<{
+  id: string;
+  workingGroupId?: string;
+  workingGroupName?: string;
+  name: string;
+  description?: string;
+  defaultLeadDays?: number;
+  isRemoved: boolean;
+  version: number;
+  sections: readonly TemplateSectionModel[];
+}>;
+export type TemplateListModel = Readonly<{
+  items: readonly Readonly<{
+    id: string;
+    name: string;
+    workingGroupId?: string;
+    groupName?: string;
+    taskCount: number;
+    status: "active" | "removed";
+    version: number;
+  }>[];
+  canManageCommunity: boolean;
+  managedGroupIds: readonly string[];
+}>;
+export type TemplateOptionsModel = Readonly<{
+  items: readonly Readonly<{
+    id: string;
+    name: string;
+    defaultLeadDays?: number;
+    workingGroupId?: string;
+    hasSummerTasks: boolean;
+  }>[];
+}>;
+
+/** What a checklist or template command returns: the row's id and its new version (none for a removal). */
+export type ChecklistChangeModel = EventChangeModel;
+
 /** A typed name on an event role, for the removal screen's super-admin list (BR124.2). */
 export type TypedRoleItem = Readonly<{
   roleId: string;

@@ -237,24 +237,17 @@ for (const schema of DIRECTORY_SCHEMAS) {
       assert.equal(await count(db, "event_notices", `event_id = '${EVENT_1}'`), 2);
     });
 
-    it("creates a task with or without an event, takes the place from the event and defaults the rest", async () => {
+    it("creates a task with no event, defaults the rest, and refuses a new link to an event (U11, BR169.1)", async () => {
       const withEvent = await taskSave(ADMIN_G1, {
         ...newTask,
         event_id: EVENT_1,
         category: "konyha",
       });
-      assert.deepEqual([withEvent.state, withEvent.version], ["success", 1]);
       assert.deepEqual(
-        await one("select location, category, status, event_id from tasks where id = $1", [
-          withEvent.reference,
-        ]),
-        {
-          location: "Tornaterem",
-          category: "konyha",
-          status: "open",
-          event_id: EVENT_1,
-        },
+        [withEvent.state, withEvent.field, withEvent.reason],
+        ["validation", "event_id", "retired"],
       );
+      assert.equal(await count(db, "tasks", "title = 'Takarítás'"), 0, "nothing was created");
       const bare = await taskSave(ADMIN_G1, newTask);
       assert.deepEqual(
         await one("select location, category, event_id from tasks where id = $1", [bare.reference]),
@@ -291,7 +284,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
         assert.deepEqual([result.state, result.field], ["validation", field], field);
       }
       const mismatch = await taskSave(SUPER_ADMIN, { ...newTask, event_id: EVENT_2 });
-      assert.deepEqual([mismatch.field, mismatch.reason], ["event_id", "group_mismatch"]);
+      assert.deepEqual([mismatch.field, mismatch.reason], ["event_id", "retired"]);
       // Capacity may equal the taken places but not go below: task 1 has one place taken.
       await db.query(
         "insert into assignments (organization_id, task_id, family_id, source) values ($1, $2, $3, 'admin_assign')",
@@ -412,7 +405,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
       assert.equal(await count(db, "audit_events"), 0, "task changes are not audited");
     });
 
-    it("closes tasks of a cancelled event: a new one is created closed and a closed one cannot be reopened", async () => {
+    it("closes tasks of a cancelled event: a closed one cannot be reopened, and no new one can be linked", async () => {
       await eventSave(SUPER_ADMIN, {
         id: EVENT_1,
         expected_version: 1,
@@ -422,12 +415,9 @@ for (const schema of DIRECTORY_SCHEMAS) {
         ends_at: END,
         status: "cancelled",
       });
+      // A new task can no longer be linked to an event (BR169.1); TASK_1 keeps the link it already has.
       const created = await taskSave(SUPER_ADMIN, { ...newTask, event_id: EVENT_1 });
-      assert.equal(created.state, "success");
-      assert.equal(
-        (await one("select status from tasks where id = $1", [created.reference])).status,
-        "closed",
-      );
+      assert.deepEqual([created.state, created.reason], ["validation", "retired"]);
       const reopen = await taskSave(SUPER_ADMIN, {
         ...newTask,
         id: TASK_1,

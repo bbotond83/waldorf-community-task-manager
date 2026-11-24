@@ -38,6 +38,7 @@ vi.mock("next/navigation", () => ({
 vi.mock("../../app/_events/facade.ts", () => ({
   resolveEventFacade: async () => (world.signedIn ? world.facade : undefined),
 }));
+vi.mock("../../app/_checklists/ChecklistScreens.tsx", () => ({ ChecklistBlock: () => null }));
 vi.mock("../../app/admin/_lib/facade.ts", () => ({ resolveAdminFacade: async () => undefined }));
 vi.mock("../../app/admin/_lib/session.ts", () => ({
   resolveAdminSession: async () => ({ state: "signed-out" }),

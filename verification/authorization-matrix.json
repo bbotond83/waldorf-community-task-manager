@@ -469,7 +469,7 @@
       "scope": "linked-family",
       "route": "/szulo/esemenyek/**",
       "actions": ["create", "update", "delete"],
-      "resources": ["event_signup", "food_offer"],
+      "resources": ["event_signup", "food_offer", "checklist_claim"],
       "fields": [],
       "effect": "allow"
     },
@@ -479,7 +479,7 @@
       "scope": "unrelated-family",
       "route": "/szulo/esemenyek/**",
       "actions": ["update", "delete"],
-      "resources": ["event_signup", "food_offer"],
+      "resources": ["event_signup", "food_offer", "checklist_claim"],
       "fields": [],
       "effect": "deny"
     },
@@ -489,7 +489,7 @@
       "scope": "linked-family",
       "route": "/szulo/esemenyek/**",
       "actions": ["create", "update", "delete"],
-      "resources": ["event_signup", "food_offer"],
+      "resources": ["event_signup", "food_offer", "checklist_claim"],
       "fields": [],
       "effect": "allow"
     },
@@ -509,7 +509,7 @@
       "scope": "community",
       "route": "/teacher/esemenyek/**",
       "actions": ["create", "update", "delete"],
-      "resources": ["event", "event_role", "event_signup", "food_offer"],
+      "resources": ["event", "event_role", "event_signup", "food_offer", "checklist_claim"],
       "fields": [],
       "effect": "deny"
     },

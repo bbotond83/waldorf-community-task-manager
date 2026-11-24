@@ -109,7 +109,10 @@ for (const schema of NOTIFICATION_SCHEMAS) {
       assert.deepEqual(
         answer.checks.map((check) => [check.check, check.outcome]),
         [
+          // U11's two checks: the unclaimed-task alert and the lead-time notice.
+          ["checklist_unclaimed_alert", "success"],
           ["duty_reminders", "success"],
+          ["event_lead_notice", "success"],
           ["housekeeping", "success"],
           // The lending library's daily return reminder (U13) and the checks of the rota unit (U6), registered in the
           // same run.
@@ -142,7 +145,9 @@ for (const schema of NOTIFICATION_SCHEMAS) {
           )
         ).rows,
         [
+          { check_name: "checklist_unclaimed_alert", outcome: "success", created: 0 },
           { check_name: "duty_reminders", outcome: "success", created: 2 },
+          { check_name: "event_lead_notice", outcome: "success", created: 0 },
           { check_name: "housekeeping", outcome: "success", created: 0 },
           { check_name: "library_return_due", outcome: "success", created: 0 },
           { check_name: "recurring_duties", outcome: "success", created: 0 },
@@ -230,7 +235,9 @@ for (const schema of NOTIFICATION_SCHEMAS) {
             ["broken_step2", "failed"],
             ["missing_step3", "missing"],
             ["aa_step4", "success"],
+            ["checklist_unclaimed_alert", "success"],
             ["duty_reminders", "success"],
+            ["event_lead_notice", "success"],
             ["housekeeping", "success"],
             ["library_return_due", "success"],
             ["recurring_duties", "success"],

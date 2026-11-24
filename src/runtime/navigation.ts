@@ -54,6 +54,7 @@ export const SUPER_ADMIN_NAVIGATION: readonly NavigationItem[] = [
   { id: "admin-archive", label: "Archívum", href: "/admin/archivum" },
   { id: "admin-working-groups", label: "Munkacsoportok", href: "/admin/munkacsoportok" },
   { id: "admin-events", label: "Események", href: "/admin/esemenyek" },
+  { id: "admin-templates", label: "Sablonok", href: "/admin/sablonok" },
   { id: "admin-library", label: "Könyvtár", href: "/admin/konyvtar" },
   { id: "admin-school-year", label: "Tanév", href: "/admin/tanev" },
   { id: "admin-rota", label: "Beosztás", href: "/admin/beosztas" },

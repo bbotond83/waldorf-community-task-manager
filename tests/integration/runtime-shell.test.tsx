@@ -98,7 +98,7 @@ describe("runtime shell", () => {
 
   it.each([
     ["group-admin", 11],
-    ["super-admin", 15],
+    ["super-admin", 16],
   ] as const)("shows the one menu of %s with %i items", (id, count) => {
     const profile = shellProfile(id);
     render(

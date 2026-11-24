@@ -91,7 +91,7 @@ export const AUTHORIZATION_MATRIX: readonly MatrixRow[] = Object.freeze([
     id: "AUTH-PARENT-EVENT-SIGNUP",
     roles: ["parent"],
     actions: ["create", "update", "delete"],
-    resources: ["event_signup", "food_offer"],
+    resources: ["event_signup", "food_offer", "checklist_claim"],
     fields: [],
   },
   {

@@ -15,6 +15,7 @@ export {
   type DirectoryPort,
   type OwnProfileModel,
 } from "./directory.ts";
+export { createChecklistPort } from "./checklists.ts";
 export { createEventPort } from "./events.ts";
 export { createLibraryPort } from "./library.ts";
 export { createRecurringPort } from "./recurring.ts";

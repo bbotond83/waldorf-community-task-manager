@@ -153,8 +153,6 @@ export function parseTaskExtras(
   }
 
   if (kind !== "event") {
-    const eventId = text(formData, "eventId");
-    if (eventId) payload.eventId = eventId;
     const category = text(formData, "category");
     if (category.length > 100) errors.category = "A kategória legfeljebb 100 karakter lehet.";
     else if (category) payload.category = category;

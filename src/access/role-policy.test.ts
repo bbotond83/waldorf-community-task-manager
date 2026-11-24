@@ -446,7 +446,7 @@ test("every role reads the event pages, signing up and offering food are a paren
       role === "group_admin" || role === "super_admin",
       `${role} manage`,
     );
-    for (const kind of ["event_signup", "food_offer"]) {
+    for (const kind of ["event_signup", "food_offer", "checklist_claim"]) {
       for (const action of ["create", "update", "delete"] as const) {
         assert.equal(
           grantAllows(grant(role, scope), { action, resource: { kind, scope } }),

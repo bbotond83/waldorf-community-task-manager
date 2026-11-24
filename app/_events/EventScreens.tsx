@@ -19,6 +19,8 @@ import {
 import { terminalFailure } from "../../src/application/results.ts";
 import { STATUS_ICON_CHARACTERS, type StatusSymbol } from "../../src/application/status-labels.ts";
 import { StatusBadge } from "../../src/runtime/StatusBadge.tsx";
+import { ChecklistBlock } from "../_checklists/ChecklistScreens.tsx";
+import { resolveChecklistFacade } from "../_checklists/facade.ts";
 import { ParentStatePanel } from "../szulo/_components/ParentStatePanel.tsx";
 import { resolveDirectoryFacade } from "../szulo/_lib/facade.ts";
 import { resolveWorkingGroupFacade } from "../teacher/_lib/facade.ts";
@@ -248,6 +250,14 @@ export function GroupEventsSection({
         {model.canManage === true && actor.area !== "teacher" && (
           <a href={`${actor.basePath}/uj?csoport=${groupId}`} data-testid="group-events-new-link">
             Új esemény
+          </a>
+        )}
+        {model.canManage === true && actor.area !== "teacher" && (
+          <a
+            href={`/${actor.area}/munkacsoportok/${groupId}/sablonok`}
+            data-testid="group-templates-link"
+          >
+            Sablonok
           </a>
         )}
       </p>
@@ -532,6 +542,7 @@ export async function EventDetailScreen({
               )}
               <SignupSection actor={actor} detail={detail} />
               <FoodSection actor={actor} detail={detail} />
+              <ChecklistBlock actor={actor} eventId={event.id} groupId={event.groupId} />
               {detail.caller.canManage && actor.area !== "teacher" && (
                 <section
                   className="parent-event-section parent-event-manager"
@@ -617,6 +628,14 @@ export async function EventFormScreen({
   const detail =
     eventId && events ? await events.detail(actor.session, actor.scope, eventId) : undefined;
   const groups = await groupOptions(actor, listModel, presetGroupId);
+  const checklists = eventId === undefined ? await resolveChecklistFacade() : undefined;
+  const templateResult = checklists
+    ? await checklists.templateOptions(actor.session, actor.scope)
+    : undefined;
+  const templates =
+    templateResult && (templateResult.state === "success" || templateResult.state === "recovery")
+      ? templateResult.data.items
+      : [];
   const parents = eventId ? await parentOptions(actor) : [];
   const backHref = eventId ? `${actor.basePath}/${eventId}` : actor.basePath;
   const allowed =
@@ -656,7 +675,7 @@ export async function EventFormScreen({
           )}
           {detail === undefined ? (
             <>
-              <EventCoreForm area={actor.area} groups={groups} />
+              <EventCoreForm area={actor.area} groups={groups} templates={templates} />
               <p className="form-hint">
                 A tudnivalókat, a szerepeket és az év meséjét az esemény mentése után adhatod meg.
               </p>

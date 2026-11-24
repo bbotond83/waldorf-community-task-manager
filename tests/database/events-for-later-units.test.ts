@@ -103,11 +103,17 @@ for (const schema of DIRECTORY_SCHEMAS) {
       assert.equal(none.rowCount, 0);
     });
 
-    it("the registries hold the event target and the three kinds", async () => {
+    it("the registries hold the event target and its five kinds (three of U10, two of U11)", async () => {
       const kinds = (
         await db.query("select kind from notice_kinds where target_type = 'event' order by kind")
       ).rows.map((row) => row.kind);
-      assert.deepEqual(kinds, ["event_cancelled", "event_changed", "event_new"]);
+      assert.deepEqual(kinds, [
+        "checklist_unclaimed",
+        "event_cancelled",
+        "event_changed",
+        "event_lead_time",
+        "event_new",
+      ]);
       assert.equal(
         (await db.query("select 1 from notice_targets where target_type = 'event'")).rowCount,
         1,
