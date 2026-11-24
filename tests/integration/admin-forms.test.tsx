@@ -359,7 +359,7 @@ describe("the field components of the admin forms", () => {
 });
 
 describe("the task and event form", () => {
-  it("offers the fields of a task and follows the group for the events", () => {
+  it("offers the fields of a task, with no event choice (U11 retires the link)", () => {
     render(
       <AdminMutationForm action={saveTaskAction} submitLabel="Mentés" testId="task-form" longForm>
         <TaskFields mode="create" lookups={LOOKUPS} />
@@ -369,7 +369,6 @@ describe("the task and event form", () => {
     for (const label of [
       "Megnevezés",
       "Munkacsoport",
-      "Esemény",
       "Kategória",
       "Férőhelyek száma",
       "Kezdés (budapesti idő)",
@@ -385,14 +384,7 @@ describe("the task and event form", () => {
     );
     expect(screen.getByLabelText("Férőhelyek száma")).toHaveAttribute("min", "1");
     expect(screen.getByLabelText("Férőhelyek száma")).toHaveAttribute("max", "50");
-    const events = screen.getByLabelText("Esemény");
-    expect(within(events).getAllByRole("option")).toHaveLength(3);
-    fireEvent.change(screen.getByLabelText("Munkacsoport"), { target: { value: "g-1" } });
-    expect(
-      within(events)
-        .getAllByRole("option")
-        .map((option) => option.textContent),
-    ).toEqual(["Nem tartozik eseményhez", "Őszi ünnep"]);
+    expect(screen.queryByLabelText("Esemény")).not.toBeInTheDocument();
     expect(screen.queryByLabelText("Állapot")).not.toBeInTheDocument();
   });
 
@@ -432,7 +424,7 @@ describe("the task and event form", () => {
     );
     expect(screen.getByLabelText("Megnevezés")).toHaveValue("Sütés");
     expect(screen.getByLabelText("Munkacsoport")).toHaveValue("g-1");
-    expect(screen.getByLabelText("Esemény")).toHaveValue("e-1");
+    expect(screen.queryByLabelText("Esemény")).not.toBeInTheDocument();
     expect(screen.getByLabelText("Férőhelyek száma")).toHaveValue(3);
     expect(screen.getByLabelText("Kezdés (budapesti idő)")).toHaveValue("2026-11-05T09:00");
     expect(screen.getByLabelText("Befejezés (budapesti idő)")).toHaveValue("2026-11-05T11:30");

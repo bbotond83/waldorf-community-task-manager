@@ -59,7 +59,6 @@ export function TaskFields({
     details?.groupId ?? (mode === "edit" ? COMMUNITY_GROUP : ""),
   );
   const kind = mode === "edit" ? (storedKind ?? "task") : chosen;
-  const events = lookups.events.filter((event) => !groupId || event.groupId === groupId);
   return (
     <>
       <input type="hidden" name="extended" value="1" />
@@ -98,16 +97,6 @@ export function TaskFields({
       />
       {kind === "task" && (
         <>
-          <AdminSelectField
-            id="eventId"
-            name="eventId"
-            label="Esemény"
-            options={events}
-            defaultValue={details?.eventId}
-            placeholder="Nem tartozik eseményhez"
-            hint="Csak a kiválasztott munkacsoport eseményei választhatók."
-            testId="admin-task-event-select"
-          />
           <AdminTextField
             id="category"
             name="category"

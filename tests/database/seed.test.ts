@@ -220,13 +220,30 @@ describe("seed on the real stack", () => {
   it("gives the same result after a reset and a seed as after a fresh seed", async () => {
     const { deps, lines } = realSeedDeps();
     assert.equal(await seedMain(["--schema", A], deps), 0, lines.join("\n"));
-    const fresh = await dumpSchema(db, A);
+    // The starting checklist templates (U11) get random ids on each install, so they are compared by their counts.
+    const templateTables = [
+      "checklist_templates",
+      "checklist_template_sections",
+      "checklist_template_tasks",
+    ];
+    const templateCounts = async () =>
+      (
+        await db.query(
+          `select (select count(*) from "${A}".checklist_templates)::int as templates,
+                (select count(*) from "${A}".checklist_template_tasks)::int as tasks`,
+        )
+      ).rows[0];
+    const fresh = await dumpSchema(db, A, templateTables);
+    const freshCounts = await templateCounts();
+    assert.deepEqual(freshCounts, { templates: 10, tasks: 124 });
     await resetSchema(realSeedDeps().deps, { schema: A });
     assert.deepEqual((await dumpSchema(db, A))["families"], []);
+    assert.deepEqual((await dumpSchema(db, A))["checklist_templates"], []);
     const second = realSeedDeps();
     assert.equal(await seedMain(["--schema", A], second.deps), 0, second.lines.join("\n"));
     assert.match(second.lines[0]!, /accounts_created=10$/);
-    assert.deepEqual(await dumpSchema(db, A), fresh);
+    assert.deepEqual(await dumpSchema(db, A, templateTables), fresh);
+    assert.deepEqual(await templateCounts(), freshCounts);
   });
 
   it("leaves the schema and the sign-in service as they were when a record write fails midway", async () => {

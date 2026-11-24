@@ -176,7 +176,6 @@ describe("saveTaskAction with the extended task form", () => {
       title: "Sütés",
       kind: "task",
       groupId: "g-1",
-      eventId: "e-1",
       category: "sütés",
       capacity: 3,
       location: "Konyha",

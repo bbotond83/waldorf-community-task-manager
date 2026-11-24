@@ -2,6 +2,7 @@ import {
   AdminApplicationFacade,
   AuthorizationContract,
   DirectoryApplicationFacade,
+  ChecklistApplicationFacade,
   EventApplicationFacade,
   LibraryApplicationFacade,
   RecurringApplicationFacade,
@@ -13,6 +14,7 @@ import {
   TeacherApplicationFacade,
   WorkingGroupApplicationFacade,
   type DomainOutcome,
+  type ChecklistApplicationPort,
   type EventApplicationPort,
   type LibraryApplicationPort,
   type RecurringApplicationPort,
@@ -134,6 +136,29 @@ const EVENT_PORT_DOUBLE: EventApplicationPort = {
   addOffer: deniedOutcome,
   changeOffer: deniedOutcome,
   withdrawOffer: deniedOutcome,
+};
+
+/** A checklist port with nothing planned: every read and command is refused, as the screens are not built yet. */
+const CHECKLIST_PORT_DOUBLE: ChecklistApplicationPort = {
+  checklist: deniedOutcome,
+  templates: deniedOutcome,
+  templatesForGroup: deniedOutcome,
+  template: deniedOutcome,
+  templateOptions: deniedOutcome,
+  saveTemplate: deniedOutcome,
+  setTemplateRemoved: deniedOutcome,
+  copyTemplate: deniedOutcome,
+  saveSection: deniedOutcome,
+  removeSection: deniedOutcome,
+  saveTask: deniedOutcome,
+  removeTask: deniedOutcome,
+  reorder: deniedOutcome,
+  claim: deniedOutcome,
+  claimTyped: deniedOutcome,
+  changeClaim: deniedOutcome,
+  withdrawClaim: deniedOutcome,
+  markDone: deniedOutcome,
+  undoDone: deniedOutcome,
 };
 
 /** A library port with no books: every read and command is refused, as the screens are not built yet. */
@@ -358,6 +383,7 @@ export function createRequestWorld() {
       directory: new DirectoryApplicationFacade(pipeline, directoryPort),
       // The event screens come after the owner's design approval; until then every event read is empty.
       events: new EventApplicationFacade(pipeline, EVENT_PORT_DOUBLE),
+      checklists: new ChecklistApplicationFacade(pipeline, CHECKLIST_PORT_DOUBLE),
       library: new LibraryApplicationFacade(pipeline, LIBRARY_PORT_DOUBLE),
       recurring: new RecurringApplicationFacade(pipeline, RECURRING_PORT_DOUBLE),
     });

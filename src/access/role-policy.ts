@@ -91,6 +91,8 @@ const PARENT_ONLY_RESOURCES = new Set([
   // Signing up for an event and offering food: the database acts for the caller's own parent (BR108.1, BR113.1).
   "event_signup",
   "food_offer",
+  // Taking a checklist task and marking it done: the database acts for the caller's own parent (BR165, BR166).
+  "checklist_claim",
 ]);
 export function grantAllows(
   grant: Pick<RoleGrant, "role" | "scope" | "revokedAt">,
@@ -155,6 +157,7 @@ function parentCan({ action, resource }: AuthorizationRequest): boolean {
     // Signing up for an event and offering food, changing and withdrawing them (BR108.1, BR113.1).
     case "event_signup":
     case "food_offer":
+    case "checklist_claim":
       return action === "create" || action === "update" || action === "delete";
     // Adding, changing, removing, borrowing and returning a book, and asking to be told when it is back (BR131 to BR135).
     // The database acts for the caller's own parent and decides who owns or holds the book; a super admin acts

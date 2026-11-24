@@ -132,8 +132,9 @@ describe("honest executable denominator", () => {
     // (app/_recurring: person, facade resolver, form reader, result mapper, actions: 5): 297 + 7. The screens add eleven
     // more: the format helpers (src/application/recurring-format.ts), the forms and screens (app/_recurring: 2) and
     // eight pages (the group page in the parent, teacher and admin areas, my duties, and the new and change forms in the
-    // parent and admin areas): 304 + 11.
-    expect(inventory.length).toBe(315);
+    // parent and admin areas): 304 + 11. U11 adds the checklist facade (src/application/checklist-facade.ts) and its
+    // data adapter (src/data/checklists.ts) so far: 315 + 2.
+    expect(inventory.length).toBe(335);
     for (const path of [
       "src/runtime/AppNav.tsx",
       "src/runtime/StatusBadge.tsx",

@@ -4206,3 +4206,180 @@ nav a:hover {
 .recurring-group-link h2 {
   margin: 0 0 0.75rem;
 }
+
+/*
+ * Checklists and templates (U11): the checklist block of the event page, its editor, the template list and the template
+ * editor. The Stitch designs were followed for the order, the states and the wording; the search box, the tip boxes,
+ * the sample empty-state panel and the school header of the designs were left out because no data stands behind them.
+ * A state is always a word with a symbol, never only a colour.
+ */
+.checklist-block,
+.checklist-page {
+  display: grid;
+  gap: 1rem;
+}
+
+.checklist-section {
+  display: grid;
+  gap: 0.75rem;
+  margin-block: 0.75rem;
+}
+
+.checklist-section-head,
+.checklist-template-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.checklist-section-head h2 {
+  margin: 0;
+  font-size: var(--text-headline-sm);
+}
+
+.checklist-chip {
+  border-radius: var(--radius-pill);
+  padding: 0.1rem 0.7rem;
+  color: var(--color-muted);
+  background: var(--color-info-bg);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.checklist-tasks,
+.checklist-templates,
+.checklist-claims {
+  display: grid;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.checklist-task,
+.checklist-template,
+.checklist-editor-section,
+.checklist-template-section {
+  display: grid;
+  gap: 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  background: var(--color-surface);
+  box-shadow: var(--shadow);
+  overflow-wrap: break-word;
+}
+
+.checklist-task[data-done="yes"] {
+  border-left: 0.35rem solid var(--color-success);
+}
+
+.checklist-task-title,
+.checklist-template-name {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--text-headline-sm);
+}
+
+.checklist-meta,
+.checklist-tip {
+  margin: 0;
+  color: var(--color-muted);
+}
+
+.checklist-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-pill);
+  padding: 0.1rem 0.7rem;
+  background: var(--color-info-bg);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.checklist-claims li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  border-radius: var(--radius);
+  padding: 0.5rem 0.75rem;
+  background: var(--color-info-bg);
+}
+
+.checklist-actions,
+.checklist-move-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.checklist-actions form,
+.checklist-move-row form {
+  flex: 0 0 auto;
+}
+
+.checklist-callout {
+  margin: 0;
+  border-left: 0.35rem solid var(--color-primary);
+  border-radius: var(--radius);
+  padding: 0.75rem 1rem;
+  background: var(--color-info-bg);
+}
+
+.checklist-callout-success {
+  border-left-color: var(--color-success);
+  background: var(--color-success-bg);
+}
+
+.checklist-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  gap: 0.75rem;
+}
+
+.checklist-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 0;
+}
+
+.checklist-template-removed {
+  color: var(--color-read-text);
+  background: var(--color-read-bg);
+}
+
+.checklist-template-removed .checklist-template-name {
+  text-decoration: line-through;
+}
+
+.checklist-chooser {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.checklist-editor-task {
+  display: grid;
+  gap: 0.5rem;
+  border-top: 1px solid var(--color-border);
+  padding-top: 0.75rem;
+}
+
+/* A button of a task or template card is a plain button on the card, not a form card of its own. */
+.checklist-actions .parent-form,
+.checklist-move-row .parent-form,
+.checklist-claims .parent-form,
+.checklist-template-head .parent-form {
+  margin: 0;
+  border: 0;
+  padding: 0;
+  background: none;
+  box-shadow: none;
+}

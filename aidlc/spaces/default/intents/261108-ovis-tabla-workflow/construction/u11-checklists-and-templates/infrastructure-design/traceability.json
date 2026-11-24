@@ -1,0 +1,33 @@
+{
+  "stage": "infrastructure-design",
+  "unit": "u11-checklists-and-templates",
+  "upstream_ids": [
+    "NFR1.5", "NFR3.16", "NFR3.17", "NFR4.12", "NFR4.13", "NFR4.14",
+    "NFR5.8", "NFR5.10", "NFR5.13",
+    "NFR6.5", "NFR6.7", "NFR7.11", "NFR7.12", "NFR7.14", "NFR7.15", "NFR7.16", "NFR7.17",
+    "NFR8.4", "NFR9.5", "NFR9.9", "NFR11.4"
+  ],
+  "coverage": [
+    { "id": "NFR1.5", "status": "OK", "target": "cicd-pipeline.md Privacy scan row; infrastructure-specification.md Starting data: install function" },
+    { "id": "NFR3.16", "status": "OK", "target": "infrastructure-specification.md Daily-run registry row and Shared Infrastructure: owner-rights functions with no signed-in grant" },
+    { "id": "NFR3.17", "status": "OK", "target": "infrastructure-specification.md Infrastructure Services: row-level security with no signed-in policy" },
+    { "id": "NFR4.12", "status": "OK", "target": "infrastructure-specification.md Storage row: new audit action values in the migration" },
+    { "id": "NFR4.13", "status": "OK", "target": "infrastructure-specification.md Daily-run registry row; monitoring-design.md Metrics: timed_check_runs" },
+    { "id": "NFR4.14", "status": "OK", "target": "infrastructure-specification.md Notice registries row; monitoring-design.md Metrics: delivery-problems screen" },
+    { "id": "NFR5.8", "status": "OK", "target": "infrastructure-specification.md Infrastructure Services: deferred capacity trigger" },
+    { "id": "NFR5.10", "status": "OK", "target": "infrastructure-specification.md Infrastructure Services: deferrable position constraints" },
+    { "id": "NFR5.13", "status": "OK", "target": "infrastructure-specification.md Shared Infrastructure: C1 amendment note" },
+    { "id": "NFR6.5", "status": "OK", "target": "cicd-pipeline.md Unit tests row" },
+    { "id": "NFR6.7", "status": "OK", "target": "cicd-pipeline.md Database tests row: scripts, shuffled run, catalogue tests" },
+    { "id": "NFR7.11", "status": "OK", "target": "infrastructure-specification.md Infrastructure Services: unique keys and trigger" },
+    { "id": "NFR7.12", "status": "OK", "target": "monitoring-design.md Alerts: failed event in the run detail; cicd-pipeline.md Database tests row" },
+    { "id": "NFR7.14", "status": "OK", "target": "infrastructure-specification.md Shared Infrastructure: event_save_core replacement" },
+    { "id": "NFR7.15", "status": "OK", "target": "infrastructure-specification.md Starting data; cicd-pipeline.md install-twice test" },
+    { "id": "NFR7.16", "status": "OK", "target": "cicd-pipeline.md Pipeline: verify:local in three browsers" },
+    { "id": "NFR7.17", "status": "OK", "target": "cicd-pipeline.md Database tests row: stopped-run test" },
+    { "id": "NFR8.4", "status": "OK", "target": "cicd-pipeline.md Browser flow row" },
+    { "id": "NFR9.5", "status": "OK", "target": "monitoring-design.md Metrics: timings on the large seed; infrastructure-specification.md Shared Infrastructure: large seed" },
+    { "id": "NFR9.9", "status": "OK", "target": "monitoring-design.md Metrics: daily check budget" },
+    { "id": "NFR11.4", "status": "OK", "target": "infrastructure-specification.md Shared Infrastructure: task_save_core replacement; cicd-pipeline.md Unit tests row" }
+  ]
+}

@@ -31,6 +31,9 @@
 - 2026-11-16T05:49:19Z — [unit u6-full-rotas-and-weekend-picks] Judge a rota week's changeover eligibility by its Monday; the stories give only a date, and a week that contains the changeover date would otherwise leave its weekend duties and pick with a family that may not hold them. Recorded as an assumption for the owner.
 - 2026-11-16T05:49:19Z — [unit u6-full-rotas-and-weekend-picks] Treat a family with no standing row as staying; contract C20 said "null when the family has no row", but backfilling a row for every family and year would keep two copies of one fact. Listed as a contract delta.
 - 2026-11-21T16:41:47Z [unit u7-swaps-and-duty-changes] — Read "the administrator" in AC8.2.4 and AC8.3.2 as a super admin for rota duties and an admin reaching the group for other duties, the same reach as assigning a duty today; the stories name no role and AC5.4.5 refuses working-group admins only for rota duties.
+- 2026-11-23T14:03:56Z [unit u11-checklists-and-templates] — Read "start from template only at creation" (Q7) as a copy allowed only into an event whose checklist is still empty; the event form saves the event first and copies second, so a failed copy can be retried from the empty event page without adding a template to a list that already has tasks.
+- 2026-11-23T14:03:56Z [unit u11-checklists-and-templates] — Placed "létszám megadása" (Szent Miklós) and "darabszám megadása" (Gyermekek búcsúnapja) in the teachers' sections of the starting templates; appendix F lost its parents and teachers columns when it was copied, and giving the head count is the teachers' information to the parents. Flagged for the owner at the gate.
+- 2026-11-23T14:03:56Z [unit u11-checklists-and-templates] — Appendix C lists nine areas, not the ten written in Q8; the big-cleaning template gets one section per area of appendix C as written.
 
 ## Deviations
 <!-- example: 2026-05-29T10:14:32Z — skipped the optional caching layer the stage prose suggested; the dataset is small enough that it adds risk -->
@@ -48,6 +51,10 @@
 
 - 2026-11-15T12:01:26Z [unit u4-working-groups] — The coordinator notice goes out with its email although Q4 first chose no email; U5's notice_send always queues one email per notice, and the owner chose in follow-up Q5 to accept that rather than change U5.
 - 2026-11-15T13:05:00Z [unit u4-working-groups] — U4 changes three functions of other units: end_admin gains an audit reason, lifecycle_run_core ends grants before deleting memberships, and directory_list moves its contact logic into helpers U4 also uses; the review showed each would otherwise break a U4 rule.
+- 2026-11-23T14:03:56Z [unit u11-checklists-and-templates] — Added section records (template and event) with a kind, and a separate claim record, although components.md lists only TemplateTask with a section text and EventChecklistTask with one claimedBy; the owner's Q2 (several helpers) and Q4 (three section kinds) cannot be held in a single claimedBy and a text label.
+- 2026-11-23T14:20:00Z [unit u11-checklists-and-templates] — After the design review and at the owner's request, U11 also changes U10's event_save_core so its cancellation and change notice reaches checklist helpers through checklist_claimant_ids; this is one read from Events into Checklists, accepted because it replaces the event-task holders that notice used to reach.
+- 2026-11-23T14:20:00Z [unit u11-checklists-and-templates] — Starting templates moved from the seed script into an install function in the migration, so a hosted database gets them too; the seed only calls it.
+- 2026-11-23T14:03:56Z [unit u11-checklists-and-templates] — U11 changes U10-era task_save so it refuses linking a task to an event (owner answer Q1); contract C4's event_task origin is retired rather than used. Listed as a contract delta.
 
 ## Tradeoffs
 <!-- example: 2026-05-29T10:14:32Z — picked TDD over BDD this run; the team is unit-first and the domain is well-understood -->
@@ -70,6 +77,9 @@
 
 - 2026-11-21T16:41:47Z [unit u7-swaps-and-duty-changes] — Kept the one change_requests table and widened it, instead of a new swap table; today's requests, notices and approvals screen already read it, at the cost of more statuses and nullable swap-only columns.
 - 2026-11-21T16:41:47Z [unit u7-swaps-and-duty-changes] — The decider of a request stays an account id rather than a parent id, because a super admin may have no parent record; removal clears it by account, which settles the C16 open question.
+- 2026-11-23T14:03:56Z [unit u11-checklists-and-templates] — Copying a template is its own command after the event is saved, not part of U10's event_save; it keeps Checklists depending on Events and not the other way round, at the cost of a second step that can fail on its own (the empty event can then be filled again).
+- 2026-11-23T14:03:56Z [unit u11-checklists-and-templates] — The template's default lead time only pre-fills the event form, and event_save stores it on the event; U11 never writes U10's event row, so the event keeps one owner.
+- 2026-11-23T14:03:56Z [unit u11-checklists-and-templates] — On removal, a claim on a task not yet done of an event not yet finished is deleted, so its helper place frees up and the unclaimed-task alert can see it; claims on done tasks or finished events are kept and anonymised for history.
 
 ## Open questions
 
@@ -85,6 +95,7 @@
 - 2026-11-21T08:50:00Z [unit u13-lending-library] — U15 should say that the spreadsheet's current holder of a book is not migrated and that a row with no authors is refused; U14 decides whether a leaving owner's books should be removed rather than left ownerless.
 
 - 2026-11-21T06:04:15Z — [unit u10-events-and-signups] Replay after Request Changes: kept the approved design and corrected two rules to match the built behaviour; BR110.1 now says a repeated withdrawal answers denied, and BR119.1 says event_list_for_group is readable by every signed-in reader and carries the count and own flag.
+- 2026-11-23T14:03:56Z [unit u11-checklists-and-templates] — Until U12 builds the coordinator's management page, a coordinator reaches the group's templates from a link on the group page; confirm the place in the Stitch design.
 
 - 2026-11-22T12:40:00Z [unit u9-recurring-duties] — Deviation: occurrences are their own records with their own done mark (ADR-003) and create no duty or place, unlike components.md ("occurrences are duties") and contract C18; a group has no single family to hold a place and a rota-week place would need every swap to move it. The cost is that occurrences cannot be swapped and need their own read for My tasks.
 - 2026-11-22T12:40:00Z [unit u9-recurring-duties] — Tradeoff: a rota-week occurrence reads its family live through rota_family_for, so swaps and reassignments move the bottle-cleaning duty with no change to U7.

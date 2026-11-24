@@ -34,6 +34,12 @@ vi.mock("next/navigation", () => ({
   usePathname: () => "/",
   useSearchParams: () => new URLSearchParams(),
 }));
+vi.mock("../../app/_checklists/ChecklistScreens.tsx", () => ({
+  ChecklistBlock: () => <p data-testid="checklist-block-stub" />,
+}));
+vi.mock("../../app/_checklists/facade.ts", () => ({
+  resolveChecklistFacade: async () => undefined,
+}));
 vi.mock("../../app/_events/facade.ts", () => ({
   resolveEventFacade: async () => (world.facadeOn ? world.facade : undefined),
 }));

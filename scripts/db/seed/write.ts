@@ -220,6 +220,8 @@ export async function writeSeedPlan(client: SqlClient, plan: SeedPlan): Promise<
         event.foodSignupOn,
       ]),
     );
+    // The ten starting checklist templates of U11 (W1), the same set a fresh community gets from the migration step.
+    await client.query("select checklist_starting_templates_install($1::uuid)", [organization]);
     await insertRows(
       client,
       "event_notices",

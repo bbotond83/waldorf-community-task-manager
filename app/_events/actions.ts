@@ -8,6 +8,7 @@ import { FOOD_CATEGORIES, type FoodCategory } from "../../src/application/contra
 import { manageScopeFor, noticeLines } from "../../src/application/event-format.ts";
 import { normalizeRequiredText, validation } from "../../src/application/index.ts";
 import { resolveAdminFacade } from "../admin/_lib/facade.ts";
+import { resolveChecklistFacade } from "../_checklists/facade.ts";
 import type { ParentActionState } from "../szulo/_lib/action-state.ts";
 import { isEventArea, resolveEventActor, type EventActor } from "./actor.ts";
 import { parseEventForm } from "./event-payload.ts";
@@ -270,6 +271,22 @@ export async function saveEventAction(
   });
   if (result.state === "success") {
     refresh(result.data.id, groupChoice);
+    const templateId = creating ? uuidField(formData, "templateId") : undefined;
+    if (templateId) {
+      // The list is copied once the event exists. A refused copy leaves an empty list; the editor offers the copy again.
+      const checklists = await resolveChecklistFacade();
+      await checklists?.copyTemplate(ctx.actor.session, {
+        scope: manageScopeFor(
+          ctx.actor.session,
+          ctx.actor.scope,
+          groupChoice && UUID.test(groupChoice) ? groupChoice : undefined,
+        ),
+        idempotencyKey: `checklist-copy:${result.data.id}`,
+        eventId: result.data.id,
+        templateId,
+      });
+      redirect(`${ctx.actor.basePath}/${result.data.id}/feladatlista`);
+    }
     redirect(`${ctx.actor.basePath}/${result.data.id}/szerkesztes?mentve=${creating ? "uj" : "1"}`);
   }
   return mapEventResult(result, "Az esemény mentése sikerült.");

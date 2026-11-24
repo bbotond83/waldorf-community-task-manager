@@ -40,6 +40,17 @@ describe("seed writer", () => {
     assert.equal(calls.filter((call) => call.sql === "rollback").length, 0);
   });
 
+  it("installs the starting checklist templates once, for the seeded organisation, before the event notices", async () => {
+    const { client, calls } = recorder();
+    await writeSeedPlan(client, plan);
+    const installs = calls.filter((call) => /checklist_starting_templates_install/.test(call.sql));
+    assert.equal(installs.length, 1);
+    assert.equal(installs[0]!.values.length, 1);
+    const at = calls.indexOf(installs[0]!);
+    assert.ok(calls.slice(0, at).some((call) => /^insert into "events"/.test(call.sql)));
+    assert.ok(calls.slice(at).some((call) => /^insert into "event_notices"/.test(call.sql)));
+  });
+
   it("writes the tables in the order their foreign keys need", async () => {
     const { client, calls } = recorder();
     await writeSeedPlan(client, plan);

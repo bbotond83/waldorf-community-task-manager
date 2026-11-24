@@ -205,6 +205,55 @@ export function libraryMessage(answer: {
 }
 
 /**
+ * What a person reads for each refusal of the checklist commands (U11). Codes name what was refused; a refused field
+ * names its reason. An access refusal reads as an unavailable list, so a person cannot tell a missing task from a
+ * hidden one.
+ */
+const CHECKLIST_CODE_MESSAGES: Readonly<Record<string, string>> = Object.freeze({
+  TASK_TAKEN: "Közben betelt ez a feladat, nincs több szabad hely.",
+  ALREADY_CLAIMED: "Ezt a feladatot már vállaltad.",
+  TASK_NOT_CLAIMABLE: "Ezt a feladatot nem lehet vállalni.",
+  TASK_DONE: "Ez a feladat már kész, előbb vedd vissza a kész jelölést.",
+  EVENT_CLOSED: "Az esemény már lezárult vagy elmaradt, a lista nem módosítható.",
+  CHECKLIST_TASK_UNAVAILABLE: "Ez a feladat nem érhető el.",
+  CHECKLIST_NOT_EMPTY: "A lista már nem üres, ezért nem másolható bele sablon.",
+  SECTION_HAS_CLAIMS: "A részben vállalt feladatok vannak, ezért nem törölhető.",
+  TASK_HAS_CLAIMS: "A feladatot már vállalták, ezért nem törölhető.",
+  TEMPLATE_UNAVAILABLE: "Ez a sablon nem érhető el.",
+  VERSION_CONFLICT: "Közben valaki módosította, töltsd újra.",
+  authorization_denied: "Ezt a műveletet nem végezheted el.",
+});
+
+const CHECKLIST_REASON_MESSAGES: Readonly<Record<string, string>> = Object.freeze({
+  not_offered: "Ennél a feladatnál nem lehet időpontot választani.",
+  outside_event: "Az időpont az eseményen kívül esik.",
+  name_taken: "Ilyen nevű sablon már van.",
+  sections_differ: "A rendezett lista nem egyezik a mostanival, töltsd újra.",
+  tasks_differ: "A rendezett lista nem egyezik a mostanival, töltsd újra.",
+  too_many_sections: "Legfeljebb 30 rész lehet egy listában.",
+  too_many_tasks: "Legfeljebb 300 feladat lehet egy listában.",
+  retired: "Az események feladata már a feladatlistából kezelhető.",
+  invalid: "Az egyik megadott adat nem megfelelő.",
+});
+
+export function checklistMessage(answer: {
+  state: string;
+  code?: string | undefined;
+  fieldErrors?: Readonly<Record<string, string>> | undefined;
+}): string {
+  if (answer.state === "denied" && answer.code === undefined) {
+    return CHECKLIST_CODE_MESSAGES.CHECKLIST_TASK_UNAVAILABLE!;
+  }
+  const byCode = answer.code && CHECKLIST_CODE_MESSAGES[answer.code];
+  if (byCode) return byCode;
+  for (const reason of Object.values(answer.fieldErrors ?? {})) {
+    const known = CHECKLIST_REASON_MESSAGES[reason];
+    if (known) return known;
+  }
+  return DIRECTORY_REFUSAL_FALLBACK;
+}
+
+/**
  * What a person reads for each refusal of the recurring-duty commands (U9). A refused field names its reason, which the
  * adapter turns into the field codes; the form field it belongs to decides the words, so a person is told which
  * entry to correct. An access refusal reads as "not allowed", never as which part was missing.

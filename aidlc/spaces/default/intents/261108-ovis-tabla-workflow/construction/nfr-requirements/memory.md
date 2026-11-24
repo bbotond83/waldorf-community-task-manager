@@ -11,6 +11,7 @@
 - 2026-11-15T13:40:00Z [unit u4-working-groups] — Closing the general role-change function for group_admin covers revoking too, with the refusal after the authorization check; the design's second review asked this to be stated, and one way in means both directions.
 
 - 2026-11-16T05:56:00Z — [unit u6-full-rotas-and-weekend-picks] Asked no NFR questions; every target follows from NFR1 to NFR11, the U2 targets for the same pages (2 seconds a page, 5 seconds for draft and publish) and the unit's own rules, so no questions file was written.
+- 2026-11-23T14:40:00Z [unit u11-checklists-and-templates] — Asked no NFR questions; the targets follow from NFR1 to NFR11, U10's targets for the same event page (2 seconds), and U11's rules. Added a 1-second target for taking and finishing a task, because the row updates in place and parents tap many tasks in a row at a big cleaning.
 
 ## Deviations
 <!-- example: 2026-05-29T10:14:32Z — skipped the optional caching layer the stage prose suggested; the dataset is small enough that it adds risk -->
