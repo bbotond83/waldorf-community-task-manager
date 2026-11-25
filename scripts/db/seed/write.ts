@@ -381,6 +381,7 @@ export async function writeSeedPlan(client: SqlClient, plan: SeedPlan): Promise<
     await writeNotices(client, plan);
     await writeRota(client, plan);
     await writeRecurring(client, plan);
+    await writeTodo(client, plan);
     await writeAnimalCare(client, plan);
     await client.query("commit");
   } catch (error) {
@@ -543,6 +544,78 @@ async function writeRecurring(client: SqlClient, plan: SeedPlan): Promise<void> 
                from recurring_occurrences o2 join recurring_schedules s on s.id = o2.schedule_id
               where o2.organization_id = $1::uuid and o2.status = 'open' and o2.due_date < current_date - 14) w
       where o.id = w.id and w.parent_id is not null`,
+    [organization],
+  );
+}
+
+/**
+ * The to-do tasks (U12), written as the schema owner with the dates as days from today in the database's own clock, so a
+ * seed made on any day has deadlines already past and "not before" dates still ahead. A claimed task holds its claim
+ * time two days back; a done task holds the done time and the claimant as the person who finished it. Each task also gets
+ * the one history row "created" by the system, once (a second seed finds it and adds nothing).
+ */
+async function writeTodo(client: SqlClient, plan: SeedPlan): Promise<void> {
+  const organization = plan.organization.id;
+  const daysAhead = (name: string): Column => ({
+    name,
+    sql: (placeholder) => `current_date + ${placeholder}::integer`,
+  });
+  await insertRows(
+    client,
+    "todo_tasks",
+    [
+      "id",
+      "organization_id",
+      "owner_group_id",
+      "owner_family_id",
+      "topic",
+      "priority",
+      "description",
+      "materials",
+      "status",
+      "note",
+      daysAhead("not_before"),
+      daysAhead("deadline"),
+      "claimant_parent_id",
+      {
+        name: "claimed_at",
+        sql: (placeholder) =>
+          `case when ${placeholder}::boolean then now() - interval '2 days' end`,
+      },
+      {
+        name: "done_at",
+        sql: (placeholder) => `now() - make_interval(days => ${placeholder}::integer)`,
+      },
+      "done_by_parent_id",
+      "source_key",
+    ],
+    plan.todoTasks.map((task) => [
+      task.id,
+      organization,
+      task.groupId,
+      task.familyId,
+      task.topic,
+      task.priority,
+      task.description,
+      task.materials,
+      task.status,
+      task.note,
+      task.notBeforeInDays,
+      task.deadlineInDays,
+      task.claimantParentId,
+      task.claimantParentId !== null,
+      task.doneDaysAgo,
+      task.status === "done" ? task.claimantParentId : null,
+      task.sourceKey,
+    ]),
+  );
+  await client.query(
+    `insert into todo_task_history (id, task_id, change, actor_kind)
+     select md5(t.id::text || ':created')::uuid, t.id, 'created', 'system'
+       from todo_tasks t
+      where t.organization_id = $1::uuid and t.source_key like 'seed-todo:%'
+        and not exists (select 1 from todo_task_history h where h.task_id = t.id and h.change = 'created')
+     on conflict do nothing`,
     [organization],
   );
 }

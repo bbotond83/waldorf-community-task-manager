@@ -90,6 +90,10 @@ export type AuthorizationMatrixRowId =
   | "AUTH-RECURRING"
   | "AUTH-RECURRING-DUTY"
   | "AUTH-RECURRING-MANAGE"
+  | "AUTH-TODO"
+  | "AUTH-TODO-TASK"
+  | "AUTH-TODO-MANAGE"
+  | "AUTH-MY-TASKS"
   | "AUTH-ANIMAL"
   | "AUTH-ANIMAL-SLOT"
   | "AUTH-ANIMAL-MANAGE"
@@ -594,6 +598,142 @@ export type RecurringScheduleModel = Readonly<{
 
 /** What a recurring command returns: the row's id and its new version. */
 export type RecurringChangeModel = Readonly<{ id: string | null; version: number | null }>;
+
+export const TODO_STATUSES = ["open", "in_progress", "done", "postponed"] as const;
+export type TodoStatus = (typeof TODO_STATUSES)[number];
+export type TodoOwnerKind = "working_group" | "family";
+
+/**
+ * One to-do task as the list and the task page show it (U12). A person appears only as a display name, a removed one as
+ * "korábbi tag", and a removed family as "korábbi család". "Overdue" and "not yet" are read from the dates, never stored.
+ */
+export type TodoCard = Readonly<{
+  id: string;
+  topic: string;
+  status: TodoStatus;
+  ownerKind: TodoOwnerKind;
+  ownerId: string;
+  ownerLabel: string;
+  claimedByMe: boolean;
+  isDone: boolean;
+  isNotYet: boolean;
+  isOverdue: boolean;
+  needsAttention: boolean;
+  canClaim: boolean;
+  version: number;
+  priority?: number;
+  claimantDisplayName?: string;
+  notBefore?: string;
+  deadline?: string;
+  /** Whether the task was pulled into an event whose checklist task is still there, and whether it is done there. */
+  onEvent: boolean;
+  doneOnEvent: boolean;
+}>;
+
+/** The narrowing of the community list. Done and not-yet tasks appear only with `showHidden`. */
+export type TodoListFilters = Readonly<{
+  showHidden?: boolean;
+  owner?: string;
+  status?: TodoStatus;
+  priority?: number;
+  attentionOnly?: boolean;
+}>;
+
+/** The community's list in one document, cut at 500 with `truncated`. */
+export type TodoListModel = Readonly<{
+  items: readonly TodoCard[];
+  truncated: boolean;
+  caller: Readonly<{ canClaimTasks: boolean; canManageCommunity: boolean }>;
+}>;
+
+export type TodoHistoryEntry = Readonly<{
+  change: string;
+  actor: string;
+  at: string;
+  fromStatus?: TodoStatus;
+  toStatus?: TodoStatus;
+  eventId?: string;
+  eventTitle?: string;
+}>;
+
+/** Where a pulled task went: on the event's list, finished there, or no longer on it. */
+export type TodoEventLink = Readonly<{
+  eventId: string;
+  pulledAt: string;
+  state: "on_list" | "done_on_event" | "gone";
+  eventClosed: boolean;
+  eventTitle?: string;
+}>;
+
+/** One task page: the card, its text fields, the done mark, the history, the links and what the caller may do. */
+export type TodoDetailModel = Readonly<{
+  item: TodoCard;
+  createdAt: string;
+  history: readonly TodoHistoryEntry[];
+  eventLinks: readonly TodoEventLink[];
+  can: Readonly<{
+    claim: boolean;
+    giveBack: boolean;
+    update: boolean;
+    markDone: boolean;
+    undoDone: boolean;
+    freeClaim: boolean;
+    edit: boolean;
+  }>;
+  description?: string;
+  materials?: string;
+  note?: string;
+  done?: Readonly<{ at: string; isOwn: boolean; byDisplayName?: string }>;
+}>;
+
+/** A group's to-do tasks for its coordinator: the open ones and those done in the last 60 days. */
+export type TodoGroupListModel = Readonly<{
+  items: readonly Readonly<{
+    id: string;
+    title: string;
+    status: TodoStatus;
+    isOverdue: boolean;
+    needsAttention: boolean;
+    version: number;
+    priority?: number;
+    deadline?: string;
+    claimantDisplayName?: string;
+  }>[];
+  truncated: boolean;
+}>;
+
+/** One row of My tasks: a duty of the family, a recurring duty or a claimed to-do task. */
+export type MyTasksRow = Readonly<{
+  kind: "duty" | "recurring" | "todo";
+  id: string;
+  refId: string;
+  title: string;
+  status: string;
+  version: number;
+  isOverdue: boolean;
+  canMarkDone: boolean;
+  date?: string;
+}>;
+
+/** My tasks in one document: this week (overdue ones marked), later, and without a date. */
+export type MyTasksModel = Readonly<{
+  thisWeek: readonly MyTasksRow[];
+  later: readonly MyTasksRow[];
+  noDate: readonly MyTasksRow[];
+  isEmpty: boolean;
+  weekEnd: string;
+}>;
+
+/** What a to-do command returns: the task's id and its new version. */
+export type TodoChangeModel = Readonly<{ id: string | null; version: number | null }>;
+
+/** What a pull into an event returns: how many tasks were added, were already there, and brought a helper along. */
+export type TodoPullModel = Readonly<{
+  eventId: string | null;
+  added: number;
+  alreadyOnList: number;
+  claimantsCarried: number;
+}>;
 
 /** One link from a duty to a section of the information page (U8). */
 export type InfoLink = Readonly<{ key: string; title: string }>;

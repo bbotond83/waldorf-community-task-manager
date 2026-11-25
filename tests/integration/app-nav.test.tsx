@@ -71,6 +71,8 @@ describe("AppNav for a parent", () => {
     expect(links.map((link) => link.textContent)).toEqual([
       "Értesítések",
       "Feladatok",
+      "Feladataim",
+      "Teendők",
       "Beosztás",
       "Cserék",
       "Munkacsoportok",

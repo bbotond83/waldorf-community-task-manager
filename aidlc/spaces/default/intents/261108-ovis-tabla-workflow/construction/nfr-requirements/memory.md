@@ -13,6 +13,8 @@
 - 2026-11-16T05:56:00Z — [unit u6-full-rotas-and-weekend-picks] Asked no NFR questions; every target follows from NFR1 to NFR11, the U2 targets for the same pages (2 seconds a page, 5 seconds for draft and publish) and the unit's own rules, so no questions file was written.
 - 2026-11-23T14:40:00Z [unit u11-checklists-and-templates] — Asked no NFR questions; the targets follow from NFR1 to NFR11, U10's targets for the same event page (2 seconds), and U11's rules. Added a 1-second target for taking and finishing a task, because the row updates in place and parents tap many tasks in a row at a big cleaning.
 
+- 2026-11-24T17:35:00Z [unit u12-todo-and-my-tasks] — Asked no NFR questions; targets follow from NFR1 to NFR11, U10/U11's 2-second page and 1-second command targets, and U12's rules. Added NFR3.25 (re-check that the caller is still an active parent after the task row is locked), taken from the Functional Design review's first major finding. The NFR review (READY) left six minor wording points for the unit checkpoint: NFR3.25 is stricter than BR182.1/182.3/183.2; NFR3.23 "no row looked up" and "same audit entry"; NFR3.24 "give back" vs administrators "free"; no requirement for another community's task or event answering as not found; NFR4.23 omits no_parent_record, too_many_tasks, status_not_allowed; NFR9.16 needs a number.
+
 ## Deviations
 <!-- example: 2026-05-29T10:14:32Z — skipped the optional caching layer the stage prose suggested; the dataset is small enough that it adds risk -->
 

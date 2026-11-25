@@ -13,6 +13,10 @@ const RESOURCE_BY_ROUTE: Readonly<Record<string, string>> = {
   "/teacher/esemenyek": "event",
   "/admin/esemenyek": "event",
   "/admin/sablonok": "event",
+  "/szulo/feladataim": "my_tasks",
+  "/szulo/teendok": "todo",
+  "/teacher/teendok": "todo",
+  "/admin/teendok": "todo_manage",
   "/szulo/ismetlodo": "recurring",
   "/szulo/konyvtar": "library",
   "/teacher/konyvtar": "library",
@@ -94,6 +98,8 @@ describe("navigation and default pages follow the access rules", () => {
     expect(labels("parent")).toEqual([
       "Értesítések",
       "Feladatok",
+      "Feladataim",
+      "Teendők",
       "Beosztás",
       "Cserék",
       "Munkacsoportok",
@@ -109,6 +115,7 @@ describe("navigation and default pages follow the access rules", () => {
       "Beosztás",
       "Takarítás",
       "Munkacsoportok",
+      "Teendők",
       "Események",
       "Könyvtár",
       "Állatgondozás",
@@ -122,6 +129,8 @@ describe("navigation and default pages follow the access rules", () => {
       "Cserék",
       "Archívum",
       "Munkacsoportok",
+      "Feladataim",
+      "Teendők",
       "Események",
       "Ismétlődők",
       "Könyvtár",
@@ -138,6 +147,7 @@ describe("navigation and default pages follow the access rules", () => {
       "Cserék",
       "Archívum",
       "Munkacsoportok",
+      "Teendők",
       "Események",
       "Sablonok",
       "Könyvtár",
@@ -154,9 +164,11 @@ describe("navigation and default pages follow the access rules", () => {
 
   it("gives the super admin every group admin item", () => {
     // "Ismétlődők" is a parent's own page (the family's and the groups' duties); a super admin has no family and
-    // reaches a group's recurring duties from the group's page instead.
+    // reaches a group's recurring duties from the group's page instead. "Feladataim" is the same: a parent's own tasks.
     expect(labels("super-admin")).toEqual(
-      expect.arrayContaining(labels("group-admin").filter((label) => label !== "Ismétlődők")),
+      expect.arrayContaining(
+        labels("group-admin").filter((label) => label !== "Ismétlődők" && label !== "Feladataim"),
+      ),
     );
   });
 
@@ -179,6 +191,7 @@ describe("navigation and default pages follow the access rules", () => {
       ["Beosztás", "/teacher/schedule"],
       ["Takarítás", "/teacher/beosztas"],
       ["Munkacsoportok", "/teacher/munkacsoportok"],
+      ["Teendők", "/teacher/teendok"],
       ["Események", "/teacher/esemenyek"],
       ["Könyvtár", "/teacher/konyvtar"],
       ["Állatgondozás", "/teacher/allatok"],

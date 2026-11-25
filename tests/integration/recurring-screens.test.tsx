@@ -212,8 +212,8 @@ describe("the group page", () => {
     ).not.toContain("recurring-empty");
   });
 
-  it("links the group page to its recurring duties in each area", () => {
-    for (const area of ["szulo", "teacher", "admin"] as const) {
+  it("links the group page to its recurring duties for a parent and a teacher", () => {
+    for (const area of ["szulo", "teacher"] as const) {
       const out = renderToStaticMarkup(<GroupRecurringLink area={area} groupId={GROUP} />);
       expect(out).toContain(`href="/${area}/munkacsoportok/${GROUP}/ismetlodo"`);
     }

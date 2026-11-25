@@ -6,6 +6,7 @@ import {
   EventApplicationFacade,
   LibraryApplicationFacade,
   RecurringApplicationFacade,
+  TodoApplicationFacade,
   AnimalCareApplicationFacade,
   InformationApplicationFacade,
   FacadePipeline,
@@ -23,6 +24,7 @@ import {
   createLibraryPort,
   createParentPort,
   createRecurringPort,
+  createTodoPort,
   createAnimalCarePort,
   createInformationPort,
   createRotaPort,
@@ -58,6 +60,8 @@ export type RequestServices = Readonly<{
   library: LibraryApplicationFacade;
   /** Recurring duties: group pages, my duties, the bottle line, marking done and the schedules (U9). */
   recurring: RecurringApplicationFacade;
+  /** The community to-do list, a task's page, claiming and finishing tasks, and My tasks (U12). */
+  todo: TodoApplicationFacade;
   /** Animal-care slots: the sign-up page, the fair share, giving up and the year's settings (U8). */
   animalCare: AnimalCareApplicationFacade;
   /** The information page and its editing (U8). */
@@ -92,6 +96,7 @@ export function createProductionServices(database: DatabaseClient): ProductionSe
         checklists: new ChecklistApplicationFacade(pipeline, createChecklistPort(asPerson)),
         library: new LibraryApplicationFacade(pipeline, createLibraryPort(asPerson)),
         recurring: new RecurringApplicationFacade(pipeline, createRecurringPort(asPerson)),
+        todo: new TodoApplicationFacade(pipeline, createTodoPort(asPerson)),
         animalCare: new AnimalCareApplicationFacade(pipeline, createAnimalCarePort(asPerson)),
         information: new InformationApplicationFacade(pipeline, createInformationPort(asPerson)),
       });

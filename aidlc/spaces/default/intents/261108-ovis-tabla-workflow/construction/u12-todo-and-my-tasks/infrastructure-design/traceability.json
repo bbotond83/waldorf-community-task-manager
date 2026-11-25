@@ -1,0 +1,206 @@
+{
+ "stage": "infrastructure-design",
+ "unit": "u12-todo-and-my-tasks",
+ "upstream_ids": [
+  "NFR1.8",
+  "NFR3.28",
+  "NFR3.29",
+  "NFR4.20",
+  "NFR4.21",
+  "NFR4.22",
+  "NFR4.17",
+  "NFR5.15",
+  "NFR5.16",
+  "NFR5.17",
+  "NFR5.18",
+  "NFR5.19",
+  "NFR5.20",
+  "NFR5.21",
+  "NFR5.22",
+  "NFR9.14",
+  "NFR9.15",
+  "NFR6.9",
+  "NFR6.11",
+  "NFR6.12",
+  "NFR7.20",
+  "NFR7.21",
+  "NFR7.22",
+  "NFR7.23",
+  "NFR7.24",
+  "NFR8.6",
+  "NFR9.11",
+  "NFR9.12",
+  "NFR9.13",
+  "NFR9.16",
+  "NFR9.17",
+  "NFR11.5",
+  "NFR11.7"
+ ],
+ "coverage": [
+  {
+   "id": "NFR1.8",
+   "status": "OK",
+   "target": "cicd-pipeline.md"
+  },
+  {
+   "id": "NFR3.28",
+   "status": "OK",
+   "target": "infrastructure-specification.md"
+  },
+  {
+   "id": "NFR3.29",
+   "status": "OK",
+   "target": "infrastructure-specification.md"
+  },
+  {
+   "id": "NFR4.20",
+   "status": "OK",
+   "target": "monitoring-design.md"
+  },
+  {
+   "id": "NFR4.21",
+   "status": "OK",
+   "target": "monitoring-design.md"
+  },
+  {
+   "id": "NFR4.22",
+   "status": "OK",
+   "target": "monitoring-design.md"
+  },
+  {
+   "id": "NFR4.17",
+   "status": "OK",
+   "target": "monitoring-design.md"
+  },
+  {
+   "id": "NFR5.15",
+   "status": "OK",
+   "target": "cicd-pipeline.md > Database tests row (repeated-click and two-at-once tests, NFR5.15 to NFR5.22)"
+  },
+  {
+   "id": "NFR5.16",
+   "status": "OK",
+   "target": "cicd-pipeline.md > Database tests row"
+  },
+  {
+   "id": "NFR5.17",
+   "status": "OK",
+   "target": "cicd-pipeline.md > Database tests row"
+  },
+  {
+   "id": "NFR5.18",
+   "status": "OK",
+   "target": "cicd-pipeline.md > Database tests row"
+  },
+  {
+   "id": "NFR5.19",
+   "status": "OK",
+   "target": "cicd-pipeline.md > Database tests row"
+  },
+  {
+   "id": "NFR5.20",
+   "status": "OK",
+   "target": "cicd-pipeline.md > Database tests row"
+  },
+  {
+   "id": "NFR5.21",
+   "status": "OK",
+   "target": "cicd-pipeline.md > Database tests row"
+  },
+  {
+   "id": "NFR9.14",
+   "status": "OK",
+   "target": "monitoring-design.md > Metrics and KPIs (claim, done and undo under 1 second)"
+  },
+  {
+   "id": "NFR9.15",
+   "status": "OK",
+   "target": "monitoring-design.md > Metrics and KPIs (pull of 50 under 2 seconds)"
+  },
+  {
+   "id": "NFR5.22",
+   "status": "OK",
+   "target": "cicd-pipeline.md"
+  },
+  {
+   "id": "NFR6.9",
+   "status": "OK",
+   "target": "cicd-pipeline.md"
+  },
+  {
+   "id": "NFR6.11",
+   "status": "OK",
+   "target": "cicd-pipeline.md"
+  },
+  {
+   "id": "NFR6.12",
+   "status": "OK",
+   "target": "cicd-pipeline.md"
+  },
+  {
+   "id": "NFR7.20",
+   "status": "OK",
+   "target": "cicd-pipeline.md"
+  },
+  {
+   "id": "NFR7.21",
+   "status": "OK",
+   "target": "cicd-pipeline.md"
+  },
+  {
+   "id": "NFR7.22",
+   "status": "OK",
+   "target": "cicd-pipeline.md"
+  },
+  {
+   "id": "NFR7.23",
+   "status": "OK",
+   "target": "cicd-pipeline.md"
+  },
+  {
+   "id": "NFR7.24",
+   "status": "OK",
+   "target": "cicd-pipeline.md"
+  },
+  {
+   "id": "NFR8.6",
+   "status": "OK",
+   "target": "cicd-pipeline.md"
+  },
+  {
+   "id": "NFR9.11",
+   "status": "OK",
+   "target": "cicd-pipeline.md"
+  },
+  {
+   "id": "NFR9.12",
+   "status": "OK",
+   "target": "monitoring-design.md > Metrics and KPIs (timings row); cicd-pipeline.md > Browser flow row"
+  },
+  {
+   "id": "NFR9.13",
+   "status": "OK",
+   "target": "cicd-pipeline.md"
+  },
+  {
+   "id": "NFR9.16",
+   "status": "OK",
+   "target": "infrastructure-specification.md > Daily-run registry row; monitoring-design.md > Metrics and KPIs (daily run under 10 seconds)"
+  },
+  {
+   "id": "NFR9.17",
+   "status": "OK",
+   "target": "cicd-pipeline.md"
+  },
+  {
+   "id": "NFR11.5",
+   "status": "OK",
+   "target": "cicd-pipeline.md"
+  },
+  {
+   "id": "NFR11.7",
+   "status": "OK",
+   "target": "cicd-pipeline.md"
+  }
+ ]
+}

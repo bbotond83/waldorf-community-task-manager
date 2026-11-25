@@ -105,6 +105,7 @@ describe("seed writer", () => {
       "family_year_standings",
       "rota_plans",
       "recurring_schedules",
+      "todo_tasks",
       "animal_calendars",
     ]);
   });
@@ -168,10 +169,24 @@ describe("seed writer", () => {
     assert.equal(rowsOf("loans"), plan.loans.length);
     assert.equal(rowsOf("return_watches"), plan.watches.length);
     assert.equal(rowsOf("recurring_schedules"), plan.recurringSchedules.length);
+    assert.equal(rowsOf("todo_tasks"), plan.todoTasks.length);
     assert.equal(rowsOf("tasks"), counts.tasks);
     assert.equal(rowsOf("assignments"), counts.assignments);
     const familyInsert = calls.find((call) => call.sql.startsWith('insert into "families"'))!;
     assert.ok(familyInsert.values.includes(plan.families[0]!.id));
+  });
+
+  it("writes the to-do tasks with their dates in the database's own clock, a claim time only for a claimed task, and the created row once", async () => {
+    const { client, calls } = recorder();
+    await writeSeedPlan(client, plan);
+    const insert = calls.find((call) => call.sql.startsWith('insert into "todo_tasks"'))!;
+    assert.match(insert.sql, /current_date \+ \$\d+::integer/);
+    assert.match(insert.sql, /case when \$\d+::boolean then now\(\) - interval '2 days' end/);
+    assert.match(insert.sql, /now\(\) - make_interval\(days => \$\d+::integer\)/);
+    assert.ok(insert.values.includes(plan.todoTasks[0]!.id));
+    const history = calls.find((call) => call.sql.startsWith("insert into todo_task_history"))!;
+    assert.match(history.sql, /not exists \(select 1 from todo_task_history/);
+    assert.deepEqual(history.values, [plan.organization.id]);
   });
 
   it("turns hours into timestamps in the database's own clock", async () => {

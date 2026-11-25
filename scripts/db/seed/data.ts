@@ -214,6 +214,27 @@ export interface SeedPlan {
   }[];
   /** The account that is named as the person who skipped a past occurrence (the super admin). */
   recurringSkippedByAccountId: string;
+  /**
+   * The invented to-do tasks (U12): a group's or a family's, open, started, postponed and done, some claimed, some with a
+   * deadline already past or a "not before" date still ahead. Dates are days from today; a done task was finished
+   * `doneDaysAgo` days ago by its claimant. The set has 8 tasks, the large set 300.
+   */
+  todoTasks: {
+    id: string;
+    groupId: string | null;
+    familyId: string | null;
+    topic: string;
+    priority: number | null;
+    description: string | null;
+    materials: string | null;
+    status: "open" | "in_progress" | "done" | "postponed";
+    note: string | null;
+    notBeforeInDays: number | null;
+    deadlineInDays: number | null;
+    claimantParentId: string | null;
+    doneDaysAgo: number | null;
+    sourceKey: string;
+  }[];
   tasks: {
     id: string;
     groupId: string | null;
@@ -1007,6 +1028,105 @@ export function buildSeedPlan(
     }
   }
 
+  // The to-do tasks (U12). The small set is eight hand-placed tasks that cover every state the screens show; the large
+  // set cycles the same shapes over 300 tasks, so the list, the group page and My tasks have a real size to read.
+  const TODO_TOPICS = [
+    "Kerítés festése",
+    "Homokozó takarítása",
+    "Mesesarok polcai",
+    "Ablakpárkányok lemosása",
+    "Tavaszi virághagymák",
+    "Játékok javítása",
+    "Udvari pad csiszolása",
+    "Fűtés ellenőrzése",
+  ] as const;
+  const todoTasks: SeedPlan["todoTasks"] = [];
+  const claimant = (number: number) => id(`parent:${((number - 1) % families.length) + 1}:1`);
+  const todo = (
+    key: string,
+    owner: { group?: number; family?: number },
+    topic: string,
+    fields: Partial<SeedPlan["todoTasks"][number]>,
+  ) =>
+    todoTasks.push({
+      id: id(`todo:${key}`),
+      groupId: owner.group === undefined ? null : groups[owner.group]!.id,
+      familyId: owner.family === undefined ? null : families[owner.family]!.id,
+      topic,
+      priority: null,
+      description: null,
+      materials: null,
+      status: "open",
+      note: null,
+      notBeforeInDays: null,
+      deadlineInDays: null,
+      claimantParentId: null,
+      doneDaysAgo: null,
+      sourceKey: `seed-todo:${key}`,
+      ...fields,
+    });
+  if (size === "small") {
+    todo("1", { group: 0 }, "Kerítés festése", {
+      priority: 1,
+      description: "A játszótér mögötti kerítés két rétegben.",
+      materials: "Festék, ecset",
+      deadlineInDays: 10,
+    });
+    todo("2", { group: 0 }, "Homokozó takarítása", {
+      status: "in_progress",
+      priority: 2,
+      deadlineInDays: 2,
+      claimantParentId: claimant(1),
+      note: "A homok már megvan.",
+    });
+    todo("3", { group: 1 }, "Tavaszi virághagymák", { priority: 2, notBeforeInDays: 20 });
+    todo("4", { group: 1 }, "Mesesarok polcai", {
+      status: "postponed",
+      priority: 3,
+      note: "Várunk a deszkákra.",
+    });
+    todo("5", { group: 2 }, "Ablakpárkányok lemosása", {
+      status: "done",
+      claimantParentId: claimant(2),
+      doneDaysAgo: 10,
+    });
+    todo("6", { group: 2 }, "Játékok javítása", {
+      priority: 1,
+      deadlineInDays: -5,
+      claimantParentId: claimant(3),
+    });
+    todo("7", { family: 0 }, "Komposztláda szita cseréje", { deadlineInDays: 30 });
+    todo("8", { group: 3 }, "Fűtés ellenőrzése", {});
+  } else {
+    const SHAPES = ["open", "claimed", "started", "postponed", "done", "overdue", "later"] as const;
+    for (let k = 1; k <= 300; k += 1) {
+      const shape = pick(SHAPES, k - 1);
+      const owner = k % 7 === 0 ? { family: k % families.length } : { group: k % groups.length };
+      const topic = `${pick(TODO_TOPICS, k - 1)} ${Math.ceil(k / TODO_TOPICS.length)}`;
+      const priority = k % 4 === 0 ? null : (k % 3) + 1;
+      const fields: Partial<SeedPlan["todoTasks"][number]> = { priority };
+      const takes = () => ("family" in owner ? claimant((owner.family ?? 0) + 1) : claimant(k));
+      if (shape === "claimed") fields.claimantParentId = takes();
+      if (shape === "started") {
+        fields.status = "in_progress";
+        fields.claimantParentId = takes();
+        fields.deadlineInDays = 3 + (k % 20);
+      }
+      if (shape === "postponed") fields.status = "postponed";
+      if (shape === "done") {
+        fields.status = "done";
+        fields.claimantParentId = takes();
+        fields.doneDaysAgo = 1 + (k % 50);
+      }
+      if (shape === "overdue") {
+        fields.deadlineInDays = -(1 + (k % 30));
+        fields.claimantParentId = k % 2 === 0 ? takes() : null;
+      }
+      if (shape === "later") fields.notBeforeInDays = 5 + (k % 40);
+      todo(String(k), owner, topic, fields);
+    }
+  }
+
   const DELIVERY_STATES = ["queued", "sent", "failed"] as const;
   if (size === "large") {
     // 200 ended cancellation requests in every ended status, cycling over the places; the places stay active.
@@ -1147,6 +1267,7 @@ export function buildSeedPlan(
     watches,
     recurringSchedules,
     recurringSkippedByAccountId: accounts[0]!.id,
+    todoTasks,
     tasks,
     assignments,
     changeRequests,
@@ -1180,6 +1301,7 @@ export function describePlan(plan: SeedPlan): Record<string, number> {
     loans: plan.loans.length,
     watches: plan.watches.length,
     recurringSchedules: plan.recurringSchedules.length,
+    todoTasks: plan.todoTasks.length,
     tasks: plan.tasks.length,
     assignments: plan.assignments.length,
     changeRequests: plan.changeRequests.length,

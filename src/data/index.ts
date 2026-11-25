@@ -19,6 +19,7 @@ export { createChecklistPort } from "./checklists.ts";
 export { createEventPort } from "./events.ts";
 export { createLibraryPort } from "./library.ts";
 export { createRecurringPort } from "./recurring.ts";
+export { createTodoPort } from "./todo.ts";
 export { createAnimalCarePort } from "./animal-care.ts";
 export { createInformationPort } from "./information.ts";
 export { createParentPort, PARENT_NOTIFICATION_USE_CASES } from "./parent-port.ts";

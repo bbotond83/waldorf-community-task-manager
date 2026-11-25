@@ -6,6 +6,7 @@ import {
   EventApplicationFacade,
   LibraryApplicationFacade,
   RecurringApplicationFacade,
+  TodoApplicationFacade,
   AnimalCareApplicationFacade,
   InformationApplicationFacade,
   FacadePipeline,
@@ -20,6 +21,7 @@ import {
   type EventApplicationPort,
   type LibraryApplicationPort,
   type RecurringApplicationPort,
+  type TodoApplicationPort,
   type AnimalCareApplicationPort,
   type InformationApplicationPort,
   type RotaApplicationPort,
@@ -192,6 +194,22 @@ const RECURRING_PORT_DOUBLE: RecurringApplicationPort = {
   markDone: deniedOutcome,
   undoDone: deniedOutcome,
   skip: deniedOutcome,
+};
+
+/** A to-do port with nothing planned: every read and command is refused, as the screens are not built yet. */
+const TODO_PORT_DOUBLE: TodoApplicationPort = {
+  list: deniedOutcome,
+  get: deniedOutcome,
+  groupList: deniedOutcome,
+  myTasks: deniedOutcome,
+  save: deniedOutcome,
+  claim: deniedOutcome,
+  giveBack: deniedOutcome,
+  freeClaim: deniedOutcome,
+  update: deniedOutcome,
+  markDone: deniedOutcome,
+  undoDone: deniedOutcome,
+  pullToEvent: deniedOutcome,
 };
 
 /** Animal-care and information ports with nothing set up: every read and command is refused, as the screens are not built yet. */
@@ -407,6 +425,7 @@ export function createRequestWorld() {
       checklists: new ChecklistApplicationFacade(pipeline, CHECKLIST_PORT_DOUBLE),
       library: new LibraryApplicationFacade(pipeline, LIBRARY_PORT_DOUBLE),
       recurring: new RecurringApplicationFacade(pipeline, RECURRING_PORT_DOUBLE),
+      todo: new TodoApplicationFacade(pipeline, TODO_PORT_DOUBLE),
       animalCare: new AnimalCareApplicationFacade(pipeline, ANIMAL_PORT_DOUBLE),
       information: new InformationApplicationFacade(pipeline, INFORMATION_PORT_DOUBLE),
     });

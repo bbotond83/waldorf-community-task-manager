@@ -254,10 +254,10 @@ export function GroupEventsSection({
         )}
         {model.canManage === true && actor.area !== "teacher" && (
           <a
-            href={`/${actor.area}/munkacsoportok/${groupId}/sablonok`}
-            data-testid="group-templates-link"
+            href={`/${actor.area}/munkacsoportok/${groupId}/kezeles`}
+            data-testid="group-manage-link"
           >
-            Sablonok
+            Kezelés
           </a>
         )}
       </p>

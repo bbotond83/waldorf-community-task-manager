@@ -137,6 +137,41 @@ export const AUTHORIZATION_MATRIX: readonly MatrixRow[] = Object.freeze([
     fields: [],
   },
   {
+    // Every signed-in role reads the to-do list and a task's page, a teacher too (BR180.1).
+    id: "AUTH-TODO",
+    roles: ["parent", "group_admin", "kindergarten_teacher", "super_admin"],
+    actions: ["read"],
+    resources: ["todo"],
+    fields: [],
+  },
+  {
+    // Taking a task, giving it back, changing its status and marking it done: the database checks that the caller is the
+    // claimant or a manager (BR182, BR183). A group admin who is a parent acts through the parent grant; a teacher
+    // writes nothing.
+    id: "AUTH-TODO-TASK",
+    roles: ["parent", "group_admin", "super_admin"],
+    actions: ["update"],
+    resources: ["todo_task"],
+    fields: [],
+  },
+  {
+    // A coordinator keeps their group's tasks, frees claims and pulls tasks into an event; a super admin does it for every
+    // owner (BR180.2, BR185.1).
+    id: "AUTH-TODO-MANAGE",
+    roles: ["group_admin", "super_admin"],
+    actions: ["read", "create", "update"],
+    resources: ["todo_manage"],
+    fields: [],
+  },
+  {
+    // The caller's own My tasks page (BR186.1); the database refuses a caller without a family, a teacher included.
+    id: "AUTH-MY-TASKS",
+    roles: ["parent", "group_admin", "super_admin"],
+    actions: ["read"],
+    resources: ["my_tasks"],
+    fields: [],
+  },
+  {
     // Every signed-in role reads the animal-care sign-up page and its fair share, a teacher too (BR81.6, BR83).
     id: "AUTH-ANIMAL",
     roles: ["parent", "group_admin", "kindergarten_teacher", "super_admin"],

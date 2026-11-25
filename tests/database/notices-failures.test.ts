@@ -427,7 +427,14 @@ for (const schema of NOTIFICATION_SCHEMAS) {
         `insert into recurring_occurrences (id, organization_id, schedule_id, due_date) values ($1, $2, $3, '2026-12-07')`,
         [RECURRING_OCCURRENCE, ORGANIZATION, RECURRING_SCHEDULE],
       );
+      const TODO_TASK = "99999999-0000-4000-8000-000000000006";
+      await db.query(
+        `insert into todo_tasks (id, organization_id, owner_group_id, topic, deadline)
+         values ($1, $2, $3, 'Kitalált teendő a leak tesztből', '2026-12-07')`,
+        [TODO_TASK, ORGANIZATION, GROUP_1],
+      );
       const targets: Record<string, string> = {
+        todo_task: TODO_TASK,
         animal_signup: YEAR_1,
         recurring_duty: RECURRING_OCCURRENCE,
         book: BOOK,

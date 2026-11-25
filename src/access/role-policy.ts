@@ -64,6 +64,11 @@ const CORE_RESOURCES = new Set([
   "recurring_duty",
   // A coordinator edits the text of their group's information sections; the database checks the group (BR87.1).
   "info_section",
+  // A coordinator keeps their group's to-do tasks, frees a claim and pulls tasks into an event (BR180.2, BR185.1); a
+  // group admin who is a parent also claims and finishes tasks and reads My tasks. The database checks the group.
+  "todo_manage",
+  "todo_task",
+  "my_tasks",
 ]);
 const TRACKING_FIELDS = new Set([
   "display_name",
@@ -115,6 +120,8 @@ export function grantAllows(
   if (request.resource.kind === "event") return request.action === "read";
   // Every signed-in role reads the library pages, a teacher too (BR130.1).
   if (request.resource.kind === "library") return request.action === "read";
+  // Every signed-in role reads the to-do list and a task's page, a teacher too (BR180.1).
+  if (request.resource.kind === "todo") return request.action === "read";
   // Every signed-in role reads the recurring duties, a teacher too; the database decides which parts.
   if (request.resource.kind === "recurring") return request.action === "read";
   // Every signed-in role reads the animal-care sign-up page and the information page (BR81.6, BR86.1).
@@ -176,6 +183,13 @@ function parentCan({ action, resource }: AuthorizationRequest): boolean {
     // Giving up the family's own animal-care slot; the database checks that the family holds it (BR82.1).
     case "animal_slot":
       return action === "update";
+    // Taking a to-do task, giving it back, changing its status and marking it done: the database checks that the parent
+    // is the claimant or a manager (BR182, BR183). A super admin acts through the default grant.
+    case "todo_task":
+      return action === "update";
+    // The parent's own My tasks page; the database refuses a caller without a family (BR186.1).
+    case "my_tasks":
+      return action === "read";
     // A duty card of the family's own rota duty; the database checks that the family holds it (BR24.2). This also
     // serves a group admin who is a parent: the parent grant carries the read, the group admin grant adds nothing.
     case "rota_duty":

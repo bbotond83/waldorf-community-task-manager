@@ -381,6 +381,48 @@ test("the U11 functions change no assignment and are not part of the hand-off li
 });
 
 /**
+ * U12 (the to-do list and My tasks) adds callable functions, but none changes a place: a to-do task is not a duty, and My
+ * tasks only reads the places a family holds. The change notice and the deadline reminder tell people through
+ * `notice_send` themselves, so none is a wrapped use case of the hand-off list.
+ */
+test("the U12 functions change no assignment and are not part of the hand-off list", () => {
+  const functions = definitions();
+  const changing = writers(functions);
+  const u12 = [
+    "todo_task_save",
+    "todo_task_claim",
+    "todo_task_give_back",
+    "todo_task_free_claim",
+    "todo_task_update",
+    "todo_task_mark_done",
+    "todo_task_undo_done",
+    "todo_pull_to_event",
+    "todo_list",
+    "todo_get",
+    "todo_list_for_group",
+    "my_tasks_get",
+    "todo_task_set_attention",
+    "checklist_task_done_state",
+    "todo_notify_changed",
+    "todo_deadline_reminder",
+    "todo_removal_preview",
+    "todo_removal_apply",
+    "migration_load_todo",
+  ];
+  for (const name of u12) {
+    assert.ok(functions.has(name), `${name} is defined by the migrations`);
+    assert.equal(changing.has(name), false, `${name} writes no assignment`);
+    assert.equal(
+      NOTIFICATION_USE_CASES.some((useCase) => useCase.replaceAll(".", "_") === name),
+      false,
+      `${name} is not a wrapped use case`,
+    );
+  }
+  assert.match(functions.get("todo_notify_changed")!.body, /notice_send\(/);
+  assert.match(functions.get("todo_deadline_reminder")!.body, /notice_send\(/);
+});
+
+/**
  * U7 functions decide their own notices (BR71.5, BR72.2, BR72.5, BR73.2, BR74.3, BR75.2, BR76.3): each of them that
  * tells someone does it through the helpers that write the notice and the reminder plan inside the same function, and
  * only after the work has succeeded and the key is not a replay.

@@ -217,9 +217,14 @@ export async function ChecklistBlock({
       <div className="checklist-section-head">
         <h2 id="checklist-title">Feladatlista</h2>
         {team && actor.area !== "teacher" && (
-          <a href={`${actor.basePath}/${eventId}/feladatlista`} data-testid="checklist-edit-link">
-            Feladatlista szerkesztése
-          </a>
+          <>
+            <a href={`${actor.basePath}/${eventId}/feladatlista`} data-testid="checklist-edit-link">
+              Feladatlista szerkesztése
+            </a>
+            <a href={`${actor.basePath}/${eventId}/teendok`} data-testid="checklist-pull-link">
+              Teendők hozzáadása
+            </a>
+          </>
         )}
       </div>
       {list.sections.length === 0 ? (

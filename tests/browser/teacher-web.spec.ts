@@ -191,6 +191,7 @@ test("Teacher's menu lists Beosztás and Munkacsoportok, and the way back works 
     "Beosztás",
     "Takarítás",
     "Munkacsoportok",
+    "Teendők",
     "Események",
     "Könyvtár",
     "Állatgondozás",

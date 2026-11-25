@@ -63,6 +63,8 @@ test("a parent's family comes from the linked Parent and the matching family gra
     [
       "/szulo/ertesitesek",
       "/szulo/feladatok",
+      "/szulo/feladataim",
+      "/szulo/teendok",
       "/szulo/beosztas",
       "/szulo/cserek",
       "/szulo/munkacsoportok",
@@ -180,6 +182,7 @@ test("a teacher holds the community, and others are denied to the home of their 
         "Beosztás",
         "Takarítás",
         "Munkacsoportok",
+        "Teendők",
         "Események",
         "Könyvtár",
         "Állatgondozás",

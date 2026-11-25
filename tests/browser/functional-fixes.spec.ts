@@ -33,6 +33,8 @@ test.describe("parent: notifications stay under Értesítések", () => {
     await expect(links).toHaveText([
       "Értesítések",
       "Feladatok",
+      "Feladataim",
+      "Teendők",
       "Beosztás",
       "Cserék",
       "Munkacsoportok",

@@ -89,7 +89,11 @@ for (const profile of ROLES) {
                 ? "animal-page"
                 : path === "/szulo/ismetlodo"
                   ? "recurring-mine-page"
-                  : "rota-overview-page";
+                  : path === "/szulo/feladataim"
+                    ? "my-tasks-page"
+                    : path === "/szulo/teendok"
+                      ? "todo-list-page"
+                      : "rota-overview-page";
         await expect(page.getByTestId(pageId)).toBeVisible();
         continue;
       }
