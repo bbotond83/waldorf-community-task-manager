@@ -114,42 +114,87 @@ export async function TemplateListScreen({
         emptyMessage="A sablonok nem érhetők el."
         testId="template-list"
       >
-        {(list) => {
-          // A group list is read only by a person who may manage the group, so a list that was answered is a managed one.
-          const manage = groupId ? true : list.canManageCommunity;
-          const items = groupId
-            ? list.items.filter((item) => item.workingGroupId === groupId)
-            : list.items;
-          return (
-            <>
-              {manage && (
-                <p className="recurring-new">
-                  <a className="button-link" href={`${base}/uj`} data-testid="template-new-link">
-                    Új sablon
-                  </a>
-                </p>
-              )}
-              {items.length === 0 ? (
-                <p className="parent-event-empty" role="status" data-testid="template-empty">
-                  Még nincs sablon.
-                </p>
-              ) : (
-                <ul className="checklist-templates" aria-label="Sablonok">
-                  {items.map((item) => (
-                    <TemplateRow
-                      key={item.id}
-                      item={item}
-                      actor={actor}
-                      groupId={groupId}
-                      manage={manage}
-                      base={base}
-                    />
-                  ))}
-                </ul>
-              )}
-            </>
-          );
-        }}
+        {(list) => <TemplateListBody list={list} actor={actor} groupId={groupId} base={base} />}
+      </ParentStatePanel>
+    </section>
+  );
+}
+
+/** The new-template link and the template rows of one answered list; shared by the templates page and the management tab. */
+function TemplateListBody({
+  list,
+  actor,
+  groupId,
+  base,
+}: Readonly<{
+  list: TemplateListModel;
+  actor: EventActor;
+  groupId?: string | undefined;
+  base: string;
+}>) {
+  // A group list is read only by a person who may manage the group, so a list that was answered is a managed one.
+  const manage = groupId ? true : list.canManageCommunity;
+  const items = groupId ? list.items.filter((item) => item.workingGroupId === groupId) : list.items;
+  return (
+    <>
+      {manage && (
+        <p className="recurring-new">
+          <a className="button-link" href={`${base}/uj`} data-testid="template-new-link">
+            Új sablon
+          </a>
+        </p>
+      )}
+      {items.length === 0 ? (
+        <p className="parent-event-empty" role="status" data-testid="template-empty">
+          Még nincs sablon.
+        </p>
+      ) : (
+        <ul className="checklist-templates" aria-label="Sablonok">
+          {items.map((item) => (
+            <TemplateRow
+              key={item.id}
+              item={item}
+              actor={actor}
+              groupId={groupId}
+              manage={manage}
+              base={base}
+            />
+          ))}
+        </ul>
+      )}
+    </>
+  );
+}
+
+/** A group's templates as a tab of the management page (W7.2): the same read and rows as the templates page, under a section heading. */
+export async function TemplateListTab({
+  actor,
+  groupId,
+}: Readonly<{ actor: EventActor; groupId: string }>) {
+  const checklists = await resolveChecklistFacade();
+  const result = checklists
+    ? await checklists.templatesForGroup(actor.session, actor.scope, groupId)
+    : terminalFailure();
+  return (
+    <section
+      className="checklist-page"
+      aria-labelledby="manage-templates-title"
+      data-testid="manage-templates"
+    >
+      <h2 id="manage-templates-title">Sablonok</h2>
+      <ParentStatePanel
+        result={result}
+        emptyMessage="A sablonok nem érhetők el."
+        testId="manage-templates-state"
+      >
+        {(list) => (
+          <TemplateListBody
+            list={list}
+            actor={actor}
+            groupId={groupId}
+            base={templatesPath(actor.area, groupId)}
+          />
+        )}
       </ParentStatePanel>
     </section>
   );

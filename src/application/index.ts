@@ -46,6 +46,8 @@ export { EventApplicationFacade } from "./event-facade.ts";
 export type { EventApplicationPort } from "./event-facade.ts";
 export { LibraryApplicationFacade } from "./library-facade.ts";
 export type { LibraryApplicationPort } from "./library-facade.ts";
+export { TodoApplicationFacade, TODO_PULL_LIMIT } from "./todo-facade.ts";
+export type { TodoApplicationPort, TodoSaveInput } from "./todo-facade.ts";
 export { RecurringApplicationFacade } from "./recurring-facade.ts";
 export type { RecurringApplicationPort, RecurringScheduleInput } from "./recurring-facade.ts";
 export { AnimalCareApplicationFacade } from "./animal-care-facade.ts";

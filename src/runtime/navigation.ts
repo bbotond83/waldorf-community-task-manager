@@ -7,6 +7,8 @@ import type { NavigationItem } from "../application/index.ts";
 export const PARENT_NAVIGATION: readonly NavigationItem[] = [
   { id: "parent-notifications", label: "Értesítések", href: "/szulo/ertesitesek" },
   { id: "parent-duties", label: "Feladatok", href: "/szulo/feladatok" },
+  { id: "parent-my-tasks", label: "Feladataim", href: "/szulo/feladataim" },
+  { id: "parent-todo", label: "Teendők", href: "/szulo/teendok" },
   { id: "parent-rota", label: "Beosztás", href: "/szulo/beosztas" },
   { id: "parent-swaps", label: "Cserék", href: "/szulo/cserek" },
   { id: "parent-working-groups", label: "Munkacsoportok", href: "/szulo/munkacsoportok" },
@@ -24,6 +26,8 @@ export const TEACHER_NAVIGATION: readonly NavigationItem[] = [
   // "Beosztás" stays the task schedule; the indoor-cleaning rota has its own short name so the two never read alike.
   { id: "teacher-rota", label: "Takarítás", href: "/teacher/beosztas" },
   { id: "teacher-working-groups", label: "Munkacsoportok", href: "/teacher/munkacsoportok" },
+  // A teacher reads the community's to-do list and changes nothing on it.
+  { id: "teacher-todo", label: "Teendők", href: "/teacher/teendok" },
   { id: "teacher-events", label: "Események", href: "/teacher/esemenyek" },
   { id: "teacher-library", label: "Könyvtár", href: "/teacher/konyvtar" },
   { id: "teacher-animal-care", label: "Állatgondozás", href: "/teacher/allatok" },
@@ -38,6 +42,9 @@ export const GROUP_ADMIN_NAVIGATION: readonly NavigationItem[] = [
   { id: "admin-swaps", label: "Cserék", href: "/admin/cserek" },
   { id: "admin-archive", label: "Archívum", href: "/admin/archivum" },
   { id: "admin-working-groups", label: "Munkacsoportok", href: "/admin/munkacsoportok" },
+  // My tasks and the to-do list are the parent pages: a group admin is also a parent, who claims and finishes tasks there.
+  { id: "admin-my-tasks", label: "Feladataim", href: "/szulo/feladataim" },
+  { id: "admin-todo", label: "Teendők", href: "/szulo/teendok" },
   { id: "admin-events", label: "Események", href: "/admin/esemenyek" },
   // The personal recurring-duty page is the parent page: a group admin is also a parent, who marks duties done there.
   { id: "admin-recurring", label: "Ismétlődők", href: "/szulo/ismetlodo" },
@@ -60,6 +67,7 @@ export const SUPER_ADMIN_NAVIGATION: readonly NavigationItem[] = [
   { id: "admin-swaps", label: "Cserék", href: "/admin/cserek" },
   { id: "admin-archive", label: "Archívum", href: "/admin/archivum" },
   { id: "admin-working-groups", label: "Munkacsoportok", href: "/admin/munkacsoportok" },
+  { id: "admin-todo", label: "Teendők", href: "/admin/teendok" },
   { id: "admin-events", label: "Események", href: "/admin/esemenyek" },
   { id: "admin-templates", label: "Sablonok", href: "/admin/sablonok" },
   { id: "admin-library", label: "Könyvtár", href: "/admin/konyvtar" },

@@ -1110,6 +1110,176 @@
       "effect": "deny"
     },
     {
+      "id": "AUTH-TODO-READ-PARENT-ALLOW",
+      "role": "parent",
+      "scope": "community",
+      "route": "/szulo/teendok/**",
+      "actions": ["read"],
+      "resources": ["todo"],
+      "fields": ["SF-DISPLAY-NAME"],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-TODO-READ-GROUP-ADMIN-ALLOW",
+      "role": "group_admin",
+      "scope": "community",
+      "route": "/szulo/teendok/**",
+      "actions": ["read"],
+      "resources": ["todo"],
+      "fields": ["SF-DISPLAY-NAME"],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-TODO-READ-SUPER-ADMIN-ALLOW",
+      "role": "super_admin",
+      "scope": "community",
+      "route": "/szulo/teendok/**",
+      "actions": ["read"],
+      "resources": ["todo"],
+      "fields": ["SF-DISPLAY-NAME"],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-TODO-READ-TEACHER-ALLOW",
+      "role": "kindergarten_teacher",
+      "scope": "community",
+      "route": "/teacher/teendok/**",
+      "actions": ["read"],
+      "resources": ["todo"],
+      "fields": ["SF-DISPLAY-NAME"],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-TODO-TASK-PARENT-ALLOW",
+      "role": "parent",
+      "scope": "linked-family",
+      "route": "/szulo/teendok/**",
+      "actions": ["update"],
+      "resources": ["todo_task"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-TODO-TASK-GROUP-ADMIN-PARENT-ALLOW",
+      "role": "group_admin",
+      "scope": "linked-family",
+      "route": "/szulo/teendok/**",
+      "actions": ["update"],
+      "resources": ["todo_task"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-TODO-TASK-SUPER-ADMIN-ALLOW",
+      "role": "super_admin",
+      "scope": "community",
+      "route": "/szulo/teendok/**",
+      "actions": ["update"],
+      "resources": ["todo_task"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-TODO-TASK-TEACHER-DENY",
+      "role": "kindergarten_teacher",
+      "scope": "community",
+      "route": "/teacher/teendok/**",
+      "actions": ["update"],
+      "resources": ["todo_task"],
+      "fields": [],
+      "effect": "deny"
+    },
+    {
+      "id": "AUTH-TODO-MANAGE-GROUP-ADMIN-ALLOW",
+      "role": "group_admin",
+      "scope": "granted-group",
+      "route": "/szulo/munkacsoportok/**",
+      "actions": ["read", "create", "update"],
+      "resources": ["todo_manage"],
+      "fields": ["SF-DISPLAY-NAME"],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-TODO-MANAGE-SUPER-ADMIN-ALLOW",
+      "role": "super_admin",
+      "scope": "organization",
+      "route": "/admin/teendok/**",
+      "actions": ["read", "create", "update"],
+      "resources": ["todo_manage"],
+      "fields": ["SF-DISPLAY-NAME"],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-TODO-MANAGE-GROUP-ADMIN-OUT-OF-SCOPE-DENY",
+      "role": "group_admin",
+      "scope": "ungranted-group",
+      "route": "/szulo/munkacsoportok/**",
+      "actions": ["read", "create", "update"],
+      "resources": ["todo_manage"],
+      "fields": [],
+      "effect": "deny"
+    },
+    {
+      "id": "AUTH-TODO-MANAGE-PARENT-TEACHER-DENY",
+      "role": "any_authenticated",
+      "scope": "parent-or-teacher",
+      "route": "/szulo/munkacsoportok/**",
+      "actions": ["read", "create", "update"],
+      "resources": ["todo_manage"],
+      "fields": [],
+      "effect": "deny"
+    },
+    {
+      "id": "AUTH-MYTASKS-READ-PARENT-ALLOW",
+      "role": "parent",
+      "scope": "linked-family",
+      "route": "/szulo/feladataim",
+      "actions": ["read"],
+      "resources": ["my_tasks"],
+      "fields": ["SF-DISPLAY-NAME"],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-MYTASKS-READ-GROUP-ADMIN-PARENT-ALLOW",
+      "role": "group_admin",
+      "scope": "linked-family",
+      "route": "/szulo/feladataim",
+      "actions": ["read"],
+      "resources": ["my_tasks"],
+      "fields": ["SF-DISPLAY-NAME"],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-MYTASKS-READ-SUPER-ADMIN-ALLOW",
+      "role": "super_admin",
+      "scope": "community",
+      "route": "/szulo/feladataim",
+      "actions": ["read"],
+      "resources": ["my_tasks"],
+      "fields": ["SF-DISPLAY-NAME"],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-MYTASKS-READ-TEACHER-DENY",
+      "role": "kindergarten_teacher",
+      "scope": "community",
+      "route": "/teacher/feladataim",
+      "actions": ["read"],
+      "resources": ["my_tasks"],
+      "fields": [],
+      "effect": "deny"
+    },
+    {
+      "id": "AUTH-TODO-OTHER-COMMUNITY-DENY",
+      "role": "any_authenticated",
+      "scope": "other-community",
+      "route": "/szulo/teendok/**",
+      "actions": ["read", "create", "update"],
+      "resources": ["todo", "todo_task", "todo_manage", "my_tasks"],
+      "fields": [],
+      "effect": "deny"
+    },
+    {
       "id": "AUTH-INFO-READ-PARENT-ALLOW",
       "role": "parent",
       "scope": "community",

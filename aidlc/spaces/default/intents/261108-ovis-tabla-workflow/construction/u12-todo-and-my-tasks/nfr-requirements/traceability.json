@@ -1,0 +1,18 @@
+{
+  "stage": "nfr-requirements",
+  "unit": "u12-todo-and-my-tasks",
+  "upstream_ids": ["NFR1", "NFR2", "NFR3", "NFR4", "NFR5", "NFR6", "NFR7", "NFR8", "NFR9", "NFR10", "NFR11"],
+  "coverage": [
+    { "id": "NFR1", "status": "OK", "target": "NFR1.8, NFR1.9, NFR1.10" },
+    { "id": "NFR2", "status": "N/A", "target": "the profile-sharing choice is delivered by u3-directory-and-profile and plays no part in to-do tasks" },
+    { "id": "NFR3", "status": "OK", "target": "NFR3.21, NFR3.22, NFR3.23, NFR3.24, NFR3.25, NFR3.26, NFR3.27, NFR3.28, NFR3.29, NFR3.30, NFR3.31, NFR3.32" },
+    { "id": "NFR4", "status": "OK", "target": "NFR4.17, NFR4.18, NFR4.19, NFR4.20, NFR4.21, NFR4.22, NFR4.23, NFR4.24, NFR4.25" },
+    { "id": "NFR5", "status": "OK", "target": "NFR5.15, NFR5.16, NFR5.17, NFR5.18, NFR5.19, NFR5.20, NFR5.21, NFR5.22" },
+    { "id": "NFR6", "status": "OK", "target": "NFR6.9, NFR6.10, NFR6.11, NFR6.12" },
+    { "id": "NFR7", "status": "OK", "target": "NFR7.18, NFR7.19, NFR7.20, NFR7.21, NFR7.22, NFR7.23, NFR7.24" },
+    { "id": "NFR8", "status": "OK", "target": "NFR8.5, NFR8.6" },
+    { "id": "NFR9", "status": "OK", "target": "NFR9.11, NFR9.12, NFR9.13, NFR9.14, NFR9.15, NFR9.16, NFR9.17" },
+    { "id": "NFR10", "status": "OK", "target": "NFR10.4, NFR10.5" },
+    { "id": "NFR11", "status": "OK", "target": "NFR11.5, NFR11.6, NFR11.7" }
+  ]
+}

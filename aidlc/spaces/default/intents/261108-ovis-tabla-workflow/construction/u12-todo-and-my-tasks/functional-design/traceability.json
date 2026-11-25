@@ -1,0 +1,42 @@
+{
+  "stage": "functional-design",
+  "unit": "u12-todo-and-my-tasks",
+  "upstream_ids": [
+    "AC2.4.1",
+    "AC2.4.2",
+    "AC14.1.1",
+    "AC14.1.2",
+    "AC14.1.3",
+    "AC14.2.1",
+    "AC14.2.2",
+    "AC14.2.3",
+    "AC14.3.1",
+    "AC15.1.1",
+    "AC15.1.2",
+    "AC17.1.1",
+    "AC17.1.6"
+  ],
+  "coverage": [
+    { "id": "AC2.4.1", "status": "OK", "target": "BR187.1, BR180.2" },
+    { "id": "AC2.4.2", "status": "OK", "target": "BR181.2, BR187.1" },
+    { "id": "AC14.1.1", "status": "OK", "target": "BR180.2, BR181.1, BR181.2, BR181.3" },
+    { "id": "AC14.1.2", "status": "OK", "target": "BR180.2" },
+    { "id": "AC14.1.3", "status": "OK", "target": "BR182.1, BR183.1, BR180.2" },
+    { "id": "AC14.2.1", "status": "OK", "target": "BR184.1" },
+    { "id": "AC14.2.2", "status": "OK", "target": "BR182.1, BR182.2, BR183.2, BR184.2" },
+    { "id": "AC14.2.3", "status": "OK", "target": "BR180.1" },
+    { "id": "AC14.3.1", "status": "OK", "target": "BR185.1, BR185.2" },
+    { "id": "AC15.1.1", "status": "OK", "target": "BR186.1, BR186.2" },
+    { "id": "AC15.1.2", "status": "OK", "target": "BR186.2" },
+    { "id": "AC17.1.1", "status": "OK", "target": "BR188.1, BR188.2" },
+    { "id": "AC17.1.6", "status": "OK", "target": "BR188.1, BR188.2" }
+  ],
+  "reverse": [
+    { "id": "BR181.3", "status": "N/A", "target": "outdated-screen and repeat protection, contract C1" },
+    { "id": "BR189.1", "status": "N/A", "target": "lock order and repeat protection, NFR3 and NFR5" },
+    { "id": "BR189.2", "status": "N/A", "target": "database-side rights, NFR3" },
+    { "id": "BR189.3", "status": "N/A", "target": "audit of administrator interventions, NFR4" },
+    { "id": "BR190.1", "status": "N/A", "target": "removal block, contract C16 and NFR11" },
+    { "id": "BR190.2", "status": "N/A", "target": "one-off load, FR18.1 and contract C17" }
+  ]
+}

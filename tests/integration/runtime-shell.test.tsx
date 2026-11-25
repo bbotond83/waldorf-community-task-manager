@@ -81,10 +81,12 @@ describe("runtime shell", () => {
       "href",
       "/szulo/munkacsoportok",
     );
-    expect(navigation.getAllByRole("link")).toHaveLength(12);
+    expect(navigation.getAllByRole("link")).toHaveLength(14);
     expect(navigation.getAllByRole("link").map((link) => link.textContent)).toEqual([
       "Értesítések",
       "Feladatok",
+      "Feladataim",
+      "Teendők",
       "Beosztás",
       "Cserék",
       "Munkacsoportok",
@@ -99,8 +101,8 @@ describe("runtime shell", () => {
   });
 
   it.each([
-    ["group-admin", 13],
-    ["super-admin", 18],
+    ["group-admin", 15],
+    ["super-admin", 19],
   ] as const)("shows the one menu of %s with %i items", (id, count) => {
     const profile = shellProfile(id);
     render(
@@ -144,6 +146,7 @@ it("teacher shell announces the localized role and lists Beosztás, Takarítás,
     "Beosztás",
     "Takarítás",
     "Munkacsoportok",
+    "Teendők",
     "Események",
     "Könyvtár",
     "Állatgondozás",

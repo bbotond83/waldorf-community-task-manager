@@ -37,6 +37,7 @@ const allIds = (plan: SeedPlan): string[] => [
   ...plan.loans.map((entry) => entry.id),
   ...plan.watches.map((entry) => entry.id),
   ...plan.recurringSchedules.map((entry) => entry.id),
+  ...plan.todoTasks.map((entry) => entry.id),
   ...plan.tasks.map((entry) => entry.id),
   ...plan.assignments.map((entry) => entry.id),
   ...plan.notices.flatMap((entry) => [entry.id, entry.deliveryId]),
@@ -145,6 +146,63 @@ describe("seed data: the small set", () => {
     assert.equal(plan.recurringSkippedByAccountId, plan.accounts[0]!.id);
   });
 
+  it("gives the to-do list eight invented tasks that cover every state the screens show (U12)", () => {
+    const tasks = plan.todoTasks;
+    assert.equal(tasks.length, 8);
+    assert.deepEqual(
+      new Set(tasks.map((task) => task.status)),
+      new Set(["open", "in_progress", "done", "postponed"]),
+    );
+    assert.ok(
+      tasks.some((task) => task.claimantParentId === null && task.status === "open"),
+      "unclaimed",
+    );
+    assert.ok(
+      tasks.some((task) => task.claimantParentId !== null && task.status !== "done"),
+      "claimed",
+    );
+    assert.ok(
+      tasks.some((task) => (task.deadlineInDays ?? 0) < 0 && task.status !== "done"),
+      "overdue",
+    );
+    assert.ok(
+      tasks.some((task) => (task.notBeforeInDays ?? 0) > 0),
+      "not yet",
+    );
+    assert.ok(
+      tasks.some((task) => task.familyId !== null),
+      "family-owned",
+    );
+    assert.ok(
+      tasks.some((task) => (task.deadlineInDays ?? 99) <= 3 && task.claimantParentId !== null),
+      "in the reminder window",
+    );
+    for (const task of tasks) {
+      assert.ok((task.groupId === null) !== (task.familyId === null), "exactly one owner");
+      assert.ok(
+        (task.status === "done") === (task.doneDaysAgo !== null),
+        "a done time only when done",
+      );
+      assert.ok(
+        task.status !== "done" || task.claimantParentId !== null,
+        "a done task names who finished it",
+      );
+      assert.ok(
+        task.notBeforeInDays === null ||
+          task.deadlineInDays === null ||
+          task.notBeforeInDays <= task.deadlineInDays,
+        "not before is not after the deadline",
+      );
+      assert.ok(task.topic.length <= 200 && task.sourceKey.startsWith("seed-todo:"));
+    }
+    for (const task of tasks.filter((entry) => entry.claimantParentId !== null)) {
+      assert.ok(
+        plan.parents.some((parent) => parent.id === task.claimantParentId),
+        "the claimant is a seeded parent",
+      );
+    }
+  });
+
   it("has the six working groups, 6 families with parents and children, a super admin, two group admins and a teacher", () => {
     assert.deepEqual(describePlan(plan), {
       groups: 6,
@@ -157,6 +215,7 @@ describe("seed data: the small set", () => {
       loans: 4,
       watches: 4,
       recurringSchedules: 13,
+      todoTasks: 8,
       tasks: 8,
       assignments: 8,
       changeRequests: 2,
@@ -367,6 +426,39 @@ describe("seed data: the 30-family set", () => {
       const number = large.families.indexOf(family) + 1;
       const count = large.children.filter((child) => child.familyId === family.id).length;
       assert.equal(count, number % 3 === 0 ? 2 : 1);
+    }
+  });
+
+  it("seeds 300 to-do tasks in every status, with unique topics and keys, some owned by a family, claimed only by seeded parents (U12)", () => {
+    const tasks = large.todoTasks;
+    assert.equal(tasks.length, 300);
+    assert.deepEqual(
+      new Set(tasks.map((task) => task.status)),
+      new Set(["open", "in_progress", "done", "postponed"]),
+    );
+    assert.equal(new Set(tasks.map((task) => task.topic)).size, 300);
+    assert.equal(new Set(tasks.map((task) => task.sourceKey)).size, 300);
+    assert.ok(tasks.some((task) => task.familyId !== null));
+    assert.ok(tasks.some((task) => task.groupId !== null));
+    assert.ok(
+      tasks.some((task) => (task.deadlineInDays ?? 0) < 0 && task.status !== "done"),
+      "overdue",
+    );
+    assert.ok(
+      tasks.some((task) => (task.notBeforeInDays ?? 0) > 0),
+      "not yet",
+    );
+    const parents = new Set(large.parents.map((parent) => parent.id));
+    for (const task of tasks) {
+      assert.ok((task.groupId === null) !== (task.familyId === null));
+      assert.ok((task.status === "done") === (task.doneDaysAgo !== null));
+      assert.ok(task.claimantParentId === null || parents.has(task.claimantParentId));
+      assert.ok(task.status !== "done" || task.claimantParentId !== null);
+    }
+    // A family's own task is claimed only by a parent of that family (BR181.1).
+    for (const task of tasks.filter((entry) => entry.familyId !== null && entry.claimantParentId)) {
+      const parent = large.parents.find((entry) => entry.id === task.claimantParentId)!;
+      assert.equal(parent.familyId, task.familyId);
     }
   });
 

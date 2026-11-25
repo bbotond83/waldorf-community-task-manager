@@ -139,7 +139,13 @@ describe("honest executable denominator", () => {
     // actions, forms and screens: 5), the information code (app/_info: person, actions, forms, screens and the hash
     // opener: 5) and four pages (the information page and its layout, the parent sign-up page and the admin settings
     // page): 340 + 14.
-    expect(inventory.length).toBe(355);
+    // U12 adds the to-do facade (src/application/todo-facade.ts) and its data adapter (src/data/todo.ts) so far:
+    // 355 + 2. The screens add twenty-five: the format helpers (src/application/todo-format.ts), the shared to-do code
+    // (app/_todo: person, facade resolver, form reader, result mapper, actions, forms and screens: 7) and seventeen
+    // pages (parent list, task and My tasks: 3; teacher list and task: 2; admin list, task, new and change: 4; the
+    // management page with its two form pages in the parent and admin areas: 6; the pull list in both areas: 2):
+    // 357 + 25.
+    expect(inventory.length).toBe(383);
     for (const path of [
       "src/runtime/AppNav.tsx",
       "src/runtime/StatusBadge.tsx",

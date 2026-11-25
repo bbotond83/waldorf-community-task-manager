@@ -31,11 +31,12 @@ test("signing out and signing in as another role clears the prior projection", a
   await page.goto("/");
   await expect(page).toHaveURL(/\/teacher\/schedule$/);
   await expect(page.getByRole("heading", { name: "Beosztás", exact: true })).toBeVisible();
-  // The teacher's menu lists Beosztás, Takarítás, Munkacsoportok, Események, Könyvtár, Állatgondozás, Információ and Szülők, and nothing of the parent's.
+  // The teacher's menu lists Beosztás, Takarítás, Munkacsoportok, Teendők, Események, Könyvtár, Állatgondozás, Információ and Szülők, and nothing of the parent's.
   await expect(page.getByTestId("app-shell-navigation").getByRole("link")).toHaveText([
     "Beosztás",
     "Takarítás",
     "Munkacsoportok",
+    "Teendők",
     "Események",
     "Könyvtár",
     "Állatgondozás",

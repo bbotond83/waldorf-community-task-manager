@@ -339,3 +339,53 @@ export function animalMessage(answer: {
 export function directoryRefusalMessage(code: string | undefined): string {
   return (code && DIRECTORY_REFUSAL_MESSAGES[code]) || DIRECTORY_REFUSAL_FALLBACK;
 }
+
+/**
+ * What a person reads for each refusal of the to-do commands (U12). The code names what was refused; a refused field
+ * is answered by the entry it belongs to. An access refusal reads as "not allowed", never as which part was missing.
+ */
+const TODO_CODE_MESSAGES: Readonly<Record<string, string>> = Object.freeze({
+  authorization_denied: "Ezt a műveletet nem végezheted el.",
+  TODO_CLAIMED: "Ezt a feladatot közben valaki más vállalta.",
+  TODO_DONE: "Ez a feladat már kész.",
+  TODO_NOT_DONE: "Ez a feladat nincs késznek jelölve.",
+  TODO_NOT_CLAIMED: "Ezt a feladatot nem te vállaltad.",
+  TODO_NOT_YET: "Ez a feladat még nem vállalható, később kezdődik.",
+  EVENT_CLOSED: "Ez az esemény már le van zárva, nem vehető fel rá feladat.",
+  VERSION_CONFLICT: "Közben valaki módosította, töltsd újra.",
+  status_not_allowed: "Ez az állapot most nem választható ehhez a feladathoz.",
+  too_many_tasks: "Egyszerre legfeljebb 50 feladatot lehet az eseményre felvenni.",
+  no_parent_record: "Ehhez a művelethez szülői profil kell.",
+  idempotency_key_reused: "Ezt a kérést már elküldted, de más tartalommal. Töltsd újra az oldalt.",
+});
+
+const TODO_FIELD_MESSAGES: Readonly<Record<string, string>> = Object.freeze({
+  topic: "Adj meg egy témát, legfeljebb 200 karakterrel.",
+  priority: "A fontosság 1, 2 vagy 3 lehet.",
+  description: "A leírás legfeljebb 2000 karakter lehet.",
+  materials: "Az anyagok legfeljebb 500 karakter lehetnek.",
+  note: "A megjegyzés legfeljebb 1000 karakter lehet.",
+  status: "Ez az állapot nem választható.",
+  notBefore: "Add meg a kezdő dátumot, és ne legyen a határidő után.",
+  deadline: "Add meg a határidőt érvényes dátumként.",
+  owner: "Válassz pontosan egy felelőst.",
+  expectedVersion: "Közben valaki módosította, töltsd újra.",
+  tasks: "Válassz ki egy és ötven közötti feladatot.",
+});
+
+export function todoMessage(answer: {
+  state: string;
+  code?: string | undefined;
+  fieldErrors?: Readonly<Record<string, string>> | undefined;
+}): string {
+  if (answer.state === "denied") return TODO_CODE_MESSAGES.authorization_denied!;
+  const byCode = answer.code && TODO_CODE_MESSAGES[answer.code];
+  if (byCode) return byCode;
+  for (const [field, reason] of Object.entries(answer.fieldErrors ?? {})) {
+    if (field === "owner" && reason === "VAL-ARCHIVED") return "Ez a csoport már archivált.";
+    if (reason === "VAL-DATE-RANGE") return TODO_FIELD_MESSAGES.notBefore!;
+    const known = TODO_FIELD_MESSAGES[field];
+    if (known) return known;
+  }
+  return DIRECTORY_REFUSAL_FALLBACK;
+}

@@ -584,6 +584,8 @@ describe("the group page section", () => {
     expect(out).toContain('data-testid="group-events-all-link"');
     expect(out).toContain(`/szulo/esemenyek/uj`);
     expect(out).toContain('data-testid="group-events-new-link"');
+    expect(out).toContain(`href="/szulo/munkacsoportok/${GROUP}/kezeles"`);
+    expect(out).not.toContain("group-templates-link");
   });
 
   it("says there is no coming event, shows no new link to an ordinary member, and hides the section when unreadable", async () => {
@@ -594,6 +596,7 @@ describe("the group page section", () => {
     );
     expect(out).toContain("Nincs közelgő esemény.");
     expect(out).not.toContain("group-events-new-link");
+    expect(out).not.toContain("group-manage-link");
     world.groupList = terminalFailure();
     const failed = await loadGroupEvents(actor, GROUP);
     expect(

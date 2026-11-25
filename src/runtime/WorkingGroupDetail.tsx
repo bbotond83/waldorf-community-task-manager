@@ -136,37 +136,65 @@ export function WorkingGroupDetail({
         </p>
       )}
       {ownControls?.(model)}
-      <section className={`${area}-group-members`} aria-labelledby={`${area}-group-members-title`}>
-        <h2 id={`${area}-group-members-title`}>Tagok</h2>
-        {area === "admin" && manages && (
-          <p className={`${area}-group-hint`} data-testid={`${area}-group-member-note`}>
-            {COORDINATOR_MEMBER_NOTE}
-          </p>
-        )}
-        {model.members.length === 0 ? (
-          <p
-            className={`${area}-group-empty`}
-            role="status"
-            data-testid={`${area}-group-members-empty`}
-          >
-            {EMPTY_MEMBERS_TEXT}
-          </p>
-        ) : (
-          <ul className={`${area}-group-member-list`} data-testid={`${area}-group-members`}>
-            {model.members.map((member) => (
-              <MemberRow
-                key={member.membershipId}
-                member={member}
-                model={model}
-                area={area}
-                directoryPath={directoryPath}
-                memberControls={memberControls}
-              />
-            ))}
-          </ul>
-        )}
-      </section>
+      <GroupMembersSection
+        model={model}
+        area={area}
+        directoryPath={directoryPath}
+        memberControls={memberControls}
+        manages={manages}
+      />
       {extraSections}
+    </section>
+  );
+}
+
+/**
+ * The members of a group: the "Tagok" section of the group page, also shown as a tab of the management page. The
+ * section is read only unless `memberControls` is given.
+ */
+export function GroupMembersSection({
+  model,
+  area,
+  directoryPath,
+  memberControls,
+  manages = false,
+}: Readonly<{
+  model: WorkingGroupDetailModel;
+  area: GroupArea;
+  directoryPath: string;
+  memberControls?: Props["memberControls"];
+  manages?: boolean;
+}>) {
+  return (
+    <section className={`${area}-group-members`} aria-labelledby={`${area}-group-members-title`}>
+      <h2 id={`${area}-group-members-title`}>Tagok</h2>
+      {area === "admin" && manages && (
+        <p className={`${area}-group-hint`} data-testid={`${area}-group-member-note`}>
+          {COORDINATOR_MEMBER_NOTE}
+        </p>
+      )}
+      {model.members.length === 0 ? (
+        <p
+          className={`${area}-group-empty`}
+          role="status"
+          data-testid={`${area}-group-members-empty`}
+        >
+          {EMPTY_MEMBERS_TEXT}
+        </p>
+      ) : (
+        <ul className={`${area}-group-member-list`} data-testid={`${area}-group-members`}>
+          {model.members.map((member) => (
+            <MemberRow
+              key={member.membershipId}
+              member={member}
+              model={model}
+              area={area}
+              directoryPath={directoryPath}
+              memberControls={memberControls}
+            />
+          ))}
+        </ul>
+      )}
     </section>
   );
 }

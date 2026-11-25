@@ -200,6 +200,8 @@ describe("the checklist block of the event page", () => {
     expect(out).toContain("Levétel");
     expect(out).toContain("checklist-all-done");
     expect(out).toContain("checklist-edit-link");
+    expect(out).toContain("checklist-pull-link");
+    expect(out).toContain("Teendők hozzáadása");
   });
 
   it("hides the open-tasks callout once the event is finished or cancelled", async () => {

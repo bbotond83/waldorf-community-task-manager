@@ -299,6 +299,21 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Phase Progress
 <!-- Status values: Pending, Active, Verified, Skipped -->
 
@@ -359,7 +374,7 @@
 - **Current Stage**: functional-design
 - **Next Stage**: nfr-requirements
 - **Status**: Running
-- **Last Updated**: 2026-11-24T11:07:20Z
+- **Last Updated**: 2026-11-25T11:33:35Z
 
 - **Construction Autonomy Mode**: gated
 

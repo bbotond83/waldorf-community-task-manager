@@ -4588,3 +4588,319 @@ nav a:hover {
   background: transparent;
   box-shadow: none;
 }
+
+/*
+ * To-do tasks and My tasks (U12): the community list, a task's page, My tasks, a group's management page, the task form
+ * and the pull list of an event. The Stitch designs were followed for the order, the states and the approved wording;
+ * everything the design invented that this unit does not have (credited hours, intro and footer texts, placeholder
+ * names) was left out. A status is always an icon and a word, never only a colour. A row is one card; the buttons in it
+ * are plain forms, never a card inside the card.
+ */
+.todo-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.todo-header h1 {
+  margin: 0;
+  font-size: var(--text-headline-lg);
+  line-height: 1.15;
+}
+
+.todo-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.todo-filter {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.todo-filter select {
+  min-height: 44px;
+  max-width: 100%;
+}
+
+.todo-filter-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 44px;
+}
+
+.todo-filters button[type="submit"] {
+  min-height: 44px;
+}
+
+.todo-list,
+.todo-history-list,
+.todo-event-links,
+.todo-pull-list {
+  display: grid;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.todo-row {
+  display: grid;
+  gap: 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  background: var(--color-surface);
+  box-shadow: var(--shadow);
+  overflow-wrap: break-word;
+}
+
+.todo-row-attention {
+  border-left: 0.35rem solid var(--color-primary);
+}
+
+.todo-row-done {
+  border-left: 0.35rem solid var(--color-success);
+}
+
+.todo-row-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.todo-status {
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-pill);
+  padding: 0.1rem 0.7rem;
+  background: var(--color-info-bg);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.todo-status-attention {
+  color: var(--color-primary-dark);
+  background: var(--color-danger-bg);
+}
+
+.todo-status-done {
+  color: var(--color-success);
+  background: var(--color-success-bg);
+}
+
+.todo-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.75rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-pill);
+  padding: 0.1rem 0.7rem;
+  color: var(--color-primary-dark);
+  background: var(--color-info-bg);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.todo-title {
+  margin: 0;
+  color: var(--color-primary-dark);
+  font-size: 1.2rem;
+  line-height: 1.25;
+}
+
+.todo-title a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+.todo-meta {
+  margin: 0;
+  color: var(--color-muted);
+}
+
+.todo-empty {
+  margin-block: 1.5rem;
+  color: var(--color-muted);
+}
+
+.todo-section {
+  margin-block: 1.75rem;
+}
+
+.todo-section h2 {
+  margin: 0 0 0.75rem;
+  font-size: var(--text-headline-sm);
+}
+
+.todo-section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.todo-section-head h2 {
+  margin: 0;
+}
+
+.todo-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.todo-actions a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-weight: 600;
+}
+
+.todo-actions .parent-form,
+.todo-pull-row .parent-form {
+  margin: 0;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.todo-actions .parent-form button[type="submit"] {
+  min-height: 44px;
+}
+
+.todo-actions [data-testid^="todo-giveback-form"] button[type="submit"],
+.todo-actions [data-testid^="todo-undo-form"] button[type="submit"],
+.todo-actions [data-testid^="todo-free-form"] button[type="submit"] {
+  border: 0;
+  border-radius: var(--radius-pill);
+  padding: 0.75rem 1.1rem;
+  box-shadow: inset 0 0 0 1px var(--color-primary);
+  color: var(--color-primary-dark);
+  background: transparent;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.todo-actions [data-testid^="todo-giveback-form"] button[type="submit"]:hover,
+.todo-actions [data-testid^="todo-undo-form"] button[type="submit"]:hover,
+.todo-actions [data-testid^="todo-free-form"] button[type="submit"]:hover {
+  background: var(--color-info-bg);
+}
+
+.todo-facts {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0 0 1.25rem;
+}
+
+.todo-fact {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.todo-fact dt {
+  color: var(--color-muted);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.todo-fact dd {
+  margin: 0;
+  white-space: pre-line;
+  overflow-wrap: break-word;
+}
+
+.todo-event-links {
+  margin-bottom: 1.25rem;
+}
+
+.todo-history {
+  margin-top: 1.75rem;
+}
+
+.todo-history h2 {
+  margin: 0 0 0.75rem;
+  font-size: var(--text-headline-sm);
+}
+
+.todo-history-list {
+  gap: 0.5rem;
+  color: var(--color-muted);
+}
+
+.todo-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.todo-tabs a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-pill);
+  padding: 0.5rem 1rem;
+  color: var(--color-primary-dark);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.todo-tabs a[aria-current="page"] {
+  color: white;
+  background: var(--color-primary);
+}
+
+.todo-owner-line {
+  margin: 0;
+}
+
+.todo-field-invalid input,
+.todo-field-invalid select,
+.todo-field-invalid textarea {
+  border-color: var(--color-primary);
+}
+
+.todo-pull-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 0.75rem;
+}
+
+.todo-pull-label {
+  display: flex;
+  flex: 1 1 14rem;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 44px;
+}
+
+.todo-pull-label input[type="checkbox"] {
+  flex: none;
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.todo-pull-text {
+  display: grid;
+  gap: 0.15rem;
+}

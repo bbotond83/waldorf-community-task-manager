@@ -38,8 +38,13 @@
 - 2026-11-24T04:20:00Z [unit u8-animal-care-and-information] — After the review, at the owner's request: section owners are stored by group name and resolved in the current school year, because groups are per year and names are unique within a year; and families holding a slot whose start time changes get one notice, which the review left open as "notify or record why not".
 - 2026-11-24T04:01:57Z [unit u8-animal-care-and-information] — Read "the administrator" in AC7.3.2 as every super admin with a parent record, the same reading as U6's Friday-noon alert, because notices reach parents only.
 
+- 2026-11-24T17:40:00Z [unit u12-todo-and-my-tasks] — Read the to-do task's "topic" (FR14.3) as its heading and kept no separate title; components.md lists topic and no title, though the mockup cards read "topic, title". Flagged in entities.md.
+- 2026-11-24T17:40:00Z [unit u12-todo-and-my-tasks] — Family-owned tasks are managed by super admins only; a family has no administrators of its own and AC14.1.3 says "an administrator names which family". Easy to widen in BR180.2.
+
 ## Deviations
 <!-- example: 2026-05-29T10:14:32Z — skipped the optional caching layer the stage prose suggested; the dataset is small enough that it adds risk -->
+- 2026-11-24T17:40:00Z [unit u12-todo-and-my-tasks] — Added a TodoEventLink record and an internal read checklist_task_done_state, because the owner chose (Q1) that a pulled task shows whether it is done on the event while neither side writes to the other; U11 is merged, so U12's migration adds the read in the Checklists block.
+- 2026-11-24T17:40:00Z [unit u12-todo-and-my-tasks] — todo_pull_to_event takes expected versions beside the ids (contract C15 listed none), so an outdated screen fails the pull and the to-do rows can be locked last, in the C1 order, after checklist_add_task.
 - 2026-11-21T16:41:47Z [unit u7-swaps-and-duty-changes] — U7 changes U6's rota_adjust_picks_after_change so a change with no new family empties the week with reason cancelled and returns its pick; the owner's Q3 answer frees a rota duty on an approved cancellation, and C11 only knew changes to another family. Listed as a C11 contract delta.
 - 2026-11-21T08:50:00Z [unit u13-lending-library] — U13's removal block also clears closed-loan borrower links and the owner link of the subject's books and deletes return watches; contract C16 listed only flagging held books and removing watches, but a deleted family or parent would otherwise leave links to nothing.
 - 2026-11-21T08:50:00Z [unit u13-lending-library] — A super admin may change a book's owner and record a return only for a book with no owner who has rights; Q1 to Q3 left both open and a typed-name or ownerless book would otherwise be stuck.
@@ -86,7 +91,12 @@
 - 2026-11-24T04:01:57Z [unit u8-animal-care-and-information] — The fair-share counts and empty-slot lists are worked out when read instead of stored; only the month's reminder round is recorded (FairShareRound), so a missed first-weekday run is made up later that month without a second reminder and without stored counts that could go stale.
 - 2026-11-24T04:01:57Z [unit u8-animal-care-and-information] — Information sections keep no editor's name, only the time; who edited is not shown, and leaving the person out keeps contract C16 true that U8 needs no removal function.
 
+- 2026-11-24T17:40:00Z [unit u12-todo-and-my-tasks] — A task is never deleted and a removed person's open claim is released and flagged instead of kept; a kept claim would point at nobody, and the flag lets the administrator list in U14 find it.
+
 ## Open questions
+
+- 2026-11-24T17:40:00Z [unit u12-todo-and-my-tasks] — A task with a future "not before" date cannot be claimed (BR182.1); not in the requirements, confirm at the gate. Also confirm that coordinators may not create family-owned tasks.
+- 2026-11-24T17:40:00Z [unit u12-todo-and-my-tasks] — Confirm in the Stitch design where the "Kezelés" link sits on the group page and how the menu entries Feladataim and Teendők sit beside today's "Családi feladatok".
 
 - 2026-11-16T05:49:19Z — [unit u6-full-rotas-and-weekend-picks] Notices reach only parents with an account, so a super admin with no parent record gets no Friday-noon alert; confirm whether every administrator is also a parent before go-live.
 - 2026-11-10T08:05:00Z [unit u2-first-rota-slice] — The teacher's overview route is only proposed; confirm it in the Stitch design.

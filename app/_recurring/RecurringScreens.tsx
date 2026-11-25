@@ -391,7 +391,41 @@ export async function RecurringGroupScreen({
   );
 }
 
-/** The link of a group page to its recurring duties, for all three areas. */
+/**
+ * The recurring duties of a group as a tab of the management page (W7.2): the same one read and the same body as the
+ * group's own recurring page, under a section heading instead of a page header. A refused or failed read shows its
+ * own state, never an empty list.
+ */
+export async function RecurringGroupTab({
+  actor,
+  groupId,
+}: Readonly<{ actor: RecurringActor; groupId: string }>) {
+  const recurring = await resolveRecurringFacade();
+  const result: ApplicationResult<RecurringGroupListModel> = recurring
+    ? await recurring.groupList(actor.session, actor.scope, groupId)
+    : terminalFailure();
+  const now = new Date();
+  return (
+    <section
+      className="recurring-page"
+      aria-labelledby="manage-recurring-title"
+      data-testid="manage-recurring"
+    >
+      <h2 id="manage-recurring-title">Ismétlődő feladatok</h2>
+      <ParentStatePanel
+        result={result}
+        emptyMessage="Ez a munkacsoport nem érhető el."
+        testId="manage-recurring-state"
+      >
+        {(model) => (
+          <GroupBody model={model} area={actor.area} today={budapestToday(now)} now={now} />
+        )}
+      </ParentStatePanel>
+    </section>
+  );
+}
+
+/** The link of a group page to its recurring duties (read only for a parent or teacher who does not manage the group). */
 export function GroupRecurringLink({
   area,
   groupId,
