@@ -73,15 +73,25 @@ export async function expectSignedIn(page: Page): Promise<void> {
 }
 
 /**
+ * Repeats a page change until it goes through. For the moments right after a sign-in, when a redirect still on its way
+ * can make Firefox abort the change the test starts (NS_BINDING_ABORTED).
+ */
+export async function retryNavigation(navigate: () => Promise<unknown>): Promise<void> {
+  await expect(async () => {
+    await navigate();
+  }).toPass({ timeout: 10_000 });
+}
+
+/**
  * Clears the browser's sign-in and opens a link as a stranger would. `expectSignedIn` returns as soon as the sign-in
  * cookie exists, while the server redirect that follows may still be on its way, so the page first settles. The
  * signed-in page is then left for a blank one before the cookie goes: without its cookie the page can send itself to
  * the sign-in screen, and that navigation would abort the one the test starts. Either overlap shows up in Firefox as
- * NS_BINDING_ABORTED.
+ * NS_BINDING_ABORTED. Settling does not rule it out, so the move to the blank page is also repeated if aborted.
  */
 export async function openLinkSignedOut(page: Page, link: string): Promise<void> {
   await page.waitForLoadState("networkidle");
-  await page.goto("about:blank");
+  await retryNavigation(() => page.goto("about:blank"));
   await page.context().clearCookies();
   await page.goto(link);
 }
