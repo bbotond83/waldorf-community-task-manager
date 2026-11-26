@@ -531,9 +531,13 @@ for (const schema of DIRECTORY_SCHEMAS) {
             next,
           ]),
         ]);
-        assert.deepEqual(
-          deletes.map((answer) => answer.state).sort(),
-          ["success", "validation"],
+        const states = deletes.map((answer) => answer.state);
+        assert.equal(states.filter((state) => state === "success").length, 1);
+        // The loser's refusal depends on timing: "validation" when it was already waiting for the lock,
+        // "denied" when the winner had committed before it first looked the task up.
+        const loser = states.find((state) => state !== "success")!;
+        assert.ok(
+          ["validation", "denied"].includes(loser),
           "the loser finds the task already gone",
         );
         assert.equal((await rowsOf(db, "event_checklist_tasks")).length, 4);

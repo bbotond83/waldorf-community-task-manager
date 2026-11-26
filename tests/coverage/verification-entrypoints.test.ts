@@ -29,6 +29,9 @@ beforeEach(() => {
   seams.spawn.mockReset();
   seams.exec.mockReset();
   vi.resetModules();
+  // A CI verification part runs this file with these set; the runner under test must not inherit them.
+  vi.stubEnv("VERIFY_PART", "");
+  vi.stubEnv("VERIFY_BROWSER_PROJECTS", "");
 });
 afterEach(() => {
   process.argv = originalArgv;
