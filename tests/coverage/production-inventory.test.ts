@@ -149,7 +149,8 @@ describe("honest executable denominator", () => {
     // the two removal actions share (app/admin/_lib/removal.ts): 383 + 3. The screens add seven: the preview, the form
     // and the result (app/admin/_components: 3), their reads (app/admin/_lib/removal-reads.ts) and three pages (the
     // family's confirmation and the two result pages): 386 + 7.
-    expect(inventory.length).toBe(393);
+    // The CI split adds scripts/verification/parts.ts: 393 + 1.
+    expect(inventory.length).toBe(394);
     for (const path of [
       "src/runtime/AppNav.tsx",
       "src/runtime/StatusBadge.tsx",

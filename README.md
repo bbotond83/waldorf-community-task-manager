@@ -229,7 +229,11 @@ command accepts no target credentials and calls no hosted target.
 
 This is a public repository, so GitHub Actions minutes are free. A pull request runs `npm run verify:local`, including
 the full browser phase (Chromium, Firefox and mobile Chrome); a draft pull request is checked once it is marked ready for
-review. The same full check runs every Monday at 03:00 UTC and whenever the workflow is started by hand from the
+review. CI runs the same steps as five parts at the same time, each on its own machine: the quick checks with the
+database stages in order, the shuffled database run, and one part for each of the three browsers. The required
+`Validate` check passes only when every part passed; it then builds the evidence report from their results. To run a
+failed part again, use **Re-run failed jobs**; evidence older than 24 hours is refused, so after a day use **Re-run all
+jobs**. On your own computer `npm run verify:local` still runs everything in order. The same full check runs every Monday at 03:00 UTC and whenever the workflow is started by hand from the
 **Actions** tab (**Run workflow**). A push to `main` does not repeat the validation: the squash-merged change was
 validated on its pull request. Changes that touch only `aidlc/` workflow records start no run.
 
