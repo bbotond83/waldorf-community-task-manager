@@ -29,6 +29,9 @@ beforeEach(() => {
   seams.spawn.mockReset();
   seams.exec.mockReset();
   vi.resetModules();
+  // A CI verification part runs this file with these set; the runner under test must not inherit them.
+  vi.stubEnv("VERIFY_PART", "");
+  vi.stubEnv("VERIFY_BROWSER_PROJECTS", "");
 });
 afterEach(() => {
   process.argv = originalArgv;
@@ -139,6 +142,55 @@ it("halts at failed lint before security/build and records safe evidence", async
   await expect(runner("lint")).rejects.toThrow("step=lint exit=7");
   expect(seams.spawn.mock.calls.some((call) => call[1].includes("build"))).toBe(false);
   expect(readFileSync(join(root, ".verification/logs/lint.log"), "utf8")).toBe("SAFE_STEP_OK");
+});
+it("runs the parts one by one and builds the evidence from their combined results", async () => {
+  const parts = [
+    ["checks", ""],
+    ["database-shuffled", ""],
+    ["browser", "chromium"],
+    ["browser", "firefox"],
+    ["browser", "mobile-chrome"],
+  ] as const;
+  const handedOver = mkdtempSync(join(tmpdir(), "waldorf-coverage-parts-"));
+  try {
+    for (const [part, browser] of parts) {
+      vi.stubEnv("VERIFY_PART", part);
+      vi.stubEnv("VERIFY_BROWSER_PROJECTS", browser);
+      seams.spawn.mockClear();
+      vi.resetModules();
+      await runner();
+      const commands = seams.spawn.mock.calls.map((call) => call[1].join(" "));
+      expect(commands.at(-1)).toBe("run scan:privacy");
+      expect(commands).not.toContain("run verify:evidence");
+      expect(commands.includes("run test:browser")).toBe(part === "browser");
+      expect(commands.includes("run test:database:shuffled")).toBe(part === "database-shuffled");
+      // Each machine hands over its own files; the next run on this one would remove them.
+      for (const folder of ["logs", "parts"])
+        cpSync(join(root, ".verification", folder), join(handedOver, folder), { recursive: true });
+    }
+    cpSync(handedOver, join(root, ".verification"), { recursive: true });
+  } finally {
+    rmSync(handedOver, { recursive: true, force: true });
+  }
+  vi.stubEnv("VERIFY_PART", "combine");
+  vi.stubEnv("VERIFY_BROWSER_PROJECTS", "");
+  seams.spawn.mockClear();
+  vi.resetModules();
+  await runner();
+  expect(seams.spawn.mock.calls.map((call) => call[1].join(" "))).toEqual([
+    "run verify:evidence",
+    "run scan:privacy",
+  ]);
+  const records = readEvidenceDirectory(join(root, ".verification/evidence")) as Evidence[];
+  expect(records).toHaveLength(validateManifests(root).length);
+  expect(records.some((r) => r.browser === "chromium,firefox,mobile-chrome")).toBe(true);
+  vi.stubEnv("VERIFICATION_EVIDENCE_DIR", join(root, ".verification/evidence"));
+  await import("../../scripts/verification/aggregate-evidence.ts");
+});
+it("stops a part at its failed step without handing results over", async () => {
+  vi.stubEnv("VERIFY_PART", "database-shuffled");
+  await expect(runner("test:database:shuffled")).rejects.toThrow("step=database-shuffled exit=7");
+  expect(readEvidenceDirectory(join(root, ".verification/parts"))).toEqual([]);
 });
 it("rejects omitted and duplicated aggregate evidence", () => {
   const directory = join(root, ".verification/evidence");

@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { describe, it } from "node:test";
+import { PART_NAMES } from "./parts.ts";
 import { scanNoDeploy } from "./scan-core.ts";
+import { BROWSER_PROJECTS } from "../../tests/browser/support/projects.ts";
 
 const root = new URL("../../", import.meta.url);
 const read = (path: string) => readFileSync(new URL(path, root), "utf8");
@@ -13,7 +15,7 @@ describe("CI workflow configuration (BR10.2, FR10.3)", () => {
   it("has no deployment job, environment, publish or promotion step", () => {
     const jobSection = workflow.slice(workflow.indexOf("\njobs:\n"));
     const jobs = [...jobSection.matchAll(/^  ([a-z_]+):\s*$/gm)].map((match) => match[1]);
-    assert.deepEqual(jobs, ["validate", "build_evidence"]);
+    assert.deepEqual(jobs, ["verification_part", "validate", "build_evidence"]);
     assert.equal(/^\s+environment:/m.test(workflow), false);
     // Built from parts so this file does not trip the no-deployment scan it relies on.
     const forbidden = [
@@ -95,7 +97,7 @@ describe("CI workflow configuration (BR10.2, FR10.3)", () => {
     // Masked: the two session secrets, the admin key and (U5) the stack's public key.
     assert.equal([...workflow.matchAll(/::add-mask::/g)].length, 4);
     assert.equal(/APP_SESSION_SECRET:\s*\S/.test(workflow), false);
-    // Only the validate job has a stack, so only it exposes the admin key (masked) to the environment.
+    // Only the verification parts have a stack, so only it exposes the admin key (masked) to the environment.
     assert.equal([...workflow.matchAll(/SUPABASE_SERVICE_ROLE_KEY=\$key/g)].length, 1);
   });
 
@@ -195,17 +197,17 @@ describe("CI workflow configuration (BR10.2, FR10.3)", () => {
     assert.equal(/\$\{\{\s*secrets\./.test(workflow), false);
     assert.equal(/pull_request_target/.test(workflow), false);
     assert.match(workflow, /^permissions:\n  contents: read$/m);
-    assert.equal([...workflow.matchAll(/^    permissions:\n      contents: read$/gm)].length, 2);
+    assert.equal([...workflow.matchAll(/^    permissions:\n      contents: read$/gm)].length, 3);
     assert.equal(/APP_RUNTIME_MODE|APP_SYNTHETIC_FIXTURE_VERSION|synthetic/i.test(workflow), false);
     assert.equal(/runtimeMode|fixtureVersion/.test(workflow), false);
   });
 
-  it("gives the validate job 120 minutes and the stack's address and public key for build, smoke and browser (U5)", () => {
+  it("gives each part 60 minutes and the stack's address and public key for build, smoke and browser (U5)", () => {
     const validate = workflow.slice(
+      workflow.indexOf("  verification_part:"),
       workflow.indexOf("  validate:"),
-      workflow.indexOf("  build_evidence:"),
     );
-    assert.match(validate, /timeout-minutes: 120/);
+    assert.match(validate, /timeout-minutes: 60/);
     assert.equal(/timeout-minutes: 45/.test(workflow), false);
     assert.match(validate, /echo "SUPABASE_URL=\$url" >> "\$GITHUB_ENV"/);
     assert.match(validate, /echo "SUPABASE_ANON_KEY=\$anon" >> "\$GITHUB_ENV"/);
@@ -256,22 +258,57 @@ describe("CI workflow configuration (BR10.2, FR10.3)", () => {
       workflow,
       /group: ci-\$\{\{ github\.workflow \}\}-\$\{\{ github\.event_name \}\}-/,
     );
-    const validate = workflow.slice(
+    const parts = workflow.slice(
+      workflow.indexOf("  verification_part:"),
       workflow.indexOf("  validate:"),
-      workflow.indexOf("  build_evidence:"),
     );
-    assert.match(
-      validate,
-      /if: github\.event_name != 'push' && !github\.event\.pull_request\.draft/,
+    assert.match(parts, /if: github\.event_name != 'push' && !github\.event\.pull_request\.draft/);
+    // No run narrows the browser phase: the browser parts together are exactly every browser project.
+    const browsers = [...parts.matchAll(/^ {12}browser: ([a-z-]+)$/gm)].map((match) => match[1]!);
+    assert.deepEqual(
+      browsers,
+      BROWSER_PROJECTS.map(({ name }) => name as string),
     );
-    // No run narrows the browser phase: the repository is public, so every run uses every browser.
-    assert.equal(/VERIFY_BROWSER_PROJECTS/.test(workflow), false);
+    assert.match(parts, /VERIFY_BROWSER_PROJECTS: \$\{\{ matrix\.browser \}\}/);
+    assert.equal([...workflow.matchAll(/VERIFY_BROWSER_PROJECTS:/g)].length, 1);
     const evidence = workflow.slice(workflow.indexOf("  build_evidence:"));
     assert.match(evidence, /if: github\.event_name == 'push'/);
     assert.equal(/needs:/.test(evidence), false);
     // The evidence names only the browsers that ran.
     const pipeline = read("scripts/verification/run-local-verification.ts");
     assert.match(pipeline, /selectedBrowserProjects\(process\.env\.VERIFY_BROWSER_PROJECTS\)/);
+  });
+
+  it("keeps one required Validate check that fails when any part does not pass", () => {
+    const parts = workflow.slice(
+      workflow.indexOf("  verification_part:"),
+      workflow.indexOf("  validate:"),
+    );
+    const gate = workflow.slice(
+      workflow.indexOf("  validate:"),
+      workflow.indexOf("  build_evidence:"),
+    );
+    assert.equal([...workflow.matchAll(/^ {4}name: Validate$/gm)].length, 1);
+    assert.match(gate, /^ {4}name: Validate$/m);
+    // A skipped required check counts as passed, so the gate runs whatever happened to the parts.
+    assert.match(
+      gate,
+      /if: always\(\) && github\.event_name != 'push' && !github\.event\.pull_request\.draft\n/,
+    );
+    assert.match(gate, /needs: verification_part\n/);
+    assert.match(
+      gate,
+      /steps:\n {6}- name: [^\n]+\n {8}if: needs\.verification_part\.result != 'success'\n {8}run: exit 1\n/,
+    );
+    assert.equal(/continue-on-error/.test(workflow), false);
+    assert.match(gate, /VERIFY_PART: combine/);
+    // Every part of the pipeline has a job in the matrix.
+    const matrixParts = [...parts.matchAll(/^ {12}part: ([a-z-]+)$/gm)].map((match) => match[1]!);
+    assert.deepEqual([...new Set(matrixParts)], [...PART_NAMES]);
+    assert.equal(matrixParts.length, PART_NAMES.length - 1 + BROWSER_PROJECTS.length);
+    assert.match(parts, /VERIFY_PART: \$\{\{ matrix\.part \}\}/);
+    assert.match(parts, /fail-fast: false/);
+    assert.match(parts, /include-hidden-files: true/);
   });
 
   it("keeps the build evidence for 14 days and the existing PostgreSQL role-migration step", () => {

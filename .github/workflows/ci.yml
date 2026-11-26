@@ -1,7 +1,8 @@
 name: CI
 
 # This is a public repository, so Actions minutes are free. Every pull request, the weekly run and the manually started
-# runs run the full check in every browser (Chromium, Firefox and mobile Chrome). A push to main only records the build
+# runs run the full check in every browser (Chromium, Firefox and mobile Chrome), split into parts that run at the same
+# time; the Validate job then passes only when every part passed. A push to main only records the build
 # evidence: the squash-merged change was validated on its pull request. Changes that touch only AI-DLC workflow records
 # (aidlc/, which no check reads) start no run, and a draft pull request is checked once it is ready for review.
 on:
@@ -27,12 +28,35 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  validate:
-    name: Validate
+  # One part per machine; scripts/verification/parts.ts says which steps each part runs.
+  verification_part:
+    name: Part (${{ matrix.id }})
     if: github.event_name != 'push' && !github.event.pull_request.draft
     runs-on: ubuntu-latest
-    # The full run in three browsers has outgrown 90 minutes: GitHub cancelled one during the browser tests.
-    timeout-minutes: 120
+    # The longest part takes about 25 minutes; the margin covers slow runners and browser retries.
+    timeout-minutes: 60
+    strategy:
+      # Every part finishes, so one run shows every failure and only the failed parts need running again.
+      fail-fast: false
+      matrix:
+        include:
+          - id: checks
+            part: checks
+          - id: database-shuffled
+            part: database-shuffled
+          - id: browser-chromium
+            part: browser
+            browser: chromium
+            playwright: chromium
+          - id: browser-firefox
+            part: browser
+            browser: firefox
+            playwright: firefox
+          # Mobile Chrome runs in the Chromium engine.
+          - id: browser-mobile-chrome
+            part: browser
+            browser: mobile-chrome
+            playwright: chromium
     permissions:
       contents: read
     env:
@@ -55,7 +79,8 @@ jobs:
       - name: Install locked dependencies
         run: npm ci
       - name: Install browser dependencies
-        run: npx playwright install --with-deps chromium firefox
+        if: matrix.playwright
+        run: npx playwright install --with-deps ${{ matrix.playwright }}
       - name: Install PostgreSQL 18 tools without a service or default cluster
         run: |
           sudo apt-get update
@@ -96,11 +121,63 @@ jobs:
           echo "SUPABASE_SERVICE_ROLE_KEY=$key" >> "$GITHUB_ENV"
           echo "SUPABASE_ANON_KEY=$anon" >> "$GITHUB_ENV"
           echo "SUPABASE_URL=$url" >> "$GITHUB_ENV"
-      - name: Run the complete local verification pipeline
+      - name: Run this part of the local verification pipeline
         run: npm run verify:local
+        env:
+          VERIFY_PART: ${{ matrix.part }}
+          # Set for the browser parts only; empty elsewhere.
+          VERIFY_BROWSER_PROJECTS: ${{ matrix.browser }}
       - name: Stop the local database stack
         if: always()
         run: npm run db:stop
+      # Only a part that passed, including its privacy scan of these logs, hands its results to Validate.
+      - name: Hand the results to the Validate job
+        if: success()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: verification-part-${{ matrix.id }}
+          path: |
+            .verification/parts
+            .verification/logs
+          include-hidden-files: true
+          if-no-files-found: error
+          overwrite: true
+          retention-days: 14
+
+  # The required check on main. GitHub counts a skipped required check as passed, so this job must run even when a
+  # part failed or was cancelled (always()) and fail itself.
+  validate:
+    name: Validate
+    if: always() && github.event_name != 'push' && !github.event.pull_request.draft
+    needs: verification_part
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Fail unless every part passed
+        if: needs.verification_part.result != 'success'
+        run: exit 1
+      - name: Check out source
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+      - name: Collect the results of every part
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: verification-part-*
+          path: .verification
+          merge-multiple: true
+      # Checks that every part passed on this commit, then writes and validates the evidence report and runs the
+      # final privacy scan. It needs no installed packages.
+      - name: Verify the combined evidence
+        run: npm run verify:local
+        env:
+          VERIFY_PART: combine
 
   build_evidence:
     name: SBOM and build evidence
