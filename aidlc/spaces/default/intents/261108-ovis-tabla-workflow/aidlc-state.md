@@ -44,11 +44,26 @@
 - **Construction Iteration**: unit-major
 - **Construction Execution**: serial
 
-- **Construction Verification Command**: VERIFY_BROWSER_PROJECTS=chromium npm run verify:local
+- **Construction Verification Command**: export VERIFY_BROWSER_PROJECTS=chromium APP_HOST=127.0.0.1 && npm run check:toolchain && npm run verify:manifests && npm run format:check && npm run lint && npm run lint:css && npm run typecheck && npm test && npm run test:database:roles && npm run db:migrate && npm run test:database:stack && npm run test:database:identity && npm run test:database:directory && npm run test:database:notifications && npm run test:database:seed && npm run test:coverage && npm run verify:security && npm run build && npm run test:bundle && npm run smoke:start && npm run test:browser && npm run scan:privacy
 
 - **Unit Ownership**: solo
 
 - **Skeleton Stance**: scope-dependent
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -374,7 +389,7 @@
 - **Current Stage**: functional-design
 - **Next Stage**: nfr-requirements
 - **Status**: Running
-- **Last Updated**: 2026-11-25T11:33:35Z
+- **Last Updated**: 2026-11-26T02:32:13Z
 
 - **Construction Autonomy Mode**: gated
 

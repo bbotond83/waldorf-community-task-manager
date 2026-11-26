@@ -111,7 +111,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
     const refused = (result: Result, state: string, code: string) =>
       assert.deepEqual([result.state, result.code], [state, code]);
 
-    it("archives the family, its people and its future places, withdraws its requests and keeps the history (BR30.7)", async () => {
+    it("archives the family, its people and its future places, cancels its requests and keeps the history (BR30.7, U14 BR201.1)", async () => {
       const [t1, tPast] = [await taskVersion(TASK_1), await taskVersion(TASK_PAST)];
       const result = await archive(SUPER_ADMIN);
       assert.deepEqual([result.state, result.removed_places], ["success", 1]);
@@ -140,15 +140,30 @@ for (const schema of DIRECTORY_SCHEMAS) {
         "active",
         "a place on a task that started stays as history",
       );
-      assert.equal(await status("change_requests", REQUEST_1), "withdrawn");
+      // U14 replaced the archive body with the removal run: U7's step cancels the request, U3's step ends
+      // the family's sign-ins, and the run writes its own audit row.
+      assert.equal(await status("change_requests", REQUEST_1), "cancelled");
       assert.equal(await taskVersion(TASK_1), t1 + 1, "the task version rose");
       assert.equal(await taskVersion(TASK_PAST), tPast, "a started task is left alone");
       assert.equal(
-        await count(db, "accounts", "status = 'deactivated'"),
-        1,
-        "only the seeded deactivated account",
+        await count(
+          db,
+          "accounts",
+          `status = 'active' and id in (select account_id from parents where family_id = '${FAMILY_1}')`,
+        ),
+        0,
+        "the family's sign-ins ended",
       );
-      assert.equal(await count(db, "audit_events"), 0, "an archive writes no audit event");
+      assert.equal(
+        await count(
+          db,
+          "accounts",
+          `status <> 'active' and id in (select account_id from parents where family_id = '${FAMILY_2}')`,
+        ),
+        0,
+        "another family's sign-ins are untouched",
+      );
+      assert.equal(await count(db, "audit_events", "action = 'lifecycle.family_removed'"), 1);
       assert.equal(
         await count(db, "assignments", `family_id = '${FAMILY_2}' and status = 'active'`),
         2,
@@ -182,7 +197,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
         ],
       );
       assert.equal((await archive(SUPER_ADMIN)).state, "success");
-      assert.equal(await status("change_requests", uuid(890)), "withdrawn");
+      assert.equal(await status("change_requests", uuid(890)), "cancelled");
       assert.equal(await status("assignments", A_F2_T2), "active");
       assert.equal(await status("assignments", ASSIGNMENT_F1_T1), "removed");
     });
@@ -214,11 +229,11 @@ for (const schema of DIRECTORY_SCHEMAS) {
 
     it("hides the archived family from its parents and from the lists, while super admins still read it (BR30.7, BR3.9)", async () => {
       assert.equal((await archive(SUPER_ADMIN)).state, "success");
-      refused(await fn(PARENT_F1, "duty_list()"), "denied", "no_family");
+      refused(await fn(PARENT_F1, "duty_list()"), "denied", "session_inactive");
       refused(
         await fn(CO_PARENT_F1, "duty_sign_up($1, $2, 1)", [nextKey(), TASK_2]),
         "denied",
-        "no_family",
+        "session_inactive",
       );
       const parentRows = await asActor(
         db,
@@ -264,15 +279,15 @@ for (const schema of DIRECTORY_SCHEMAS) {
       );
       refused(await restore(SUPER_ADMIN), "conflict", "RESTORE_CONFLICT");
       refused(await restore(SUPER_ADMIN, FAMILY_2), "conflict", "RESTORE_CONFLICT");
-      assert.equal(
-        (
-          await fn(PARENT_F1, "duty_sign_up($1, $2, $3)", [
-            nextKey(),
-            TASK_1,
-            await taskVersion(TASK_1),
-          ])
-        ).state,
-        "success",
+      // U14 BR207.1: a sign-in does not come back; each parent needs a new invitation.
+      refused(
+        await fn(PARENT_F1, "duty_sign_up($1, $2, $3)", [
+          nextKey(),
+          TASK_1,
+          await taskVersion(TASK_1),
+        ]),
+        "denied",
+        "session_inactive",
       );
     });
 

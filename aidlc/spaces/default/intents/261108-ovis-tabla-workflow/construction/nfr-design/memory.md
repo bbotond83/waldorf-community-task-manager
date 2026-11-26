@@ -3,6 +3,8 @@
 
 ## Interpretations
 <!-- example: 2026-05-29T10:14:32Z — chose REST over GraphQL; the consuming team only needs CRUD, revisit if subscriptions land -->
+- 2026-11-25T19:39:07Z [unit u14-removal-and-anonymisation] — Put a "which text wins" table in logical-components.md that names each functional-design rule the NFR answers replace (BR204.1 single-parent name, BR204.2 and BR206.4 free texts, BR202.2 wording, the preview refusals); the NFR review found that a developer reading the frozen rules first would build the old behaviour.
+- 2026-11-25T19:39:07Z [unit u14-removal-and-anonymisation] — The task and place locks of the removal reuse the existing reminder_lock_family_tasks and coordination_lock_assignments helpers instead of a new lock; they are the locks today's family_archive already takes, so the existing lock tests keep their timing and the "no new wrapper lock" correction is respected.
 
 - 2026-11-10T08:25:00Z [unit u2-first-rota-slice] — Asked no questions because the NFR requirements and the approved functional design already fix every pattern; publishing uses set-based inserts rather than one duty-function call per week, which keeps the 5-second target easy.
 - 2026-11-14T07:30:00Z [unit u3-directory-and-profile] — The 30-day clearing of finished email requests counts from decidedAt, or from expiresAt for expired ones, so no job has to mark expiry.

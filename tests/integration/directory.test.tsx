@@ -6,7 +6,7 @@ import type { ApplicationResult, DirectoryModel } from "../../src/application/in
 import { DirectoryPage } from "../../src/runtime/DirectoryPage.tsx";
 import { filterFamilies, normalizeForSearch } from "../../src/runtime/directory-search.ts";
 import { ACCOUNT_IDS, requestWorld } from "../support/request-world.ts";
-import { DIRECTORY_FIXTURE } from "../support/port-doubles.ts";
+import { DIRECTORY_FIXTURE, removedParent } from "../support/port-doubles.ts";
 import {
   envelope,
   fakeAdmin,
@@ -316,7 +316,9 @@ describe("removing a parent (W7, BR36.3)", () => {
     const result = await removeParentAction({ state: "initial" }, input());
     expect(result.state).toBe("success");
     expect(result.code).toBe("SIGN_IN_FOLLOW_UP_PENDING");
-    expect(result.message).toContain("még nem fejeződött be");
+    expect(result.message).toBe(
+      "A szülő eltávolítva. Egy kijelentkeztetés nem sikerült; a fiók a következő kérésnél úgyis le lesz tiltva.",
+    );
     expect(harness.events.events).toEqual([
       expect.objectContaining({ event: "follow_up_failed", code: "parent_removal" }),
     ]);
@@ -337,7 +339,7 @@ describe("removing a parent (W7, BR36.3)", () => {
     requestWorld.signIn("super_admin");
     requestWorld.ports.directory.removeAnswer = {
       state: "success",
-      data: { parentId: REMOVED_PARENT, accountId: null },
+      data: removedParent(REMOVED_PARENT, []),
     };
     const { removeParentAction } = await import("../../app/admin/parent-actions.ts");
     const result = await removeParentAction({ state: "initial" }, input());

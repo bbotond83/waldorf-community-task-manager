@@ -506,7 +506,12 @@ describe("the admin pages with real data", () => {
       }),
     );
     expect(screen.getByLabelText("A család neve")).toHaveValue("Fenyő család");
-    expect(screen.getByTestId("admin-record-archive-form")).toBeInTheDocument();
+    // A family is no longer archived by one click: the record leads to its removal confirmation (U14, W2).
+    expect(screen.getByTestId("admin-family-remove-link")).toHaveAttribute(
+      "href",
+      "/admin/nyilvantartasok/f-1/eltavolitas",
+    );
+    expect(screen.queryByTestId("admin-record-archive-form")).toBeNull();
   });
 
   it("keeps the one-field edit form for a record without a kind", async () => {

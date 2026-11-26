@@ -11,6 +11,7 @@ import type {
 } from "../application/index.ts";
 import type { DatabaseClient } from "../runtime/database/client.ts";
 import { DataGateway, type Envelope } from "./gateway.ts";
+import { removeParentRecord } from "./removal.ts";
 import { toOutcome } from "./results.ts";
 import { asRows, flag, integer, optionalText, text, type Row } from "./values.ts";
 
@@ -236,21 +237,13 @@ export function createDirectoryPort(database: DatabaseClient): DirectoryPort {
         idempotencyKey,
       ),
     async removeParent({ idempotencyKey, parentId, expectedVersion }) {
-      const envelope = await gateway.call(
-        "parent_remove",
-        {
-          p_idempotency_key: idempotencyKey,
-          p_parent_id: parentId,
-          p_expected_version: expectedVersion,
-        },
+      const outcome = await removeParentRecord(gateway, {
         idempotencyKey,
-      );
-      return toOutcome(envelope, (current) =>
-        Object.freeze({
-          parentId: current.reference ?? parentId,
-          accountId: typeof current.account_id === "string" ? current.account_id : null,
-        }),
-      );
+        id: parentId,
+        expectedVersion,
+      });
+      if (outcome.state !== "success" && outcome.state !== "recovery") return outcome;
+      return { state: outcome.state, data: Object.freeze({ parentId, removal: outcome.data }) };
     },
   };
 }

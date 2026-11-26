@@ -154,11 +154,13 @@ test("removing a parent ends their sign-in, and the only parent of a family is r
   await page.goto(`/admin/nyilvantartasok/${family}/szulo/${removed}/eltavolitas`);
   await expect(page.getByTestId("admin-parent-remove-summary")).toContainText("eltávolítása");
   await page.getByTestId("admin-parent-remove-form").getByRole("button").click();
-  // The page refreshes after the removal, so the form gives way to the plain "no longer in the family" line.
+  // The removal leads to its result page; the confirmation page then says the parent is no longer in the family.
+  await expect(page.getByTestId("admin-removal-success")).toHaveText("A szülő eltávolítva.");
+  await expect(page.getByRole("link", { name: "Vissza a családhoz" })).toBeVisible();
+  await page.goto(`/admin/nyilvantartasok/${family}/szulo/${removed}/eltavolitas`);
   await expect(page.getByTestId("admin-parent-remove-missing")).toContainText(
     "Ez a szülő már nem szerepel a családban.",
   );
-  await expect(page.getByRole("link", { name: "Vissza a családhoz" })).toBeVisible();
   await signOut(page);
   await trySignIn(page, account);
   await expect(page.getByTestId("sign-in-form")).toBeVisible();

@@ -535,12 +535,31 @@ test("a child without a known family is refused and a refused child change is pa
 });
 
 test("archiving a family and the other kinds call different functions", async () => {
+  const report = {
+    steps: [{ block: "duties", to_clear: 1, to_flag: 0 }],
+    ended_account_ids: [id(91)],
+    groups_left_without_coordinator: [],
+    audit_event_id: id(70),
+  };
   const { fake, run } = admin({
-    rpc: () => envelope("success", null, {}, id(1)),
+    rpc: (name) => envelope("success", null, name === "family_archive" ? report : {}, id(1)),
     table: tables({ families: [FAMILY], groups: [GROUP], school_years: [YEAR], children: [CHILD] }),
   });
   const done = { state: "success", data: { completed: true } };
-  assert.deepEqual(await run("records.archive", { id: id(1), expectedVersion: 3 }, KEY), done);
+  // Archiving a family is its removal, so the answer also says what the removal did (U14).
+  assert.deepEqual(await run("records.archive", { id: id(1), expectedVersion: 3 }, KEY), {
+    state: "success",
+    data: {
+      completed: true,
+      removal: {
+        subject: { kind: "family", id: id(1) },
+        steps: [{ block: "duties", toClear: 1, toFlag: 0 }],
+        endedAccountIds: [id(91)],
+        groupsLeftWithoutCoordinator: [],
+        auditEvidenceId: id(70),
+      },
+    },
+  });
   assert.deepEqual(await run("records.archive", { id: id(3), expectedVersion: 5 }, KEY), done);
   assert.deepEqual(await run("records.restore", { id: id(1), expectedVersion: 3 }, KEY), done);
   assert.deepEqual(await run("records.restore", { id: id(4), expectedVersion: 1 }, KEY), done);
@@ -1191,20 +1210,25 @@ test("lifecycle candidates carry their eligibility and a Hungarian blocker line"
 });
 
 test("running the lifecycle needs the confirmation word and reports what happened", async () => {
+  const steps = [{ block: "todo", to_clear: 0, to_flag: 1 }];
+  const mapped = [{ block: "todo", toClear: 0, toFlag: 1 }];
   const { fake, run } = admin({
-    rpc: () => envelope("success", null, { outcome: "anonymized", audit_event_id: id(70) }, id(1)),
+    rpc: () =>
+      envelope("success", null, { outcome: "anonymized", audit_event_id: id(70), steps }, id(1)),
   });
   assert.deepEqual(
     await run("lifecycle.run", { id: id(1), expectedVersion: 2, confirmed: "yes" }, KEY),
     {
       state: "success",
-      data: { familyId: id(1), state: "anonymized", auditEvidenceId: id(70) },
+      data: { familyId: id(1), state: "anonymized", auditEvidenceId: id(70), steps: mapped },
     },
   );
   assert.equal(fake.rpcCalls[0]?.args.p_confirmed, true);
   await run("lifecycle.run", { id: id(1), expectedVersion: 2 }, KEY);
   assert.equal(fake.rpcCalls[1]?.args.p_confirmed, false);
-  const deleted = admin({ rpc: () => envelope("success", null, { outcome: "deleted" }, id(1)) });
+  const deleted = admin({
+    rpc: () => envelope("success", null, { outcome: "deleted", steps: [] }, id(1)),
+  });
   const result = await deleted.run(
     "lifecycle.run",
     { id: id(1), expectedVersion: 2, confirmed: "yes" },
@@ -1212,7 +1236,7 @@ test("running the lifecycle needs the confirmation word and reports what happene
   );
   assert.deepEqual(result, {
     state: "success",
-    data: { familyId: id(1), state: "deleted", auditEvidenceId: "" },
+    data: { familyId: id(1), state: "deleted", auditEvidenceId: "", steps: [] },
   });
   assert.deepEqual(await run("lifecycle.run", { id: "x", expectedVersion: 2 }, KEY), {
     state: "denied",

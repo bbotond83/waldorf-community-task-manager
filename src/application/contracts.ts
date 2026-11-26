@@ -1285,7 +1285,67 @@ export type LifecycleOutcomeModel = Readonly<{
   familyId: string;
   state: "deleted" | "anonymized" | "deferred" | "recovered";
   auditEvidenceId: string;
+  /** What the removal steps found when the later run repeated them (U14, BR206.2). */
+  steps?: readonly RemovalStepModel[];
 }>;
+
+/** The removal of a parent or a family (U14). Ids, counts, codes, titles, dates and group names; no person's name. */
+export type RemovalSubjectModel = Readonly<{ kind: "parent" | "family"; id: string }>;
+
+export type RemovalBlock =
+  | "rota_planning"
+  | "dutychanges"
+  | "duties"
+  | "checklists"
+  | "todo"
+  | "library"
+  | "events"
+  | "recurring_duties"
+  | "notifications"
+  | "working_groups"
+  | "directory";
+
+export type RemovalStepModel = Readonly<{ block: RemovalBlock; toClear: number; toFlag: number }>;
+
+export type CoordinatorGroupModel = Readonly<{ groupId: string; groupName: string }>;
+
+export type RemovalRefusal =
+  "SELF_REMOVAL" | "last_super_admin" | "PARENT_LAST_IN_FAMILY" | "VERSION_CONFLICT";
+
+export type RemovalPreviewModel = Readonly<{
+  subject: RemovalSubjectModel;
+  version: number;
+  steps: readonly RemovalStepModel[];
+  totals: Readonly<{ toClear: number; toFlag: number }>;
+  groupsLeftWithoutCoordinator: readonly CoordinatorGroupModel[];
+  /** Set when the command would refuse; the screen then shows the refusal instead of the button. */
+  refusal?: RemovalRefusal;
+}>;
+
+export type RemovalReportModel = Readonly<{
+  subject: RemovalSubjectModel;
+  steps: readonly RemovalStepModel[];
+  /** The accounts whose sign-in the server ends after the commit. */
+  endedAccountIds: readonly string[];
+  groupsLeftWithoutCoordinator: readonly CoordinatorGroupModel[];
+  auditEvidenceId: string;
+}>;
+
+export type FlaggedItemModel = Readonly<{
+  kind: "future_place" | "held_book" | "claimed_task" | "family_task" | "family_schedule";
+  itemId: string;
+  label: string;
+  onDate?: string;
+  link: string;
+}>;
+
+export type FlaggedItemListModel = Readonly<{
+  subject: RemovalSubjectModel;
+  items: readonly FlaggedItemModel[];
+}>;
+
+/** The answer of an archive command; a family removal also says what it did. */
+export type ArchiveOutcomeModel = Readonly<{ completed: true; removal?: RemovalReportModel }>;
 
 export type RecipientOptionModel = Readonly<{
   id: string;
@@ -1397,4 +1457,4 @@ export type ParentInput = Readonly<{
 }>;
 
 export type VersionModel = Readonly<{ id: string | null; version: number | null }>;
-export type RemovedParentModel = Readonly<{ parentId: string; accountId: string | null }>;
+export type RemovedParentModel = Readonly<{ parentId: string; removal: RemovalReportModel }>;

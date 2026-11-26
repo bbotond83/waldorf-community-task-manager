@@ -1091,7 +1091,8 @@ for (const schema of DIRECTORY_SCHEMAS) {
         nextKey("a"),
         JSON.stringify({ id: duty.task_id, expected_version: duty.task_version, title: "Más" }),
       ]);
-      await refusedFor(SUPER_ADMIN, "family_archive($1, $2, $3)", [nextKey("a"), FAMILY_1, 1]);
+      // U14 BR202.1: removing a family with rota duties is no longer refused; the places are kept and
+      // flagged (tests/database/removal-duties.test.ts).
       // U7: requests on rota duties are allowed and decided by the request functions; tests/database/swaps-rota.test.ts covers them.
       assert.equal(await count(db, "tasks", "title = 'Más'"), 0);
       assert.equal(

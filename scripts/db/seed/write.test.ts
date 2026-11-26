@@ -228,7 +228,21 @@ describe("seed writer", () => {
     await writeSeedPlan(large.client, buildSeedPlan("worker_2", "large"));
     // A table of more than 200 rows is written in several statements (the 300 books), so repeats in a row count once.
     const once = (names: string[]) => names.filter((name, index) => name !== names[index - 1]);
-    assert.deepEqual(once(tables(small.calls)), once(tables(large.calls)));
+    // Only the large set has an event checklist (U14: its first family has a record of every kind).
+    const checklist = [
+      "event_checklists",
+      "event_checklist_sections",
+      "event_checklist_tasks",
+      "checklist_claims",
+    ];
+    assert.deepEqual(
+      tables(large.calls).filter((name) => checklist.includes(name)),
+      checklist,
+    );
+    assert.deepEqual(
+      once(tables(small.calls)),
+      once(tables(large.calls).filter((name) => !checklist.includes(name))),
+    );
     const familyRows = (calls: { sql: string }[]) =>
       calls.find((call) => call.sql.startsWith('insert into "families"'))!.sql.match(/\(\$/g)!
         .length;

@@ -1,9 +1,9 @@
 {
   "schemaVersion": "waldorf-acceptance-report-v1",
-  "gitSha": "05ecd50751b7c53c1af7aecaa5d22e98633b7db0",
+  "gitSha": "6534ceb08f670b0cf3b801c653bb5f4e3c878166",
   "manifestVersion": "waldorf-scenarios-v1",
-  "manifestSha256": "58b5e5deea8a2e81d2b8e3e0d054aaf87761068378cbabbae13f7cbf7c24b814",
-  "generatedAt": "2026-11-25T12:02:18.329Z",
+  "manifestSha256": "4f59e9de71ece3e8a67d70090abbfd4a1107fa70c523e7c5a3e9faac1b33e5d7",
+  "generatedAt": "2026-11-26T01:58:37.222Z",
   "counts": {
     "pass": 31,
     "fail": 0,
@@ -30,12 +30,12 @@
       "tool": "npm run verify:manifests",
       "toolVersion": "node=v24.22.0;npm=11.19.1",
       "result": "PASS",
-      "startedAt": "2026-11-25T11:34:03.919Z",
-      "finishedAt": "2026-11-25T11:34:04.069Z",
-      "gitSha": "05ecd50751b7c53c1af7aecaa5d22e98633b7db0",
+      "startedAt": "2026-11-26T01:02:41.538Z",
+      "finishedAt": "2026-11-26T01:02:41.683Z",
+      "gitSha": "6534ceb08f670b0cf3b801c653bb5f4e3c878166",
       "artifactPath": ".verification/logs/manifests.log",
       "exitCode": 0,
-      "durationMs": 150
+      "durationMs": 145
     },
     {
       "schemaVersion": "waldorf-evidence-v1",
@@ -59,12 +59,12 @@
       "tool": "npm run smoke:start",
       "toolVersion": "node=v24.22.0;npm=11.19.1",
       "result": "PASS",
-      "startedAt": "2026-11-25T11:53:50.482Z",
-      "finishedAt": "2026-11-25T11:53:53.126Z",
-      "gitSha": "05ecd50751b7c53c1af7aecaa5d22e98633b7db0",
+      "startedAt": "2026-11-26T01:31:27.310Z",
+      "finishedAt": "2026-11-26T01:31:30.011Z",
+      "gitSha": "6534ceb08f670b0cf3b801c653bb5f4e3c878166",
       "artifactPath": ".verification/logs/smoke.log",
       "exitCode": 0,
-      "durationMs": 2644
+      "durationMs": 2701
     },
     {
       "schemaVersion": "waldorf-evidence-v1",
@@ -87,14 +87,14 @@
       "target": "local",
       "tool": "npm run test:browser",
       "toolVersion": "node=v24.22.0;npm=11.19.1",
-      "browser": "chromium",
+      "browser": "chromium,firefox,mobile-chrome",
       "result": "PASS",
-      "startedAt": "2026-11-25T11:53:53.127Z",
-      "finishedAt": "2026-11-25T12:02:18.325Z",
-      "gitSha": "05ecd50751b7c53c1af7aecaa5d22e98633b7db0",
+      "startedAt": "2026-11-26T01:31:30.011Z",
+      "finishedAt": "2026-11-26T01:58:37.216Z",
+      "gitSha": "6534ceb08f670b0cf3b801c653bb5f4e3c878166",
       "artifactPath": ".verification/logs/browser.log",
       "exitCode": 0,
-      "durationMs": 505198
+      "durationMs": 1627205
     },
     {
       "schemaVersion": "waldorf-evidence-v1",
@@ -116,14 +116,14 @@
       "target": "local",
       "tool": "npm run test:browser",
       "toolVersion": "node=v24.22.0;npm=11.19.1",
-      "browser": "chromium",
+      "browser": "chromium,firefox,mobile-chrome",
       "result": "PASS",
-      "startedAt": "2026-11-25T11:53:53.127Z",
-      "finishedAt": "2026-11-25T12:02:18.325Z",
-      "gitSha": "05ecd50751b7c53c1af7aecaa5d22e98633b7db0",
+      "startedAt": "2026-11-26T01:31:30.011Z",
+      "finishedAt": "2026-11-26T01:58:37.216Z",
+      "gitSha": "6534ceb08f670b0cf3b801c653bb5f4e3c878166",
       "artifactPath": ".verification/logs/browser.log",
       "exitCode": 0,
-      "durationMs": 505198
+      "durationMs": 1627205
     },
     {
       "schemaVersion": "waldorf-evidence-v1",
@@ -148,14 +148,14 @@
       "target": "local",
       "tool": "npm run test:browser",
       "toolVersion": "node=v24.22.0;npm=11.19.1",
-      "browser": "chromium",
+      "browser": "chromium,firefox,mobile-chrome",
       "result": "PASS",
-      "startedAt": "2026-11-25T11:53:53.127Z",
-      "finishedAt": "2026-11-25T12:02:18.325Z",
-      "gitSha": "05ecd50751b7c53c1af7aecaa5d22e98633b7db0",
+      "startedAt": "2026-11-26T01:31:30.011Z",
+      "finishedAt": "2026-11-26T01:58:37.216Z",
+      "gitSha": "6534ceb08f670b0cf3b801c653bb5f4e3c878166",
       "artifactPath": ".verification/logs/browser.log",
       "exitCode": 0,
-      "durationMs": 505198
+      "durationMs": 1627205
     },
     {
       "schemaVersion": "waldorf-evidence-v1",
@@ -177,14 +177,14 @@
       "target": "local",
       "tool": "npm run test:browser",
       "toolVersion": "node=v24.22.0;npm=11.19.1",
-      "browser": "chromium",
+      "browser": "chromium,firefox,mobile-chrome",
       "result": "PASS",
-      "startedAt": "2026-11-25T11:53:53.127Z",
-      "finishedAt": "2026-11-25T12:02:18.325Z",
-      "gitSha": "05ecd50751b7c53c1af7aecaa5d22e98633b7db0",
+      "startedAt": "2026-11-26T01:31:30.011Z",
+      "finishedAt": "2026-11-26T01:58:37.216Z",
+      "gitSha": "6534ceb08f670b0cf3b801c653bb5f4e3c878166",
       "artifactPath": ".verification/logs/browser.log",
       "exitCode": 0,
-      "durationMs": 505198
+      "durationMs": 1627205
     },
     {
       "schemaVersion": "waldorf-evidence-v1",
@@ -207,14 +207,14 @@
       "target": "local",
       "tool": "npm run test:browser",
       "toolVersion": "node=v24.22.0;npm=11.19.1",
-      "browser": "chromium",
+      "browser": "chromium,firefox,mobile-chrome",
       "result": "PASS",
-      "startedAt": "2026-11-25T11:53:53.127Z",
-      "finishedAt": "2026-11-25T12:02:18.325Z",
-      "gitSha": "05ecd50751b7c53c1af7aecaa5d22e98633b7db0",
+      "startedAt": "2026-11-26T01:31:30.011Z",
+      "finishedAt": "2026-11-26T01:58:37.216Z",
+      "gitSha": "6534ceb08f670b0cf3b801c653bb5f4e3c878166",
       "artifactPath": ".verification/logs/browser.log",
       "exitCode": 0,
-      "durationMs": 505198
+      "durationMs": 1627205
     },
     {
       "schemaVersion": "waldorf-evidence-v1",
@@ -234,14 +234,14 @@
       "target": "local",
       "tool": "npm run test:a11y",
       "toolVersion": "node=v24.22.0;npm=11.19.1",
-      "browser": "chromium",
+      "browser": "chromium,firefox,mobile-chrome",
       "result": "PASS",
-      "startedAt": "2026-11-25T11:53:53.127Z",
-      "finishedAt": "2026-11-25T12:02:18.325Z",
-      "gitSha": "05ecd50751b7c53c1af7aecaa5d22e98633b7db0",
+      "startedAt": "2026-11-26T01:31:30.011Z",
+      "finishedAt": "2026-11-26T01:58:37.216Z",
+      "gitSha": "6534ceb08f670b0cf3b801c653bb5f4e3c878166",
       "artifactPath": ".verification/logs/browser.log",
       "exitCode": 0,
-      "durationMs": 505198
+      "durationMs": 1627205
     },
     {
       "schemaVersion": "waldorf-evidence-v1",
@@ -261,14 +261,14 @@
       "target": "local",
       "tool": "npm run test:browser",
       "toolVersion": "node=v24.22.0;npm=11.19.1",
-      "browser": "chromium",
+      "browser": "chromium,firefox,mobile-chrome",
       "result": "PASS",
-      "startedAt": "2026-11-25T11:53:53.127Z",
-      "finishedAt": "2026-11-25T12:02:18.325Z",
-      "gitSha": "05ecd50751b7c53c1af7aecaa5d22e98633b7db0",
+      "startedAt": "2026-11-26T01:31:30.011Z",
+      "finishedAt": "2026-11-26T01:58:37.216Z",
+      "gitSha": "6534ceb08f670b0cf3b801c653bb5f4e3c878166",
       "artifactPath": ".verification/logs/browser.log",
       "exitCode": 0,
-      "durationMs": 505198
+      "durationMs": 1627205
     },
     {
       "schemaVersion": "waldorf-evidence-v1",
@@ -290,14 +290,14 @@
       "target": "local",
       "tool": "npm run test:browser",
       "toolVersion": "node=v24.22.0;npm=11.19.1",
-      "browser": "chromium",
+      "browser": "chromium,firefox,mobile-chrome",
       "result": "PASS",
-      "startedAt": "2026-11-25T11:53:53.127Z",
-      "finishedAt": "2026-11-25T12:02:18.325Z",
-      "gitSha": "05ecd50751b7c53c1af7aecaa5d22e98633b7db0",
+      "startedAt": "2026-11-26T01:31:30.011Z",
+      "finishedAt": "2026-11-26T01:58:37.216Z",
+      "gitSha": "6534ceb08f670b0cf3b801c653bb5f4e3c878166",
       "artifactPath": ".verification/logs/browser.log",
       "exitCode": 0,
-      "durationMs": 505198
+      "durationMs": 1627205
     },
     {
       "schemaVersion": "waldorf-evidence-v1",
@@ -322,14 +322,14 @@
       "target": "local",
       "tool": "npm run test:browser",
       "toolVersion": "node=v24.22.0;npm=11.19.1",
-      "browser": "chromium",
+      "browser": "chromium,firefox,mobile-chrome",
       "result": "PASS",
-      "startedAt": "2026-11-25T11:53:53.127Z",
-      "finishedAt": "2026-11-25T12:02:18.325Z",
-      "gitSha": "05ecd50751b7c53c1af7aecaa5d22e98633b7db0",
+      "startedAt": "2026-11-26T01:31:30.011Z",
+      "finishedAt": "2026-11-26T01:58:37.216Z",
+      "gitSha": "6534ceb08f670b0cf3b801c653bb5f4e3c878166",
       "artifactPath": ".verification/logs/browser.log",
       "exitCode": 0,
-      "durationMs": 505198
+      "durationMs": 1627205
     },
     {
       "schemaVersion": "waldorf-evidence-v1",
@@ -351,14 +351,14 @@
       "target": "local",
       "tool": "npm run test:browser",
       "toolVersion": "node=v24.22.0;npm=11.19.1",
-      "browser": "chromium",
+      "browser": "chromium,firefox,mobile-chrome",
       "result": "PASS",
-      "startedAt": "2026-11-25T11:53:53.127Z",
-      "finishedAt": "2026-11-25T12:02:18.325Z",
-      "gitSha": "05ecd50751b7c53c1af7aecaa5d22e98633b7db0",
+      "startedAt": "2026-11-26T01:31:30.011Z",
+      "finishedAt": "2026-11-26T01:58:37.216Z",
+      "gitSha": "6534ceb08f670b0cf3b801c653bb5f4e3c878166",
       "artifactPath": ".verification/logs/browser.log",
       "exitCode": 0,
-      "durationMs": 505198
+      "durationMs": 1627205
     },
     {
       "schemaVersion": "waldorf-evidence-v1",
@@ -379,14 +379,14 @@
       "target": "local",
       "tool": "npm run test:browser",
       "toolVersion": "node=v24.22.0;npm=11.19.1",
-      "browser": "chromium",
+      "browser": "chromium,firefox,mobile-chrome",
       "result": "PASS",
-      "startedAt": "2026-11-25T11:53:53.127Z",
-      "finishedAt": "2026-11-25T12:02:18.325Z",
-      "gitSha": "05ecd50751b7c53c1af7aecaa5d22e98633b7db0",
+      "startedAt": "2026-11-26T01:31:30.011Z",
+      "finishedAt": "2026-11-26T01:58:37.216Z",
+      "gitSha": "6534ceb08f670b0cf3b801c653bb5f4e3c878166",
       "artifactPath": ".verification/logs/browser.log",
       "exitCode": 0,
-      "durationMs": 505198
+      "durationMs": 1627205
     },
     {
       "schemaVersion": "waldorf-evidence-v1",
@@ -407,14 +407,14 @@
       "target": "local",
       "tool": "npm run test:browser",
       "toolVersion": "node=v24.22.0;npm=11.19.1",
-      "browser": "chromium",
+      "browser": "chromium,firefox,mobile-chrome",
       "result": "PASS",
-      "startedAt": "2026-11-25T11:53:53.127Z",
-      "finishedAt": "2026-11-25T12:02:18.325Z",
-      "gitSha": "05ecd50751b7c53c1af7aecaa5d22e98633b7db0",
+      "startedAt": "2026-11-26T01:31:30.011Z",
+      "finishedAt": "2026-11-26T01:58:37.216Z",
+      "gitSha": "6534ceb08f670b0cf3b801c653bb5f4e3c878166",
       "artifactPath": ".verification/logs/browser.log",
       "exitCode": 0,
-      "durationMs": 505198
+      "durationMs": 1627205
     },
     {
       "schemaVersion": "waldorf-evidence-v1",
@@ -435,14 +435,14 @@
       "target": "local",
       "tool": "npm run test:browser",
       "toolVersion": "node=v24.22.0;npm=11.19.1",
-      "browser": "chromium",
+      "browser": "chromium,firefox,mobile-chrome",
       "result": "PASS",
-      "startedAt": "2026-11-25T11:53:53.127Z",
-      "finishedAt": "2026-11-25T12:02:18.325Z",
-      "gitSha": "05ecd50751b7c53c1af7aecaa5d22e98633b7db0",
+      "startedAt": "2026-11-26T01:31:30.011Z",
+      "finishedAt": "2026-11-26T01:58:37.216Z",
+      "gitSha": "6534ceb08f670b0cf3b801c653bb5f4e3c878166",
       "artifactPath": ".verification/logs/browser.log",
       "exitCode": 0,
-      "durationMs": 505198
+      "durationMs": 1627205
     },
     {
       "schemaVersion": "waldorf-evidence-v1",
@@ -463,14 +463,14 @@
       "target": "local",
       "tool": "npm run test:browser",
       "toolVersion": "node=v24.22.0;npm=11.19.1",
-      "browser": "chromium",
+      "browser": "chromium,firefox,mobile-chrome",
       "result": "PASS",
-      "startedAt": "2026-11-25T11:53:53.127Z",
-      "finishedAt": "2026-11-25T12:02:18.325Z",
-      "gitSha": "05ecd50751b7c53c1af7aecaa5d22e98633b7db0",
+      "startedAt": "2026-11-26T01:31:30.011Z",
+      "finishedAt": "2026-11-26T01:58:37.216Z",
+      "gitSha": "6534ceb08f670b0cf3b801c653bb5f4e3c878166",
       "artifactPath": ".verification/logs/browser.log",
       "exitCode": 0,
-      "durationMs": 505198
+      "durationMs": 1627205
     },
     {
       "schemaVersion": "waldorf-evidence-v1",
@@ -491,14 +491,14 @@
       "target": "local",
       "tool": "npm run test:browser",
       "toolVersion": "node=v24.22.0;npm=11.19.1",
-      "browser": "chromium",
+      "browser": "chromium,firefox,mobile-chrome",
       "result": "PASS",
-      "startedAt": "2026-11-25T11:53:53.127Z",
-      "finishedAt": "2026-11-25T12:02:18.325Z",
-      "gitSha": "05ecd50751b7c53c1af7aecaa5d22e98633b7db0",
+      "startedAt": "2026-11-26T01:31:30.011Z",
+      "finishedAt": "2026-11-26T01:58:37.216Z",
+      "gitSha": "6534ceb08f670b0cf3b801c653bb5f4e3c878166",
       "artifactPath": ".verification/logs/browser.log",
       "exitCode": 0,
-      "durationMs": 505198
+      "durationMs": 1627205
     },
     {
       "schemaVersion": "waldorf-evidence-v1",
@@ -522,14 +522,14 @@
       "target": "local",
       "tool": "npm run test:browser",
       "toolVersion": "node=v24.22.0;npm=11.19.1",
-      "browser": "chromium",
+      "browser": "chromium,firefox,mobile-chrome",
       "result": "PASS",
-      "startedAt": "2026-11-25T11:53:53.127Z",
-      "finishedAt": "2026-11-25T12:02:18.325Z",
-      "gitSha": "05ecd50751b7c53c1af7aecaa5d22e98633b7db0",
+      "startedAt": "2026-11-26T01:31:30.011Z",
+      "finishedAt": "2026-11-26T01:58:37.216Z",
+      "gitSha": "6534ceb08f670b0cf3b801c653bb5f4e3c878166",
       "artifactPath": ".verification/logs/browser.log",
       "exitCode": 0,
-      "durationMs": 505198
+      "durationMs": 1627205
     },
     {
       "schemaVersion": "waldorf-evidence-v1",
@@ -553,14 +553,14 @@
       "target": "local",
       "tool": "npm run test:browser",
       "toolVersion": "node=v24.22.0;npm=11.19.1",
-      "browser": "chromium",
+      "browser": "chromium,firefox,mobile-chrome",
       "result": "PASS",
-      "startedAt": "2026-11-25T11:53:53.127Z",
-      "finishedAt": "2026-11-25T12:02:18.325Z",
-      "gitSha": "05ecd50751b7c53c1af7aecaa5d22e98633b7db0",
+      "startedAt": "2026-11-26T01:31:30.011Z",
+      "finishedAt": "2026-11-26T01:58:37.216Z",
+      "gitSha": "6534ceb08f670b0cf3b801c653bb5f4e3c878166",
       "artifactPath": ".verification/logs/browser.log",
       "exitCode": 0,
-      "durationMs": 505198
+      "durationMs": 1627205
     },
     {
       "schemaVersion": "waldorf-evidence-v1",
@@ -582,12 +582,12 @@
       "tool": "npm test",
       "toolVersion": "node=v24.22.0;npm=11.19.1",
       "result": "PASS",
-      "startedAt": "2026-11-25T11:34:21.179Z",
-      "finishedAt": "2026-11-25T11:34:32.530Z",
-      "gitSha": "05ecd50751b7c53c1af7aecaa5d22e98633b7db0",
+      "startedAt": "2026-11-26T01:02:59.584Z",
+      "finishedAt": "2026-11-26T01:03:11.178Z",
+      "gitSha": "6534ceb08f670b0cf3b801c653bb5f4e3c878166",
       "artifactPath": ".verification/logs/tests.log",
       "exitCode": 0,
-      "durationMs": 11351
+      "durationMs": 11594
     },
     {
       "schemaVersion": "waldorf-evidence-v1",
@@ -614,12 +614,12 @@
       "tool": "npm run verify:security",
       "toolVersion": "node=v24.22.0;npm=11.19.1",
       "result": "PASS",
-      "startedAt": "2026-11-25T11:53:43.606Z",
-      "finishedAt": "2026-11-25T11:53:46.101Z",
-      "gitSha": "05ecd50751b7c53c1af7aecaa5d22e98633b7db0",
+      "startedAt": "2026-11-26T01:30:52.500Z",
+      "finishedAt": "2026-11-26T01:31:22.322Z",
+      "gitSha": "6534ceb08f670b0cf3b801c653bb5f4e3c878166",
       "artifactPath": ".verification/logs/security.log",
       "exitCode": 0,
-      "durationMs": 2495
+      "durationMs": 29822
     },
     {
       "schemaVersion": "waldorf-evidence-v1",
@@ -641,14 +641,14 @@
       "target": "local",
       "tool": "npm run verify:local",
       "toolVersion": "node=v24.22.0;npm=11.19.1",
-      "browser": "chromium",
+      "browser": "chromium,firefox,mobile-chrome",
       "result": "PASS",
-      "startedAt": "2026-11-25T11:34:03.812Z",
-      "finishedAt": "2026-11-25T12:02:18.325Z",
-      "gitSha": "05ecd50751b7c53c1af7aecaa5d22e98633b7db0",
+      "startedAt": "2026-11-26T01:02:41.432Z",
+      "finishedAt": "2026-11-26T01:58:37.216Z",
+      "gitSha": "6534ceb08f670b0cf3b801c653bb5f4e3c878166",
       "artifactPath": ".verification/logs/aggregate.log",
       "exitCode": 0,
-      "durationMs": 1694502
+      "durationMs": 3355763
     },
     {
       "schemaVersion": "waldorf-evidence-v1",
@@ -670,12 +670,12 @@
       "tool": "npm run verify:no-deploy",
       "toolVersion": "node=v24.22.0;npm=11.19.1",
       "result": "PASS",
-      "startedAt": "2026-11-25T11:53:43.606Z",
-      "finishedAt": "2026-11-25T11:53:46.101Z",
-      "gitSha": "05ecd50751b7c53c1af7aecaa5d22e98633b7db0",
+      "startedAt": "2026-11-26T01:30:52.500Z",
+      "finishedAt": "2026-11-26T01:31:22.322Z",
+      "gitSha": "6534ceb08f670b0cf3b801c653bb5f4e3c878166",
       "artifactPath": ".verification/logs/security.log",
       "exitCode": 0,
-      "durationMs": 2495
+      "durationMs": 29822
     },
     {
       "schemaVersion": "waldorf-evidence-v1",
@@ -694,14 +694,14 @@
       "target": "local",
       "tool": "npm run test:browser",
       "toolVersion": "node=v24.22.0;npm=11.19.1",
-      "browser": "chromium",
+      "browser": "chromium,firefox,mobile-chrome",
       "result": "PASS",
-      "startedAt": "2026-11-25T11:53:53.127Z",
-      "finishedAt": "2026-11-25T12:02:18.325Z",
-      "gitSha": "05ecd50751b7c53c1af7aecaa5d22e98633b7db0",
+      "startedAt": "2026-11-26T01:31:30.011Z",
+      "finishedAt": "2026-11-26T01:58:37.216Z",
+      "gitSha": "6534ceb08f670b0cf3b801c653bb5f4e3c878166",
       "artifactPath": ".verification/logs/browser.log",
       "exitCode": 0,
-      "durationMs": 505198
+      "durationMs": 1627205
     },
     {
       "schemaVersion": "waldorf-evidence-v1",
@@ -720,14 +720,14 @@
       "target": "local",
       "tool": "npm run test:browser",
       "toolVersion": "node=v24.22.0;npm=11.19.1",
-      "browser": "chromium",
+      "browser": "chromium,firefox,mobile-chrome",
       "result": "PASS",
-      "startedAt": "2026-11-25T11:53:53.127Z",
-      "finishedAt": "2026-11-25T12:02:18.325Z",
-      "gitSha": "05ecd50751b7c53c1af7aecaa5d22e98633b7db0",
+      "startedAt": "2026-11-26T01:31:30.011Z",
+      "finishedAt": "2026-11-26T01:58:37.216Z",
+      "gitSha": "6534ceb08f670b0cf3b801c653bb5f4e3c878166",
       "artifactPath": ".verification/logs/browser.log",
       "exitCode": 0,
-      "durationMs": 505198
+      "durationMs": 1627205
     },
     {
       "schemaVersion": "waldorf-evidence-v1",
@@ -746,14 +746,14 @@
       "target": "local",
       "tool": "npm run test:browser",
       "toolVersion": "node=v24.22.0;npm=11.19.1",
-      "browser": "chromium",
+      "browser": "chromium,firefox,mobile-chrome",
       "result": "PASS",
-      "startedAt": "2026-11-25T11:53:53.127Z",
-      "finishedAt": "2026-11-25T12:02:18.325Z",
-      "gitSha": "05ecd50751b7c53c1af7aecaa5d22e98633b7db0",
+      "startedAt": "2026-11-26T01:31:30.011Z",
+      "finishedAt": "2026-11-26T01:58:37.216Z",
+      "gitSha": "6534ceb08f670b0cf3b801c653bb5f4e3c878166",
       "artifactPath": ".verification/logs/browser.log",
       "exitCode": 0,
-      "durationMs": 505198
+      "durationMs": 1627205
     },
     {
       "schemaVersion": "waldorf-evidence-v1",
@@ -773,14 +773,14 @@
       "target": "local",
       "tool": "npm run test:browser",
       "toolVersion": "node=v24.22.0;npm=11.19.1",
-      "browser": "chromium",
+      "browser": "chromium,firefox,mobile-chrome",
       "result": "PASS",
-      "startedAt": "2026-11-25T11:53:53.127Z",
-      "finishedAt": "2026-11-25T12:02:18.325Z",
-      "gitSha": "05ecd50751b7c53c1af7aecaa5d22e98633b7db0",
+      "startedAt": "2026-11-26T01:31:30.011Z",
+      "finishedAt": "2026-11-26T01:58:37.216Z",
+      "gitSha": "6534ceb08f670b0cf3b801c653bb5f4e3c878166",
       "artifactPath": ".verification/logs/browser.log",
       "exitCode": 0,
-      "durationMs": 505198
+      "durationMs": 1627205
     },
     {
       "schemaVersion": "waldorf-evidence-v1",
@@ -799,14 +799,14 @@
       "target": "local",
       "tool": "npm run test:browser",
       "toolVersion": "node=v24.22.0;npm=11.19.1",
-      "browser": "chromium",
+      "browser": "chromium,firefox,mobile-chrome",
       "result": "PASS",
-      "startedAt": "2026-11-25T11:53:53.127Z",
-      "finishedAt": "2026-11-25T12:02:18.325Z",
-      "gitSha": "05ecd50751b7c53c1af7aecaa5d22e98633b7db0",
+      "startedAt": "2026-11-26T01:31:30.011Z",
+      "finishedAt": "2026-11-26T01:58:37.216Z",
+      "gitSha": "6534ceb08f670b0cf3b801c653bb5f4e3c878166",
       "artifactPath": ".verification/logs/browser.log",
       "exitCode": 0,
-      "durationMs": 505198
+      "durationMs": 1627205
     },
     {
       "schemaVersion": "waldorf-evidence-v1",
@@ -830,12 +830,12 @@
       "tool": "npm run verify:manifests",
       "toolVersion": "node=v24.22.0;npm=11.19.1",
       "result": "PASS",
-      "startedAt": "2026-11-25T11:34:03.919Z",
-      "finishedAt": "2026-11-25T11:34:04.069Z",
-      "gitSha": "05ecd50751b7c53c1af7aecaa5d22e98633b7db0",
+      "startedAt": "2026-11-26T01:02:41.538Z",
+      "finishedAt": "2026-11-26T01:02:41.683Z",
+      "gitSha": "6534ceb08f670b0cf3b801c653bb5f4e3c878166",
       "artifactPath": ".verification/logs/manifests.log",
       "exitCode": 0,
-      "durationMs": 150
+      "durationMs": 145
     },
     {
       "schemaVersion": "waldorf-evidence-v1",
@@ -854,14 +854,14 @@
       "target": "local",
       "tool": "npm run test:browser",
       "toolVersion": "node=v24.22.0;npm=11.19.1",
-      "browser": "chromium",
+      "browser": "chromium,firefox,mobile-chrome",
       "result": "PASS",
-      "startedAt": "2026-11-25T11:53:53.127Z",
-      "finishedAt": "2026-11-25T12:02:18.325Z",
-      "gitSha": "05ecd50751b7c53c1af7aecaa5d22e98633b7db0",
+      "startedAt": "2026-11-26T01:31:30.011Z",
+      "finishedAt": "2026-11-26T01:58:37.216Z",
+      "gitSha": "6534ceb08f670b0cf3b801c653bb5f4e3c878166",
       "artifactPath": ".verification/logs/browser.log",
       "exitCode": 0,
-      "durationMs": 505198
+      "durationMs": 1627205
     },
     {
       "schemaVersion": "waldorf-evidence-v1",
@@ -880,14 +880,14 @@
       "target": "local",
       "tool": "npm run test:browser",
       "toolVersion": "node=v24.22.0;npm=11.19.1",
-      "browser": "chromium",
+      "browser": "chromium,firefox,mobile-chrome",
       "result": "PASS",
-      "startedAt": "2026-11-25T11:53:53.127Z",
-      "finishedAt": "2026-11-25T12:02:18.325Z",
-      "gitSha": "05ecd50751b7c53c1af7aecaa5d22e98633b7db0",
+      "startedAt": "2026-11-26T01:31:30.011Z",
+      "finishedAt": "2026-11-26T01:58:37.216Z",
+      "gitSha": "6534ceb08f670b0cf3b801c653bb5f4e3c878166",
       "artifactPath": ".verification/logs/browser.log",
       "exitCode": 0,
-      "durationMs": 505198
+      "durationMs": 1627205
     },
     {
       "schemaVersion": "waldorf-evidence-v1",
@@ -910,9 +910,9 @@
       "toolVersion": "node=v24.22.0;npm=11.19.1",
       "browser": "safari-desktop",
       "result": "OUTSTANDING",
-      "startedAt": "2026-11-25T12:02:18.329Z",
-      "finishedAt": "2026-11-25T12:02:18.329Z",
-      "gitSha": "05ecd50751b7c53c1af7aecaa5d22e98633b7db0",
+      "startedAt": "2026-11-26T01:58:37.222Z",
+      "finishedAt": "2026-11-26T01:58:37.222Z",
+      "gitSha": "6534ceb08f670b0cf3b801c653bb5f4e3c878166",
       "artifactPath": ".verification/logs/outstanding.log",
       "durationMs": 0
     },
@@ -937,9 +937,9 @@
       "toolVersion": "node=v24.22.0;npm=11.19.1",
       "browser": "mobile-safari",
       "result": "OUTSTANDING",
-      "startedAt": "2026-11-25T12:02:18.329Z",
-      "finishedAt": "2026-11-25T12:02:18.329Z",
-      "gitSha": "05ecd50751b7c53c1af7aecaa5d22e98633b7db0",
+      "startedAt": "2026-11-26T01:58:37.222Z",
+      "finishedAt": "2026-11-26T01:58:37.222Z",
+      "gitSha": "6534ceb08f670b0cf3b801c653bb5f4e3c878166",
       "artifactPath": ".verification/logs/outstanding.log",
       "durationMs": 0
     },
@@ -962,9 +962,9 @@
       "tool": "future linked-target suite",
       "toolVersion": "node=v24.22.0;npm=11.19.1",
       "result": "OUTSTANDING",
-      "startedAt": "2026-11-25T12:02:18.329Z",
-      "finishedAt": "2026-11-25T12:02:18.329Z",
-      "gitSha": "05ecd50751b7c53c1af7aecaa5d22e98633b7db0",
+      "startedAt": "2026-11-26T01:58:37.222Z",
+      "finishedAt": "2026-11-26T01:58:37.222Z",
+      "gitSha": "6534ceb08f670b0cf3b801c653bb5f4e3c878166",
       "artifactPath": ".verification/logs/outstanding.log",
       "durationMs": 0
     },
@@ -987,9 +987,9 @@
       "tool": "future linked-target suite",
       "toolVersion": "node=v24.22.0;npm=11.19.1",
       "result": "OUTSTANDING",
-      "startedAt": "2026-11-25T12:02:18.329Z",
-      "finishedAt": "2026-11-25T12:02:18.329Z",
-      "gitSha": "05ecd50751b7c53c1af7aecaa5d22e98633b7db0",
+      "startedAt": "2026-11-26T01:58:37.222Z",
+      "finishedAt": "2026-11-26T01:58:37.222Z",
+      "gitSha": "6534ceb08f670b0cf3b801c653bb5f4e3c878166",
       "artifactPath": ".verification/logs/outstanding.log",
       "durationMs": 0
     },
@@ -1012,9 +1012,9 @@
       "tool": "future linked-target suite",
       "toolVersion": "node=v24.22.0;npm=11.19.1",
       "result": "OUTSTANDING",
-      "startedAt": "2026-11-25T12:02:18.329Z",
-      "finishedAt": "2026-11-25T12:02:18.329Z",
-      "gitSha": "05ecd50751b7c53c1af7aecaa5d22e98633b7db0",
+      "startedAt": "2026-11-26T01:58:37.222Z",
+      "finishedAt": "2026-11-26T01:58:37.222Z",
+      "gitSha": "6534ceb08f670b0cf3b801c653bb5f4e3c878166",
       "artifactPath": ".verification/logs/outstanding.log",
       "durationMs": 0
     },
@@ -1036,9 +1036,9 @@
       "tool": "future approved deployment workflow",
       "toolVersion": "node=v24.22.0;npm=11.19.1",
       "result": "OUTSTANDING",
-      "startedAt": "2026-11-25T12:02:18.329Z",
-      "finishedAt": "2026-11-25T12:02:18.329Z",
-      "gitSha": "05ecd50751b7c53c1af7aecaa5d22e98633b7db0",
+      "startedAt": "2026-11-26T01:58:37.222Z",
+      "finishedAt": "2026-11-26T01:58:37.222Z",
+      "gitSha": "6534ceb08f670b0cf3b801c653bb5f4e3c878166",
       "artifactPath": ".verification/logs/outstanding.log",
       "durationMs": 0
     }

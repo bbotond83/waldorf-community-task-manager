@@ -32,6 +32,9 @@ async function expectAccessible(page: Page, label: string) {
 test("a coordinator starts an event from a template; a parent takes a task and gives it back; the team marks it done", async ({
   page,
 }) => {
+  // Three sign-ins, four accessibility scans and a reseed: about 14 s in Firefox on a developer machine, and past the
+  // default 30 s on CI runners. This triples the time limit for this flow only.
+  test.slow();
   await signInAs(page, world().account("group-admin-1"));
   await page.goto("/szulo/esemenyek/uj");
   await expect(page.getByTestId("event-form-page")).toBeVisible();

@@ -113,6 +113,13 @@ type AdminData = Item & {
   invalidatedSubjectId: string;
   familyId: string;
   auditEvidenceId: string;
+  completed: boolean;
+  removal: {
+    subject: { kind: string; id: string };
+    steps: unknown[];
+    endedAccountIds: string[];
+    auditEvidenceId: string;
+  };
 };
 type Outcome = {
   state: string;
@@ -806,7 +813,13 @@ for (const schema of DIRECTORY_SCHEMAS) {
           id: FAMILY_1,
           expectedVersion: 1,
         });
-        assert.deepEqual(archived, { state: "success", data: { completed: true } });
+        assert.equal(archived.state, "success");
+        // Archiving a family is its removal (U14), so the answer also carries what the removal did.
+        assert.equal(archived.data.completed, true);
+        assert.deepEqual(archived.data.removal.subject, { kind: "family", id: FAMILY_1 });
+        assert.equal(archived.data.removal.steps.length, 11);
+        assert.ok(archived.data.removal.endedAccountIds.length > 0);
+        assert.match(archived.data.removal.auditEvidenceId, /^[0-9a-f-]{36}$/);
         assert.equal(
           (await sql("select status from assignments where id = $1", [ASSIGNMENT_F1_T1]))[0].status,
           "removed",

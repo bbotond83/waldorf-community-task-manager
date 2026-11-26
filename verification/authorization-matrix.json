@@ -729,6 +729,26 @@
       "effect": "allow"
     },
     {
+      "id": "AUTH-REMOVAL-SUPER-ADMIN-ALLOW",
+      "role": "super_admin",
+      "scope": "organization",
+      "route": "/admin/nyilvantartasok/**",
+      "actions": ["read", "delete"],
+      "resources": ["removal"],
+      "fields": [],
+      "effect": "allow"
+    },
+    {
+      "id": "AUTH-REMOVAL-NON-SUPER-DENY",
+      "role": "any_authenticated",
+      "scope": "non-super-role",
+      "route": "/admin/nyilvantartasok/**",
+      "actions": ["read", "delete"],
+      "resources": ["removal"],
+      "fields": [],
+      "effect": "deny"
+    },
+    {
       "id": "AUTH-DELIVERY-PROBLEMS-SUPER-ADMIN-ALLOW",
       "role": "super_admin",
       "scope": "organization",

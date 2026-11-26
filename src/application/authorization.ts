@@ -300,6 +300,8 @@ export const AUTHORIZATION_MATRIX: readonly MatrixRow[] = Object.freeze([
       "archive",
       "reminder",
       "lifecycle",
+      // The preview of a removal and the items it left for an administrator (U14, BR200.1).
+      "removal",
       "settings",
       "invitation",
       // Appointing and revoking a coordinator is a super admin's alone (BR41.1).

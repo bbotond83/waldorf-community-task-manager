@@ -1,0 +1,31 @@
+{
+  "stage": "functional-design",
+  "unit": "u14-removal-and-anonymisation",
+  "upstream_ids": [
+    "AC3.6.1",
+    "AC3.6.2",
+    "AC3.6.3",
+    "AC3.6.4",
+    "AC3.6.5",
+    "AC3.6.6",
+    "AC3.6.7"
+  ],
+  "coverage": [
+    { "id": "AC3.6.1", "status": "N/A", "target": "delivered by u3-directory-and-profile (adding a family)" },
+    { "id": "AC3.6.2", "status": "OK", "target": "BR201.1, BR202.1, BR205.1, BR205.2" },
+    { "id": "AC3.6.3", "status": "N/A", "target": "delivered by u3-directory-and-profile (refusing parents and teachers)" },
+    { "id": "AC3.6.4", "status": "OK", "target": "BR200.2, BR201.1, BR201.3" },
+    { "id": "AC3.6.5", "status": "OK", "target": "BR202.2, BR204.1, BR204.2" },
+    { "id": "AC3.6.6", "status": "OK", "target": "BR201.1, BR206.1, BR206.2, BR206.3, BR206.4" },
+    { "id": "AC3.6.7", "status": "OK", "target": "BR205.1, BR205.2" }
+  ],
+  "reverse": [
+    { "id": "BR200.1", "status": "N/A", "target": "authorization rule from FR3.7 and NFR1; applies to every command" },
+    { "id": "BR200.3", "status": "N/A", "target": "outdated-screen and repeated-click rule from the team's fixed test list and contract C1" },
+    { "id": "BR201.2", "status": "N/A", "target": "step order fixed by contract C16" },
+    { "id": "BR201.4", "status": "N/A", "target": "two-people-at-once rule from the team's fixed test list" },
+    { "id": "BR203.1", "status": "N/A", "target": "owner answer Q2 on contract C16's open point" },
+    { "id": "BR205.3", "status": "N/A", "target": "owner answer Q6 (confirmation screen)" },
+    { "id": "BR207.1", "status": "N/A", "target": "owner answer Q7 (restore), from FR3.7" }
+  ]
+}

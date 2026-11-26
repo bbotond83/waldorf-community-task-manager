@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import { removeFamily } from "./support/removal.ts";
 import { requestCancellation } from "./support/scenarios.ts";
 import { SERIOUS, signInAs, bindSeededSchema } from "./support/seeded-schema.ts";
 
@@ -94,10 +95,7 @@ test("a whole approval item opens its detail and shows Hungarian states", async 
 
 test("archiving a family keeps it in the archive and out of the active list", async ({ page }) => {
   await signInAs(page, world().account("super-admin"));
-  await page.goto(`/admin/nyilvantartasok/${world().id("family:5")}`);
-  await page.waitForLoadState("networkidle");
-  await page.getByTestId("admin-record-archive-form-submit-button").click();
-  await expect(page.getByTestId("admin-record-archive-form-state-success")).toBeVisible();
+  await removeFamily(page, world().id("family:5"));
   await page.goto("/admin/archivum");
   await expect(page.getByTestId("admin-archive-page")).toContainText("Molnár család");
   await page.goto(`/admin/archivum/${world().id("family:5")}`);

@@ -386,9 +386,13 @@ for (const schema of DIRECTORY_SCHEMAS) {
           event.target_type,
           event.target_id,
           event.actor_account_id,
-          event.details,
         ]),
-        [["lifecycle.anonymize", "success", "family", FAMILY_1, SUPER_ADMIN, "family"]],
+        [["lifecycle.anonymize", "success", "family", FAMILY_1, SUPER_ADMIN]],
+      );
+      // Since U14 the event holds each step's counts and the number of accounts, never a name (NFR4.3).
+      assert.match(
+        String(lifecycleEvents[0]!.details),
+        /^rota_planning:\d+:\d+\.dutychanges:.*\.directory:\d+:\d+\.ended_accounts:4$/,
       );
       // It is out of the list and cannot be run or restored again.
       assert.deepEqual(items(await list(SUPER_ADMIN)), []);
@@ -424,7 +428,11 @@ for (const schema of DIRECTORY_SCHEMAS) {
         accounts.every((row) => row.status === "deactivated"),
         JSON.stringify(accounts),
       );
-      const events = (await auditEvents(db)).map((event) => event.action).sort();
+      // Since U14 the later run repeats the steps, and some of them write their own "removal applied" event.
+      const events = (await auditEvents(db))
+        .map((event) => event.action)
+        .filter((action) => !/removal.applied$/.test(action))
+        .sort();
       assert.deepEqual(
         events,
         ["account.deactivate", "account.deactivate", "account.deactivate", "lifecycle.anonymize"],
@@ -509,7 +517,9 @@ for (const schema of DIRECTORY_SCHEMAS) {
       }
       assert.equal(await count(db, "group_memberships", `parent_id = '${uuid(620)}'`), 0);
       assert.deepEqual(
-        (await auditEvents(db)).map((event) => [event.action, event.target_id]),
+        (await auditEvents(db))
+          .filter((event) => !/removal.applied$/.test(event.action))
+          .map((event) => [event.action, event.target_id]),
         [["lifecycle.delete", FAMILY_NO_GROUP]],
       );
       assert.equal(await count(db, "families"), 5, "the other families are untouched");

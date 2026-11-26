@@ -377,6 +377,7 @@ export async function writeSeedPlan(client: SqlClient, plan: SeedPlan): Promise<
         row.hasGarlic,
       ]),
     );
+    await writeEventChecklists(client, plan);
     await writeLibrary(client, plan);
     await writeNotices(client, plan);
     await writeRota(client, plan);
@@ -388,6 +389,45 @@ export async function writeSeedPlan(client: SqlClient, plan: SeedPlan): Promise<
     await client.query("rollback").catch(() => undefined);
     throw error;
   }
+}
+
+/** The invented event checklists with a parent's claim (U14, large set only). */
+async function writeEventChecklists(client: SqlClient, plan: SeedPlan): Promise<void> {
+  const organization = plan.organization.id;
+  const lists = plan.eventChecklists;
+  await insertRows(
+    client,
+    "event_checklists",
+    ["id", "organization_id", "event_id"],
+    lists.map((row) => [row.id, organization, row.eventId]),
+  );
+  // These two tables hold a deferrable position key, which `insertRows`'s untargeted "on conflict" cannot use, so each
+  // row names its id as the key a second seed skips on.
+  for (const row of lists) {
+    await client.query(
+      `insert into "event_checklist_sections" ("id", "organization_id", "checklist_id", "event_id", "position", "title")
+       values ($1, $2, $3, $4, 1, $5) on conflict (id) do nothing`,
+      [row.sectionId, organization, row.id, row.eventId, row.sectionTitle],
+    );
+    await client.query(
+      `insert into "event_checklist_tasks" ("id", "organization_id", "event_id", "section_id", "position", "title")
+       values ($1, $2, $3, $4, 1, $5) on conflict (id) do nothing`,
+      [row.taskId, organization, row.eventId, row.sectionId, row.taskTitle],
+    );
+  }
+  await insertRows(
+    client,
+    "checklist_claims",
+    ["id", "organization_id", "event_id", "task_id", "parent_id", "family_id"],
+    lists.map((row) => [
+      row.claimId,
+      organization,
+      row.eventId,
+      row.taskId,
+      row.parentId,
+      row.familyId,
+    ]),
+  );
 }
 
 /** The invented library: books, their loans (closed and open) and the watches on borrowed books (U13). */

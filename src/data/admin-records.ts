@@ -4,9 +4,11 @@ import type {
   AdminItemModel,
   AdminListModel,
   AdminParentDetail,
+  ArchiveOutcomeModel,
   DomainOutcome,
 } from "../application/index.ts";
 import type { DataGateway } from "./gateway.ts";
+import { removeFamilyRecord } from "./removal.ts";
 import {
   defined,
   likePattern,
@@ -449,22 +451,37 @@ function versionOf(envelope: Row, fallback: number): number {
   return typeof envelope.version === "number" ? envelope.version : Math.max(1, fallback);
 }
 
-/** records.archive and records.restore: a family has its own use case, the rest share one function. */
+/**
+ * records.archive and records.restore: a family has its own use case, the rest share one function. Archiving a family
+ * is its removal (U14), so its answer also carries what the removal did.
+ */
 export async function changeRecordState(
   gateway: DataGateway,
   call: RecordCall,
   change: "archive" | "restore",
-): Promise<DomainOutcome<Readonly<{ completed: true }>>> {
+): Promise<DomainOutcome<ArchiveOutcomeModel>> {
   const { payload } = call;
   const id = payloadText(payload, "id") ?? "";
   const expectedVersion = payloadNumber(payload, "expectedVersion");
   const key = call.idempotencyKey ?? "";
   const found = await findRecord(gateway, id);
   if (!found) return { state: "denied" };
+  if (found.kind === "family" && change === "archive") {
+    const removed = await removeFamilyRecord(gateway, {
+      idempotencyKey: key,
+      id,
+      expectedVersion: expectedVersion ?? 0,
+    });
+    if (removed.state !== "success" && removed.state !== "recovery") return removed;
+    return {
+      state: removed.state,
+      data: Object.freeze({ completed: true as const, removal: removed.data }),
+    };
+  }
   const envelope =
     found.kind === "family"
       ? await gateway.call(
-          change === "archive" ? "family_archive" : "family_restore",
+          "family_restore",
           { p_idempotency_key: key, p_family_id: id, p_expected_version: expectedVersion ?? null },
           key,
         )

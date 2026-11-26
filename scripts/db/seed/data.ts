@@ -195,6 +195,21 @@ export interface SeedPlan {
   /** Invented return watches on borrowed books. */
   watches: { id: string; bookId: string; parentId: string }[];
   /**
+   * Invented event checklists (U14, large set only): one list with one section, one task and one parent's claim, so the
+   * family the removal is timed on has a record of every kind. The small set has none.
+   */
+  eventChecklists: {
+    id: string;
+    eventId: string;
+    sectionId: string;
+    sectionTitle: string;
+    taskId: string;
+    taskTitle: string;
+    claimId: string;
+    parentId: string;
+    familyId: string;
+  }[];
+  /**
    * The recurring duties (U9): the starting list of the community and one family schedule. Their occurrences are made by
    * the writer from the due-date function of the database, so they follow the published water weeks.
    */
@@ -1156,6 +1171,65 @@ export function buildSeedPlan(
       });
     }
   }
+  // U14: the first family of the large set has a record of every kind the removal steps touch, because the removal is
+  // timed on it. Most come from the rules above; added here are a place its first parent signed up for (it brings a
+  // notice), a place with an open cancellation request and a claim on an event checklist.
+  const eventChecklists: SeedPlan["eventChecklists"] = [];
+  if (size === "large") {
+    for (const [key, title, source, status] of [
+      ["sign-up", "Teremrendezés", "parent_sign_up", "active"],
+      ["request", "Terítők mosása", "admin_assign", "cancellation_pending"],
+    ] as const) {
+      const taskId = id(`task:busiest:${key}`);
+      const startsAtHours = hours(key === "sign-up" ? 21 : 23, 15);
+      tasks.push({
+        id: taskId,
+        groupId: groups[0]!.id,
+        eventId: null,
+        title,
+        capacity: 2,
+        startsAtHours,
+        endsAtHours: startsAtHours + 2,
+        location: "Csoportszoba",
+      });
+      const assignment: SeedPlan["assignments"][number] = {
+        id: id(`assignment:busiest:${key}`),
+        taskId,
+        familyId: families[0]!.id,
+        parentId: source === "parent_sign_up" ? id("parent:1:1") : null,
+        source,
+        status,
+      };
+      assignments.push(assignment);
+      if (status === "cancellation_pending") {
+        changeRequests.push({
+          id: id("change-request:busiest"),
+          kind: "cancellation",
+          status: "open",
+          endedReason: null,
+          assignmentId: assignment.id,
+          targetAssignmentId: null,
+          sourceTaskId: taskId,
+          targetTaskId: null,
+          sourceFamilyId: assignment.familyId,
+          targetFamilyId: null,
+          reason: "Elutazunk",
+        });
+      }
+    }
+    eventChecklists.push({
+      id: id("checklist:busiest"),
+      eventId: events[1]!.id,
+      sectionId: id("checklist-section:busiest"),
+      sectionTitle: "Előkészületek",
+      taskId: id("checklist-task:busiest"),
+      taskTitle: "Asztalok elrendezése",
+      claimId: id("checklist-claim:busiest"),
+      parentId: id("parent:1:1"),
+      familyId: families[0]!.id,
+    });
+  }
+
   const notices: SeedPlan["notices"] = assignments
     .filter(
       (assignment) =>
@@ -1265,6 +1339,7 @@ export function buildSeedPlan(
     books,
     loans,
     watches,
+    eventChecklists,
     recurringSchedules,
     recurringSkippedByAccountId: accounts[0]!.id,
     todoTasks,

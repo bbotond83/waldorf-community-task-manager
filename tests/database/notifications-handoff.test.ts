@@ -17,6 +17,7 @@ import {
   TASK_2,
   uuid,
 } from "./directory-support.ts";
+import { count } from "./identity-support.ts";
 import { NOTIFICATION_SCHEMAS } from "./notifications-support.ts";
 import { ensureAccount, failureOf, openDatabase, sessionIdFor } from "./stack-support.ts";
 
@@ -512,11 +513,11 @@ for (const schema of NOTIFICATION_SCHEMAS) {
         version,
       ]);
       assert.equal(archived.state, "success");
-      assert.equal(
-        await total(),
-        before,
-        "the archived family's parents are archived and get no notice",
-      );
+      // U14: the removal run also removes the family's own notices (the notifications step). It writes no new one.
+      const familyNotices = `parent_id in (select id from parents where family_id = '${FAMILY_A}')`;
+      assert.equal(await count(db, "notifications", familyNotices), 0, "their notices are gone");
+      const kept = await total();
+      assert.ok(kept < before, "only the removed family's notices went");
       assert.deepEqual(await recipients(TASK_P), []);
       assert.equal(await liveJobs(TASK_P), 0);
       assert.equal(await liveJobs(TASK_Q), 2, "other families' jobs are untouched");
@@ -534,7 +535,7 @@ for (const schema of NOTIFICATION_SCHEMAS) {
         restoredVersion,
       ]);
       assert.equal(restored.state, "success");
-      assert.equal(await total(), before, "restoring creates no notice");
+      assert.equal(await total(), kept, "restoring creates no notice and brings none back");
       assert.equal(
         await liveJobs(TASK_P),
         0,

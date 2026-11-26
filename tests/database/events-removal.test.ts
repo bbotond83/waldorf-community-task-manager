@@ -90,11 +90,12 @@ for (const schema of DIRECTORY_SCHEMAS) {
         await count(
           db,
           "event_signups",
-          "note = 'jegyzet' and parent_id is null and family_id is null",
+          "note is null and parent_id is null and family_id is null",
         ),
         1,
+        "U14 NFR1.3: the removed person's own note is emptied",
       );
-      assert.equal(await count(db, "food_offers", "parent_id is null"), 1);
+      assert.equal(await count(db, "food_offers", "parent_id is null and text = '—'"), 1);
       assert.equal(
         await count(
           db,

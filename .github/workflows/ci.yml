@@ -31,7 +31,8 @@ jobs:
     name: Validate
     if: github.event_name != 'push' && !github.event.pull_request.draft
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    # The full run in three browsers has outgrown 90 minutes: GitHub cancelled one during the browser tests.
+    timeout-minutes: 120
     permissions:
       contents: read
     env:

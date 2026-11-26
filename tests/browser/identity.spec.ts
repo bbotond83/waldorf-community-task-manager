@@ -15,7 +15,12 @@ import {
   serviceKey,
   stackSettings,
 } from "../database/stack-support.ts";
-import { bindSeededSchema, expectSignedIn, openLinkSignedOut } from "./support/seeded-schema.ts";
+import {
+  bindSeededSchema,
+  expectSignedIn,
+  openLinkSignedOut,
+  retryNavigation,
+} from "./support/seeded-schema.ts";
 
 /**
  * The four identity screens and the sign-out control against the real local stack, with the automated
@@ -279,7 +284,7 @@ test("an expired access cookie with a live refresh cookie stays signed in: the p
   const encode = (value: unknown) => Buffer.from(JSON.stringify(value)).toString("base64url");
   const expired = `${encode({ alg: "none" })}.${encode({ sub: user.id, exp: Math.floor(Date.now() / 1000) - 120 })}.x`;
   await context.addCookies([{ ...before, value: expired }]);
-  await page.reload();
+  await retryNavigation(() => page.reload());
   await expectSignedIn(page);
   const after = (await context.cookies()).find((cookie) => cookie.name === "wb_access")!;
   expect(after.value).not.toBe(expired);

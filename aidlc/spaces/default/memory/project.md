@@ -37,6 +37,8 @@
 
 - ALWAYS extend tests/database/identity-catalogue.test.ts (elevated-function list, policy-test list, scope-probe decisions) and src/data/notification-use-cases.test.ts when a new database function or table is added, or they fail on the new objects. (learned 2026-11-17) <!-- cid:261108-ovis-tabla-workflow:code-generation:8c0c296623456e1e5d281cc17df14c664633d7c0a80001079d3d9e9b18a425be -->
 
+- ALWAYS check that every file listed in the test:* scripts exists after editing those lists, because node --test skips a mistyped path without failing. (learned 2026-11-26) <!-- cid:261108-ovis-tabla-workflow:code-generation:e00cf16766d90cce83db917f11f68f42fe9d77706a4732253529545548bb9218 -->
+
 ## Deployment
 
 <!-- Project-specific specialisation. -->
@@ -156,3 +158,4 @@ None. (affirmed 2026-10-06)
 - npm run verify:local needs the local settings loaded first: source .env.database.local and export APP_SESSION_SECRET, APP_PUBLIC_URL and SMTP_FROM, otherwise the build fails with an invalid APP_SESSION_SECRET error. (learned 2026-11-10) <!-- cid:261108-ovis-tabla-workflow:functional-design:b7c24f43b28a3d04c61ba3d31e5f45c81632cbe254e1cc1f2592e2c1a8b783c6 -->
 - Once the Saturday of a weekend has begun, rota changes leave that weekend's picks alone. (learned 2026-11-17) <!-- cid:261108-ovis-tabla-workflow:code-generation:3bb983b7c1fc209681443c9585b24316f108de224c69d356818d5f11ffd76c60 -->
 - NEVER add a row lock in a wrapper function just to check a family's standing, because it broke the timing of the existing lock tests; use a cheap guard that only checks when some family is not staying. (learned 2026-11-17) <!-- cid:261108-ovis-tabla-workflow:code-generation:2b2982ab0a4d97258a90c3103995e390bfeecfc732a8f3fbb9612a0355d4f3b0 -->
+- ALWAYS have a new database function that records something about the calling parent call platform_idempotency_check before it checks the caller, because that shared entry takes the family's standing lock so a removal and the removed person's own action take turns (swap_respond is the one exemption). (learned 2026-11-26) <!-- cid:261108-ovis-tabla-workflow:code-generation:0fe2b91d934f24bcc109e50202c1612ee71de66ee8d3739b345558f8064652da -->

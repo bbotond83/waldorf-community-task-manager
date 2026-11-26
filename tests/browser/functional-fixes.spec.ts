@@ -7,6 +7,7 @@ import {
   signUpForDecorating,
   withOtherPage,
 } from "./support/scenarios.ts";
+import { removeFamily } from "./support/removal.ts";
 import { SERIOUS, signInAs, bindSeededSchema } from "./support/seeded-schema.ts";
 
 const world = bindSeededSchema();
@@ -287,10 +288,7 @@ test.describe("admin: the way back", () => {
 
   test("an archived family has a back link to the archive", async ({ page }) => {
     await signInAs(page, world().account("super-admin"));
-    await page.goto(`/admin/nyilvantartasok/${world().id("family:5")}`);
-    await page.waitForLoadState("networkidle");
-    await page.getByTestId("admin-record-archive-form-submit-button").click();
-    await expect(page.getByTestId("admin-record-archive-form-state-success")).toBeVisible();
+    await removeFamily(page, world().id("family:5"));
     await page.goto(`/admin/archivum/${world().id("family:5")}`);
     await page.getByTestId("admin-back-link").click();
     await expect(page).toHaveURL(/\/admin\/archivum$/);

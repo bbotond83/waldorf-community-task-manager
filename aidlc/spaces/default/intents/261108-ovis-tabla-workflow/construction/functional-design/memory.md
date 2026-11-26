@@ -40,9 +40,13 @@
 
 - 2026-11-24T17:40:00Z [unit u12-todo-and-my-tasks] — Read the to-do task's "topic" (FR14.3) as its heading and kept no separate title; components.md lists topic and no title, though the mockup cards read "topic, title". Flagged in entities.md.
 - 2026-11-24T17:40:00Z [unit u12-todo-and-my-tasks] — Family-owned tasks are managed by super admins only; a family has no administrators of its own and AC14.1.3 says "an administrator names which family". Easy to widen in BR180.2.
+- 2026-11-25T18:04:26Z [unit u14-removal-and-anonymisation] — Read "appears in any record" (Q4) as "a record still points at the family or one of its parents after every removal step has run"; the steps clear most links at removal, so links that remain (places, rota weeks, picks, schedules, family-owned tasks, anonymised sign-ups) are exactly the history that needs the family row kept.
+- 2026-11-25T18:04:26Z [unit u14-removal-and-anonymisation] — Settled U10's open point: an anonymised sign-up's note and a food offer's note are emptied, because a note can hold a name. Settled U13's open point: a removed owner's books stay in the library with no owner, as U13's step already does; a super admin can give them a new owner or remove them.
 
 ## Deviations
 <!-- example: 2026-05-29T10:14:32Z — skipped the optional caching layer the stage prose suggested; the dataset is small enough that it adds risk -->
+- 2026-11-25T18:04:26Z [unit u14-removal-and-anonymisation] — U14 adds the duties removal step that contract C16 gave U2, because U2 never built it; and it keeps a place's done-by id instead of clearing it, because the done mark needs both the time and the person (a database check) and the name already reads "korábbi tag" through the name helper.
+- 2026-11-25T18:04:26Z [unit u14-removal-and-anonymisation] — U14 changes the shared name helpers (C6): an archived parent or family now reads as former at once, and a family reads "korábbi család" instead of "korábbi tag" (owner answer Q5). Tests that expect "korábbi tag" for a family change in the same pull request. Listed as a contract delta.
 - 2026-11-24T17:40:00Z [unit u12-todo-and-my-tasks] — Added a TodoEventLink record and an internal read checklist_task_done_state, because the owner chose (Q1) that a pulled task shows whether it is done on the event while neither side writes to the other; U11 is merged, so U12's migration adds the read in the Checklists block.
 - 2026-11-24T17:40:00Z [unit u12-todo-and-my-tasks] — todo_pull_to_event takes expected versions beside the ids (contract C15 listed none), so an outdated screen fails the pull and the to-do rows can be locked last, in the C1 order, after checklist_add_task.
 - 2026-11-21T16:41:47Z [unit u7-swaps-and-duty-changes] — U7 changes U6's rota_adjust_picks_after_change so a change with no new family empties the week with reason cancelled and returns its pick; the owner's Q3 answer frees a rota duty on an approved cancellation, and C11 only knew changes to another family. Listed as a C11 contract delta.
@@ -92,11 +96,14 @@
 - 2026-11-24T04:01:57Z [unit u8-animal-care-and-information] — Information sections keep no editor's name, only the time; who edited is not shown, and leaving the person out keeps contract C16 true that U8 needs no removal function.
 
 - 2026-11-24T17:40:00Z [unit u12-todo-and-my-tasks] — A task is never deleted and a removed person's open claim is released and flagged instead of kept; a kept claim would point at nobody, and the flag lets the administrator list in U14 find it.
+- 2026-11-25T18:04:26Z [unit u14-removal-and-anonymisation] — The removal commands keep today's names (family_archive, parent_remove) as their entry points and gain the Lifecycle body, instead of adding new commands beside them; today's screens and their tests keep calling the same command, at the cost of those functions' bodies changing a lot.
+- 2026-11-25T18:04:26Z [unit u14-removal-and-anonymisation] — The result screen's list of flagged items is read from each area's own flag (flagged duties, held loans, to-do attention, flagged schedules) filtered to the removed family, not stored by U14; a stored list would go stale once an administrator handles an item.
 
 ## Open questions
 
 - 2026-11-24T17:40:00Z [unit u12-todo-and-my-tasks] — A task with a future "not before" date cannot be claimed (BR182.1); not in the requirements, confirm at the gate. Also confirm that coordinators may not create family-owned tasks.
 - 2026-11-24T17:40:00Z [unit u12-todo-and-my-tasks] — Confirm in the Stitch design where the "Kezelés" link sits on the group page and how the menu entries Feladataim and Teendők sit beside today's "Családi feladatok".
+- 2026-11-25T18:04:26Z [unit u14-removal-and-anonymisation] — A parent removed on their own keeps their name on the archived parent row until the family itself is deleted or anonymised; it is shown nowhere but the super admin's record. Confirm with the kindergarten's privacy responsibilities before go-live whether that is long enough to keep it.
 
 - 2026-11-16T05:49:19Z — [unit u6-full-rotas-and-weekend-picks] Notices reach only parents with an account, so a super admin with no parent record gets no Friday-noon alert; confirm whether every administrator is also a parent before go-live.
 - 2026-11-10T08:05:00Z [unit u2-first-rota-slice] — The teacher's overview route is only proposed; confirm it in the Stitch design.

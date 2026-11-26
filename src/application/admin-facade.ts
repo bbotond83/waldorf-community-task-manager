@@ -5,6 +5,7 @@ import type {
   AdminListModel,
   ApplicationResult,
   ApprovalOutcome,
+  ArchiveOutcomeModel,
   DashboardModel,
   GrantOutcome,
   GrantListModel,
@@ -110,10 +111,11 @@ export class AdminApplicationFacade {
     return this.command(session, "record", "records.save", input);
   }
 
+  /** Archiving a family is its removal (U14): the answer then also says what the removal did. */
   archiveRecord(
     session: SessionContext,
     input: AdminCommandInput,
-  ): Promise<ApplicationResult<Readonly<{ completed: true }>>> {
+  ): Promise<ApplicationResult<ArchiveOutcomeModel>> {
     return this.command(session, "archive", "records.archive", input);
   }
 

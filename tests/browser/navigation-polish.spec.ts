@@ -7,6 +7,7 @@ import {
   signUpForDecorating,
   withOtherPage,
 } from "./support/scenarios.ts";
+import { removeFamily } from "./support/removal.ts";
 import { SERIOUS, signInAs, bindSeededSchema } from "./support/seeded-schema.ts";
 
 const world = bindSeededSchema();
@@ -174,10 +175,7 @@ test("admin list items open on a click anywhere on the item and show Hungarian s
   await withOtherPage(browser, testInfo.project.use.baseURL, (other) =>
     requestCancellation(other, world()),
   );
-  await page.goto(`/admin/nyilvantartasok/${world().id("family:5")}`);
-  await page.waitForLoadState("networkidle");
-  await page.getByTestId("admin-record-archive-form-submit-button").click();
-  await expect(page.getByTestId("admin-record-archive-form-state-success")).toBeVisible();
+  await removeFamily(page, world().id("family:5"));
   for (const basePath of [
     "/admin/jovahagyasok",
     "/admin/nyilvantartasok",

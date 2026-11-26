@@ -16,6 +16,7 @@ import {
 } from "./copy.ts";
 import type { DataGateway } from "./gateway.ts";
 import { payloadFlag, payloadNumber, payloadText, type Payload } from "./payload.ts";
+import { toRemovalSteps } from "./removal.ts";
 import { toItemsOutcome, toOutcome } from "./results.ts";
 import { asRows, flag, integer, isUuid, oneOf, optionalText, text, type Row } from "./values.ts";
 
@@ -195,6 +196,7 @@ export async function runLifecycle(
       familyId: id,
       state,
       auditEvidenceId: optionalText(result, "audit_event_id") ?? "",
+      steps: toRemovalSteps(result.steps),
     });
   });
 }
