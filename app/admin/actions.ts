@@ -2,8 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { normalizeRequiredText, validation } from "../../src/application/index.ts";
+import { REMOVAL_TEXTS } from "../../src/data/copy.ts";
 import { mapApplicationResult } from "./_lib/action-state.ts";
 import { parseRecordExtras, parseTaskExtras } from "./_lib/record-payload.ts";
+import { removalFailed, removalSucceeded } from "./_lib/removal.ts";
 import { resolveAdminFacade } from "./_lib/facade.ts";
 import { resolveAdminSession } from "./_lib/session.ts";
 
@@ -22,6 +24,8 @@ export type AdminActionState = Readonly<{
   fieldErrors?: Readonly<Record<string, string>>;
   retry?: Readonly<{ idempotencyKey: string; action: string }>;
   outcome?: string;
+  /** After a removal: the page that lists what is left to handle (U14). */
+  resultPath?: string;
 }>;
 
 export type AdminAction = (
@@ -235,18 +239,38 @@ async function runRecordStateAction(
     ...context.value,
     payload: {},
   };
-  const result =
-    operation === "archive"
-      ? await boundary.facade.archiveRecord(boundary.session.applicationSession, input)
-      : await boundary.facade.restoreRecord(boundary.session.applicationSession, input);
-  if (result.state === "success") {
-    revalidatePath("/admin/nyilvantartasok");
-    revalidatePath("/admin/archivum");
+  if (operation === "restore") {
+    const restored = await boundary.facade.restoreRecord(
+      boundary.session.applicationSession,
+      input,
+    );
+    if (restored.state === "success") revalidateRecordLists();
+    return mapApplicationResult(restored, "Az elem visszaállítva.");
   }
-  return mapApplicationResult(
-    result,
-    operation === "archive" ? "Az elem archiválva." : "Az elem visszaállítva.",
+  const result = await boundary.facade.archiveRecord(boundary.session.applicationSession, input);
+  if (result.state !== "success") {
+    // The form says which kind it archives, so only a family's failure is worded as a removal that did not happen.
+    return stringValue(formData, "kind") === "family"
+      ? removalFailed("family_archive", context.value.idempotencyKey, result)
+      : mapApplicationResult(result);
+  }
+  revalidateRecordLists();
+  const removal = result.data.removal;
+  if (!removal) return mapApplicationResult(result, "Az elem archiválva.");
+  // Archiving a family is its removal: the sign-in of every account it returned is ended (U14).
+  revalidatePath(`/admin/nyilvantartasok/${context.value.id}`);
+  revalidatePath("/admin/szulok");
+  return removalSucceeded(
+    REMOVAL_TEXTS.familyRemoved,
+    result.code,
+    removal,
+    `/admin/nyilvantartasok/${context.value.id}/eltavolitas/eredmeny`,
   );
+}
+
+function revalidateRecordLists(): void {
+  revalidatePath("/admin/nyilvantartasok");
+  revalidatePath("/admin/archivum");
 }
 
 function parseMutationContext(

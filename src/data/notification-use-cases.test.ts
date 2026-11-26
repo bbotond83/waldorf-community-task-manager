@@ -134,6 +134,20 @@ const U7_DECIDED_ITSELF = [
  */
 const U8_DECIDED_ITSELF = ["slot_give_up"];
 
+/**
+ * U14 (removal) runs the same eleven steps for a parent and for a family. This reading of the function bodies therefore
+ * finds the duties step behind parent_remove too, although that step does nothing for a parent: a place belongs to a
+ * family. So parent_remove changes no one's schedule and stays without a wrapper, as before;
+ * `tests/database/removal-duties.test.ts` proves that no place changes. The family removal stays on the hand-off list.
+ */
+const U14_DECIDED_ITSELF = ["parent_remove"];
+
+/**
+ * The later delete or anonymise of a family that left runs the same steps again (U14, BR206.2), so it now reaches the
+ * duties step too. It already has its own notification hook as `lifecycle.run` on the extra list.
+ */
+const U14_ON_THE_EXTRA_LIST = ["lifecycle_run"];
+
 test("the use cases U4 must connect to notifications are exactly the callable functions that change assignments", () => {
   const functions = definitions();
   assert.ok(functions.size > 80, "the migrations were read");
@@ -145,7 +159,9 @@ test("the use cases U4 must connect to notifications are exactly the callable fu
         !IMPORT_WITHOUT_NOTICES.includes(name) &&
         !ROTA_DECIDED_ITSELF.includes(name) &&
         !U7_DECIDED_ITSELF.includes(name) &&
-        !U8_DECIDED_ITSELF.includes(name),
+        !U8_DECIDED_ITSELF.includes(name) &&
+        !U14_DECIDED_ITSELF.includes(name) &&
+        !U14_ON_THE_EXTRA_LIST.includes(name),
     )
     .sort();
   const listed = NOTIFICATION_USE_CASES.map((name) => name.replaceAll(".", "_")).sort();
@@ -171,6 +187,8 @@ test("the internal helpers that change assignments are reached only through list
     ...ROTA_DECIDED_ITSELF,
     ...U7_DECIDED_ITSELF,
     ...U8_DECIDED_ITSELF,
+    ...U14_DECIDED_ITSELF,
+    ...U14_ON_THE_EXTRA_LIST,
   ]);
   for (const helper of internal) {
     const callers = [...functions.values()].filter(
@@ -459,6 +477,29 @@ test("the U7 functions are defined and tell the families through their own helpe
     "notification_after_decision",
   ]) {
     assert.equal(functions.has(retired), false, `${retired} is gone`);
+  }
+});
+
+test("the U14 duties step changes places only for a family, and parent removal has no wrapper", () => {
+  const functions = definitions();
+  for (const name of U14_DECIDED_ITSELF) {
+    assert.ok(functions.has(name), `${name} exists`);
+    assert.equal(functions.has(`${name}_core`), false, `${name} has no wrapper`);
+  }
+  assert.match(
+    functions.get("duties_removal_apply")!.body,
+    /if p_subject_kind is distinct from 'family' then\s+return/,
+  );
+  for (const name of U14_ON_THE_EXTRA_LIST) {
+    assert.ok(
+      NOTIFICATION_EXTRA_FUNCTIONS.some((entry) => entry.replaceAll(".", "_") === name),
+      `${name} is on the extra list`,
+    );
+    assert.match(functions.get(name)!.body, /notification_after_lifecycle\(/, name);
+  }
+  for (const read of ["removal_preview", "removal_flagged_items", "lifecycle_list"]) {
+    assert.ok(functions.has(read), `${read} exists`);
+    assert.equal(writers(functions).has(read), false, `${read} writes no assignment`);
   }
 });
 

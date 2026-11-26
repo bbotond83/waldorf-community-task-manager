@@ -1299,8 +1299,25 @@ export class DirectoryPortDouble implements DirectoryApplicationPort {
     return (
       this.removeAnswer ?? {
         state: "success",
-        data: { parentId: input.parentId, accountId: "account-removed" },
+        data: removedParent(input.parentId, ["account-removed"]),
       }
     );
   }
+}
+
+/** What a committed parent removal answers; the report's counts are not what these tests look at. */
+export function removedParent(
+  parentId: string,
+  endedAccountIds: readonly string[],
+): RemovedParentModel {
+  return {
+    parentId,
+    removal: {
+      subject: { kind: "parent", id: parentId },
+      steps: [],
+      endedAccountIds,
+      groupsLeftWithoutCoordinator: [],
+      auditEvidenceId: "audit-removal",
+    },
+  };
 }

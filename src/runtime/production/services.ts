@@ -6,6 +6,7 @@ import {
   EventApplicationFacade,
   LibraryApplicationFacade,
   RecurringApplicationFacade,
+  RemovalApplicationFacade,
   TodoApplicationFacade,
   AnimalCareApplicationFacade,
   InformationApplicationFacade,
@@ -24,6 +25,7 @@ import {
   createLibraryPort,
   createParentPort,
   createRecurringPort,
+  createRemovalPort,
   createTodoPort,
   createAnimalCarePort,
   createInformationPort,
@@ -66,6 +68,8 @@ export type RequestServices = Readonly<{
   animalCare: AnimalCareApplicationFacade;
   /** The information page and its editing (U8). */
   information: InformationApplicationFacade;
+  /** What a removal would do and what it left to handle (U14); the screens come after the owner's design approval. */
+  removal: RemovalApplicationFacade;
 }>;
 
 export interface ProductionServices {
@@ -99,6 +103,7 @@ export function createProductionServices(database: DatabaseClient): ProductionSe
         todo: new TodoApplicationFacade(pipeline, createTodoPort(asPerson)),
         animalCare: new AnimalCareApplicationFacade(pipeline, createAnimalCarePort(asPerson)),
         information: new InformationApplicationFacade(pipeline, createInformationPort(asPerson)),
+        removal: new RemovalApplicationFacade(pipeline, createRemovalPort(asPerson)),
       });
     },
   };

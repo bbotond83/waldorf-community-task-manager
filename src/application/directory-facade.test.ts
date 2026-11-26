@@ -8,12 +8,24 @@ import {
   FacadePipeline,
   InMemoryAuthorizationVersions,
   type DirectoryApplicationPort,
+  type RemovedParentModel,
   type SessionContext,
 } from "./index.ts";
 
 const organization: Scope = { id: "org-1", type: "organization", organizationId: "org-1" };
 const family: Scope = { id: "family-1", type: "family", organizationId: "org-1" };
 const KEY = "key-0001-abcdefgh";
+
+const removedParent = (parentId: string): RemovedParentModel => ({
+  parentId,
+  removal: {
+    subject: { kind: "parent", id: parentId },
+    steps: [],
+    endedAccountIds: ["account-1"],
+    groupsLeftWithoutCoordinator: [],
+    auditEvidenceId: "audit-1",
+  },
+});
 
 function session(role: Role, scope: Scope): SessionContext {
   return {
@@ -46,7 +58,7 @@ function setup(role: Role) {
     },
     removeParent: async ({ parentId }) => {
       calls.push("removeParent");
-      return { state: "success", data: { parentId, accountId: "account-1" } };
+      return { state: "success", data: removedParent(parentId) };
     },
   };
   const versions = new InMemoryAuthorizationVersions({ [`${role}-synthetic`]: 1 });
@@ -130,10 +142,7 @@ describe("the directory facade", () => {
       idempotencyKey: KEY,
     });
     assert.equal(result.state, "success");
-    assert.deepEqual(result.state === "success" && result.data, {
-      parentId: "parent-1",
-      accountId: "account-1",
-    });
+    assert.deepEqual(result.state === "success" && result.data, removedParent("parent-1"));
     for (const [role, scope] of [
       ["parent", family],
       ["kindergarten_teacher", organization],

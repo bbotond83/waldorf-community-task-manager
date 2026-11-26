@@ -680,7 +680,7 @@ for (const schema of DIRECTORY_SCHEMAS) {
       assert.equal(await familyName(FAMILY_1), "Fenyő család");
       await db.query("update families set anonymized_at = now() where id = $1", [FAMILY_1]);
       assert.equal(await parentName(PARENT_ROW_F1), "korábbi tag");
-      assert.equal(await familyName(FAMILY_1), "korábbi tag");
+      assert.equal(await familyName(FAMILY_1), "korábbi család"); // U14 BR204.1
       assert.equal(await parentName(MADE_UP), null);
       assert.equal(await familyName(MADE_UP), null);
     });

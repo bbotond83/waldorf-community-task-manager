@@ -281,6 +281,23 @@ export const ELEVATED: Record<
   working_groups_removal_preview: INTERNAL,
   working_groups_removal_apply: INTERNAL,
   notice_facts_working_group: INTERNAL,
+  // Ovis tábla U14 (removal). removal_preview and removal_flagged_items are the super admin's two reads: they count
+  // and collect across every area's tables. The duties step, the run of all steps, the refusal check, the stored
+  // result of a removal, the account and group lookups and the "still referenced" check are internal; the commands
+  // that use them were listed before.
+  removal_preview: "authenticated",
+  removal_flagged_items: "authenticated",
+  lifecycle_family_still_referenced: INTERNAL,
+  recurring_duties_family_referenced: INTERNAL,
+  recurring_duties_family_schedules: INTERNAL,
+  duties_removal_preview: INTERNAL,
+  duties_removal_apply: INTERNAL,
+  lifecycle_removal_apply: INTERNAL,
+  lifecycle_removal_refusal: INTERNAL,
+  lifecycle_store_result_details: INTERNAL,
+  lifecycle_stored_result_details: INTERNAL,
+  lifecycle_subject_accounts: INTERNAL,
+  working_groups_sole_coordinator_groups: INTERNAL,
   // Ovis tábla U2 (C3, C4, C5, C18, BR20 to BR27). The calendar, the draft, the adjusting, the publishing and the
   // reads are signed-in commands and lists that check their caller themselves; the school calendar helpers, the
   // shared duty and place functions, the rota guard and the two renamed cores are internal.

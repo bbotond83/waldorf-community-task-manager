@@ -1,3 +1,4 @@
+import type { FlaggedItemModel, RemovalBlock } from "../application/contracts.ts";
 import { STATUS_LABELS } from "../application/status-labels.ts";
 
 /**
@@ -74,6 +75,9 @@ export const DIRECTORY_REFUSAL_MESSAGES: Readonly<Record<string, string>> = Obje
   INVITATION_MAIL_NOT_SENT: "A meghívó elkészült, de a levelet most nem sikerült elküldeni.",
   INVITATION_BUSY: "Ehhez a szülőhöz már tartozik nyitott meghívó.",
   PARENT_LAST_IN_FAMILY: "Az utolsó szülő nem távolítható el a családból.",
+  // The refusals of a removal (U14, BR200.2).
+  SELF_REMOVAL: "Ezt egy másik főadminisztrátornak kell elvégeznie",
+  last_super_admin: "Az utolsó főadminisztrátor nem távolítható el.",
   PARENT_HAS_ACCOUNT: "Ennek a szülőnek már van fiókja, ezért a címét ott lehet módosítani.",
   PROFILE_FIELD_INVALID: "Az egyik megadott adat nem érvényes.",
   authorization_denied: "Ehhez nincs jogosultsága.",
@@ -81,6 +85,42 @@ export const DIRECTORY_REFUSAL_MESSAGES: Readonly<Record<string, string>> = Obje
 });
 
 export const DIRECTORY_REFUSAL_FALLBACK = "A művelet most nem hajtható végre.";
+
+/** What a person reads about a removal (U14): the report's fields, the flagged items and the two warnings. */
+export const REMOVAL_TEXTS = Object.freeze({
+  parentRemoved: "A szülő eltávolítva.",
+  familyRemoved: "A család eltávolítva.",
+  failed: "Az eltávolítás nem sikerült, semmi sem változott.",
+  signOutWarning:
+    "Egy kijelentkeztetés nem sikerült; a fiók a következő kérésnél úgyis le lesz tiltva.",
+  toClear: "Törlődik vagy megszűnik",
+  toFlag: "Intézendő marad",
+  groupsLeftWithoutCoordinator: "Koordinátor nélkül maradó csoportok",
+  flaggedItems: "Intézendő tételek",
+});
+
+export const REMOVAL_BLOCK_LABELS: Readonly<Record<RemovalBlock, string>> = Object.freeze({
+  rota_planning: "Tanévi beosztás",
+  dutychanges: "Cserék és lemondások",
+  duties: "Feladathelyek",
+  checklists: "Eseménylisták",
+  todo: "Teendők",
+  library: "Könyvtár",
+  events: "Események",
+  recurring_duties: "Ismétlődő feladatok",
+  notifications: "Értesítések",
+  working_groups: "Munkacsoportok",
+  directory: "Névjegyzék",
+});
+
+export const REMOVAL_FLAGGED_KIND_LABELS: Readonly<Record<FlaggedItemModel["kind"], string>> =
+  Object.freeze({
+    future_place: "Jövőbeli beosztás",
+    held_book: "Kint lévő könyv",
+    claimed_task: "Felszabadult vállalás",
+    family_task: "A család teendője",
+    family_schedule: "A család ismétlődő feladata",
+  });
 
 export type WorkingGroupAction = "join" | "leave" | "appoint" | "revoke";
 

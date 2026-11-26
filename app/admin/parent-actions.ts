@@ -3,12 +3,13 @@
 import { revalidatePath } from "next/cache";
 import { mapApplicationResult } from "./_lib/action-state.ts";
 import { resolveAdminFacade } from "./_lib/facade.ts";
+import { removalFailed, removalSucceeded } from "./_lib/removal.ts";
 import { resolveAdminSession } from "./_lib/session.ts";
 import type { AdminActionState } from "./actions.ts";
 import { productionRequest } from "../_identity/production-request.ts";
 import { currentSession } from "../_identity/current-session.ts";
 import { validation } from "../../src/application/index.ts";
-import { endRemovedParentSignIn } from "../../src/identity/accounts.ts";
+import { REMOVAL_TEXTS } from "../../src/data/copy.ts";
 import { sendParentInvitation } from "../../src/identity/account-changes.ts";
 import { accountChangeDeps, getIdentityRuntime } from "../../src/identity/runtime.ts";
 
@@ -27,10 +28,10 @@ const TEMPORARY: AdminActionState = {
 };
 
 /**
- * Removes a parent from the directory (W7). The database archives the parent, clears the details and ends the
- * sign-in on its side in one commit; only afterwards does the server ban the sign-in user and end its sessions.
- * That follow-up is tried three times and, if it still fails, reported on the screen and as an event line: the
- * removal itself stands, because the database already refuses the account.
+ * Removes a parent (W7; U14). The database archives the parent, clears the details, runs every removal step and ends
+ * the sign-in on its side in one commit; only afterwards does the server ban the sign-in users it returned and end
+ * their sessions. That follow-up is tried three times and, if it still fails, reported on the screen and as an event
+ * line: the removal itself stands, because the database already refuses the account.
  */
 export async function removeParentAction(
   _state: AdminActionState,
@@ -52,25 +53,18 @@ export async function removeParentAction(
     expectedVersion,
     idempotencyKey,
   });
-  if (result.state !== "success") return mapApplicationResult(result);
+  if (result.state !== "success") return removalFailed("parent_remove", idempotencyKey, result);
   revalidatePath("/admin/nyilvantartasok");
   if (UUID.test(familyId)) revalidatePath(`/admin/nyilvantartasok/${familyId}`);
   revalidatePath("/admin/szulok");
-  let followUp: "done" | "pending";
-  try {
-    const runtime = getIdentityRuntime();
-    followUp = await endRemovedParentSignIn(result.data.accountId, runtime);
-  } catch {
-    followUp = "pending";
-  }
-  return followUp === "done"
-    ? { state: "success", message: "A szülő eltávolítva.", code: result.code }
-    : {
-        state: "success",
-        message:
-          "A szülő eltávolítva, de a bejelentkezésének lezárása még nem fejeződött be. A rendszer újra megpróbálja; a fiók addig sem fér hozzá az adatokhoz.",
-        code: "SIGN_IN_FOLLOW_UP_PENDING",
-      };
+  return removalSucceeded(
+    REMOVAL_TEXTS.parentRemoved,
+    result.code,
+    result.data.removal,
+    UUID.test(familyId)
+      ? `/admin/nyilvantartasok/${familyId}/szulo/${parentId}/eltavolitas/eredmeny`
+      : undefined,
+  );
 }
 
 /**

@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
+import { removeFamily } from "./support/removal.ts";
 import { SERIOUS, signInAs, bindSeededSchema } from "./support/seeded-schema.ts";
 
 const world = bindSeededSchema();
@@ -217,7 +218,7 @@ test("a revoked group administrator right stops at the next request, on the page
   }
 });
 
-test("an archived family stops its parent and its group administrator at the next request", async ({
+test("a removed family's parent and group administrator are signed out at the next request", async ({
   page,
   browser,
 }) => {
@@ -234,17 +235,19 @@ test("an archived family stops its parent and its group administrator at the nex
     await expect(adminPage.getByTestId("admin-dashboard-page")).toBeVisible();
 
     await signInAs(page, world().account("super-admin"));
-    await page.goto(`/admin/nyilvantartasok/${world().id("family:1")}`);
-    await page.waitForLoadState("networkidle");
-    await page.getByTestId("admin-record-archive-form-submit-button").click();
-    await expect(page.getByTestId("admin-record-archive-form-state-success")).toBeVisible();
+    await removeFamily(page, world().id("family:1"));
 
+    // The removal ends every sign-in of the family (U14, BR201.1), so the next request asks for a sign-in.
+    const signInNeeded = (target: Page) =>
+      target.getByRole("heading", { name: "Bejelentkezés szükséges" });
     await parentPage.goto("/szulo/feladatok");
-    await expect(denied(parentPage)).toBeVisible();
+    await expect(signInNeeded(parentPage)).toBeVisible();
     await parentPage.goto("/szulo/munkacsoportok");
-    await expect(denied(parentPage)).toBeVisible();
+    await expect(parentPage.getByTestId("app-shell-navigation-admin-tasks")).toHaveCount(0);
+    await expect(parentPage.getByTestId("sign-out-button")).toHaveCount(0);
     await adminPage.goto("/admin");
-    await expect(denied(adminPage)).toBeVisible();
+    await expect(adminPage.getByTestId("admin-dashboard-page")).toHaveCount(0);
+    await expect(adminPage.getByTestId("sign-out-button")).toHaveCount(0);
     await expect(adminPage.getByTestId("app-shell-navigation-admin-tasks")).toHaveCount(0);
   } finally {
     await context.close();

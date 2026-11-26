@@ -145,7 +145,11 @@ describe("honest executable denominator", () => {
     // pages (parent list, task and My tasks: 3; teacher list and task: 2; admin list, task, new and change: 4; the
     // management page with its two form pages in the parent and admin areas: 6; the pull list in both areas: 2):
     // 357 + 25.
-    expect(inventory.length).toBe(383);
+    // U14 adds the removal facade (src/application/removal-facade.ts), its data adapter (src/data/removal.ts) and what
+    // the two removal actions share (app/admin/_lib/removal.ts): 383 + 3. The screens add seven: the preview, the form
+    // and the result (app/admin/_components: 3), their reads (app/admin/_lib/removal-reads.ts) and three pages (the
+    // family's confirmation and the two result pages): 386 + 7.
+    expect(inventory.length).toBe(393);
     for (const path of [
       "src/runtime/AppNav.tsx",
       "src/runtime/StatusBadge.tsx",

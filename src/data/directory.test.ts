@@ -199,18 +199,36 @@ test("the admin changes send the database's field names and return the new versi
   assert.deepEqual(fake.rpcCalls[2]!.args.p_fields, { email: "uj@example.test" });
 });
 
-test("removing a parent returns the account whose sign-in the server must end", async () => {
-  const withAccount = await port({
-    rpc: () => envelope("success", null, { account_id: id(99) }, id(10)),
-  }).port.removeParent({ idempotencyKey: "r", parentId: id(10), expectedVersion: 2 });
-  assert.deepEqual(withAccount, {
-    state: "success",
-    data: { parentId: id(10), accountId: id(99) },
-  });
-  const without = await port({
-    rpc: () => envelope("success", null, { account_id: null }, id(10)),
-  }).port.removeParent({ idempotencyKey: "r", parentId: id(10), expectedVersion: 2 });
-  assert.deepEqual(without, { state: "success", data: { parentId: id(10), accountId: null } });
+test("removing a parent returns the report with the accounts whose sign-in the server must end", async () => {
+  for (const accounts of [[id(99)], []]) {
+    const outcome = await port({
+      rpc: () =>
+        envelope(
+          "success",
+          null,
+          {
+            steps: [],
+            ended_account_ids: accounts,
+            groups_left_without_coordinator: [],
+            audit_event_id: id(70),
+          },
+          id(10),
+        ),
+    }).port.removeParent({ idempotencyKey: "r", parentId: id(10), expectedVersion: 2 });
+    assert.deepEqual(outcome, {
+      state: "success",
+      data: {
+        parentId: id(10),
+        removal: {
+          subject: { kind: "parent", id: id(10) },
+          steps: [],
+          endedAccountIds: accounts,
+          groupsLeftWithoutCoordinator: [],
+          auditEvidenceId: id(70),
+        },
+      },
+    });
+  }
   const last = await port({
     rpc: () => envelope("conflict", "PARENT_LAST_IN_FAMILY"),
   }).port.removeParent({

@@ -3,6 +3,8 @@
 
 ## Interpretations
 <!-- example: 2026-05-29T10:14:32Z — chose REST over GraphQL; the consuming team only needs CRUD, revisit if subscriptions land -->
+- 2026-11-25T19:08:20Z [unit u14-removal-and-anonymisation] — Carried the design review's two Major findings into this stage as requirements (read the account ids before the steps run, so sessions really end; lock task rows then place rows right after the family row) and its Minor findings on the last super admin and the DUTY_ROTA_MANAGED test; the reviewed design files are frozen, and the gate shows both the finding and where it is now required.
+- 2026-11-25T19:08:20Z [unit u14-removal-and-anonymisation] — The owner's Q2 (replace a single removed parent's name at once) changes BR207.1's assumption and the design's open point; it is a stricter privacy rule on the same records, recorded here as NFR1.4 rather than by editing the frozen rules file.
 - 2026-11-09T07:30:54Z [unit u1-community-foundation] — Asked no questions because requirements.md and the approved contracts already fix the targets; the 2-second list target is measured on the 30-family seed, which exceeds the required 20.
 
 - 2026-11-10T07:56:00Z [unit u2-first-rota-slice] — Asked no questions because requirements.md, the contracts and the approved functional design already fix the targets; the 5-second target for making and publishing a full-year draft is mine, since requirements.md only sets the 2-second list target.

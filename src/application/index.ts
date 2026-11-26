@@ -54,5 +54,7 @@ export { AnimalCareApplicationFacade } from "./animal-care-facade.ts";
 export type { AnimalCareApplicationPort, AnimalCalendarInput } from "./animal-care-facade.ts";
 export { InformationApplicationFacade } from "./information-facade.ts";
 export type { InformationApplicationPort, InfoSectionInput } from "./information-facade.ts";
+export { RemovalApplicationFacade } from "./removal-facade.ts";
+export type { RemovalApplicationPort } from "./removal-facade.ts";
 export { DirectoryApplicationFacade } from "./directory-facade.ts";
 export type { DirectoryApplicationPort } from "./directory-facade.ts";

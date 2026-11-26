@@ -4904,3 +4904,120 @@ nav a:hover {
   display: grid;
   gap: 0.15rem;
 }
+
+/*
+ * Removal (U14): the counts table, which becomes one card per area on a phone so nothing scrolls sideways, and the
+ * lists of what a removal left to handle.
+ */
+.admin-removal-start {
+  justify-self: start;
+}
+
+.admin-removal-table-wrapper {
+  margin-block: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--color-surface);
+  box-shadow: var(--shadow);
+}
+
+.admin-removal-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-removal-table th,
+.admin-removal-table td {
+  border-top: 1px solid var(--color-border);
+  padding: 0.65rem 1rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.admin-removal-table thead th {
+  border-top: 0;
+  color: var(--color-muted);
+  background: var(--color-info-bg);
+  font-size: var(--text-eyebrow);
+  font-weight: 700;
+}
+
+.admin-removal-table tbody tr:last-child > * {
+  font-weight: 700;
+}
+
+.admin-removal-cards {
+  display: none;
+  gap: 0.75rem;
+  margin-block: 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.admin-removal-cards li {
+  display: grid;
+  gap: 0.35rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 0.75rem 1rem;
+  background: var(--color-surface);
+}
+
+.admin-removal-cards dl {
+  display: grid;
+  gap: 0.25rem;
+  margin: 0;
+}
+
+.admin-removal-cards dl > div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+}
+
+.admin-removal-cards dt {
+  color: var(--color-muted);
+}
+
+.admin-removal-cards dd {
+  margin: 0;
+  font-weight: 700;
+}
+
+.admin-removal-items {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0;
+  list-style: none;
+}
+
+.admin-removal-items li {
+  display: grid;
+  justify-items: start;
+  gap: 0.15rem;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 0.75rem;
+}
+
+.admin-removal-items .eyebrow {
+  margin: 0;
+}
+
+.admin-removal-item-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 44rem) {
+  .admin-removal-table-wrapper {
+    display: none;
+  }
+
+  .admin-removal-cards {
+    display: grid;
+  }
+}

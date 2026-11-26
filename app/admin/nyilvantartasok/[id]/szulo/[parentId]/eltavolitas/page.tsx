@@ -1,15 +1,23 @@
 import { randomUUID } from "node:crypto";
 import Link from "next/link";
 import { terminalFailure } from "../../../../../../../src/application/results.ts";
-import { AdminMutationForm } from "../../../../../_components/AdminMutationForm.tsx";
+import { DIRECTORY_REFUSAL_MESSAGES } from "../../../../../../../src/data/copy.ts";
 import { AsyncStatePanel } from "../../../../../_components/AsyncStatePanel.tsx";
+import { RemovalForm } from "../../../../../_components/RemovalForm.tsx";
+import {
+  RemovalConsequences,
+  RemovalCounts,
+  RemovalGroupsWarning,
+} from "../../../../../_components/RemovalPreview.tsx";
 import { resolveAdminFacade } from "../../../../../_lib/facade.ts";
+import { readRemovalPreview } from "../../../../../_lib/removal-reads.ts";
 import { resolveAdminSession } from "../../../../../_lib/session.ts";
 import { removeParentAction } from "../../../../../parent-actions.ts";
 
 /**
- * The confirmation before a parent is removed (US3.6, W7). It names the parent and says what happens; the only parent
- * of a family gets the refusal and the way to the family instead of a button.
+ * The confirmation before a parent is removed (US3.6, W7; U14 W1 and W6). It names the parent, says what happens and
+ * how many records it touches; the only parent of a family gets the refusal and the way to remove the family instead
+ * of a button.
  */
 export default async function RemoveParentPage({
   params,
@@ -23,6 +31,7 @@ export default async function RemoveParentPage({
     session.state === "success" && facade
       ? await facade.getRecord(session.data.applicationSession, session.data.scope, "record", id)
       : terminalFailure();
+  const preview = await readRemovalPreview({ kind: "parent", id: parentId });
   return (
     <section className="admin-page" data-testid="admin-parent-remove-page">
       <header>
@@ -57,43 +66,60 @@ export default async function RemoveParentPage({
                 <h2>{parent.displayName} a család egyetlen szülője</h2>
                 <p>
                   Az utolsó szülő nem távolítható el. Ha az egész családot el szeretnéd távolítani,
-                  archiváld a családot a családi adatlapon.
+                  távolítsd el a családot.
                 </p>
+                <Link className="admin-back-link" href={`/admin/nyilvantartasok/${id}/eltavolitas`}>
+                  Család eltávolítása
+                </Link>
               </section>
             );
           }
           return (
-            <div className="admin-detail-grid">
-              <section data-testid="admin-parent-remove-summary">
-                <h2>{parent.displayName} eltávolítása</h2>
-                <p>Az eltávolítás után:</p>
-                <ul>
-                  <li>a szülő bejelentkezése megszűnik, és minden munkamenete véget ér;</li>
-                  <li>a telefonszáma, az e-mail-címe és a megosztott adatai törlődnek;</li>
-                  <li>a nyitott meghívója érvénytelenné válik;</li>
-                  <li>
-                    a szülő eltűnik a névsorból, a korábbi bejegyzéseknél „korábbi tag” néven
-                    szerepel.
-                  </li>
-                </ul>
-              </section>
-              <AdminMutationForm
-                action={removeParentAction}
-                submitLabel="Szülő eltávolítása"
-                testId="admin-parent-remove-form"
-                successLink={{ href: `/admin/nyilvantartasok/${id}`, label: "Vissza a családhoz" }}
-                longForm
-              >
-                <input type="hidden" name="parentId" value={parent.id} />
-                <input type="hidden" name="familyId" value={id} />
-                <input type="hidden" name="expectedVersion" value={parent.version} />
-                <input
-                  type="hidden"
-                  name="idempotencyKey"
-                  value={`remove:${parent.id.slice(0, 8)}:${randomUUID()}`}
-                />
-              </AdminMutationForm>
-            </div>
+            <AsyncStatePanel
+              result={preview}
+              testId="admin-parent-remove-preview"
+              emptyMessage="A szülő nem található."
+            >
+              {(data) => (
+                <div className="admin-detail-grid">
+                  <section data-testid="admin-parent-remove-summary">
+                    <h2>{parent.displayName} eltávolítása</h2>
+                    {data.refusal ? (
+                      <p
+                        className="admin-action-state admin-action-state-conflict"
+                        role="alert"
+                        data-testid="admin-parent-remove-refusal"
+                      >
+                        {DIRECTORY_REFUSAL_MESSAGES[data.refusal]}
+                      </p>
+                    ) : (
+                      <>
+                        <RemovalConsequences kind="parent" />
+                        <RemovalCounts preview={data} />
+                        <RemovalGroupsWarning groups={data.groupsLeftWithoutCoordinator} />
+                      </>
+                    )}
+                  </section>
+                  {!data.refusal && (
+                    <RemovalForm
+                      action={removeParentAction}
+                      submitLabel="Szülő eltávolítása"
+                      testId="admin-parent-remove-form"
+                      cancelHref={`/admin/nyilvantartasok/${id}`}
+                    >
+                      <input type="hidden" name="parentId" value={parent.id} />
+                      <input type="hidden" name="familyId" value={id} />
+                      <input type="hidden" name="expectedVersion" value={data.version} />
+                      <input
+                        type="hidden"
+                        name="idempotencyKey"
+                        value={`remove:${parent.id.slice(0, 8)}:${randomUUID()}`}
+                      />
+                    </RemovalForm>
+                  )}
+                </div>
+              )}
+            </AsyncStatePanel>
           );
         }}
       </AsyncStatePanel>

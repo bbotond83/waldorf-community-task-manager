@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import Link from "next/link";
 import { AdminBackLink } from "../../_components/AdminBackLink.tsx";
 import { AdminMutationForm, AdminTextField } from "../../_components/AdminMutationForm.tsx";
 import { AsyncStatePanel } from "../../_components/AsyncStatePanel.tsx";
@@ -90,19 +91,32 @@ export default async function RecordDetailPage({
                 </>
               )}
             </AdminMutationForm>
-            <AdminMutationForm
-              action={archiveRecordAction}
-              submitLabel="Archiválás"
-              testId="admin-record-archive-form"
-            >
-              <input type="hidden" name="id" value={record.id} />
-              <input type="hidden" name="expectedVersion" value={record.version ?? 1} />
-              <input
-                type="hidden"
-                name="idempotencyKey"
-                value={`record:archive:${record.id}:${randomUUID()}`}
-              />
-            </AdminMutationForm>
+            {record.kind === "family" ? (
+              // Archiving a family is its removal, so it goes through the confirmation page (U14).
+              record.state !== "archived" && (
+                <Link
+                  className="button-link button-link-secondary admin-removal-start"
+                  href={`/admin/nyilvantartasok/${record.id}/eltavolitas`}
+                  data-testid="admin-family-remove-link"
+                >
+                  Család eltávolítása
+                </Link>
+              )
+            ) : (
+              <AdminMutationForm
+                action={archiveRecordAction}
+                submitLabel="Archiválás"
+                testId="admin-record-archive-form"
+              >
+                <input type="hidden" name="id" value={record.id} />
+                <input type="hidden" name="expectedVersion" value={record.version ?? 1} />
+                <input
+                  type="hidden"
+                  name="idempotencyKey"
+                  value={`record:archive:${record.id}:${randomUUID()}`}
+                />
+              </AdminMutationForm>
+            )}
             <DeveloperDetails>
               <p>Verzió: {record.version}</p>
             </DeveloperDetails>

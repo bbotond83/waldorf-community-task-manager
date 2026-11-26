@@ -6,6 +6,8 @@ import {
   EventApplicationFacade,
   LibraryApplicationFacade,
   RecurringApplicationFacade,
+  RemovalApplicationFacade,
+  type RemovalApplicationPort,
   TodoApplicationFacade,
   AnimalCareApplicationFacade,
   InformationApplicationFacade,
@@ -228,6 +230,14 @@ const INFORMATION_PORT_DOUBLE: InformationApplicationPort = {
   setHidden: deniedOutcome,
 };
 
+/** A removal port with nothing set up: both reads are refused until a test replaces one. */
+const newRemovalPort = (): {
+  -readonly [K in keyof RemovalApplicationPort]: RemovalApplicationPort[K];
+} => ({
+  preview: deniedOutcome,
+  flaggedItems: deniedOutcome,
+});
+
 /** A rota port with nothing published: the overview is empty, everything else is refused. */
 const ROTA_PORT_DOUBLE: RotaApplicationPort = {
   calendar: deniedOutcome,
@@ -359,6 +369,7 @@ export function createRequestWorld() {
   let adminPort = newAdminPort();
   let directoryPort = new DirectoryPortDouble();
   let workingGroupPort = new WorkingGroupPortDouble();
+  let removalPort = newRemovalPort();
 
   function newAdminPort(): AdminPortDouble {
     return new AdminPortDouble({
@@ -428,6 +439,7 @@ export function createRequestWorld() {
       todo: new TodoApplicationFacade(pipeline, TODO_PORT_DOUBLE),
       animalCare: new AnimalCareApplicationFacade(pipeline, ANIMAL_PORT_DOUBLE),
       information: new InformationApplicationFacade(pipeline, INFORMATION_PORT_DOUBLE),
+      removal: new RemovalApplicationFacade(pipeline, removalPort),
     });
   }
 
@@ -457,6 +469,7 @@ export function createRequestWorld() {
         teacher: teacherSource,
         directory: directoryPort,
         workingGroups: workingGroupPort,
+        removal: removalPort,
       };
     },
     /** The state of a fresh test: everyone active, nobody signed in, all fixture data as first delivered. */
@@ -471,6 +484,7 @@ export function createRequestWorld() {
       adminPort = newAdminPort();
       directoryPort = new DirectoryPortDouble();
       workingGroupPort = new WorkingGroupPortDouble();
+      removalPort = newRemovalPort();
     },
     /** What `productionRequest()` answers. */
     async productionRequest(): Promise<ProductionRequestDouble> {

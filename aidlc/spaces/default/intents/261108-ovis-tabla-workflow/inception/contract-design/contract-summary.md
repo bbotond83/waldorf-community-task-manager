@@ -147,11 +147,12 @@ shared-schema: display-name
 kind: internal
 functions:
   parent_display_name(parent_id): returns the full name, or "korábbi tag" when the parent is removed
-  family_display_name(family_id): returns the family name, or "korábbi tag" when the family is anonymised
+  family_display_name(family_id): returns the family name, or "korábbi család" when the family is removed or anonymised
 rules:
   - Returns names only; contact details come only from U3's directory reads (ADR-008)
   - Never returns a child's name (FR5.6)
   - U14 sets the status these functions read
+  - From the removal on, parent_display_name answers "korábbi tag" when the parent is removed or their family is removed or anonymised (U14, BR204.1)
 ```
 
 ### C7 Membership and coordinators
@@ -321,7 +322,7 @@ each_provider:
   rule: a block returns zero counts for a subject kind it does not hold
 providers:
   U1: ends a removed parent's sign-in and clears the account link
-  U2: clears Place doneBy; flags or frees a family's future places
+  U14: the duties step in U2's place (U2 did not build it); frees a removed family's future manual places and keeps and flags its rota-week, weekend-slot and animal-slot places; done marks keep their person
   U3: directory record, profile and sharing choice
   U4: memberships and coordinator role
   U5: notices and reminder recipients
@@ -335,7 +336,7 @@ providers:
 needs_no_function:
   U8: SlotCalendar holds no person; slots are places, covered by U2
   U15: holds no records
-display_after: "korábbi tag", through C6
+display_after: "korábbi tag" for a parent and "korábbi család" for a family, through C6
 audit: every apply is recorded; the audit log's actor id is never rewritten
 order:
   - Preview first, then apply, in one transaction
@@ -517,3 +518,14 @@ used_by:
 - C16: `todo_removal_preview` and `todo_removal_apply(subject_kind, subject_id)` return `{to_clear, to_flag}` and are granted to no role. A removed parent loses the done mark and the history names; a claim they hold on a task that is not done is released, the task is flagged, an in-progress status goes back to open and a `claimant_removed` history row (actor system) is written. A removed family's open tasks are flagged through the internal `todo_task_set_attention(task_ids, flag)`. Preview and apply return the same counts; a subject that holds nothing returns zeros.
 - C17: `migration_load_todo(source_key, organization_id, todo)` is granted to the service role only. A source key that exists returns the stored task, so a second run adds nothing. A done row is stored done with the sheet's date and nobody on the mark. A bad row is refused with the field name only. One `migrated` history row (actor system) and one audit row are written per created task.
 - Commands: `todo_task_save`, `todo_task_claim`, `todo_task_give_back`, `todo_task_free_claim`, `todo_task_update`, `todo_task_mark_done`, `todo_task_undo_done` and `todo_pull_to_event`, each taking the idempotency key first and a version where it changes one task, ending through the usual envelope with `revoke all` and an explicit `grant execute`. New refusal codes: `TODO_CLAIMED`, `TODO_DONE`, `TODO_NOT_DONE`, `TODO_NOT_CLAIMED`, `TODO_NOT_YET`, `EVENT_CLOSED`, `VERSION_CONFLICT`, `status_not_allowed`, `too_many_tasks` and `no_parent_record` (a super admin with no parent record cannot mark done).
+
+## Deltas from U14 (removal and anonymisation)
+
+- C6: `family_display_name` answers `korábbi család` for a removed or anonymised family (it was written as `korábbi tag`), and `parent_display_name` answers `korábbi tag` for a removed parent and for every parent of a removed or anonymised family. Only the super admin's family record, archive and data-lifecycle screens read the stored name. A parent removed on their own has the stored name replaced with `Anonimizált szülő` in the removal's transaction. `schedule_get` now takes family names from the helper.
+- C16, steps: the eleven blocks run in the order `rota_planning`, `dutychanges`, `duties`, `checklists`, `todo`, `library`, `events`, `recurring_duties`, `notifications`, `working_groups`, `directory`. The notifications step runs before working groups and directory. `duties_removal_preview` and `duties_removal_apply` are new and take U2's place. The events, checklists, recurring-duties and swap steps also empty the subject's own texts (a required text becomes "—"). No step function is granted to a signed-in role.
+- C16, commands: `parent_remove` and `family_archive` run every step in one transaction after the family row is locked and write one audit row (`lifecycle.parent_removed`, `lifecycle.family_removed`) holding counts only. Their result adds `ended_account_ids`, `steps`, `groups_left_without_coordinator` and `audit_event_id`, and a replayed key returns the same stored result (`idempotency_records.result_details`). New refusal: `SELF_REMOVAL`; `last_super_admin` and `PARENT_LAST_IN_FAMILY` stay; the `DUTY_ROTA_MANAGED` refusal of family archiving is gone.
+- C16, reads: `removal_preview(subject_kind, subject_id)` returns `subject`, `version`, `steps`, `totals`, `groups_left_without_coordinator` and `refusal` (the command's refusal, as a field of a successful read); it writes nothing and takes no lock. `removal_flagged_items(subject_kind, subject_id)` returns `items` of `{kind, item_id, label, on_date, link}` with the kinds `future_place`, `held_book`, `claimed_task`, `family_task` and `family_schedule`; no person's name. Both are super admin only.
+- C16 and every command, standing lock: one advisory lock per family, taken before any row lock. `platform_idempotency_check` takes it shared for a calling parent's family (every operation except `swap.respond`, which is serialised by its duty and place locks); `parent_remove`, `family_archive` and `lifecycle_run` take the subject's family exclusive. A command must ask who the caller is only after the idempotency check, so that one that waited for a removal refuses it. An administrator's command that names another parent or family is only serialised if it locks that row itself; `duty_reassign`, `library_book_add`, `library_book_change`, `event_role_save` and `checklist_add_task` do not yet.
+- C16, later run: `lifecycle_run` runs the steps again, then anonymises when `lifecycle_family_still_referenced` is true and deletes otherwise; leaving and new standings go in both cases; `lifecycle_list` uses the same check.
+- C16, restore: `family_restore` also restores the family's directory record with empty contact details and no sharing. A sign-in account that was ended keeps its e-mail address, so a restored parent who had an account cannot be given that address again.
+- Open question C16 on a family's only parent or a group's only coordinator: a family's only parent is not removed alone (`PARENT_LAST_IN_FAMILY`); removing a group's only coordinator goes ahead and the group is named before and after.
