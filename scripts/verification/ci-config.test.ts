@@ -200,12 +200,12 @@ describe("CI workflow configuration (BR10.2, FR10.3)", () => {
     assert.equal(/runtimeMode|fixtureVersion/.test(workflow), false);
   });
 
-  it("gives the validate job 90 minutes and the stack's address and public key for build, smoke and browser (U5)", () => {
+  it("gives the validate job 120 minutes and the stack's address and public key for build, smoke and browser (U5)", () => {
     const validate = workflow.slice(
       workflow.indexOf("  validate:"),
       workflow.indexOf("  build_evidence:"),
     );
-    assert.match(validate, /timeout-minutes: 90/);
+    assert.match(validate, /timeout-minutes: 120/);
     assert.equal(/timeout-minutes: 45/.test(workflow), false);
     assert.match(validate, /echo "SUPABASE_URL=\$url" >> "\$GITHUB_ENV"/);
     assert.match(validate, /echo "SUPABASE_ANON_KEY=\$anon" >> "\$GITHUB_ENV"/);
